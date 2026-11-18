@@ -5,6 +5,7 @@ import { env } from './config/env.js';
 import { initSocketServer } from './socket/index.js';
 import { healthRouter } from './routes/healthRoutes.js';
 import { roomRouter } from './routes/roomRoutes.js';
+import { socialRouter } from './routes/socialRoutes.js';
 import { redisClient, pubClient, subClient } from './config/redis.js';
 import { prisma } from './config/prisma.js';
 
@@ -24,6 +25,7 @@ app.use(express.json());
 
 // API Routes
 app.use('/api', healthRouter);
+app.use('/api', socialRouter);
 app.use('/api/rooms', roomRouter);
 
 // Root Welcome Route

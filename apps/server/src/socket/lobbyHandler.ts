@@ -3,6 +3,7 @@ import { RoomManager } from '../services/roomManager.js';
 import { TokenService } from '../services/tokenService.js';
 import { rateLimitEvent } from './middleware.js';
 import { GameRegistry } from '../games/index.js';
+import { Sanitizer } from '../utils/sanitizer.js';
 import { nanoid } from 'nanoid';
 import {
   ClientToServerEvents,
@@ -25,6 +26,8 @@ type TypedServer = Server<
   SocketData
 >;
 
+const reactionThrottle = new Map<string, number>();
+
 export const registerLobbyHandlers = (io: TypedServer, socket: any) => {
   /**
    * CREATE ROOM
@@ -38,10 +41,11 @@ export const registerLobbyHandlers = (io: TypedServer, socket: any) => {
         });
       }
 
-      if (!dto.username || dto.username.trim().length < 2) {
+      dto.username = Sanitizer.sanitizeUsername(dto.username);
+      if (!dto.username || dto.username.length < 2) {
         return callback({
           success: false,
-          error: { code: 'INVALID_USERNAME', message: 'Username must be at least 2 characters.' }
+          error: { code: 'INVALID_USERNAME', message: 'Username must be at least 2 alphanumeric characters.' }
         });
       }
 
@@ -105,6 +109,14 @@ export const registerLobbyHandlers = (io: TypedServer, socket: any) => {
         return callback({
           success: false,
           error: { code: 'RATE_LIMITED', message: 'Too many requests. Please slow down.' }
+        });
+      }
+
+      dto.username = Sanitizer.sanitizeUsername(dto.username);
+      if (!dto.username || dto.username.length < 2) {
+        return callback({
+          success: false,
+          error: { code: 'INVALID_USERNAME', message: 'Username must be at least 2 alphanumeric characters.' }
         });
       }
 
@@ -459,9 +471,10 @@ export const registerLobbyHandlers = (io: TypedServer, socket: any) => {
       const room = await RoomManager.getRoom(roomCode);
       if (!room) return callback?.({ success: false, error: { code: 'NO_ROOM', message: 'Room not found' } });
 
+      const clue = Sanitizer.sanitizeClue(data.clue);
       const engine = GameRegistry.get(room.config.gameMode);
       if (engine) {
-        const res = await engine.handlePlayerAction(room, playerId, 'submit_clue', data, io);
+        const res = await engine.handlePlayerAction(room, playerId, 'submit_clue', { clue }, io);
         callback?.({ success: true, data: res });
       }
     } catch (err: any) {
@@ -575,6 +588,98 @@ export const registerLobbyHandlers = (io: TypedServer, socket: any) => {
   });
 
   // ==========================================
+  // GAME D: WORD BATTLE EVENT ROUTERS
+  // ==========================================
+
+  socket.on('word_battle:submit_word', async (data: { word: string }, callback?: (res: any) => void) => {
+    try {
+      const { roomCode, playerId } = socket.data;
+      const room = await RoomManager.getRoom(roomCode);
+      if (!room) return callback?.({ success: false, error: { code: 'NO_ROOM', message: 'Room not found' } });
+
+      const engine = GameRegistry.get(room.config.gameMode);
+      if (engine) {
+        const res = await engine.handlePlayerAction(room, playerId, 'submit_word', data, io);
+        callback?.({ success: true, data: res });
+      }
+    } catch (err: any) {
+      callback?.({ success: false, error: { code: 'WORD_SUBMIT_FAILED', message: err.message } });
+    }
+  });
+
+  // ==========================================
+  // GAME E: TRUTH OR DARE EVENT ROUTERS
+  // ==========================================
+
+  socket.on('tod:choose_type', async (data: { choice: 'truth' | 'dare' }, callback?: (res: any) => void) => {
+    try {
+      const { roomCode, playerId } = socket.data;
+      const room = await RoomManager.getRoom(roomCode);
+      if (!room) return callback?.({ success: false, error: { code: 'NO_ROOM', message: 'Room not found' } });
+
+      const engine = GameRegistry.get(room.config.gameMode);
+      if (engine) {
+        const res = await engine.handlePlayerAction(room, playerId, 'choose_type', data, io);
+        callback?.({ success: true, data: res });
+      }
+    } catch (err: any) {
+      callback?.({ success: false, error: { code: 'TOD_CHOICE_FAILED', message: err.message } });
+    }
+  });
+
+  socket.on('tod:complete_action', async (callback?: (res: any) => void) => {
+    try {
+      const { roomCode, playerId } = socket.data;
+      const room = await RoomManager.getRoom(roomCode);
+      if (!room) return callback?.({ success: false, error: { code: 'NO_ROOM', message: 'Room not found' } });
+
+      const engine = GameRegistry.get(room.config.gameMode);
+      if (engine) {
+        const res = await engine.handlePlayerAction(room, playerId, 'complete_action', {}, io);
+        callback?.({ success: true, data: res });
+      }
+    } catch (err: any) {
+      callback?.({ success: false, error: { code: 'TOD_COMPLETE_FAILED', message: err.message } });
+    }
+  });
+
+  socket.on('tod:vote', async (data: { vote: 'completed' | 'refused' }, callback?: (res: any) => void) => {
+    try {
+      const { roomCode, playerId } = socket.data;
+      const room = await RoomManager.getRoom(roomCode);
+      if (!room) return callback?.({ success: false, error: { code: 'NO_ROOM', message: 'Room not found' } });
+
+      const engine = GameRegistry.get(room.config.gameMode);
+      if (engine) {
+        const res = await engine.handlePlayerAction(room, playerId, 'vote', data, io);
+        callback?.({ success: true, data: res });
+      }
+    } catch (err: any) {
+      callback?.({ success: false, error: { code: 'TOD_VOTE_FAILED', message: err.message } });
+    }
+  });
+
+  // ==========================================
+  // GAME F: NEVER HAVE I EVER EVENT ROUTERS
+  // ==========================================
+
+  socket.on('nhie:submit_choice', async (data: { choice: 'have' | 'havenot' }, callback?: (res: any) => void) => {
+    try {
+      const { roomCode, playerId } = socket.data;
+      const room = await RoomManager.getRoom(roomCode);
+      if (!room) return callback?.({ success: false, error: { code: 'NO_ROOM', message: 'Room not found' } });
+
+      const engine = GameRegistry.get(room.config.gameMode);
+      if (engine) {
+        const res = await engine.handlePlayerAction(room, playerId, 'submit_choice', data, io);
+        callback?.({ success: true, data: res });
+      }
+    } catch (err: any) {
+      callback?.({ success: false, error: { code: 'NHIE_SUBMIT_FAILED', message: err.message } });
+    }
+  });
+
+  // ==========================================
   // CHAT & GUESS INTERCEPTION ROUTER
   // ==========================================
 
@@ -591,7 +696,7 @@ export const registerLobbyHandlers = (io: TypedServer, socket: any) => {
       const room = await RoomManager.getRoom(roomCode);
       if (!room) return callback?.({ success: false, error: { code: 'NO_ROOM', message: 'Room not found' } });
 
-      const text = (data.message || '').trim().slice(0, 120);
+      const text = Sanitizer.sanitizeChatMessage(data.message);
       if (!text) return callback?.({ success: true, data: undefined });
 
       const engine = GameRegistry.get(room.config.gameMode);
@@ -669,5 +774,106 @@ export const registerLobbyHandlers = (io: TypedServer, socket: any) => {
    */
   socket.on('ping:latency', (_data: any, callback: (res: any) => void) => {
     callback({ pong: Date.now() });
+  });
+
+  /**
+   * SOCIAL EMOJI REACTIONS (Throttled at 1 per sec per user)
+   */
+  socket.on('reaction:send', (data: { emoji: string }) => {
+    const { roomCode, playerId, username } = socket.data;
+    if (!roomCode || !playerId) return;
+
+    const now = Date.now();
+    const lastReaction = reactionThrottle.get(playerId) || 0;
+    if (now - lastReaction < 1000) return;
+
+    const allowed = ['🔥', '😂', '😱', '👏', '💀'];
+    const emoji = allowed.includes(data?.emoji) ? data.emoji : '🔥';
+    reactionThrottle.set(playerId, now);
+
+    io.to(roomCode).emit('reaction:broadcast', {
+      id: nanoid(8),
+      playerId,
+      username: username || 'Player',
+      emoji,
+      x: Math.floor(Math.random() * 70) + 15
+    });
+  });
+
+  /**
+   * TEAM SELECTION
+   */
+  socket.on('room:select-team', async (data: { team: any }, callback?: (res: any) => void) => {
+    try {
+      const { playerId, roomCode } = socket.data;
+      if (!playerId || !roomCode) {
+        return callback?.({
+          success: false,
+          error: { code: 'UNAUTHORIZED', message: 'Not connected.' }
+        });
+      }
+      const { room } = await RoomManager.setPlayerTeam(playerId, roomCode, data.team);
+      io.to(roomCode).emit('room:state', RoomManager.toPublicState(room));
+      callback?.({ success: true, data: undefined });
+    } catch (err: any) {
+      callback?.({ success: false, error: { code: 'TEAM_FAILED', message: err.message } });
+    }
+  });
+
+  /**
+   * REMATCH / PLAY AGAIN (Host only)
+   */
+  socket.on('room:rematch', async (data?: { nextGameMode?: any }, callback?: (res: any) => void) => {
+    try {
+      const { roomCode, isHost } = socket.data;
+      if (!isHost) {
+        return callback?.({
+          success: false,
+          error: { code: 'FORBIDDEN', message: 'Only the host can trigger a rematch.' }
+        });
+      }
+      const room = await RoomManager.rematchRoom(roomCode, data?.nextGameMode);
+      io.to(roomCode).emit('room:state', RoomManager.toPublicState(room));
+      callback?.({ success: true, data: undefined });
+    } catch (err: any) {
+      callback?.({ success: false, error: { code: 'REMATCH_FAILED', message: err.message } });
+    }
+  });
+
+  /**
+   * QUICK PLAY MATCHMAKING
+   */
+  socket.on('room:quick-play', async (data: { username: string; avatar: any }, callback: (res: any) => void) => {
+    try {
+      let code = await RoomManager.findQuickPlayRoom();
+      if (!code) {
+        const playerId = socket.data.playerId || `usr_${nanoid(10)}`;
+        const safeUsername = Sanitizer.sanitizeUsername(data.username || 'Party Player');
+        const { room, reconnectToken, hostPlayer } = await RoomManager.createRoom(
+          {
+            username: safeUsername,
+            avatar: data.avatar || 'cyber_cat',
+            maxPlayers: 15,
+            isPrivate: false,
+            roundDurationSeconds: 30,
+            totalRounds: 5,
+            gameMode: 'who_is_imposter'
+          },
+          socket.id,
+          playerId
+        );
+        socket.data.playerId = playerId;
+        socket.data.roomCode = room.code;
+        socket.data.username = hostPlayer.username;
+        socket.data.isHost = true;
+        socket.data.isSpectator = false;
+        socket.data.reconnectToken = reconnectToken;
+        await socket.join(room.code);
+        code = room.code;
+      }
+      callback({ success: true, data: { roomCode: code } });
+    } catch (err: any) {
+      callback({ success: false, error: { code: 'QUICK_PLAY_FAILED', message: err.message } });
+    }
   });
 };

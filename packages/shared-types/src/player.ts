@@ -81,6 +81,7 @@ export const NEON_AVATARS: Record<NeonAvatarId, NeonAvatarMetadata> = {
 };
 
 export type PlayerConnectionStatus = 'connected' | 'disconnected_grace';
+export type PlayerTeam = 'red' | 'blue' | 'green' | 'none';
 
 export interface Player {
   id: string; // Unique UUID/nanoid for this player
@@ -98,6 +99,7 @@ export interface Player {
   secretRole?: string | null; // Server-authoritative secret role (hidden from opponents)
   isGuest: boolean;
   userId?: string | null; // Set if player is an authenticated user
+  team?: PlayerTeam;
 }
 
 /**
@@ -115,6 +117,7 @@ export interface PlayerSummary {
   connectionStatus: PlayerConnectionStatus;
   graceExpiresAt: number | null;
   joinedAt: number;
+  team?: PlayerTeam;
 }
 
 /**

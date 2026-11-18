@@ -31,6 +31,7 @@ export interface RoomConfig {
   gameMode: GameMode;
   customDeckId?: string | null;
   allowSpectators: boolean;
+  isTeamMode?: boolean;
 }
 
 export type PublicRoomConfig = Omit<RoomConfig, 'pinHash'>;
@@ -49,6 +50,7 @@ export interface RoomState {
   updatedAt: number;
   currentRound: number;
   gameData?: any; // Dynamic state for the active mini-game
+  teamScores?: Record<string, number>;
 }
 
 /**
@@ -66,6 +68,7 @@ export interface PublicRoomState {
   currentRound: number;
   createdAt: number;
   updatedAt: number;
+  teamScores?: Record<string, number>;
 }
 
 /**

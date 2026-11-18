@@ -34,6 +34,7 @@ interface ActiveImposterSession {
   suddenDeathActive: boolean;
   suddenDeathPlayerId?: string;
   suddenDeathEndsAt?: number;
+  phaseEndsAt?: number;
   phase: 'role_reveal' | 'clue_giving' | 'voting' | 'imposter_sudden_death' | 'round_result' | 'game_over';
   suddenDeathTimer?: NodeJS.Timeout;
 }
@@ -366,6 +367,10 @@ export class ImposterGameEngine implements IPartyGameEngine {
   ): Promise<any> {
     const session = this.sessions.get(room.code);
     if (!session) throw new Error('NO_ACTIVE_GAME');
+    if (room.status !== 'in_game') throw new Error('ROOM_NOT_IN_GAME');
+    if (session.phaseEndsAt && Date.now() > session.phaseEndsAt + 1000) {
+      throw new Error('PHASE_TIMER_EXPIRED');
+    }
 
     const player = room.players[playerId];
     if (!player) throw new Error('PLAYER_NOT_IN_ROOM');

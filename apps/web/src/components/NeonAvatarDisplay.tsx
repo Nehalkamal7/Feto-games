@@ -7,6 +7,7 @@ interface NeonAvatarDisplayProps {
   avatarId: NeonAvatarId;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   showGlow?: boolean;
+  isGlowing?: boolean;
   className?: string;
   isReady?: boolean;
 }
@@ -22,10 +23,12 @@ export const NeonAvatarDisplay: React.FC<NeonAvatarDisplayProps> = ({
   avatarId,
   size = 'md',
   showGlow = true,
+  isGlowing,
   className = '',
   isReady
 }) => {
   const meta = NEON_AVATARS[avatarId] || NEON_AVATARS.cyber_cat;
+  const shouldGlow = isGlowing !== undefined ? isGlowing : showGlow;
 
   return (
     <div
@@ -33,7 +36,7 @@ export const NeonAvatarDisplay: React.FC<NeonAvatarDisplayProps> = ({
       style={{
         backgroundColor: '#0c0e1a',
         border: `2px solid ${isReady ? '#39FF14' : meta.primaryColor}`,
-        boxShadow: showGlow
+        boxShadow: shouldGlow
           ? `0 0 ${size === 'xl' ? '30px' : '18px'} ${isReady ? 'rgba(57, 255, 20, 0.6)' : meta.glowColor}`
           : 'none'
       }}

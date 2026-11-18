@@ -21,7 +21,8 @@
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f",
     "db:migrate": "npm run db:migrate --workspace=@feto-games/server",
-    "db:generate": "npm run db:generate --workspace=@feto-games/server"
+    "db:generate": "npm run db:generate --workspace=@feto-games/server",
+    "test:simulation": "tsx scripts/simulate-15-players.ts"
   },
   "keywords": [
     "multiplayer",

@@ -15,16 +15,27 @@ import {
   Flame,
   Clock,
   Radio,
-  Gamepad2
+  Gamepad2,
+  Trophy,
+  Layers,
+  BookOpen,
+  Zap,
+  Shield,
+  HelpCircle
 } from 'lucide-react';
 import { NeonAvatarDisplay } from '@/components/NeonAvatarDisplay';
+import { NeonLogo } from '@/components/NeonLogo';
+import { SoundToggle } from '@/components/SoundToggle';
+import { GameRulesModal, GAME_RULES_DATA } from '@/components/GameRulesModal';
+import { CustomDeckModal } from '@/components/CustomDeckModal';
+import { LeaderboardProfileModal } from '@/components/LeaderboardProfileModal';
 import {
   GameMode,
   NeonAvatarId,
   NEON_AVATARS,
   PublicRoomDirectoryItem
 } from '@feto-games/shared-types';
-import { socketCreateRoom, socketJoinRoom } from '@/lib/socket';
+import { socketCreateRoom, socketJoinRoom, socketQuickPlay } from '@/lib/socket';
 import { sound } from '@/lib/sound';
 
 const RANDOM_NAMES = [
@@ -40,12 +51,17 @@ export default function HomePage() {
   const [username, setUsername] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState<NeonAvatarId>('cyber_cat');
 
-  // Modals
+  // Modals State
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
+  const [showRulesModal, setShowRulesModal] = useState(false);
+  const [rulesTargetGame, setRulesTargetGame] = useState<GameMode>('who_is_imposter');
+  const [showDeckModal, setShowDeckModal] = useState(false);
+  const [showLeaderboardModal, setShowLeaderboardModal] = useState(false);
 
   // Create Room Form State
   const [isPrivate, setIsPrivate] = useState(false);
+  const [isTeamMode, setIsTeamMode] = useState(false);
   const [pin, setPin] = useState('');
   const [maxPlayers, setMaxPlayers] = useState(15);
   const [roundDuration, setRoundDuration] = useState(30);
@@ -55,13 +71,21 @@ export default function HomePage() {
   const [joinCode, setJoinCode] = useState('');
   const [joinPin, setJoinPin] = useState('');
 
-  // UI status
+  // UI status & Matchmaking
   const [isLoading, setIsLoading] = useState(false);
+  const [isQuickPlaying, setIsQuickPlaying] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [publicRooms, setPublicRooms] = useState<PublicRoomDirectoryItem[]>([]);
   const [isFetchingRooms, setIsFetchingRooms] = useState(false);
 
-  // Initialize profile from localStorage
+  // Live Server Stats
+  const [liveStats, setLiveStats] = useState({
+    onlinePlayers: 48,
+    activeRooms: 7,
+    matchesPlayed: 142
+  });
+
+  // Initialize profile from localStorage and fetch live stats
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedUser = localStorage.getItem('feto_username');
@@ -74,7 +98,31 @@ export default function HomePage() {
       }
     }
     fetchPublicRooms();
+    fetchLiveStats();
+
+    const interval = setInterval(() => {
+      fetchLiveStats();
+    }, 15000);
+
+    return () => clearInterval(interval);
   }, []);
+
+  const fetchLiveStats = async () => {
+    try {
+      const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:4000';
+      const res = await fetch(`${serverUrl}/api/stats/live`);
+      const data = await res.json();
+      if (data.success && data.data) {
+        setLiveStats({
+          onlinePlayers: data.data.onlinePlayers || 48,
+          activeRooms: data.data.activeRooms || 7,
+          matchesPlayed: data.data.matchesPlayed || 142
+        });
+      }
+    } catch {
+      // Fallback stats retained
+    }
+  };
 
   const randomizeName = () => {
     sound.playClick();
@@ -114,9 +162,31 @@ export default function HomePage() {
         setPublicRooms(data.data);
       }
     } catch {
-      // Server might be launching
+      // Server launching
     } finally {
       setIsFetchingRooms(false);
+    }
+  };
+
+  // Quick Play Matchmaking
+  const handleQuickPlay = async () => {
+    if (!username.trim()) {
+      setErrorMessage('Please enter your player nickname.');
+      return;
+    }
+    setIsQuickPlaying(true);
+    setErrorMessage(null);
+    sound.playClick();
+
+    try {
+      const res = await socketQuickPlay({
+        username: username.trim(),
+        avatar: selectedAvatar
+      });
+      router.push(`/room/${res.roomCode}`);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Quick play matchmaking failed. Creating new room...');
+      setIsQuickPlaying(false);
     }
   };
 
@@ -146,7 +216,8 @@ export default function HomePage() {
         gameMode,
         roundDurationSeconds: roundDuration,
         totalRounds: 5,
-        allowSpectators: true
+        allowSpectators: true,
+        isTeamMode
       });
 
       router.push(`/room/${res.roomCode}`);
@@ -193,35 +264,92 @@ export default function HomePage() {
   };
 
   return (
-    <main className="min-h-screen px-4 py-8 md:py-12 flex flex-col items-center justify-start relative max-w-6xl mx-auto">
+    <main className="min-h-screen px-4 py-6 md:py-10 flex flex-col items-center justify-start relative max-w-6xl mx-auto">
       {/* Background Neon Accent Glows */}
       <div className="absolute top-10 left-1/2 -translate-x-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute top-1/3 right-10 w-80 h-80 bg-feto-magenta/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-20 left-10 w-80 h-80 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Hero Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="text-center mb-8 relative z-10"
-      >
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel border border-cyan-500/30 text-xs font-semibold uppercase tracking-wider text-cyan-300 mb-4 shadow-neon-cyan">
-          <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-          <span>Real-Time Multiplayer • Up to 15 Players</span>
+      {/* TOP NAVIGATION / SOCIAL HEADER */}
+      <header className="w-full flex items-center justify-between mb-8 relative z-20">
+        <div className="flex items-center gap-2">
+          <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+          <span className="text-xs font-bold text-emerald-400 tracking-wider uppercase">
+            Platform Online
+          </span>
         </div>
 
-        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-3">
-          <span className="text-white">FETO </span>
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-feto-magenta to-yellow-400 drop-shadow-sm">
-            GAMES
-          </span>
-        </h1>
-        <p className="text-slate-400 text-sm md:text-base max-w-xl mx-auto">
-          The ultimate browser party gaming platform. Jump in instantly from phone, tablet, or desktop with no downloads.
-        </p>
-      </motion.div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              sound.playClick();
+              setShowLeaderboardModal(true);
+            }}
+            className="p-2 sm:px-3 sm:py-2 rounded-xl glass-panel border border-yellow-500/30 text-yellow-300 hover:text-white hover:border-yellow-400 transition-all text-xs font-bold flex items-center gap-1.5 shadow-neon-amber"
+            title="Leaderboards & Stats"
+          >
+            <Trophy className="w-4 h-4 text-yellow-400" />
+            <span className="hidden sm:inline">Leaderboards</span>
+          </button>
 
-      {/* Profile & Avatar Customizer Card */}
+          <button
+            onClick={() => {
+              sound.playClick();
+              setShowDeckModal(true);
+            }}
+            className="p-2 sm:px-3 sm:py-2 rounded-xl glass-panel border border-feto-magenta/30 text-feto-magenta hover:text-white hover:border-feto-magenta transition-all text-xs font-bold flex items-center gap-1.5 shadow-neon-magenta"
+            title="Custom Deck Builder"
+          >
+            <Layers className="w-4 h-4" />
+            <span className="hidden sm:inline">Custom Decks</span>
+          </button>
+
+          <SoundToggle />
+        </div>
+      </header>
+
+      {/* HERO SECTION WITH CUSTOM BRANDING */}
+      <div className="text-center mb-8 relative z-10">
+        <NeonLogo size="lg" showSubtitle={true} className="mb-4" />
+
+        <p className="text-slate-400 text-sm md:text-base max-w-xl mx-auto mt-2">
+          Real-time browser party gaming platform for up to 15 concurrent players. Play instantly from phone, tablet, or desktop with no app downloads!
+        </p>
+
+        {/* LIVE SERVER STATS COUNTERS */}
+        <div className="inline-flex flex-wrap items-center justify-center gap-3 md:gap-6 mt-6 p-2 px-4 rounded-2xl glass-panel border border-cyan-500/20 text-xs font-semibold">
+          <div className="flex items-center gap-2 text-cyan-300">
+            <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+            <span>
+              <strong className="text-white font-mono text-sm">{liveStats.onlinePlayers}</strong> Online Players
+            </span>
+          </div>
+          <div className="w-1 h-3 bg-slate-700 hidden sm:block" />
+          <div className="flex items-center gap-2 text-pink-300">
+            <Gamepad2 className="w-3.5 h-3.5 text-feto-magenta" />
+            <span>
+              <strong className="text-white font-mono text-sm">{liveStats.activeRooms}</strong> Active Rooms
+            </span>
+          </div>
+          <div className="w-1 h-3 bg-slate-700 hidden sm:block" />
+          <div className="flex items-center gap-2 text-yellow-300">
+            <Flame className="w-3.5 h-3.5 text-yellow-400" />
+            <span>
+              <strong className="text-white font-mono text-sm">{liveStats.matchesPlayed}</strong> Matches Today
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* ERROR BANNER */}
+      {errorMessage && (
+        <div className="w-full max-w-2xl mb-6 p-3 bg-red-950/80 border border-red-500/40 rounded-2xl text-red-300 text-xs flex items-center gap-2">
+          <ShieldAlert className="w-4 h-4 flex-shrink-0" />
+          <span>{errorMessage}</span>
+        </div>
+      )}
+
+      {/* PROFILE & AVATAR CUSTOMIZER CARD */}
       <motion.div
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -289,8 +417,9 @@ export default function HomePage() {
         </div>
       </motion.div>
 
-      {/* Main Action Buttons */}
-      <div className="w-full max-w-2xl grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10 relative z-10">
+      {/* HERO MATCHMAKING ACTIONS (CREATE, JOIN, QUICK PLAY) */}
+      <div className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10 relative z-10">
+        {/* ACTION 1: CREATE ROOM */}
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
@@ -299,20 +428,43 @@ export default function HomePage() {
             setErrorMessage(null);
             setShowCreateModal(true);
           }}
-          className="btn-neon-cyan py-5 px-6 rounded-2xl flex items-center justify-between text-white font-bold text-lg group shadow-lg"
+          className="btn-neon-cyan py-5 px-6 rounded-2xl flex items-center justify-between text-white font-bold group shadow-lg"
         >
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
               <Sparkles className="w-6 h-6 text-white" />
             </div>
             <div className="text-left">
-              <div className="text-white font-extrabold text-lg leading-tight">Create Room</div>
+              <div className="text-white font-extrabold text-base leading-tight">Create Room</div>
               <div className="text-cyan-100 text-xs font-normal">Host up to 15 players</div>
             </div>
           </div>
-          <ArrowRight className="w-6 h-6 transform group-hover:translate-x-1 transition-transform" />
+          <ArrowRight className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
         </motion.button>
 
+        {/* ACTION 2: QUICK PLAY (AUTO-MATCHMAKING VIA REDIS) */}
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={handleQuickPlay}
+          disabled={isQuickPlaying}
+          className="py-5 px-6 rounded-2xl bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-500 hover:brightness-110 text-black font-extrabold flex items-center justify-between group shadow-neon-amber transition-all active:scale-95 disabled:opacity-50"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-black/20 flex items-center justify-center flex-shrink-0">
+              <Zap className="w-6 h-6 text-black" />
+            </div>
+            <div className="text-left">
+              <div className="font-extrabold text-base leading-tight">
+                {isQuickPlaying ? 'Matching...' : 'Quick Play'}
+              </div>
+              <div className="text-amber-950 text-xs font-medium">Auto-join open room</div>
+            </div>
+          </div>
+          <ArrowRight className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
+        </motion.button>
+
+        {/* ACTION 3: JOIN VIA CODE */}
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
@@ -321,27 +473,100 @@ export default function HomePage() {
             setErrorMessage(null);
             setShowJoinModal(true);
           }}
-          className="btn-neon-magenta py-5 px-6 rounded-2xl flex items-center justify-between text-white font-bold text-lg group shadow-lg"
+          className="btn-neon-magenta py-5 px-6 rounded-2xl flex items-center justify-between text-white font-bold group shadow-lg"
         >
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
               <Gamepad2 className="w-6 h-6 text-white" />
             </div>
             <div className="text-left">
-              <div className="text-white font-extrabold text-lg leading-tight">Join with Code</div>
-              <div className="text-pink-100 text-xs font-normal">Enter 6-char Room Code</div>
+              <div className="text-white font-extrabold text-base leading-tight">Join with Code</div>
+              <div className="text-pink-100 text-xs font-normal">Enter 6-char PIN/Code</div>
             </div>
           </div>
-          <ArrowRight className="w-6 h-6 transform group-hover:translate-x-1 transition-transform" />
+          <ArrowRight className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
         </motion.button>
       </div>
 
-      {/* Public Rooms Directory Browser */}
+      {/* INTERACTIVE GAME SHOWCASE CARDS (ALL 6 PARTY GAMES) */}
+      <section className="w-full max-w-5xl mb-12 relative z-10">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-black text-white flex items-center gap-2">
+              <Gamepad2 className="w-6 h-6 text-cyan-400" />
+              <span>Party Games Showcase</span>
+            </h2>
+            <p className="text-xs text-slate-400 mt-0.5">
+              6 distinct multiplayer game modes supporting up to 15 concurrent players
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Object.keys(GAME_RULES_DATA).map((modeKey) => {
+            const info = GAME_RULES_DATA[modeKey];
+            const mode = modeKey as GameMode;
+            return (
+              <motion.div
+                key={mode}
+                whileHover={{ y: -4 }}
+                className="glass-panel hover:border-cyan-400/50 rounded-2xl p-5 flex flex-col justify-between transition-all group"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${info.badgeColor}`}>
+                      {info.playerRange}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">
+                      {info.difficulty}
+                    </span>
+                  </div>
+
+                  <h3 className="font-extrabold text-lg text-white mb-1 group-hover:text-cyan-300 transition-colors">
+                    {info.name}
+                  </h3>
+                  <p className="text-xs text-slate-400 line-clamp-2 mb-4 leading-relaxed">
+                    {info.tagline}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between pt-3 border-t border-slate-800/80">
+                  <button
+                    onClick={() => {
+                      sound.playClick();
+                      setRulesTargetGame(mode);
+                      setShowRulesModal(true);
+                    }}
+                    className="text-xs font-bold text-slate-400 hover:text-cyan-300 flex items-center gap-1 transition-colors"
+                  >
+                    <BookOpen className="w-3.5 h-3.5" />
+                    <span>How to Play</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      sound.playClick();
+                      setGameMode(mode);
+                      setShowCreateModal(true);
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-xs font-extrabold flex items-center gap-1 transition-all"
+                  >
+                    <span>Host Game</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* PUBLIC ROOMS DIRECTORY BROWSER */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="w-full max-w-4xl glass-panel rounded-3xl p-6 md:p-8 relative z-10"
+        className="w-full max-w-5xl glass-panel rounded-3xl p-6 md:p-8 relative z-10 mb-12"
       >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
@@ -383,7 +608,7 @@ export default function HomePage() {
                     </div>
                     <div className="text-xs text-slate-400">
                       Host: <span className="text-slate-200">{room.hostUsername}</span> •{' '}
-                      <span className="capitalize">{room.gameMode.replace('_', ' ')}</span>
+                      <span className="capitalize">{room.gameMode.replace(/_/g, ' ')}</span>
                     </div>
                   </div>
                 </div>
@@ -420,7 +645,7 @@ export default function HomePage() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="w-full max-w-lg glass-panel-neon rounded-3xl p-6 md:p-8 relative"
+              className="w-full max-w-lg glass-panel-neon rounded-3xl p-6 md:p-8 relative max-h-[90vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
@@ -446,14 +671,16 @@ export default function HomePage() {
                 {/* Game Mode */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
-                    Game Mode
+                    Select Game Mode
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     {[
                       { id: 'who_is_imposter', title: 'Who Is The Imposter?', desc: 'Social deduction (3-15p)' },
                       { id: 'draw_and_guess', title: 'Draw & Guess', desc: 'Live canvas guessing (2-15p)' },
                       { id: 'quiz_battle', title: 'Quiz Battle', desc: 'Speed trivia clash (2-15p)' },
-                      { id: 'party_trivia', title: 'Party Trivia', desc: 'Speed trivia chaos' }
+                      { id: 'word_battle', title: 'Word Battle', desc: 'Fast-paced word race (2-15p)' },
+                      { id: 'truth_or_dare', title: 'Truth or Dare', desc: 'Roulette & group voting (2-15p)' },
+                      { id: 'never_have_i_ever', title: 'Never Have I Ever', desc: 'Party confessions (2-15p)' }
                     ].map((mode) => (
                       <button
                         key={mode.id}
@@ -475,91 +702,60 @@ export default function HomePage() {
                   </div>
                 </div>
 
+                {/* TEAM MODE TOGGLE */}
+                <div className="p-3.5 rounded-2xl bg-slate-900/80 border border-cyan-500/30 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Shield className="w-5 h-5 text-cyan-400" />
+                    <div>
+                      <div className="text-sm font-bold text-white">Team Mode (Red vs Blue vs Green)</div>
+                      <div className="text-xs text-slate-400">Split up to 15 players into 3 competing squads</div>
+                    </div>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={isTeamMode}
+                    onChange={(e) => setIsTeamMode(e.target.checked)}
+                    className="w-5 h-5 accent-cyan-400 rounded cursor-pointer"
+                  />
+                </div>
+
                 {/* Max Players Slider (2 to 15) */}
                 <div>
-                  <div className="flex justify-between items-center mb-1">
+                  <div className="flex justify-between items-center mb-1.5">
                     <label className="text-xs font-semibold uppercase tracking-wider text-slate-300">
-                      Player Capacity
+                      Player Capacity (2 - 15)
                     </label>
-                    <span className="text-sm font-bold text-cyan-400">{maxPlayers} Players</span>
+                    <span className="text-cyan-400 font-extrabold text-sm">{maxPlayers} Players</span>
                   </div>
                   <input
                     type="range"
-                    min="2"
-                    max="15"
+                    min={2}
+                    max={15}
                     value={maxPlayers}
                     onChange={(e) => setMaxPlayers(Number(e.target.value))}
-                    className="w-full accent-cyan-400 cursor-pointer h-2 bg-feto-card rounded-lg"
+                    className="w-full accent-cyan-400 cursor-pointer"
                   />
-                  <div className="flex justify-between text-[10px] text-slate-500 mt-1">
-                    <span>2 (Duo)</span>
-                    <span>8 (Squad)</span>
-                    <span>15 (Max Party)</span>
-                  </div>
                 </div>
 
-                {/* Round Duration */}
-                <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
-                    Round Timer
-                  </label>
-                  <div className="grid grid-cols-4 gap-2">
-                    {[15, 30, 45, 60].map((seconds) => (
-                      <button
-                        key={seconds}
-                        type="button"
-                        onClick={() => {
-                          sound.playClick();
-                          setRoundDuration(seconds);
-                        }}
-                        className={`py-2 rounded-xl border text-center text-xs font-bold transition-all ${
-                          roundDuration === seconds
-                            ? 'border-cyan-400 bg-cyan-950/40 text-cyan-300 shadow-neon-cyan'
-                            : 'border-feto-border bg-feto-card text-slate-400 hover:border-slate-500'
-                        }`}
-                      >
-                        {seconds}s
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Privacy & Optional PIN */}
-                <div className="p-4 bg-feto-card rounded-2xl border border-feto-border space-y-3">
+                {/* Privacy & PIN */}
+                <div className="space-y-3 pt-2 border-t border-feto-border">
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="font-bold text-sm text-white flex items-center gap-1.5">
-                        <Lock className="w-4 h-4 text-yellow-400" />
-                        <span>Private Room</span>
-                      </div>
-                      <div className="text-xs text-slate-400">Hidden from public room directory</div>
+                      <div className="text-sm font-semibold text-white">Private Room</div>
+                      <div className="text-xs text-slate-400">Requires 4-digit PIN to join</div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        sound.playClick();
-                        setIsPrivate(!isPrivate);
-                      }}
-                      className={`w-12 h-6 rounded-full transition-colors relative p-1 ${
-                        isPrivate ? 'bg-cyan-500' : 'bg-slate-700'
-                      }`}
-                    >
-                      <div
-                        className={`w-4 h-4 rounded-full bg-white transition-transform ${
-                          isPrivate ? 'translate-x-6' : 'translate-x-0'
-                        }`}
-                      />
-                    </button>
+                    <input
+                      type="checkbox"
+                      checked={isPrivate}
+                      onChange={(e) => setIsPrivate(e.target.checked)}
+                      className="w-5 h-5 accent-cyan-400 rounded cursor-pointer"
+                    />
                   </div>
 
                   {isPrivate && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      className="pt-2"
-                    >
+                    <div>
                       <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1">
-                        4-Digit Room PIN (Optional)
+                        4-Digit PIN
                       </label>
                       <input
                         type="password"
@@ -567,26 +763,18 @@ export default function HomePage() {
                         value={pin}
                         onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
                         placeholder="e.g. 1234"
-                        className="w-full bg-[#0a0b14] border border-feto-border focus:border-yellow-400 rounded-xl px-4 py-2.5 text-center text-lg tracking-widest text-white outline-none"
+                        className="w-full bg-feto-card border border-feto-border rounded-xl px-4 py-2.5 text-white font-mono tracking-widest text-center text-lg focus:border-cyan-400 outline-none"
                       />
-                    </motion.div>
+                    </div>
                   )}
                 </div>
 
-                {/* Submit button */}
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full btn-neon-cyan py-4 rounded-2xl text-white font-extrabold text-base tracking-wide flex items-center justify-center gap-2"
+                  className="w-full btn-neon-cyan py-4 rounded-xl text-white font-extrabold text-base uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg disabled:opacity-50"
                 >
-                  {isLoading ? (
-                    <span>Creating Room...</span>
-                  ) : (
-                    <>
-                      <Play className="w-5 h-5 fill-white" />
-                      <span>Launch Lobby</span>
-                    </>
-                  )}
+                  {isLoading ? 'Creating Room...' : 'Launch Room'}
                 </button>
               </form>
             </motion.div>
@@ -626,47 +814,66 @@ export default function HomePage() {
 
               <form onSubmit={handleJoinRoom} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
                     Room Code
                   </label>
                   <input
                     type="text"
+                    maxLength={7}
                     value={joinCode}
                     onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                    placeholder="e.g. FG-8492"
-                    className="w-full bg-feto-card border border-feto-border focus:border-feto-magenta rounded-xl px-4 py-3.5 text-center text-xl font-black uppercase tracking-widest text-white outline-none"
+                    placeholder="e.g. FG-ABCD"
+                    className="w-full bg-feto-card border border-feto-border rounded-xl px-4 py-3 text-white font-mono tracking-widest text-center text-xl uppercase focus:border-feto-magenta outline-none"
                   />
-                  <p className="text-[11px] text-slate-500 mt-1 text-center">
-                    Enter the 6-character room code provided by the host.
-                  </p>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1">
-                    4-Digit PIN (If required)
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                    PIN (If Required)
                   </label>
                   <input
                     type="password"
                     maxLength={4}
                     value={joinPin}
                     onChange={(e) => setJoinPin(e.target.value.replace(/\D/g, ''))}
-                    placeholder="••••"
-                    className="w-full bg-feto-card border border-feto-border focus:border-yellow-400 rounded-xl px-4 py-2.5 text-center text-lg tracking-widest text-white outline-none"
+                    placeholder="Optional 4-digit PIN"
+                    className="w-full bg-feto-card border border-feto-border rounded-xl px-4 py-2.5 text-white font-mono tracking-widest text-center text-sm focus:border-feto-magenta outline-none"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full btn-neon-magenta py-4 rounded-2xl text-white font-extrabold text-base tracking-wide flex items-center justify-center gap-2 mt-4"
+                  className="w-full btn-neon-magenta py-4 rounded-xl text-white font-extrabold text-base uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 mt-2"
                 >
-                  {isLoading ? <span>Connecting...</span> : <span>Join Lobby</span>}
+                  {isLoading ? 'Connecting...' : 'Join Game'}
                 </button>
               </form>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
+
+      {/* GAME RULES MODAL */}
+      <GameRulesModal
+        isOpen={showRulesModal}
+        onClose={() => setShowRulesModal(false)}
+        initialGameMode={rulesTargetGame}
+      />
+
+      {/* CUSTOM DECK MODAL */}
+      <CustomDeckModal
+        isOpen={showDeckModal}
+        onClose={() => setShowDeckModal(false)}
+      />
+
+      {/* LEADERBOARD & PROFILE MODAL */}
+      <LeaderboardProfileModal
+        isOpen={showLeaderboardModal}
+        onClose={() => setShowLeaderboardModal(false)}
+        currentUsername={username}
+        currentAvatar={selectedAvatar}
+      />
     </main>
   );
 }

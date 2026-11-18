@@ -386,6 +386,10 @@ export class DrawAndGuessEngine implements IPartyGameEngine {
   ): Promise<any> {
     const session = this.sessions.get(room.code);
     if (!session) throw new Error('NO_ACTIVE_GAME');
+    if (room.status !== 'in_game') throw new Error('ROOM_NOT_IN_GAME');
+    if (session.phaseEndsAt && Date.now() > session.phaseEndsAt + 1000) {
+      throw new Error('PHASE_TIMER_EXPIRED');
+    }
 
     // Action 1: Drawer selects word
     if (actionType === 'select_word') {

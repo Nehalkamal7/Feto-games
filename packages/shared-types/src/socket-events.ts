@@ -1,4 +1,4 @@
-import { NeonAvatarId, PlayerSummary } from './player';
+import { NeonAvatarId, PlayerSummary, PlayerTeam } from './player';
 import { GameMode, PublicRoomConfig, PublicRoomState } from './room';
 import {
   ChatMessage,
@@ -32,6 +32,7 @@ export interface CreateRoomDTO {
   roundDurationSeconds?: number;
   totalRounds?: number;
   allowSpectators?: boolean;
+  isTeamMode?: boolean;
 }
 
 export interface CreateRoomResponse {
@@ -86,6 +87,7 @@ export interface UpdateRoomSettingsDTO {
   totalRounds?: number;
   gameMode?: GameMode;
   allowSpectators?: boolean;
+  isTeamMode?: boolean;
 }
 
 export interface GameActionDTO {
@@ -139,6 +141,12 @@ export interface ClientToServerEvents {
   // Never Have I Ever Events
   'nhie:submit_choice': (data: { choice: 'have' | 'havenot' }, callback?: (res: SocketApiResponse<void>) => void) => void;
 
+  // Social Reactions, Team Mode & Rematch
+  'reaction:send': (data: { emoji: string }) => void;
+  'room:select-team': (data: { team: PlayerTeam }, callback?: (res: SocketApiResponse<void>) => void) => void;
+  'room:rematch': (data?: { nextGameMode?: GameMode }, callback?: (res: SocketApiResponse<void>) => void) => void;
+  'room:quick-play': (data: { username: string; avatar: NeonAvatarId }, callback: (res: SocketApiResponse<{ roomCode: string }>) => void) => void;
+
   // Ping/Latency
   'ping:latency': (data: { timestamp: number }, callback: (res: { pong: number }) => void) => void;
 }
@@ -187,6 +195,9 @@ export interface ServerToClientEvents {
   // Word Battle Events
   'word_battle:rejected': (data: { word: string; reason: 'already_taken' | 'invalid_letter' | 'invalid_word' }) => void;
   'word_battle:accepted': (data: { word: string; points: number; username: string }) => void;
+
+  // Live Floating Emoji Reactions
+  'reaction:broadcast': (data: { id: string; playerId: string; username: string; emoji: string; x: number }) => void;
 
   // Errors & notifications
   'error:notification': (data: { message: string; code?: string }) => void;

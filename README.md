@@ -153,7 +153,7 @@ New games register into `GameRegistry.register(new MyGameEngine())`. The network
 
 ---
 
-## 🎮 The 3 Launch Multiplayer Games (Up to 15 Players)
+## 🎮 The 6 Launch Multiplayer Games (Up to 15 Players)
 
 ### 1. Game A: "Who Is The Imposter?" (Social Deduction · 3 to 15 Players)
 - **Dynamic Imposter Scaling**:
@@ -188,6 +188,31 @@ New games register into `GameRegistry.register(new MyGameEngine())`. The network
 - **Live Leaderboard**: Animated rankings and score differentials displayed between rounds.
 - **Dataset**: `apps/server/src/games/data/quizQuestions.json` (105 questions with 4 choices and explanations).
 
+### 4. Game D: "Word Battle" (Fast-Paced Word Challenge · 2 to 15 Players)
+- **Random Category & Starting Letter**: Server selects category and starting letter per round (e.g., "Animals starting with T", "Countries starting with M").
+- **25-Second Word Racing**: All 15 players race against a 25-second countdown to submit valid words.
+- **Uniqueness & Server Validation**:
+  - Validates words against category dictionary bank.
+  - Enforces uniqueness per round: if Player A submits "Tiger" first, Player B gets an instant "Already taken!" shake feedback.
+  - Real-time claimed words stream feed with player avatars and speed bonus scoring.
+- **Dataset**: `apps/server/src/games/data/wordBattleCategories.json` (100+ category entries with starting letters and words).
+
+### 5. Game E: "Truth or Dare" (Party Roulette · 2 to 15 Players)
+- **Synchronized Roulette Wheel**: Interactive animated spinner synced across all screens that randomly selects a target player.
+- **Player Decision**: Target player picks TRUTH or DARE based on room intensity mode (`Chill`, `Party`, `Wild`).
+- **Challenge Performance & Live Voting**:
+  - Target performs the challenge and confirms completion.
+  - All other room players vote "Completed" (+100 pts) or "Chicken / Refused" (-50 pts).
+  - Majority verdict resolved live on the server with audio/visual feedback.
+- **Dataset**: `apps/server/src/games/data/truthOrDarePrompts.json` (100+ prompts across Chill, Party, Wild).
+
+### 6. Game F: "Never Have I Ever" (Party Confessions · 3 to 15 Players)
+- **10 Innocence Points**: Every player starts with 10 Innocence Points and loses 1 point whenever tapping "I Have".
+- **Simultaneous Confessions**: Server broadcasts randomized statements with a 15-second countdown.
+- **Group Statistics Reveal**: Reveals everyone's choices simultaneously with animated avatars and room stats (e.g., "73% of the room has done this!").
+- **Standings**: Tracks rankings from "Most Innocent" to "Wildest" player.
+- **Dataset**: `apps/server/src/games/data/neverHaveIEverStatements.json` (101 relatable statements).
+
 ---
 
 ## 📡 Socket.IO Event Schema (`packages/shared-types`)
@@ -217,6 +242,13 @@ New games register into `GameRegistry.register(new MyGameEngine())`. The network
 | `draw:undo` | Client ➔ Server / Server ➔ Client | - | Undoes previous stroke |
 | `chat:send` | Client ➔ Server | `{ message }` | Chat or secret word guess in Draw & Guess |
 | `quiz:submit_answer` | Client ➔ Server | `{ questionIndex, selectedOption }`| Answers trivia question in Quiz Battle |
+| `word_battle:submit_word` | Client ➔ Server | `{ word }` | Submits candidate word in Word Battle |
+| `word_battle:rejected` | Server ➔ Client | `{ word, reason }` | Instant rejection feedback (e.g. already taken) |
+| `word_battle:accepted` | Server ➔ Client | `{ word, points, username }` | Claimed word broadcast |
+| `tod:choose_type` | Client ➔ Server | `{ choice: 'truth' \| 'dare' }` | Target selects challenge type |
+| `tod:complete_action` | Client ➔ Server | - | Target completes challenge |
+| `tod:vote` | Client ➔ Server | `{ vote: 'completed' \| 'refused' }` | Group votes on challenge outcome |
+| `nhie:submit_choice` | Client ➔ Server | `{ choice: 'have' \| 'havenot' }` | Submits confession in Never Have I Ever |
 
 ---
 

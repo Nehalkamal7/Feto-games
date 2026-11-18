@@ -20,7 +20,8 @@ import {
   Eye,
   Zap,
   Sparkles,
-  Users
+  Users,
+  Shield
 } from 'lucide-react';
 import {
   GameMode,
@@ -28,6 +29,7 @@ import {
   NeonAvatarId,
   NEON_AVATARS,
   PlayerSummary,
+  PlayerTeam,
   PrivateRolePayload,
   PublicRoomConfig,
   PublicRoomState,
@@ -35,9 +37,15 @@ import {
   TimerTickPayload
 } from '@feto-games/shared-types';
 import { NeonAvatarDisplay } from '@/components/NeonAvatarDisplay';
+import { FloatingReactions } from '@/components/FloatingReactions';
+import { GamePodiumView } from '@/components/GamePodiumView';
+import { SoundToggle } from '@/components/SoundToggle';
 import { ImposterGameView } from '@/components/games/ImposterGameView';
 import { DrawAndGuessGameView } from '@/components/games/DrawAndGuessGameView';
 import { QuizBattleGameView } from '@/components/games/QuizBattleGameView';
+import { WordBattleGameView } from '@/components/games/WordBattleGameView';
+import { TruthOrDareGameView } from '@/components/games/TruthOrDareGameView';
+import { NeverHaveIEverGameView } from '@/components/games/NeverHaveIEverGameView';
 import {
   clearReconnectSession,
   getReconnectToken,
@@ -46,6 +54,7 @@ import {
   socketKickPlayer,
   socketLeaveRoom,
   socketReconnectRoom,
+  socketSelectTeam,
   socketSetReady,
   socketStartGame,
   socketUpdateSettings
@@ -384,7 +393,7 @@ export default function RoomPage() {
   const maxPlayers = room?.config.maxPlayers ?? 15;
   const allReady = activePlayers.length >= 2 && activePlayers.every((p) => p.isReady);
 
-  if (isInitializing) {
+  if (isInitializing || !room) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#07080f]">
         <div className="text-center space-y-4">
@@ -463,6 +472,8 @@ export default function RoomPage() {
 
         {/* Action Controls */}
         <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+          <SoundToggle />
+
           <button
             onClick={handleCopyInviteLink}
             className="flex-1 sm:flex-initial px-4 py-2.5 bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-500/40 hover:border-cyan-400 text-cyan-300 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
@@ -546,6 +557,27 @@ export default function RoomPage() {
               players={room.players}
               roomCode={roomCode}
             />
+          ) : room.config.gameMode === 'word_battle' ? (
+            <WordBattleGameView
+              gameState={gameStateSync.state}
+              currentPlayer={currentPlayer}
+              players={room.players}
+              roomCode={roomCode}
+            />
+          ) : room.config.gameMode === 'truth_or_dare' ? (
+            <TruthOrDareGameView
+              gameState={gameStateSync.state}
+              currentPlayer={currentPlayer}
+              players={room.players}
+              roomCode={roomCode}
+            />
+          ) : room.config.gameMode === 'never_have_i_ever' ? (
+            <NeverHaveIEverGameView
+              gameState={gameStateSync.state}
+              currentPlayer={currentPlayer}
+              players={room.players}
+              roomCode={roomCode}
+            />
           ) : (
             <div className="w-full max-w-xl glass-panel p-8 rounded-3xl text-center space-y-4 my-auto">
               <h3 className="text-2xl font-bold text-white">Party Mode Active</h3>
@@ -553,10 +585,68 @@ export default function RoomPage() {
             </div>
           )}
         </div>
+      ) : room?.status === 'game_over' ? (
+        /* ANIMATED PODIUM & REMATCH SCREEN */
+        <GamePodiumView room={room} currentPlayer={currentPlayer} />
       ) : (
         /* WAITING LOBBY (2 TO 15 PLAYERS) */
         <div className="flex-1 flex flex-col justify-between py-2 relative z-10">
           <div>
+            {/* TEAM SQUAD SELECTOR (IF TEAM MODE ENABLED) */}
+            {room.config.isTeamMode && (
+              <div className="mb-6 p-4 rounded-2xl glass-panel-neon border border-cyan-500/30">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 mb-3">
+                  <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-cyan-300">
+                    <Shield className="w-4 h-4 text-cyan-400" />
+                    <span>Select Your Squad (Team Mode)</span>
+                  </div>
+                  <span className="text-[11px] text-slate-400">
+                    Combined team scores determine victory
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    {
+                      id: 'red',
+                      name: 'Red Squad',
+                      color: 'border-red-500 bg-red-950/40 text-red-300',
+                      activeRing: 'ring-2 ring-red-400 shadow-neon-magenta',
+                      count: room.players.filter((p) => p.team === 'red').length
+                    },
+                    {
+                      id: 'blue',
+                      name: 'Blue Squad',
+                      color: 'border-blue-500 bg-blue-950/40 text-blue-300',
+                      activeRing: 'ring-2 ring-blue-400 shadow-neon-cyan',
+                      count: room.players.filter((p) => p.team === 'blue').length
+                    },
+                    {
+                      id: 'green',
+                      name: 'Green Squad',
+                      color: 'border-green-500 bg-green-950/40 text-green-300',
+                      activeRing: 'ring-2 ring-green-400 shadow-neon-green',
+                      count: room.players.filter((p) => p.team === 'green').length
+                    }
+                  ].map((squad) => (
+                    <button
+                      key={squad.id}
+                      onClick={() => {
+                        sound.playClick();
+                        socketSelectTeam(squad.id as PlayerTeam);
+                      }}
+                      className={`p-3 rounded-xl border flex flex-col items-center justify-center transition-all ${squad.color} ${
+                        currentPlayer?.team === squad.id ? `${squad.activeRing} scale-105` : 'opacity-70 hover:opacity-100'
+                      }`}
+                    >
+                      <span className="font-extrabold text-xs">{squad.name}</span>
+                      <span className="text-[10px] text-slate-300 mt-0.5">{squad.count} Players</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
                 <span>Waiting Lobby</span>
@@ -623,6 +713,19 @@ export default function RoomPage() {
                         )}
                       </div>
                       <div className="text-[11px] text-slate-400">Score: {player.score}</div>
+                      {room.config.isTeamMode && player.team && (
+                        <div
+                          className={`mt-1 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase inline-block ${
+                            player.team === 'red'
+                              ? 'bg-red-950/80 text-red-400 border border-red-500/40'
+                              : player.team === 'blue'
+                              ? 'bg-blue-950/80 text-blue-400 border border-blue-500/40'
+                              : 'bg-green-950/80 text-green-400 border border-green-500/40'
+                          }`}
+                        >
+                          {player.team} team
+                        </div>
+                      )}
                     </div>
 
                     {/* Status Badge */}
@@ -922,6 +1025,25 @@ export default function RoomPage() {
                   </div>
                 </div>
 
+                {/* Team Mode Toggle */}
+                <div className="p-3 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-cyan-400" />
+                    <div>
+                      <div className="text-xs font-bold text-white">Team Mode</div>
+                      <div className="text-[10px] text-slate-400">Red vs Blue vs Green Squads</div>
+                    </div>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={Boolean(room.config.isTeamMode)}
+                    onChange={(e) =>
+                      socketUpdateSettings({ isTeamMode: e.target.checked })
+                    }
+                    className="w-4 h-4 accent-cyan-400 rounded cursor-pointer"
+                  />
+                </div>
+
                 <button
                   onClick={() => setShowSettingsModal(false)}
                   className="w-full py-3 bg-feto-card hover:bg-feto-cardHover border border-feto-border rounded-xl text-white font-bold text-sm mt-4"
@@ -971,6 +1093,9 @@ export default function RoomPage() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* FLOATING EMOJI REACTIONS OVERLAY */}
+      <FloatingReactions />
     </div>
   );
 }

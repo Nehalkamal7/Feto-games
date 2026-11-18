@@ -54,7 +54,8 @@ export class RoomManager {
       roundDurationSeconds: dto.roundDurationSeconds || 30,
       totalRounds: dto.totalRounds || 5,
       gameMode: dto.gameMode || 'party_trivia',
-      allowSpectators: dto.allowSpectators ?? true
+      allowSpectators: dto.allowSpectators ?? true,
+      isTeamMode: dto.isTeamMode ?? false
     };
 
     const hostPlayer: Player = {
@@ -370,6 +371,9 @@ export class RoomManager {
     if (dto.allowSpectators !== undefined) {
       room.config.allowSpectators = dto.allowSpectators;
     }
+    if (dto.isTeamMode !== undefined) {
+      room.config.isTeamMode = dto.isTeamMode;
+    }
 
     // Privacy & PIN update
     if (dto.isPrivate !== undefined) {
@@ -461,6 +465,91 @@ export class RoomManager {
   }
 
   /**
+   * Sets player team for Team Mode.
+   */
+  public static async setPlayerTeam(
+    playerId: string,
+    roomCode: string,
+    team: 'red' | 'blue' | 'green' | 'none'
+  ): Promise<{ room: RoomState; player: Player }> {
+    const room = await this.getRoom(roomCode);
+    if (!room) throw new Error('ROOM_NOT_FOUND');
+
+    const player = room.players[playerId];
+    if (!player) throw new Error('PLAYER_NOT_IN_ROOM');
+
+    player.team = team;
+
+    // Recalculate team scores if in team mode
+    if (room.config.isTeamMode) {
+      const scores: Record<string, number> = { red: 0, blue: 0, green: 0 };
+      Object.values(room.players).forEach((p) => {
+        if (p.team && p.team !== 'none' && scores[p.team] !== undefined) {
+          scores[p.team] = (scores[p.team] ?? 0) + (p.score || 0);
+        }
+      });
+      room.teamScores = scores;
+    }
+
+    room.updatedAt = Date.now();
+    await this.saveRoomState(room);
+    return { room, player };
+  }
+
+  /**
+   * Rematch: Resets room state back to lobby for another game while keeping all players.
+   */
+  public static async rematchRoom(
+    roomCode: string,
+    nextGameMode?: any
+  ): Promise<RoomState> {
+    const room = await this.getRoom(roomCode);
+    if (!room) throw new Error('ROOM_NOT_FOUND');
+
+    room.status = 'lobby';
+    room.currentRound = 0;
+    if (nextGameMode) {
+      room.config.gameMode = nextGameMode;
+    }
+
+    // Reset scores & ready states
+    Object.values(room.players).forEach((p) => {
+      p.score = 0;
+      p.isReady = false;
+      delete p.secretRole;
+    });
+
+    if (room.teamScores) {
+      room.teamScores = { red: 0, blue: 0, green: 0 };
+    }
+
+    delete room.gameData;
+    room.updatedAt = Date.now();
+    await this.saveRoomState(room);
+    return room;
+  }
+
+  /**
+   * Quick Play Matchmaking: Finds open public room or returns null.
+   */
+  public static async findQuickPlayRoom(): Promise<string | null> {
+    const publicCodes = await redisClient.smembers(this.PUBLIC_ROOMS_SET);
+    for (const code of publicCodes) {
+      const room = await this.getRoom(code);
+      if (
+        room &&
+        !room.config.isPrivate &&
+        !room.config.hasPin &&
+        room.status === 'lobby' &&
+        Object.keys(room.players).length < room.config.maxPlayers
+      ) {
+        return room.code;
+      }
+    }
+    return null;
+  }
+
+  /**
    * Sanitizes server RoomState into a safe PublicRoomState for broadcasting to clients.
    * Strips secret roles and PIN hashes.
    */
@@ -475,7 +564,8 @@ export class RoomManager {
       score: p.score,
       connectionStatus: p.connectionStatus,
       graceExpiresAt: p.graceExpiresAt,
-      joinedAt: p.joinedAt
+      joinedAt: p.joinedAt,
+      team: p.team || 'none'
     }));
 
     const spectatorsList: PlayerSummary[] = Object.values(room.spectators).map((s) => ({
@@ -488,7 +578,8 @@ export class RoomManager {
       score: s.score,
       connectionStatus: s.connectionStatus,
       graceExpiresAt: s.graceExpiresAt,
-      joinedAt: s.joinedAt
+      joinedAt: s.joinedAt,
+      team: s.team || 'none'
     }));
 
     const publicConfig: PublicRoomConfig = {
@@ -499,7 +590,8 @@ export class RoomManager {
       totalRounds: room.config.totalRounds,
       gameMode: room.config.gameMode,
       customDeckId: room.config.customDeckId,
-      allowSpectators: room.config.allowSpectators
+      allowSpectators: room.config.allowSpectators,
+      isTeamMode: room.config.isTeamMode
     };
 
     return {
@@ -513,7 +605,8 @@ export class RoomManager {
       spectatorCount: spectatorsList.length,
       currentRound: room.currentRound,
       createdAt: room.createdAt,
-      updatedAt: room.updatedAt
+      updatedAt: room.updatedAt,
+      teamScores: room.teamScores
     };
   }
 }

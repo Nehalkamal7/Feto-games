@@ -3,7 +3,7 @@ import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { pubClient, subClient } from '../config/redis.js';
 import { env } from '../config/env.js';
-import { socketAuthMiddleware } from './middleware.js';
+import { socketAuthMiddleware, attachPacketRateLimiter, cleanupSocketRateLimit } from './middleware.js';
 import { registerLobbyHandlers } from './lobbyHandler.js';
 import { registerConnectionHandlers } from './connectionHandler.js';
 import {
@@ -47,9 +47,16 @@ export const initSocketServer = (httpServer: HttpServer) => {
     const typedSocket = socket as any;
     console.log(`🔌 [Socket Connected] Socket ID: ${socket.id} (IP: ${socket.handshake.address})`);
 
+    // Attach per-socket packet throttling
+    attachPacketRateLimiter(typedSocket);
+
     // Register event domains
     registerLobbyHandlers(io, typedSocket);
     registerConnectionHandlers(io, typedSocket);
+
+    socket.on('disconnect', () => {
+      cleanupSocketRateLimit(typedSocket);
+    });
   });
 
   return io;

@@ -177,3 +177,39 @@ export const socketLeaveRoom = (): Promise<void> => {
     });
   });
 };
+
+export const socketSelectTeam = (team: import('@feto-games/shared-types').PlayerTeam): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const s = getSocket();
+    s.emit('room:select-team', { team }, (res) => {
+      if (!res || res.success) resolve();
+      else reject(new Error(res.error?.message || 'Failed to select team'));
+    });
+  });
+};
+
+export const socketRematch = (nextGameMode?: import('@feto-games/shared-types').GameMode): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const s = getSocket();
+    s.emit('room:rematch', { nextGameMode }, (res) => {
+      if (!res || res.success) resolve();
+      else reject(new Error(res.error?.message || 'Failed to rematch'));
+    });
+  });
+};
+
+export const socketSendReaction = (emoji: string): void => {
+  const s = getSocket();
+  s.emit('reaction:send', { emoji });
+};
+
+export const socketQuickPlay = (dto: { username: string; avatar: any }): Promise<{ roomCode: string }> => {
+  return new Promise((resolve, reject) => {
+    const s = getSocket();
+    s.emit('room:quick-play', dto, (res) => {
+      if (res && res.success) resolve(res.data);
+      else reject(new Error(res.error?.message || 'Quick play failed'));
+    });
+  });
+};
+
