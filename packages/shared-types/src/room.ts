@@ -10,6 +10,9 @@ export type RoomStatus =
   | 'game_over';
 
 export type GameMode =
+  | 'who_is_imposter'
+  | 'draw_and_guess'
+  | 'quiz_battle'
   | 'party_trivia'
   | 'bluff_master'
   | 'secret_imposter'

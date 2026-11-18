@@ -1,9 +1,12 @@
 import { NeonAvatarId, PlayerSummary } from './player';
 import { GameMode, PublicRoomConfig, PublicRoomState } from './room';
 import {
+  ChatMessage,
+  DrawStroke,
   GamePhaseChangePayload,
   GameResultsPayload,
   PlayerScoreUpdate,
+  PrivateRolePayload,
   SecretRolePayload,
   TimerTickPayload
 } from './game';
@@ -62,6 +65,8 @@ export interface ReconnectResponse {
   player: PlayerSummary;
   room: PublicRoomState;
   secretRole?: SecretRolePayload | null;
+  privateRole?: PrivateRolePayload | null;
+  gameState?: any;
 }
 
 export interface SetReadyDTO {
@@ -84,7 +89,7 @@ export interface UpdateRoomSettingsDTO {
 }
 
 export interface GameActionDTO {
-  actionType: 'submit_answer' | 'vote' | 'draw' | 'bluff_choice';
+  actionType: string;
   payload: any;
 }
 
@@ -103,8 +108,25 @@ export interface ClientToServerEvents {
   'lobby:update-settings': (data: UpdateRoomSettingsDTO, callback?: (res: SocketApiResponse<void>) => void) => void;
   'lobby:start-game': (callback?: (res: SocketApiResponse<void>) => void) => void;
 
-  // Game actions
+  // Generic Game actions
   'game:action': (data: GameActionDTO, callback?: (res: SocketApiResponse<any>) => void) => void;
+
+  // Chat & Guessing (Draw & Guess intercept)
+  'chat:send': (data: { message: string }, callback?: (res: SocketApiResponse<void>) => void) => void;
+
+  // Drawing Events (Draw & Guess)
+  'draw:stroke': (stroke: DrawStroke) => void;
+  'draw:clear': () => void;
+  'draw:undo': () => void;
+  'draw:select_word': (data: { word: string }, callback?: (res: SocketApiResponse<void>) => void) => void;
+
+  // Who Is The Imposter Events
+  'imposter:submit_clue': (data: { clue: string }, callback?: (res: SocketApiResponse<void>) => void) => void;
+  'imposter:cast_vote': (data: { targetPlayerId: string }, callback?: (res: SocketApiResponse<void>) => void) => void;
+  'imposter:sudden_death_guess': (data: { guessedWord: string }, callback?: (res: SocketApiResponse<void>) => void) => void;
+
+  // Quiz Battle Events
+  'quiz:submit_answer': (data: { optionIndex: number }, callback?: (res: SocketApiResponse<void>) => void) => void;
 
   // Ping/Latency
   'ping:latency': (data: { timestamp: number }, callback: (res: { pong: number }) => void) => void;
@@ -136,9 +158,20 @@ export interface ServerToClientEvents {
   'game:starting': (data: { countdownSeconds: number }) => void;
   'game:phase-change': (data: GamePhaseChangePayload) => void;
   'game:secret-role': (data: SecretRolePayload) => void;
+  'game:private_role': (data: PrivateRolePayload) => void;
+  'game:state_sync': (data: { gameMode: GameMode; state: any }) => void;
   'game:timer-tick': (data: TimerTickPayload) => void;
   'game:scores-updated': (scores: PlayerScoreUpdate[]) => void;
   'game:ended': (results: GameResultsPayload) => void;
+
+  // In-Game Events: Chat & Guessing
+  'chat:message': (message: ChatMessage) => void;
+  'game:correct_guess': (data: { playerId: string; username: string; points: number }) => void;
+
+  // In-Game Events: Canvas streaming
+  'draw:stroke': (stroke: DrawStroke) => void;
+  'draw:clear': () => void;
+  'draw:undo': () => void;
 
   // Errors & notifications
   'error:notification': (data: { message: string; code?: string }) => void;

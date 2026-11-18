@@ -1,8 +1,8 @@
 import { Server } from 'socket.io';
 import { RoomManager } from '../services/roomManager.js';
-import { TimerService } from '../services/timerService.js';
 import { TokenService } from '../services/tokenService.js';
 import { rateLimitEvent } from './middleware.js';
+import { GameRegistry } from '../games/index.js';
 import { nanoid } from 'nanoid';
 import {
   ClientToServerEvents,
@@ -53,7 +53,6 @@ export const registerLobbyHandlers = (io: TypedServer, socket: any) => {
         playerId
       );
 
-      // Bind socket data
       socket.data.playerId = playerId;
       socket.data.roomCode = room.code;
       socket.data.username = hostPlayer.username;
@@ -86,7 +85,6 @@ export const registerLobbyHandlers = (io: TypedServer, socket: any) => {
         }
       });
 
-      // Broadcast fresh room state
       io.to(room.code).emit('room:state', publicState);
       console.log(`🎮 [Room Created] Room ${room.code} created by host ${hostPlayer.username}`);
     } catch (err: any) {
@@ -153,9 +151,17 @@ export const registerLobbyHandlers = (io: TypedServer, socket: any) => {
         }
       });
 
-      // Broadcast player joined & updated room state
       socket.to(room.code).emit('room:player-joined', playerSummary);
       io.to(room.code).emit('room:state', publicState);
+
+      // If mid-game, send current game state to spectator
+      const engine = GameRegistry.get(room.config.gameMode);
+      if (engine && room.status === 'in_game') {
+        socket.emit('game:state_sync', {
+          gameMode: room.config.gameMode,
+          state: engine.getPublicGameState(room, playerId)
+        });
+      }
 
       console.log(`👥 [Player Joined] ${player.username} joined ${room.code} (${isSpectator ? 'Spectator' : 'Player'})`);
     } catch (err: any) {
@@ -184,7 +190,7 @@ export const registerLobbyHandlers = (io: TypedServer, socket: any) => {
   });
 
   /**
-   * RECONNECT PLAYER (45-second grace period recovery)
+   * RECONNECT PLAYER (45-second grace recovery)
    */
   socket.on('room:reconnect', async (dto: ReconnectDTO, callback: (res: any) => void) => {
     try {
@@ -197,10 +203,6 @@ export const registerLobbyHandlers = (io: TypedServer, socket: any) => {
       }
 
       const { playerId, roomCode } = payload;
-
-      // Cancel grace period timer
-      TimerService.clearGracePeriod(roomCode, playerId);
-
       const { room, player } = await RoomManager.reconnectPlayer(playerId, roomCode, socket.id);
 
       socket.data.playerId = playerId;
@@ -245,11 +247,16 @@ export const registerLobbyHandlers = (io: TypedServer, socket: any) => {
         }
       });
 
-      // Broadcast reconnected
       socket.to(room.code).emit('room:player-reconnected', playerSummary);
       io.to(room.code).emit('room:state', publicState);
 
-      console.log(`⚡ [Player Reconnected] ${player.username} rejoined ${room.code} with score ${player.score}`);
+      // Restore game state via modular engine
+      const engine = GameRegistry.get(room.config.gameMode);
+      if (engine && room.status === 'in_game') {
+        await engine.handlePlayerReconnect(room, playerId, socket, io);
+      }
+
+      console.log(`⚡ [Player Reconnected] ${player.username} rejoined ${room.code}`);
     } catch (err: any) {
       console.error('❌ Reconnection error:', err.message);
       callback({
@@ -336,12 +343,10 @@ export const registerLobbyHandlers = (io: TypedServer, socket: any) => {
       const { room, removedPlayer } = await RoomManager.removePlayer(dto.targetPlayerId, roomCode);
 
       if (removedPlayer) {
-        // Emit kick event to target socket
         io.to(removedPlayer.socketId).emit('room:kicked', {
           reason: dto.reason || 'Kicked by the room host.'
         });
 
-        // Leave target socket from room
         const targetSocket = io.sockets.sockets.get(removedPlayer.socketId);
         if (targetSocket) {
           targetSocket.leave(roomCode);
@@ -368,7 +373,7 @@ export const registerLobbyHandlers = (io: TypedServer, socket: any) => {
   });
 
   /**
-   * START GAME (Host only, strict server-authoritative state progression)
+   * START GAME (Host only - delegates to active IPartyGameEngine plugin)
    */
   socket.on('lobby:start-game', async (callback?: (res: any) => void) => {
     try {
@@ -392,12 +397,14 @@ export const registerLobbyHandlers = (io: TypedServer, socket: any) => {
         (p) => p.connectionStatus === 'connected'
       );
 
-      if (activePlayers.length < 2) {
+      const engine = GameRegistry.get(room.config.gameMode) || GameRegistry.get('who_is_imposter')!;
+
+      if (activePlayers.length < engine.minPlayers) {
         return callback?.({
           success: false,
           error: {
             code: 'NOT_ENOUGH_PLAYERS',
-            message: 'At least 2 players are required to start.'
+            message: `At least ${engine.minPlayers} players are required to start ${engine.name}.`
           }
         });
       }
@@ -424,72 +431,14 @@ export const registerLobbyHandlers = (io: TypedServer, socket: any) => {
 
       callback?.({ success: true, data: undefined });
 
-      // Run 3-second server countdown then launch Round 1
+      // Run 3-second server countdown then launch through the engine
       setTimeout(async () => {
         const freshRoom = await RoomManager.getRoom(roomCode);
         if (!freshRoom) return;
 
-        freshRoom.status = 'in_game';
-
-        // Server-authoritative secret role distribution
-        const playerList = Object.values(freshRoom.players);
-        const imposterIndex = Math.floor(Math.random() * playerList.length);
-
-        playerList.forEach((player, index) => {
-          const isImposter = index === imposterIndex;
-          const roleTitle = isImposter ? 'The Glitch Infiltrator' : 'Neon Operative';
-          player.secretRole = roleTitle;
-
-          // Emit secret role individually to this socket only
-          const targetSocket = io.sockets.sockets.get(player.socketId);
-          if (targetSocket) {
-            targetSocket.emit('game:secret-role', {
-              playerId: player.id,
-              roleTitle,
-              roleDescription: isImposter
-                ? 'Blend in, give believable answers, and do not get voted out!'
-                : 'Identify the imposter before the round expires.',
-              isImposter,
-              team: isImposter ? 'imposters' : 'civilians'
-            });
-          }
-        });
-
-        await RoomManager.saveRoomState(freshRoom);
+        console.log(`🚀 [Game Launch] Initializing ${engine.name} in room ${roomCode}`);
+        await engine.initializeGame(freshRoom, io);
         io.to(roomCode).emit('room:state', RoomManager.toPublicState(freshRoom));
-
-        // Start Round 1 question prompt phase
-        const roundDuration = freshRoom.config.roundDurationSeconds || 30;
-        io.to(roomCode).emit('game:phase-change', {
-          phase: 'question_prompt',
-          currentRound: 1,
-          totalRounds: freshRoom.config.totalRounds,
-          durationSeconds: roundDuration,
-          prompt: {
-            id: `prompt_${nanoid(8)}`,
-            question: 'What is the most chaotic thing you could do in a virtual reality simulator?',
-            category: 'Creative Mayhem'
-          }
-        });
-
-        // Start server timer with 1s ticks
-        TimerService.startRoundTimer(
-          io,
-          roomCode,
-          roundDuration,
-          'question_prompt',
-          1,
-          async () => {
-            console.log(`⏰ Round 1 question time expired for room ${roomCode}`);
-            // Advance to voting phase
-            io.to(roomCode).emit('game:phase-change', {
-              phase: 'player_voting',
-              currentRound: 1,
-              totalRounds: freshRoom.config.totalRounds,
-              durationSeconds: 20
-            });
-          }
-        );
       }, 3000);
     } catch (err: any) {
       console.error('❌ Error starting game:', err);
@@ -497,6 +446,174 @@ export const registerLobbyHandlers = (io: TypedServer, socket: any) => {
         success: false,
         error: { code: 'START_GAME_FAILED', message: err.message }
       });
+    }
+  });
+
+  // ==========================================
+  // GAME A: WHO IS THE IMPOSTER EVENT ROUTERS
+  // ==========================================
+
+  socket.on('imposter:submit_clue', async (data: { clue: string }, callback?: (res: any) => void) => {
+    try {
+      const { roomCode, playerId } = socket.data;
+      const room = await RoomManager.getRoom(roomCode);
+      if (!room) return callback?.({ success: false, error: { code: 'NO_ROOM', message: 'Room not found' } });
+
+      const engine = GameRegistry.get(room.config.gameMode);
+      if (engine) {
+        const res = await engine.handlePlayerAction(room, playerId, 'submit_clue', data, io);
+        callback?.({ success: true, data: res });
+      }
+    } catch (err: any) {
+      callback?.({ success: false, error: { code: 'ACTION_FAILED', message: err.message } });
+    }
+  });
+
+  socket.on('imposter:cast_vote', async (data: { targetPlayerId: string }, callback?: (res: any) => void) => {
+    try {
+      const { roomCode, playerId } = socket.data;
+      const room = await RoomManager.getRoom(roomCode);
+      if (!room) return callback?.({ success: false, error: { code: 'NO_ROOM', message: 'Room not found' } });
+
+      const engine = GameRegistry.get(room.config.gameMode);
+      if (engine) {
+        const res = await engine.handlePlayerAction(room, playerId, 'cast_vote', data, io);
+        callback?.({ success: true, data: res });
+      }
+    } catch (err: any) {
+      callback?.({ success: false, error: { code: 'VOTE_FAILED', message: err.message } });
+    }
+  });
+
+  socket.on('imposter:sudden_death_guess', async (data: { guessedWord: string }, callback?: (res: any) => void) => {
+    try {
+      const { roomCode, playerId } = socket.data;
+      const room = await RoomManager.getRoom(roomCode);
+      if (!room) return callback?.({ success: false, error: { code: 'NO_ROOM', message: 'Room not found' } });
+
+      const engine = GameRegistry.get(room.config.gameMode);
+      if (engine) {
+        const res = await engine.handlePlayerAction(room, playerId, 'sudden_death_guess', data, io);
+        callback?.({ success: true, data: res });
+      }
+    } catch (err: any) {
+      callback?.({ success: false, error: { code: 'GUESS_FAILED', message: err.message } });
+    }
+  });
+
+  // ==========================================
+  // GAME B: DRAW & GUESS EVENT ROUTERS
+  // ==========================================
+
+  socket.on('draw:select_word', async (data: { word: string }, callback?: (res: any) => void) => {
+    try {
+      const { roomCode, playerId } = socket.data;
+      const room = await RoomManager.getRoom(roomCode);
+      if (!room) return callback?.({ success: false, error: { code: 'NO_ROOM', message: 'Room not found' } });
+
+      const engine = GameRegistry.get(room.config.gameMode);
+      if (engine) {
+        const res = await engine.handlePlayerAction(room, playerId, 'select_word', data, io);
+        callback?.({ success: true, data: res });
+      }
+    } catch (err: any) {
+      callback?.({ success: false, error: { code: 'SELECT_FAILED', message: err.message } });
+    }
+  });
+
+  socket.on('draw:stroke', async (stroke: any) => {
+    const { roomCode, playerId } = socket.data;
+    if (!roomCode) return;
+    const room = await RoomManager.getRoom(roomCode);
+    if (!room) return;
+    const engine = GameRegistry.get(room.config.gameMode);
+    if (engine) {
+      await engine.handlePlayerAction(room, playerId, 'draw_stroke', stroke, io);
+    }
+  });
+
+  socket.on('draw:clear', async () => {
+    const { roomCode, playerId } = socket.data;
+    if (!roomCode) return;
+    const room = await RoomManager.getRoom(roomCode);
+    if (!room) return;
+    const engine = GameRegistry.get(room.config.gameMode);
+    if (engine) {
+      await engine.handlePlayerAction(room, playerId, 'draw_clear', {}, io);
+    }
+  });
+
+  socket.on('draw:undo', async () => {
+    const { roomCode, playerId } = socket.data;
+    if (!roomCode) return;
+    const room = await RoomManager.getRoom(roomCode);
+    if (!room) return;
+    const engine = GameRegistry.get(room.config.gameMode);
+    if (engine) {
+      await engine.handlePlayerAction(room, playerId, 'draw_undo', {}, io);
+    }
+  });
+
+  // ==========================================
+  // GAME C: QUIZ BATTLE EVENT ROUTERS
+  // ==========================================
+
+  socket.on('quiz:submit_answer', async (data: { optionIndex: number }, callback?: (res: any) => void) => {
+    try {
+      const { roomCode, playerId } = socket.data;
+      const room = await RoomManager.getRoom(roomCode);
+      if (!room) return callback?.({ success: false, error: { code: 'NO_ROOM', message: 'Room not found' } });
+
+      const engine = GameRegistry.get(room.config.gameMode);
+      if (engine) {
+        const res = await engine.handlePlayerAction(room, playerId, 'submit_answer', data, io);
+        callback?.({ success: true, data: res });
+      }
+    } catch (err: any) {
+      callback?.({ success: false, error: { code: 'ANSWER_FAILED', message: err.message } });
+    }
+  });
+
+  // ==========================================
+  // CHAT & GUESS INTERCEPTION ROUTER
+  // ==========================================
+
+  socket.on('chat:send', async (data: { message: string }, callback?: (res: any) => void) => {
+    try {
+      const { roomCode, playerId, username } = socket.data;
+      if (!roomCode || !playerId) {
+        return callback?.({
+          success: false,
+          error: { code: 'UNAUTHORIZED', message: 'Not connected to room.' }
+        });
+      }
+
+      const room = await RoomManager.getRoom(roomCode);
+      if (!room) return callback?.({ success: false, error: { code: 'NO_ROOM', message: 'Room not found' } });
+
+      const text = (data.message || '').trim().slice(0, 120);
+      if (!text) return callback?.({ success: true, data: undefined });
+
+      const engine = GameRegistry.get(room.config.gameMode);
+
+      if (engine && engine.handleChatMessage) {
+        const result = await engine.handleChatMessage(room, playerId, text, io);
+        if (!result.intercepted && result.broadcastMessage) {
+          io.to(roomCode).emit('chat:message', result.broadcastMessage);
+        }
+      } else {
+        io.to(roomCode).emit('chat:message', {
+          id: nanoid(8),
+          playerId,
+          username: username || 'Player',
+          text,
+          timestamp: Date.now()
+        });
+      }
+
+      callback?.({ success: true, data: undefined });
+    } catch (err: any) {
+      callback?.({ success: false, error: { code: 'CHAT_FAILED', message: err.message } });
     }
   });
 

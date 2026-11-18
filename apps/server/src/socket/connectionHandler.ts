@@ -2,6 +2,7 @@ import { Server, Socket } from 'socket.io';
 import { RoomManager } from '../services/roomManager.js';
 import { TimerService } from '../services/timerService.js';
 import { env } from '../config/env.js';
+import { GameRegistry } from '../games/index.js';
 import { cleanupSocketRateLimit } from './middleware.js';
 import {
   ClientToServerEvents,
@@ -44,6 +45,12 @@ export const registerConnectionHandlers = (io: TypedServer, socket: TypedSocket)
       if (!result) return;
 
       const { room, graceExpiresAt } = result;
+
+      // Notify active game engine of player disconnect
+      const engine = GameRegistry.get(room.config.gameMode);
+      if (engine && room.status === 'in_game') {
+        await engine.handlePlayerDisconnect(room, playerId, io);
+      }
 
       // Broadcast disconnection status to remaining players in the room
       io.to(roomCode).emit('room:player-disconnected', {
@@ -92,6 +99,7 @@ export const registerConnectionHandlers = (io: TypedServer, socket: TypedSocket)
             io.to(roomCode).emit('room:state', RoomManager.toPublicState(updatedRoom));
           } else {
             console.log(`🧹 [Room Cleaned] Room ${roomCode} is now empty and was destroyed.`);
+            engine?.destroyGame(roomCode);
             TimerService.clearAllForRoom(roomCode);
           }
         }

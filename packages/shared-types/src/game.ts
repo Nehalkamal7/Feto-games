@@ -9,7 +9,11 @@ export type GamePhase =
   | 'player_voting'
   | 'round_reveal'
   | 'round_leaderboard'
-  | 'game_over';
+  | 'game_over'
+  | 'word_selection'
+  | 'drawing'
+  | 'clue_giving'
+  | 'imposter_sudden_death';
 
 export interface SecretRolePayload {
   playerId: string;
@@ -32,6 +36,7 @@ export interface GamePhaseChangePayload {
   currentRound: number;
   totalRounds: number;
   durationSeconds: number;
+  phaseEndsAt?: number;
   prompt?: {
     id: string;
     question: string;
@@ -59,4 +64,126 @@ export interface GameResultsPayload {
   mvpTitle: string;
   mvpPlayerId: string;
   totalRounds: number;
+}
+
+// ========================================================
+// GAME A: WHO IS THE IMPOSTER? (Social Deduction, 3-15 players)
+// ========================================================
+
+export type ImposterRole = 'civilian' | 'imposter';
+
+export interface PrivateRolePayload {
+  role: ImposterRole;
+  category: string;
+  secretWord?: string; // STRICTLY excluded for imposters
+  imposterCount: number;
+  teammateNames?: string[]; // Names of fellow imposters if > 1
+}
+
+export interface ClueSubmission {
+  playerId: string;
+  username: string;
+  avatar: NeonAvatarId;
+  clue: string;
+  submittedAt: number;
+}
+
+export interface VoteTally {
+  targetPlayerId: string;
+  targetUsername: string;
+  votesCount: number;
+  voters: { playerId: string; username: string }[];
+}
+
+export interface ImposterPublicState {
+  phase: 'role_reveal' | 'clue_giving' | 'voting' | 'imposter_sudden_death' | 'round_result' | 'game_over';
+  category: string;
+  currentTurnPlayerId?: string;
+  currentTurnUsername?: string;
+  turnOrder: string[]; // array of playerIds
+  clues: Record<string, ClueSubmission>;
+  votes: Record<string, string>; // voterId -> targetPlayerId
+  voteTallies: Record<string, number>; // targetPlayerId -> count
+  caughtImposterIds: string[];
+  suddenDeathActive: boolean;
+  suddenDeathPlayerId?: string;
+  suddenDeathPlayerUsername?: string;
+  suddenDeathEndsAt?: number;
+  revealedWord?: string; // Only populated at round_result
+  impostersWon?: boolean;
+  imposterList?: { id: string; username: string; role: ImposterRole }[];
+  roundScoreUpdates?: PlayerScoreUpdate[];
+}
+
+// ========================================================
+// GAME B: DRAW & GUESS (Drawing & Guessing, 2-15 players)
+// ========================================================
+
+export interface DrawStroke {
+  prevX: number;
+  prevY: number;
+  currX: number;
+  currY: number;
+  color: string;
+  brushSize: number;
+  isEraser: boolean;
+}
+
+export interface ChatMessage {
+  id: string;
+  playerId: string;
+  username: string;
+  text: string;
+  isCorrectGuess?: boolean;
+  isSystem?: boolean;
+  timestamp: number;
+}
+
+export interface DrawAndGuessPublicState {
+  phase: 'word_selection' | 'drawing' | 'round_result' | 'game_over';
+  currentDrawerId: string;
+  currentDrawerUsername: string;
+  currentDrawerAvatar: NeonAvatarId;
+  wordLength: number;
+  wordMask: string; // e.g. "_ _ _ _ _"
+  category: string;
+  secretWord?: string; // Only sent to drawer during drawing, and everyone at round_result
+  wordChoices?: string[]; // Sent privately to drawer during word_selection
+  correctGuessers: string[]; // List of playerIds who already guessed
+  phaseEndsAt: number;
+  roundScoreUpdates?: PlayerScoreUpdate[];
+}
+
+// ========================================================
+// GAME C: QUIZ BATTLE (Speed Trivia, 2-15 players)
+// ========================================================
+
+export interface QuizQuestionItem {
+  id: string;
+  question: string;
+  category: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  options: [string, string, string, string];
+  correctIndex: number; // Server-authoritative only
+}
+
+export interface QuizPublicQuestion {
+  id: string;
+  question: string;
+  category: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  options: [string, string, string, string];
+  phaseEndsAt: number;
+  durationSeconds: number;
+}
+
+export interface QuizPublicState {
+  phase: 'question' | 'reveal' | 'leaderboard' | 'game_over';
+  questionNumber: number;
+  totalQuestions: number;
+  currentQuestion?: QuizPublicQuestion;
+  answeredPlayerIds: string[];
+  totalActivePlayers: number;
+  correctAnswerIndex?: number; // Only revealed during 'reveal' phase
+  roundScoreUpdates?: PlayerScoreUpdate[];
 }
