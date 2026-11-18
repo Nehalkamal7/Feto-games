@@ -28,12 +28,16 @@ import {
   NeonAvatarId,
   NEON_AVATARS,
   PlayerSummary,
+  PrivateRolePayload,
   PublicRoomConfig,
   PublicRoomState,
   SecretRolePayload,
   TimerTickPayload
 } from '@feto-games/shared-types';
 import { NeonAvatarDisplay } from '@/components/NeonAvatarDisplay';
+import { ImposterGameView } from '@/components/games/ImposterGameView';
+import { DrawAndGuessGameView } from '@/components/games/DrawAndGuessGameView';
+import { QuizBattleGameView } from '@/components/games/QuizBattleGameView';
 import {
   clearReconnectSession,
   getReconnectToken,
@@ -57,6 +61,8 @@ export default function RoomPage() {
   const [room, setRoom] = useState<PublicRoomState | null>(null);
   const [currentPlayer, setCurrentPlayer] = useState<PlayerSummary | null>(null);
   const [secretRole, setSecretRole] = useState<SecretRolePayload | null>(null);
+  const [privateRole, setPrivateRole] = useState<PrivateRolePayload | null>(null);
+  const [gameStateSync, setGameStateSync] = useState<{ gameMode: GameMode; state: any } | null>(null);
 
   // In-Game State
   const [countdown, setCountdown] = useState<number | null>(null);
@@ -115,6 +121,11 @@ export default function RoomPage() {
 
     const handleRoomState = (newRoom: PublicRoomState) => {
       setRoom(newRoom);
+      if (newRoom.status === 'lobby') {
+        setPrivateRole(null);
+        setGameStateSync(null);
+        setCountdown(null);
+      }
 
       // Refresh current player reference
       const savedPlayerId = typeof window !== 'undefined'
@@ -192,6 +203,15 @@ export default function RoomPage() {
       sound.playFanfare();
     };
 
+    const handlePrivateRole = (role: PrivateRolePayload) => {
+      setPrivateRole(role);
+      sound.playFanfare();
+    };
+
+    const handleStateSync = (data: { gameMode: GameMode; state: any }) => {
+      setGameStateSync(data);
+    };
+
     const handleTimerTick = (tick: TimerTickPayload) => {
       setTimerState(tick);
     };
@@ -207,6 +227,8 @@ export default function RoomPage() {
     socket.on('game:starting', handleGameStarting);
     socket.on('game:phase-change', handlePhaseChange);
     socket.on('game:secret-role', handleSecretRole);
+    socket.on('game:private_role', handlePrivateRole);
+    socket.on('game:state_sync', handleStateSync);
     socket.on('game:timer-tick', handleTimerTick);
 
     // Initial Join or Reconnect attempt
@@ -258,6 +280,8 @@ export default function RoomPage() {
       socket.off('game:starting', handleGameStarting);
       socket.off('game:phase-change', handlePhaseChange);
       socket.off('game:secret-role', handleSecretRole);
+      socket.off('game:private_role', handlePrivateRole);
+      socket.off('game:state_sync', handleStateSync);
       socket.off('game:timer-tick', handleTimerTick);
     };
   }, [roomCode, router, showToast]);
@@ -472,56 +496,60 @@ export default function RoomPage() {
       {/* ======================================================== */}
       {room?.status === 'in_game' || room?.status === 'countdown' ? (
         /* IN-GAME ACTIVE SCREEN */
-        <div className="flex-1 flex flex-col items-center justify-center py-6 relative z-10">
-          {/* Secret Role Card */}
-          {secretRole && (
+        <div className="flex-1 flex flex-col items-center justify-start py-2 relative z-10 w-full min-h-[600px]">
+          {countdown !== null && countdown > 0 ? (
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="w-full max-w-xl glass-panel-neon p-6 rounded-3xl border border-yellow-400/40 mb-6 text-center shadow-neon-yellow"
+              exit={{ scale: 1.5, opacity: 0 }}
+              className="my-auto text-center py-20 flex flex-col items-center justify-center"
             >
-              <div className="text-xs uppercase tracking-widest text-yellow-400 font-bold mb-1">
-                Your Secret Server-Assigned Role
+              <div className="text-sm uppercase tracking-widest text-cyan-400 font-bold mb-4 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 animate-spin text-cyan-400" />
+                <span>Match Starting In</span>
               </div>
-              <h2 className="text-3xl font-black text-white mb-2">{secretRole.roleTitle}</h2>
-              <p className="text-slate-300 text-sm">{secretRole.roleDescription}</p>
+              <div className="text-9xl md:text-[12rem] font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-feto-magenta to-yellow-400 animate-pulse font-display drop-shadow-[0_0_50px_rgba(0,240,255,0.6)]">
+                {countdown}
+              </div>
             </motion.div>
-          )}
-
-          {/* Authoritative Server Timer Bar */}
-          {timerState && (
-            <div className="w-full max-w-xl mb-6">
-              <div className="flex justify-between text-xs font-bold uppercase text-cyan-300 mb-1">
-                <span>Phase: {timerState.phase.replace('_', ' ')}</span>
-                <span>{timerState.remainingSeconds}s Remaining</span>
-              </div>
-              <div className="w-full h-3 bg-feto-card rounded-full overflow-hidden border border-cyan-500/30">
-                <div
-                  className="h-full bg-gradient-to-r from-cyan-400 to-feto-magenta transition-all duration-1000 ease-linear"
-                  style={{
-                    width: `${(timerState.remainingSeconds / timerState.totalDurationSeconds) * 100}%`
-                  }}
-                />
-              </div>
+          ) : !currentPlayer ? (
+            <div className="flex flex-col items-center justify-center my-auto py-20 space-y-4">
+              <div className="w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+              <p className="text-slate-400 font-medium">Connecting to game room...</p>
             </div>
-          )}
-
-          {/* Question / Prompt display */}
-          {currentPhase?.prompt && (
-            <div className="w-full max-w-2xl glass-panel p-8 rounded-3xl text-center space-y-4 border border-feto-border">
-              <span className="px-3 py-1 bg-cyan-500/20 text-cyan-300 text-xs font-bold rounded-full uppercase tracking-wider">
-                {currentPhase.prompt.category || 'Party Challenge'}
-              </span>
-              <h3 className="text-2xl md:text-3xl font-extrabold text-white">
-                {currentPhase.prompt.question}
-              </h3>
-              <div className="pt-4">
-                <input
-                  type="text"
-                  placeholder="Type your hilarious answer..."
-                  className="w-full bg-feto-dark border border-feto-border focus:border-cyan-400 rounded-2xl px-5 py-4 text-white text-lg outline-none"
-                />
-              </div>
+          ) : !gameStateSync || gameStateSync.gameMode !== room.config.gameMode ? (
+            <div className="flex flex-col items-center justify-center my-auto py-20 space-y-4">
+              <div className="w-12 h-12 border-4 border-feto-magenta border-t-transparent rounded-full animate-spin" />
+              <p className="text-cyan-300 font-bold tracking-wide animate-pulse">
+                Synchronizing live match state...
+              </p>
+            </div>
+          ) : room.config.gameMode === 'who_is_imposter' ? (
+            <ImposterGameView
+              gameState={gameStateSync.state}
+              currentPlayer={currentPlayer}
+              players={room.players}
+              privateRole={privateRole}
+              roomCode={roomCode}
+            />
+          ) : room.config.gameMode === 'draw_and_guess' ? (
+            <DrawAndGuessGameView
+              gameState={gameStateSync.state}
+              currentPlayer={currentPlayer}
+              players={room.players}
+              roomCode={roomCode}
+            />
+          ) : room.config.gameMode === 'quiz_battle' ? (
+            <QuizBattleGameView
+              gameState={gameStateSync.state}
+              currentPlayer={currentPlayer}
+              players={room.players}
+              roomCode={roomCode}
+            />
+          ) : (
+            <div className="w-full max-w-xl glass-panel p-8 rounded-3xl text-center space-y-4 my-auto">
+              <h3 className="text-2xl font-bold text-white">Party Mode Active</h3>
+              <p className="text-slate-400">Enjoy the game with your group!</p>
             </div>
           )}
         </div>

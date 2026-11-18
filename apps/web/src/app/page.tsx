@@ -49,7 +49,7 @@ export default function HomePage() {
   const [pin, setPin] = useState('');
   const [maxPlayers, setMaxPlayers] = useState(15);
   const [roundDuration, setRoundDuration] = useState(30);
-  const [gameMode, setGameMode] = useState<GameMode>('party_trivia');
+  const [gameMode, setGameMode] = useState<GameMode>('who_is_imposter');
 
   // Join Room Form State
   const [joinCode, setJoinCode] = useState('');
@@ -450,10 +450,10 @@ export default function HomePage() {
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     {[
-                      { id: 'party_trivia', title: 'Party Trivia', desc: 'Speed trivia chaos' },
-                      { id: 'secret_imposter', title: 'Secret Imposter', desc: 'Find the traitor' },
-                      { id: 'bluff_master', title: 'Bluff Master', desc: 'Fool your friends' },
-                      { id: 'speed_draw', title: 'Speed Draw', desc: 'Rapid sketch battles' }
+                      { id: 'who_is_imposter', title: 'Who Is The Imposter?', desc: 'Social deduction (3-15p)' },
+                      { id: 'draw_and_guess', title: 'Draw & Guess', desc: 'Live canvas guessing (2-15p)' },
+                      { id: 'quiz_battle', title: 'Quiz Battle', desc: 'Speed trivia clash (2-15p)' },
+                      { id: 'party_trivia', title: 'Party Trivia', desc: 'Speed trivia chaos' }
                     ].map((mode) => (
                       <button
                         key={mode.id}

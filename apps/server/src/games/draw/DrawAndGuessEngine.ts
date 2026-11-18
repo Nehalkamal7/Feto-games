@@ -62,7 +62,7 @@ export class DrawAndGuessEngine implements IPartyGameEngine {
       roomCode: room.code,
       drawerOrder,
       currentDrawerIndex: 0,
-      currentDrawerId: drawerOrder[0],
+      currentDrawerId: drawerOrder[0] || '',
       secretWord: '',
       category: '',
       wordChoices: [],
@@ -85,7 +85,7 @@ export class DrawAndGuessEngine implements IPartyGameEngine {
    */
   private async startWordSelection(
     room: RoomState,
-    session: ActiveImposterSession | any,
+    session: ActiveDrawSession,
     io: any
   ): Promise<void> {
     session.phase = 'word_selection';
@@ -93,7 +93,7 @@ export class DrawAndGuessEngine implements IPartyGameEngine {
     session.drawingStrokes = [];
 
     // Find active drawer
-    const drawerId = session.drawerOrder[session.currentDrawerIndex % session.drawerOrder.length];
+    const drawerId = session.drawerOrder[session.currentDrawerIndex % session.drawerOrder.length] || '';
     session.currentDrawerId = drawerId;
     const drawer = room.players[drawerId];
 
@@ -134,7 +134,7 @@ export class DrawAndGuessEngine implements IPartyGameEngine {
       room.currentRound,
       async () => {
         if (session.phase === 'word_selection') {
-          const defaultPick = candidates[0];
+          const defaultPick = candidates[0] || { word: 'Cat', category: 'Animals', difficulty: 'easy' };
           await this.beginDrawingPhase(room, session, defaultPick.word, defaultPick.category, io);
         }
       }
@@ -524,7 +524,7 @@ export class DrawAndGuessEngine implements IPartyGameEngine {
 
   private broadcastState(
     room: RoomState,
-    session: ActiveDrawSession,
+    _session: ActiveDrawSession,
     io: any,
     roundScoreUpdates?: PlayerScoreUpdate[]
   ): void {

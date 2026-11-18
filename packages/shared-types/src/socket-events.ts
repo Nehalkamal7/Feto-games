@@ -128,6 +128,17 @@ export interface ClientToServerEvents {
   // Quiz Battle Events
   'quiz:submit_answer': (data: { optionIndex: number }, callback?: (res: SocketApiResponse<void>) => void) => void;
 
+  // Word Battle Events
+  'word_battle:submit_word': (data: { word: string }, callback?: (res: SocketApiResponse<{ accepted: boolean; points?: number; reason?: string }>) => void) => void;
+
+  // Truth or Dare Events
+  'tod:choose_type': (data: { choice: 'truth' | 'dare' }, callback?: (res: SocketApiResponse<void>) => void) => void;
+  'tod:complete_action': (callback?: (res: SocketApiResponse<void>) => void) => void;
+  'tod:vote': (data: { vote: 'completed' | 'refused' }, callback?: (res: SocketApiResponse<void>) => void) => void;
+
+  // Never Have I Ever Events
+  'nhie:submit_choice': (data: { choice: 'have' | 'havenot' }, callback?: (res: SocketApiResponse<void>) => void) => void;
+
   // Ping/Latency
   'ping:latency': (data: { timestamp: number }, callback: (res: { pong: number }) => void) => void;
 }
@@ -172,6 +183,10 @@ export interface ServerToClientEvents {
   'draw:stroke': (stroke: DrawStroke) => void;
   'draw:clear': () => void;
   'draw:undo': () => void;
+
+  // Word Battle Events
+  'word_battle:rejected': (data: { word: string; reason: 'already_taken' | 'invalid_letter' | 'invalid_word' }) => void;
+  'word_battle:accepted': (data: { word: string; points: number; username: string }) => void;
 
   // Errors & notifications
   'error:notification': (data: { message: string; code?: string }) => void;

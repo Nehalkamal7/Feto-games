@@ -187,3 +187,98 @@ export interface QuizPublicState {
   correctAnswerIndex?: number; // Only revealed during 'reveal' phase
   roundScoreUpdates?: PlayerScoreUpdate[];
 }
+
+// ========================================================
+// GAME D: WORD BATTLE (Speed Word Race, 2-15 players)
+// ========================================================
+
+export interface WordBattleSubmission {
+  playerId: string;
+  username: string;
+  avatar: NeonAvatarId;
+  word: string;
+  points: number;
+  submittedAt: number;
+}
+
+export interface WordBattlePublicState {
+  phase: 'starting' | 'word_racing' | 'round_results' | 'game_over';
+  round: number;
+  totalRounds: number;
+  category: string;
+  startingLetter: string;
+  claimedWords: string[];
+  recentSubmissions: WordBattleSubmission[];
+  scores: Record<string, number>;
+  playerWordCounts: Record<string, number>;
+  phaseEndsAt: number;
+  remainingSeconds: number;
+}
+
+// ========================================================
+// GAME E: TRUTH OR DARE (Party Roulette & Voting, 2-15 players)
+// ========================================================
+
+export type TodIntensityMode = 'chill' | 'party' | 'wild';
+export type TodPhase =
+  | 'roulette'
+  | 'decision'
+  | 'performing'
+  | 'voting'
+  | 'round_results'
+  | 'game_over';
+
+export interface TruthOrDareItem {
+  id: string;
+  type: 'truth' | 'dare';
+  intensity: TodIntensityMode;
+  prompt: string;
+}
+
+export interface TruthOrDarePublicState {
+  phase: TodPhase;
+  round: number;
+  totalRounds: number;
+  targetPlayerId: string;
+  targetUsername: string;
+  targetAvatar: NeonAvatarId;
+  intensity: TodIntensityMode;
+  chosenType?: 'truth' | 'dare';
+  currentPrompt?: string;
+  votes: Record<string, 'completed' | 'refused'>;
+  voteTallies: { completed: number; refused: number };
+  scores: Record<string, number>;
+  phaseEndsAt: number;
+  remainingSeconds: number;
+}
+
+// ========================================================
+// GAME F: NEVER HAVE I EVER (Party Confessions, 3-15 players)
+// ========================================================
+
+export interface NeverHaveIEverItem {
+  id: string;
+  statement: string;
+  category: string;
+}
+
+export type NhiePhase = 'statement' | 'reveal' | 'round_results' | 'game_over';
+
+export interface NeverHaveIEverPublicState {
+  phase: NhiePhase;
+  round: number;
+  totalRounds: number;
+  statement: string;
+  category: string;
+  innocencePoints: Record<string, number>;
+  roundChoices: Record<string, 'have' | 'havenot'>;
+  stats?: {
+    haveCount: number;
+    haveNotCount: number;
+    totalVoted: number;
+    havePercentage: number;
+  };
+  phaseEndsAt: number;
+  remainingSeconds: number;
+}
+

@@ -131,6 +131,7 @@ export class QuizBattleEngine implements IPartyGameEngine {
     session.phase = 'reveal';
 
     const question = session.questions[session.currentQuestionIndex];
+    const correctIndex = question ? question.correctIndex : undefined;
     const scoreUpdates: PlayerScoreUpdate[] = [];
 
     // Award scores
@@ -158,7 +159,7 @@ export class QuizBattleEngine implements IPartyGameEngine {
 
     await RoomManager.saveRoomState(room);
 
-    this.broadcastState(room, session, io, question.correctIndex, scoreUpdates);
+    this.broadcastState(room, session, io, correctIndex, scoreUpdates);
     io.to(room.code).emit('game:scores-updated', scoreUpdates);
 
     // Reveal duration: 4 seconds before advancing
@@ -257,6 +258,7 @@ export class QuizBattleEngine implements IPartyGameEngine {
       }
 
       const question = session.questions[session.currentQuestionIndex];
+      if (!question) throw new Error('NO_QUESTION');
       const isCorrect = optionIndex === question.correctIndex;
 
       // Speed-weighted score calculation
@@ -368,7 +370,7 @@ export class QuizBattleEngine implements IPartyGameEngine {
 
   private broadcastState(
     room: RoomState,
-    session: ActiveQuizSession,
+    _session: ActiveQuizSession,
     io: any,
     correctAnswerIndex?: number,
     roundScoreUpdates?: PlayerScoreUpdate[]

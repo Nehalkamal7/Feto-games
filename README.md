@@ -130,6 +130,66 @@ npm run dev
 
 ---
 
+---
+
+## 🧩 Modular `IPartyGameEngine` Plugin Architecture
+
+The server decouples game logic completely from the networking and room orchestration layer through a unified plugin interface:
+
+```typescript
+export interface IPartyGameEngine {
+  readonly gameMode: GameMode;
+  initializeGame(room: RoomState, io: Server): Promise<void>;
+  handlePlayerAction(room: RoomState, playerId: string, action: string, payload: any, socket: Socket, io: Server): Promise<void>;
+  handleChatMessage(room: RoomState, playerId: string, message: string, io: Server): Promise<boolean>;
+  handlePlayerDisconnect(room: RoomState, playerId: string, io: Server): Promise<void>;
+  handlePlayerReconnect(room: RoomState, playerId: string, socket: Socket, io: Server): Promise<void>;
+  getPublicGameState(roomCode: string): any;
+  destroyGame(roomCode: string): void;
+}
+```
+
+New games register into `GameRegistry.register(new MyGameEngine())`. The networking layer (`lobbyHandler.ts`, `connectionHandler.ts`) routes incoming events dynamically without modifying core server code.
+
+---
+
+## 🎮 The 3 Launch Multiplayer Games (Up to 15 Players)
+
+### 1. Game A: "Who Is The Imposter?" (Social Deduction · 3 to 15 Players)
+- **Dynamic Imposter Scaling**:
+  - 3–6 players: **1 Imposter**
+  - 7–11 players: **2 Imposters**
+  - 12–15 players: **3 Imposters**
+- **Zero Network Inspection Cheating**:
+  - The secret word and category are selected on the server.
+  - The secret word is sent **only** to civilians via targeted private socket events (`game:private_role`).
+  - Imposters receive `role: 'imposter'` and `secretWord: '???'`.
+- **Turn-Based Clue Phase**: Each player submits a 1-word or short clue sequentially with an authoritative 30-second timer and auto-pass.
+- **Live Interactive Voting**: Synchronized voting grid with real-time vote tallies.
+- **10-Second Sudden Death**: If caught, the accused imposter gets a 10-second sudden-death window to type and guess the secret word for +500 steal bonus points.
+- **Dataset**: `apps/server/src/games/data/imposterWords.json` (110+ categorized words).
+
+### 2. Game B: "Draw & Guess" (2 to 15 Players)
+- **Rotating Drawer**: Each round a player is selected as the Drawer to pick 1 of 3 secret words. The remaining players guess simultaneously.
+- **Responsive HTML5 Canvas**: Brush sizes (3px, 8px, 16px, 26px), 10 neon color palette, eraser, undo, and clear canvas tools.
+- **Ultra-Low Latency Streaming**: Emits optimized stroke coordinates via volatile Socket.IO events (`draw:stroke`) so network lag doesn't block the event loop.
+- **Chat Interception & Word Blocker**:
+  - Server inspects every incoming chat message.
+  - If a player guesses the secret word, the message is **blocked from public chat** to prevent spoiling.
+  - Awards speed-weighted points (up to 500) to the guesser and 75 bonus points to the drawer.
+  - Emits celebratory `game:correct_guess` notification.
+- **Dataset**: `apps/server/src/games/data/drawWords.json` (110+ drawing prompts with categories and difficulty).
+
+### 3. Game C: "Quiz Battle" (2 to 15 Players)
+- **Simultaneous Competitive Trivia**: 5 categories (*General Knowledge, Tech, Movies, Science, Sports*) across easy, medium, and hard difficulties.
+- **Authoritative Timers & Speed-Weighted Scoring**: Questions broadcast with server-side `phaseEndsAt`. Scoring awards up to 1,000 points based on response speed:
+  $$\text{Points} = \max(200, 1000 - (\Delta t \times 50))$$
+- **Duplicate Answer Prevention**: Server locks each player to a single answer per question.
+- **Live Leaderboard**: Animated rankings and score differentials displayed between rounds.
+- **Dataset**: `apps/server/src/games/data/quizQuestions.json` (105 questions with 4 choices and explanations).
+
+---
+
 ## 📡 Socket.IO Event Schema (`packages/shared-types`)
 
 | Event Name | Direction | Payload | Description |
@@ -139,20 +199,31 @@ npm run dev
 | `room:reconnect` | Client ➔ Server | `ReconnectDTO` | Recovers player state within 45s grace |
 | `lobby:set-ready` | Client ➔ Server | `{ isReady: boolean }` | Toggles player ready state |
 | `lobby:kick-player` | Client ➔ Server | `{ targetPlayerId }` | Host kicks player from room |
-| `lobby:update-settings` | Client ➔ Server | `UpdateRoomSettingsDTO` | Host updates room rules |
-| `lobby:start-game` | Client ➔ Server | - | Host starts countdown & distributes roles |
+| `lobby:update-settings` | Client ➔ Server | `UpdateRoomSettingsDTO` | Host updates room rules & game mode |
+| `lobby:start-game` | Client ➔ Server | - | Host starts countdown & launches game engine |
 | `room:state` | Server ➔ Client | `PublicRoomState` | Full broadcast of current room |
 | `room:player-joined`| Server ➔ Client | `PlayerSummary` | Broadcast when new player enters |
 | `room:player-disconnected` | Server ➔ Client | `{ playerId, graceExpiresAt }` | Disconnect with 45s grace period |
 | `room:player-reconnected` | Server ➔ Client | `PlayerSummary` | Player successfully rejoined |
 | `room:host-migrated` | Server ➔ Client | `{ newHostId, previousHostId }`| Automatic host promotion |
-| `game:secret-role` | Server ➔ Client (Private) | `SecretRolePayload` | Private secret role sent to player |
-| `game:timer-tick` | Server ➔ Client | `TimerTickPayload` | 1-second authoritative timer tick |
+| `game:private_role` | Server ➔ Client (Private) | `PrivateRolePayload` | Private secret word / role sent to player |
+| `game:state_sync` | Server ➔ Client | `{ gameMode, state }` | Engine-specific public game state |
+| `imposter:submit_clue` | Client ➔ Server | `{ clue }` | Submits clue in "Who Is The Imposter?" |
+| `imposter:vote` | Client ➔ Server | `{ votedPlayerId }` | Casts vote for imposter |
+| `imposter:guess_word` | Client ➔ Server | `{ guessedWord }` | Sudden-death word guess by caught imposter |
+| `draw:select_word` | Client ➔ Server | `{ word }` | Drawer selects prompt from 3 choices |
+| `draw:stroke` | Client ➔ Server / Server ➔ Client | `DrawStroke` | Real-time volatile canvas stroke streaming |
+| `draw:clear` | Client ➔ Server / Server ➔ Client | - | Clears the drawing canvas |
+| `draw:undo` | Client ➔ Server / Server ➔ Client | - | Undoes previous stroke |
+| `chat:send` | Client ➔ Server | `{ message }` | Chat or secret word guess in Draw & Guess |
+| `quiz:submit_answer` | Client ➔ Server | `{ questionIndex, selectedOption }`| Answers trivia question in Quiz Battle |
 
 ---
 
 ## 🔒 Security & Best Practices
-- **Never leaks private state**: Secret roles and PIN hashes are stripped from `PublicRoomState`.
-- **Token-Bucket Rate Limiter**: Sockets are capped to 20 events/second to prevent socket spam and DDoS.
+- **Zero Cheat Leaks**: Words, roles, and secret answers are omitted from public states and sent only via targeted private socket emissions.
+- **Server Interception**: Secret word guesses in Draw & Guess are intercepted and scrubbed on the server before reaching any other client's socket.
+- **Authoritative Timers**: Game phases transition strictly via server timers, immune to client clock drift or tampering.
+- **Token-Bucket Rate Limiter**: Sockets are capped to prevent socket flood and DDoS.
 - **Cryptographic PINs**: 4-digit PIN passwords hashed using bcrypt with salt rounds.
 - **Clean Disconnects**: Stale rooms are removed from Redis automatically when empty.

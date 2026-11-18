@@ -6,7 +6,6 @@ import {
   GameMode,
   ImposterPublicState,
   ImposterRole,
-  Player,
   PlayerScoreUpdate,
   RoomState
 } from '@feto-games/shared-types';
@@ -71,7 +70,7 @@ export class ImposterGameEngine implements IPartyGameEngine {
 
     // 1. Pick secret word and category
     const selectedItem =
-      IMPOSTER_WORDS[Math.floor(Math.random() * IMPOSTER_WORDS.length)] || IMPOSTER_WORDS[0];
+      IMPOSTER_WORDS[Math.floor(Math.random() * IMPOSTER_WORDS.length)] || { category: 'Animals', word: 'Elephant' };
     const category = selectedItem.category;
     const secretWord = selectedItem.word;
 
@@ -168,6 +167,10 @@ export class ImposterGameEngine implements IPartyGameEngine {
     }
 
     const currentTurnPlayerId = session.turnOrder[session.currentTurnIndex];
+    if (!currentTurnPlayerId) {
+      this.startVotingPhase(room, session, io);
+      return;
+    }
     const player = room.players[currentTurnPlayerId];
 
     if (!player || player.connectionStatus !== 'connected') {
@@ -188,7 +191,7 @@ export class ImposterGameEngine implements IPartyGameEngine {
       room.currentRound,
       async () => {
         // Auto-submit fallback if player timed out
-        if (!session.clues[currentTurnPlayerId]) {
+        if (currentTurnPlayerId && !session.clues[currentTurnPlayerId]) {
           session.clues[currentTurnPlayerId] = {
             playerId: player.id,
             username: player.username,
@@ -262,7 +265,7 @@ export class ImposterGameEngine implements IPartyGameEngine {
     if (caughtImposters.length > 0) {
       // AT LEAST ONE IMPOSTER WAS CAUGHT!
       session.caughtImposterIds = caughtImposters;
-      const primeCaughtId = caughtImposters[0];
+      const primeCaughtId = caughtImposters[0] || '';
       const caughtPlayer = room.players[primeCaughtId];
 
       console.log(`🚨 Imposter ${caughtPlayer?.username} was caught! Entering Sudden Death!`);
@@ -482,7 +485,7 @@ export class ImposterGameEngine implements IPartyGameEngine {
     room: RoomState,
     playerId: string,
     socket: any,
-    io: any
+    _io: any
   ): Promise<void> {
     const session = this.sessions.get(room.code);
     if (!session) return;
@@ -567,7 +570,7 @@ export class ImposterGameEngine implements IPartyGameEngine {
 
   private broadcastState(
     room: RoomState,
-    session: ActiveImposterSession,
+    _session: ActiveImposterSession,
     io: any,
     impostersWon?: boolean,
     roundScoreUpdates?: PlayerScoreUpdate[]
