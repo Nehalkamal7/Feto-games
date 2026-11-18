@@ -184,7 +184,7 @@ export const QuizBattleGameView: React.FC<QuizBattleGameViewProps> = ({
                 whileTap={gameState.phase === 'question' && !hasAnswered ? { scale: 0.98 } : {}}
                 onClick={() => handleSelectOption(idx)}
                 disabled={gameState.phase !== 'question' || hasAnswered}
-                className={`p-5 rounded-2xl border-2 text-left transition-all flex items-center justify-between group ${cardStyle}`}
+                className={`min-h-[56px] p-4 sm:p-5 rounded-2xl border-2 text-left transition-all flex items-center justify-between group touch-target ${cardStyle}`}
               >
                 <div className="flex items-center gap-3">
                   <div

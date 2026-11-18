@@ -123,13 +123,13 @@ export const NeverHaveIEverGameView: React.FC<NeverHaveIEverGameViewProps> = ({
       {/* ACTION BUTTONS (STATEMENT PHASE)                         */}
       {/* ======================================================== */}
       {gameState.phase === 'statement' ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-xl mx-auto w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-xl mx-auto w-full">
           <motion.button
             whileHover={!hasVoted ? { scale: 1.05 } : {}}
             whileTap={!hasVoted ? { scale: 0.95 } : {}}
             disabled={hasVoted}
             onClick={() => handleChoose('have')}
-            className={`p-6 md:p-8 rounded-3xl border-2 flex flex-col items-center gap-2 font-black text-2xl transition-all ${
+            className={`min-h-[56px] p-5 sm:p-8 rounded-3xl border-2 flex flex-col items-center justify-center gap-2 font-black text-xl sm:text-2xl transition-all touch-target ${
               selectedChoice === 'have'
                 ? 'bg-pink-950/80 border-feto-magenta text-feto-magenta shadow-neon-magenta ring-2 ring-feto-magenta'
                 : hasVoted
@@ -137,7 +137,7 @@ export const NeverHaveIEverGameView: React.FC<NeverHaveIEverGameViewProps> = ({
                 : 'bg-feto-card border-feto-border hover:border-feto-magenta text-white shadow-lg'
             }`}
           >
-            <span className="text-4xl">🙋‍♂️</span>
+            <span className="text-3xl sm:text-4xl">🙋‍♂️</span>
             <span>I HAVE</span>
             <span className="text-xs text-pink-300 font-bold uppercase tracking-wider">
               -1 Innocence Point
@@ -149,7 +149,7 @@ export const NeverHaveIEverGameView: React.FC<NeverHaveIEverGameViewProps> = ({
             whileTap={!hasVoted ? { scale: 0.95 } : {}}
             disabled={hasVoted}
             onClick={() => handleChoose('havenot')}
-            className={`p-6 md:p-8 rounded-3xl border-2 flex flex-col items-center gap-2 font-black text-2xl transition-all ${
+            className={`min-h-[56px] p-5 sm:p-8 rounded-3xl border-2 flex flex-col items-center justify-center gap-2 font-black text-xl sm:text-2xl transition-all touch-target ${
               selectedChoice === 'havenot'
                 ? 'bg-cyan-950/80 border-cyan-400 text-cyan-300 shadow-neon-cyan ring-2 ring-cyan-400'
                 : hasVoted
@@ -157,7 +157,7 @@ export const NeverHaveIEverGameView: React.FC<NeverHaveIEverGameViewProps> = ({
                 : 'bg-feto-card border-feto-border hover:border-cyan-400 text-white shadow-lg'
             }`}
           >
-            <span className="text-4xl">😇</span>
+            <span className="text-3xl sm:text-4xl">😇</span>
             <span>I HAVEN&rsquo;T</span>
             <span className="text-xs text-cyan-300 font-bold uppercase tracking-wider">
               Keep Innocence Intact

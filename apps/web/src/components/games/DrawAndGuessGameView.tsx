@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { sound } from '@/lib/sound';
 import { getSocket } from '@/lib/socket';
+import { useVisualViewport } from '@/hooks/useVisualViewport';
 
 interface DrawAndGuessGameViewProps {
   gameState: DrawAndGuessPublicState;
@@ -51,23 +52,39 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
   roomCode: _roomCode
 }) => {
   const socket = getSocket();
+  const { isKeyboardOpen, scaleFactor } = useVisualViewport();
 
   // Canvas Refs & State
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const isDrawingRef = useRef(false);
   const prevPosRef = useRef<{ x: number; y: number } | null>(null);
 
+  // Sync ref with current drawer status and phase for native touch listeners
+  const isDrawer = gameState.currentDrawerId === currentPlayer.id;
+  const isDrawerRef = useRef(isDrawer);
+  isDrawerRef.current = isDrawer;
+
+  const phaseRef = useRef(gameState.phase);
+  phaseRef.current = gameState.phase;
+
   // Tool state (for drawer)
   const [selectedColor, setSelectedColor] = useState('#00F0FF');
   const [brushSize, setBrushSize] = useState(8);
   const [isEraser, setIsEraser] = useState(false);
+
+  // Tool refs for native touch events
+  const selectedColorRef = useRef(selectedColor);
+  selectedColorRef.current = selectedColor;
+  const brushSizeRef = useRef(brushSize);
+  brushSizeRef.current = brushSize;
+  const isEraserRef = useRef(isEraser);
+  isEraserRef.current = isEraser;
 
   // Chat / Guess input state
   const [chatInput, setChatInput] = useState('');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const chatScrollRef = useRef<HTMLDivElement | null>(null);
 
-  const isDrawer = gameState.currentDrawerId === currentPlayer.id;
   const hasGuessed = gameState.correctGuessers.includes(currentPlayer.id);
 
   // Clear canvas helper
@@ -98,7 +115,71 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
     ctx.stroke();
   }, []);
 
-  // Setup Canvas Resolution & Listeners
+  // Native coordinate calculator
+  const getCoordsFromPoint = (clientX: number, clientY: number) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return null;
+
+    return {
+      x: Math.max(0, Math.min(1, (clientX - rect.left) / rect.width)),
+      y: Math.max(0, Math.min(1, (clientY - rect.top) / rect.height))
+    };
+  };
+
+  // Pointer position normalizer from React events
+  const getCanvasCoords = (e: React.MouseEvent | React.TouchEvent) => {
+    if ('touches' in e) {
+      if (e.touches.length === 0) return null;
+      return getCoordsFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+    }
+    return getCoordsFromPoint(e.clientX, e.clientY);
+  };
+
+  // Drawing stroke emitter
+  const emitStroke = useCallback((prevCoords: { x: number; y: number }, currCoords: { x: number; y: number }) => {
+    const stroke: DrawStroke = {
+      prevX: prevCoords.x,
+      prevY: prevCoords.y,
+      currX: currCoords.x,
+      currY: currCoords.y,
+      color: selectedColorRef.current,
+      brushSize: brushSizeRef.current,
+      isEraser: isEraserRef.current
+    };
+
+    drawStrokeOnCanvas(stroke);
+    socket.emit('draw:stroke', stroke);
+  }, [drawStrokeOnCanvas, socket]);
+
+  // React mouse handlers (desktop)
+  const handlePointerDown = (e: React.MouseEvent) => {
+    if (!isDrawer || gameState.phase !== 'drawing') return;
+    const coords = getCanvasCoords(e);
+    if (!coords) return;
+
+    isDrawingRef.current = true;
+    prevPosRef.current = coords;
+  };
+
+  const handlePointerMove = (e: React.MouseEvent) => {
+    if (!isDrawer || !isDrawingRef.current || !prevPosRef.current || gameState.phase !== 'drawing') {
+      return;
+    }
+    const currCoords = getCanvasCoords(e);
+    if (!currCoords) return;
+
+    emitStroke(prevPosRef.current, currCoords);
+    prevPosRef.current = currCoords;
+  };
+
+  const handlePointerUp = () => {
+    isDrawingRef.current = false;
+    prevPosRef.current = null;
+  };
+
+  // Setup Canvas Resolution, Socket Listeners, and Native Non-Passive Touch Listeners
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -107,6 +188,46 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
     canvas.width = 1000;
     canvas.height = 700;
     clearCanvas();
+
+    // Native touch listeners with { passive: false } to completely lock out scroll / pull-to-refresh
+    const onTouchStart = (e: TouchEvent) => {
+      if (!isDrawerRef.current || phaseRef.current !== 'drawing') return;
+      if (e.cancelable) e.preventDefault();
+      if (e.touches.length === 0) return;
+
+      const coords = getCoordsFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+      if (!coords) return;
+
+      isDrawingRef.current = true;
+      prevPosRef.current = coords;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (!isDrawerRef.current || !isDrawingRef.current || !prevPosRef.current || phaseRef.current !== 'drawing') {
+        return;
+      }
+      if (e.cancelable) e.preventDefault();
+      if (e.touches.length === 0) return;
+
+      const currCoords = getCoordsFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+      if (!currCoords) return;
+
+      emitStroke(prevPosRef.current, currCoords);
+      prevPosRef.current = currCoords;
+    };
+
+    const onTouchEnd = (e: TouchEvent) => {
+      if (isDrawerRef.current && phaseRef.current === 'drawing' && e.cancelable) {
+        e.preventDefault();
+      }
+      isDrawingRef.current = false;
+      prevPosRef.current = null;
+    };
+
+    canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+    canvas.addEventListener('touchend', onTouchEnd, { passive: false });
+    canvas.addEventListener('touchcancel', onTouchEnd, { passive: false });
 
     const handleIncomingStroke = (stroke: DrawStroke) => {
       drawStrokeOnCanvas(stroke);
@@ -133,73 +254,16 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
     socket.on('chat:message', handleIncomingChat);
 
     return () => {
+      canvas.removeEventListener('touchstart', onTouchStart);
+      canvas.removeEventListener('touchmove', onTouchMove);
+      canvas.removeEventListener('touchend', onTouchEnd);
+      canvas.removeEventListener('touchcancel', onTouchEnd);
+
       socket.off('draw:stroke', handleIncomingStroke);
       socket.off('draw:clear', handleIncomingClear);
       socket.off('chat:message', handleIncomingChat);
     };
-  }, [clearCanvas, drawStrokeOnCanvas, socket]);
-
-  // Pointer position normalizer
-  const getCanvasCoords = (e: React.MouseEvent | React.TouchEvent) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return null;
-    const rect = canvas.getBoundingClientRect();
-
-    let clientX = 0;
-    let clientY = 0;
-
-    if ('touches' in e) {
-      if (e.touches.length === 0) return null;
-      clientX = e.touches[0].clientX;
-      clientY = e.touches[0].clientY;
-    } else {
-      clientX = e.clientX;
-      clientY = e.clientY;
-    }
-
-    return {
-      x: (clientX - rect.left) / rect.width,
-      y: (clientY - rect.top) / rect.height
-    };
-  };
-
-  // Drawing event handlers (Drawer only)
-  const handlePointerDown = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!isDrawer || gameState.phase !== 'drawing') return;
-    const coords = getCanvasCoords(e);
-    if (!coords) return;
-
-    isDrawingRef.current = true;
-    prevPosRef.current = coords;
-  };
-
-  const handlePointerMove = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!isDrawer || !isDrawingRef.current || !prevPosRef.current || gameState.phase !== 'drawing') {
-      return;
-    }
-    const currCoords = getCanvasCoords(e);
-    if (!currCoords) return;
-
-    const stroke: DrawStroke = {
-      prevX: prevPosRef.current.x,
-      prevY: prevPosRef.current.y,
-      currX: currCoords.x,
-      currY: currCoords.y,
-      color: selectedColor,
-      brushSize: brushSize,
-      isEraser: isEraser
-    };
-
-    drawStrokeOnCanvas(stroke);
-    socket.emit('draw:stroke', stroke);
-
-    prevPosRef.current = currCoords;
-  };
-
-  const handlePointerUp = () => {
-    isDrawingRef.current = false;
-    prevPosRef.current = null;
-  };
+  }, [clearCanvas, drawStrokeOnCanvas, emitStroke, socket]);
 
   // Clear button (Drawer)
   const handleClearButton = () => {
@@ -238,12 +302,22 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-4">
+    <div
+      className="w-full max-w-6xl mx-auto space-y-3 sm:space-y-4 transition-transform duration-200"
+      style={
+        isKeyboardOpen
+          ? {
+              transform: `scale(${scaleFactor})`,
+              transformOrigin: 'top center'
+            }
+          : undefined
+      }
+    >
       {/* ======================================================== */}
       {/* HEADER: WORD MASK / SECRET WORD                         */}
       {/* ======================================================== */}
-      <div className="glass-panel-neon rounded-3xl p-4 md:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 border border-cyan-500/30">
-        <div className="flex items-center gap-3">
+      <div className="glass-panel-neon rounded-2xl sm:rounded-3xl p-3 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 border border-cyan-500/30">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
           <NeonAvatarDisplay avatarId={gameState.currentDrawerAvatar} size="sm" showGlow={false} />
           <div>
             <div className="text-xs uppercase text-slate-400 font-bold">
@@ -258,57 +332,62 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
         {/* Secret Word Display (or Masked for Guessers) */}
         <div className="text-center">
           {isDrawer || hasGuessed || gameState.phase === 'round_result' ? (
-            <div className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-amber-400 tracking-wider">
-              {gameState.secretWord || 'Choosing...'}
+            <div>
+              <span className="text-[10px] sm:text-xs uppercase text-slate-400 font-bold block">
+                {isDrawer ? 'Your Secret Word' : 'Secret Word'}
+              </span>
+              <div className="text-xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-yellow-400 tracking-wider">
+                {gameState.secretWord || '???'}
+              </div>
             </div>
           ) : (
-            <div className="text-2xl md:text-3xl font-black text-cyan-300 tracking-[0.3em]">
-              {gameState.wordMask || '_ _ _ _'}
+            <div>
+              <span className="text-[10px] sm:text-xs uppercase text-slate-400 font-bold block">
+                Secret Word ({gameState.wordLength} Letters)
+              </span>
+              <div className="text-xl sm:text-3xl font-black text-cyan-300 tracking-[0.25em]">
+                {gameState.wordMask || '_ _ _'}
+              </div>
             </div>
           )}
-          <span className="text-[10px] text-slate-400 uppercase tracking-widest block mt-0.5">
-            {gameState.wordLength > 0 ? `${gameState.wordLength} Letters` : 'Round in Progress'}
-          </span>
         </div>
 
-        {/* Correct Guessers Pill */}
+        {/* Round Timer & Guessed Badge */}
         <div className="flex items-center gap-2">
           {hasGuessed && (
-            <span className="px-3 py-1 bg-green-950/80 border border-green-500/60 rounded-full text-green-300 text-xs font-black flex items-center gap-1 shadow-neon-green">
-              <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />
+            <span className="px-3 py-1.5 bg-green-950/80 border border-green-500/50 rounded-full text-green-300 text-xs font-black flex items-center gap-1 shadow-neon-green">
+              <CheckCircle2 className="w-3.5 h-3.5" />
               <span>GUESSED!</span>
             </span>
           )}
-          <span className="text-xs text-slate-400 font-semibold">
-            {gameState.correctGuessers.length} / {players.length - 1} Guessed
-          </span>
+          <div className="px-3 py-1.5 bg-feto-dark rounded-xl border border-feto-border text-xs font-bold text-slate-300">
+            {gameState.correctGuessers.length} / {players.length - 1} Solved
+          </div>
         </div>
       </div>
 
       {/* ======================================================== */}
-      {/* MAIN GAMEPLAY AREA: CANVAS & CHAT GUESS FEED             */}
+      {/* MAIN PLAY AREA: CANVAS & LIVE CHAT FEED                   */}
       {/* ======================================================== */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* CANVAS CONTAINER (3 Columns) */}
-        <div className="lg:col-span-3 flex flex-col space-y-3">
-          <div className="relative rounded-3xl overflow-hidden border-2 border-feto-border bg-[#0a0b14] shadow-2xl aspect-[4/3] touch-none">
+        <div className="lg:col-span-3 flex flex-col space-y-2 sm:space-y-3">
+          <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border-2 border-feto-border bg-[#0a0b14] shadow-2xl aspect-[4/3] touch-action-none">
             <canvas
               ref={canvasRef}
               onMouseDown={handlePointerDown}
               onMouseMove={handlePointerMove}
               onMouseUp={handlePointerUp}
               onMouseLeave={handlePointerUp}
-              onTouchStart={handlePointerDown}
-              onTouchMove={handlePointerMove}
-              onTouchEnd={handlePointerUp}
-              className={`w-full h-full block ${
+              className={`w-full h-full block canvas-touch-safe touch-action-none ${
                 isDrawer ? 'cursor-crosshair' : 'cursor-default'
               }`}
+              style={{ touchAction: 'none' }}
             />
 
             {/* Non-drawer Spectating Tag */}
             {!isDrawer && (
-              <div className="absolute top-3 left-3 px-3 py-1 bg-black/60 backdrop-blur-md rounded-full text-[11px] text-slate-300 border border-slate-700 pointer-events-none">
+              <div className="absolute top-2 left-2 sm:top-3 sm:left-3 px-2.5 py-1 bg-black/60 backdrop-blur-md rounded-full text-[10px] sm:text-[11px] text-slate-300 border border-slate-700 pointer-events-none">
                 Watching Live Stream
               </div>
             )}
@@ -319,11 +398,11 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="glass-panel rounded-2xl p-3 flex flex-wrap items-center justify-between gap-3 border border-feto-border"
+              className="glass-panel rounded-2xl p-2.5 sm:p-3 flex flex-wrap items-center justify-between gap-2 border border-feto-border"
             >
-              {/* Color Palette */}
+              {/* Color Palette (Touch-friendly buttons) */}
               <div className="flex items-center gap-1.5 flex-wrap">
-                <Palette className="w-4 h-4 text-slate-400 mr-1" />
+                <Palette className="w-4 h-4 text-slate-400 mr-0.5 hidden sm:inline" />
                 {PALETTE_COLORS.map((c) => (
                   <button
                     key={c}
@@ -334,17 +413,18 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
                       setIsEraser(false);
                     }}
                     style={{ backgroundColor: c }}
-                    className={`w-7 h-7 rounded-xl border-2 transition-transform ${
+                    aria-label={`Color ${c}`}
+                    className={`w-8 h-8 sm:w-7 sm:h-7 rounded-xl border-2 transition-transform touch-target ${
                       selectedColor === c && !isEraser
-                        ? 'scale-125 border-white shadow-md'
-                        : 'border-slate-800 hover:scale-110'
+                        ? 'scale-110 border-white shadow-md ring-2 ring-cyan-400/50'
+                        : 'border-slate-800 hover:scale-105'
                     }`}
                   />
                 ))}
               </div>
 
               {/* Brush Sizes & Eraser / Clear */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                 {/* Brush size buttons */}
                 <div className="flex items-center gap-1 bg-feto-dark p-1 rounded-xl border border-feto-border">
                   {BRUSH_SIZES.map((size) => (
@@ -356,11 +436,12 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
                         setBrushSize(size);
                         setIsEraser(false);
                       }}
-                      className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all ${
+                      className={`w-8 h-8 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center transition-all ${
                         brushSize === size && !isEraser
                           ? 'bg-cyan-500 text-black font-bold'
                           : 'text-slate-400 hover:text-white'
                       }`}
+                      aria-label={`Brush size ${size}`}
                     >
                       <div
                         className="rounded-full bg-current"
@@ -377,12 +458,13 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
                     sound.playClick();
                     setIsEraser(!isEraser);
                   }}
-                  className={`p-2 rounded-xl border transition-all ${
+                  className={`min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 p-2 sm:p-2 rounded-xl border flex items-center justify-center transition-all ${
                     isEraser
                       ? 'bg-yellow-400 text-black border-yellow-400 shadow-neon-yellow'
                       : 'bg-feto-dark border-feto-border text-slate-300 hover:border-slate-500'
                   }`}
                   title="Eraser"
+                  aria-label="Eraser"
                 >
                   <Eraser className="w-4 h-4" />
                 </button>
@@ -391,8 +473,9 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
                 <button
                   type="button"
                   onClick={handleUndoButton}
-                  className="p-2 bg-feto-dark hover:bg-feto-card border border-feto-border rounded-xl text-slate-300 hover:text-white transition-all"
+                  className="min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 p-2 bg-feto-dark hover:bg-feto-card border border-feto-border rounded-xl text-slate-300 hover:text-white flex items-center justify-center transition-all"
                   title="Undo Stroke"
+                  aria-label="Undo"
                 >
                   <RotateCcw className="w-4 h-4" />
                 </button>
@@ -401,8 +484,9 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
                 <button
                   type="button"
                   onClick={handleClearButton}
-                  className="p-2 bg-red-950/40 hover:bg-red-900/50 border border-red-500/40 rounded-xl text-red-400 transition-all"
+                  className="min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 p-2 bg-red-950/40 hover:bg-red-900/50 border border-red-500/40 rounded-xl text-red-400 flex items-center justify-center transition-all"
                   title="Clear Canvas"
+                  aria-label="Clear Canvas"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -412,8 +496,8 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
         </div>
 
         {/* CHAT & GUESS FEED (1 Column) */}
-        <div className="lg:col-span-1 glass-panel rounded-3xl p-4 flex flex-col justify-between border border-feto-border h-[480px]">
-          <div className="flex items-center justify-between pb-3 border-b border-feto-border mb-2">
+        <div className="lg:col-span-1 glass-panel rounded-2xl sm:rounded-3xl p-3 sm:p-4 flex flex-col justify-between border border-feto-border h-[280px] sm:h-[380px] lg:h-[480px]">
+          <div className="flex items-center justify-between pb-2 sm:pb-3 border-b border-feto-border mb-2">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
               Live Guesses & Chat
             </span>
@@ -423,10 +507,10 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
           {/* Scrollable messages container */}
           <div
             ref={chatScrollRef}
-            className="flex-1 overflow-y-auto space-y-2 pr-1 text-xs"
+            className="flex-1 overflow-y-auto space-y-1.5 sm:space-y-2 pr-1 text-xs"
           >
             {chatMessages.length === 0 ? (
-              <div className="text-center py-12 text-slate-600">
+              <div className="text-center py-8 sm:py-12 text-slate-600">
                 <span>Start guessing the drawing!</span>
               </div>
             ) : (
@@ -452,8 +536,8 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
             )}
           </div>
 
-          {/* Guess Submission Input */}
-          <form onSubmit={handleSendChat} className="pt-3 border-t border-feto-border flex gap-2">
+          {/* Guess Submission Input (Touch Target >= 48px) */}
+          <form onSubmit={handleSendChat} className="pt-2 sm:pt-3 border-t border-feto-border flex gap-2">
             <input
               type="text"
               value={chatInput}
@@ -466,14 +550,15 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
                   : 'Type your guess...'
               }
               disabled={isDrawer || hasGuessed}
-              className="flex-1 bg-feto-dark border border-feto-border focus:border-cyan-400 rounded-xl px-3 py-2.5 text-white text-xs outline-none"
+              className="flex-1 min-h-[48px] bg-feto-dark border border-feto-border focus:border-cyan-400 rounded-xl px-3 text-white text-xs sm:text-sm outline-none"
             />
             <button
               type="submit"
               disabled={isDrawer || hasGuessed || !chatInput.trim()}
-              className="btn-neon-cyan px-3.5 py-2.5 rounded-xl text-white font-bold text-xs"
+              className="btn-neon-cyan min-h-[48px] min-w-[48px] px-3.5 rounded-xl text-white font-bold text-xs flex items-center justify-center"
+              aria-label="Send guess"
             >
-              <Send className="w-3.5 h-3.5" />
+              <Send className="w-4 h-4" />
             </button>
           </form>
         </div>
@@ -484,33 +569,33 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
       {/* ======================================================== */}
       <AnimatePresence>
         {gameState.phase === 'word_selection' && isDrawer && gameState.wordChoices && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md safe-top safe-bottom">
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="w-full max-w-md glass-panel-neon p-6 md:p-8 rounded-3xl text-center space-y-4 border border-cyan-400"
+              className="w-full max-w-md glass-panel-neon p-5 sm:p-8 rounded-3xl text-center space-y-4 border border-cyan-400"
             >
-              <div className="w-14 h-14 rounded-2xl bg-cyan-950/80 border border-cyan-400/60 flex items-center justify-center mx-auto text-cyan-300">
-                <Brush className="w-7 h-7" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-cyan-950/80 border border-cyan-400/60 flex items-center justify-center mx-auto text-cyan-300">
+                <Brush className="w-6 h-6 sm:w-7 sm:h-7" />
               </div>
 
               <div>
                 <span className="text-xs font-black uppercase tracking-widest text-cyan-400">
                   YOUR TURN TO DRAW!
                 </span>
-                <h3 className="text-2xl font-black text-white mt-1">Choose a Word</h3>
+                <h3 className="text-xl sm:text-2xl font-black text-white mt-1">Choose a Word</h3>
                 <p className="text-xs text-slate-400">
                   Pick one of the 3 words below to draw for everyone:
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 gap-3 pt-2">
+              <div className="grid grid-cols-1 gap-2.5 sm:gap-3 pt-2">
                 {gameState.wordChoices.map((w, idx) => (
                   <button
                     key={w}
                     onClick={() => handleSelectWord(w)}
-                    className="p-4 bg-feto-card hover:bg-cyan-950/50 border border-feto-border hover:border-cyan-400 rounded-2xl text-white font-black text-lg transition-all text-left flex items-center justify-between group"
+                    className="min-h-[52px] p-4 bg-feto-card hover:bg-cyan-950/50 border border-feto-border hover:border-cyan-400 rounded-2xl text-white font-black text-base sm:text-lg transition-all text-left flex items-center justify-between group touch-target"
                   >
                     <span>{w}</span>
                     <span className="text-xs text-slate-500 group-hover:text-cyan-300 uppercase font-bold">
@@ -531,10 +616,10 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="glass-panel p-6 rounded-3xl border border-cyan-400/40 text-center space-y-2"
+          className="glass-panel p-5 sm:p-6 rounded-3xl border border-cyan-400/40 text-center space-y-2"
         >
           <span className="text-xs uppercase font-bold text-slate-400">Round Over! The Word Was:</span>
-          <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-amber-500">
+          <div className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-amber-500">
             {gameState.secretWord}
           </div>
           <p className="text-xs text-slate-400">

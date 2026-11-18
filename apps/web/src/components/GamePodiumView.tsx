@@ -122,32 +122,32 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
       )}
 
       {/* 3D ANIMATED PODIUM PEDESTALS */}
-      <div className="w-full flex items-end justify-center gap-2 sm:gap-4 md:gap-6 mb-10 pt-10 min-h-[320px]">
+      <div className="w-full flex items-end justify-center gap-1.5 sm:gap-4 md:gap-6 mb-8 pt-8 min-h-[280px] sm:min-h-[320px]">
         {/* 2ND PLACE (SILVER - LEFT) */}
         {secondPlace && (
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex-1 max-w-[170px] flex flex-col items-center"
+            className="flex-1 min-w-0 max-w-[95px] sm:max-w-[170px] flex flex-col items-center"
           >
             <div className="relative mb-2">
-              <NeonAvatarDisplay avatarId={secondPlace.avatar} size="md" showGlow />
-              <div className="absolute -top-3 -left-2 w-7 h-7 rounded-full bg-slate-300 border-2 border-white flex items-center justify-center font-black text-xs text-black shadow-lg">
+              <NeonAvatarDisplay avatarId={secondPlace.avatar} size="sm" showGlow />
+              <div className="absolute -top-2.5 -left-2 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-300 border-2 border-white flex items-center justify-center font-black text-xs text-black shadow-lg">
                 2
               </div>
             </div>
-            <div className="font-bold text-sm text-slate-200 truncate max-w-full mb-1">
+            <div className="font-bold text-xs sm:text-sm text-slate-200 truncate max-w-full mb-0.5 sm:mb-1">
               {secondPlace.username}
             </div>
-            <div className="text-xs font-semibold text-cyan-300 mb-2">
+            <div className="text-[11px] sm:text-xs font-semibold text-cyan-300 mb-1 sm:mb-2">
               {secondPlace.score || 0} pts
             </div>
 
             {/* Silver Pedestal */}
-            <div className="w-full h-36 md:h-44 rounded-t-2xl bg-gradient-to-t from-slate-900 to-slate-700/80 border-t-2 border-l border-r border-slate-400 flex flex-col items-center justify-start pt-3 shadow-[0_0_20px_rgba(148,163,184,0.3)]">
-              <Medal className="w-6 h-6 text-slate-300 mb-1" />
-              <span className="text-xs font-extrabold text-slate-300 tracking-wider">SILVER</span>
+            <div className="w-full h-28 sm:h-36 md:h-44 rounded-t-xl sm:rounded-t-2xl bg-gradient-to-t from-slate-900 to-slate-700/80 border-t-2 border-l border-r border-slate-400 flex flex-col items-center justify-start pt-2 sm:pt-3 shadow-[0_0_20px_rgba(148,163,184,0.3)]">
+              <Medal className="w-5 h-5 sm:w-6 sm:h-6 text-slate-300 mb-0.5 sm:mb-1" />
+              <span className="text-[10px] sm:text-xs font-extrabold text-slate-300 tracking-wider">SILVER</span>
             </div>
           </motion.div>
         )}
@@ -158,28 +158,28 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
             initial={{ opacity: 0, y: 70 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
-            className="flex-1 max-w-[200px] flex flex-col items-center z-10"
+            className="flex-1 min-w-0 max-w-[120px] sm:max-w-[200px] flex flex-col items-center z-10"
           >
-            <div className="relative mb-3">
-              <div className="absolute -top-6 left-1/2 -translate-x-1/2">
-                <Crown className="w-8 h-8 text-yellow-400 fill-yellow-400 animate-bounce" />
+            <div className="relative mb-2 sm:mb-3">
+              <div className="absolute -top-5 sm:-top-6 left-1/2 -translate-x-1/2">
+                <Crown className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400 fill-yellow-400 animate-bounce" />
               </div>
-              <NeonAvatarDisplay avatarId={firstPlace.avatar} size="lg" showGlow />
-              <div className="absolute -bottom-2 right-0 w-8 h-8 rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 border-2 border-white flex items-center justify-center font-black text-sm text-black shadow-neon-gold">
+              <NeonAvatarDisplay avatarId={firstPlace.avatar} size="md" showGlow />
+              <div className="absolute -bottom-1 sm:-bottom-2 right-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 border-2 border-white flex items-center justify-center font-black text-xs sm:text-sm text-black shadow-neon-gold">
                 1
               </div>
             </div>
-            <div className="font-black text-base text-yellow-300 truncate max-w-full mb-1 drop-shadow-sm">
+            <div className="font-black text-xs sm:text-base text-yellow-300 truncate max-w-full mb-0.5 sm:mb-1 drop-shadow-sm">
               {firstPlace.username}
             </div>
-            <div className="text-sm font-extrabold text-white mb-2">
+            <div className="text-xs sm:text-sm font-extrabold text-white mb-1 sm:mb-2">
               {firstPlace.score || 0} pts
             </div>
 
             {/* Gold Pedestal */}
-            <div className="w-full h-48 md:h-60 rounded-t-2xl bg-gradient-to-t from-amber-950/80 to-yellow-600/90 border-t-4 border-l-2 border-r-2 border-yellow-300 flex flex-col items-center justify-start pt-4 shadow-neon-gold">
-              <Trophy className="w-8 h-8 text-yellow-200 fill-yellow-200 mb-1" />
-              <span className="text-sm font-black text-yellow-100 tracking-widest">CHAMPION</span>
+            <div className="w-full h-36 sm:h-48 md:h-60 rounded-t-xl sm:rounded-t-2xl bg-gradient-to-t from-amber-950/80 to-yellow-600/90 border-t-4 border-l-2 border-r-2 border-yellow-300 flex flex-col items-center justify-start pt-2 sm:pt-4 shadow-neon-gold">
+              <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-200 fill-yellow-200 mb-0.5 sm:mb-1" />
+              <span className="text-[11px] sm:text-sm font-black text-yellow-100 tracking-widest">CHAMP</span>
             </div>
           </motion.div>
         )}
@@ -190,33 +190,33 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex-1 max-w-[170px] flex flex-col items-center"
+            className="flex-1 min-w-0 max-w-[95px] sm:max-w-[170px] flex flex-col items-center"
           >
             <div className="relative mb-2">
-              <NeonAvatarDisplay avatarId={thirdPlace.avatar} size="md" showGlow />
-              <div className="absolute -top-3 -right-2 w-7 h-7 rounded-full bg-amber-700 border-2 border-amber-400 flex items-center justify-center font-black text-xs text-white shadow-lg">
+              <NeonAvatarDisplay avatarId={thirdPlace.avatar} size="sm" showGlow />
+              <div className="absolute -top-2.5 -right-2 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-amber-700 border-2 border-amber-400 flex items-center justify-center font-black text-xs text-white shadow-lg">
                 3
               </div>
             </div>
-            <div className="font-bold text-sm text-slate-300 truncate max-w-full mb-1">
+            <div className="font-bold text-xs sm:text-sm text-slate-300 truncate max-w-full mb-0.5 sm:mb-1">
               {thirdPlace.username}
             </div>
-            <div className="text-xs font-semibold text-amber-400 mb-2">
+            <div className="text-[11px] sm:text-xs font-semibold text-amber-400 mb-1 sm:mb-2">
               {thirdPlace.score || 0} pts
             </div>
 
             {/* Bronze Pedestal */}
-            <div className="w-full h-28 md:h-36 rounded-t-2xl bg-gradient-to-t from-slate-950 to-amber-900/60 border-t-2 border-l border-r border-amber-600 flex flex-col items-center justify-start pt-3 shadow-[0_0_20px_rgba(217,119,6,0.2)]">
-              <Medal className="w-6 h-6 text-amber-500 mb-1" />
-              <span className="text-xs font-extrabold text-amber-400 tracking-wider">BRONZE</span>
+            <div className="w-full h-24 sm:h-28 md:h-36 rounded-t-xl sm:rounded-t-2xl bg-gradient-to-t from-slate-950 to-amber-900/60 border-t-2 border-l border-r border-amber-600 flex flex-col items-center justify-start pt-2 sm:pt-3 shadow-[0_0_20px_rgba(217,119,6,0.2)]">
+              <Medal className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500 mb-0.5 sm:mb-1" />
+              <span className="text-[10px] sm:text-xs font-extrabold text-amber-400 tracking-wider">BRONZE</span>
             </div>
           </motion.div>
         )}
       </div>
 
       {/* FULL 15-PLAYER SCOREBOARD LIST */}
-      <div className="w-full glass-panel rounded-2xl p-4 md:p-6 mb-8">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
+      <div className="w-full glass-panel rounded-2xl p-3 sm:p-6 mb-6 sm:mb-8">
+        <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-300 mb-3 sm:mb-4 flex items-center gap-2">
           <Users className="w-4 h-4 text-cyan-400" />
           <span>Complete Room Scoreboard ({sortedPlayers.length} Players)</span>
         </h3>
@@ -225,23 +225,23 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
           {sortedPlayers.map((player, idx) => (
             <div
               key={player.id}
-              className={`py-2.5 px-3 flex items-center justify-between rounded-xl transition-all ${
+              className={`py-2 px-2.5 sm:py-2.5 sm:px-3 flex items-center justify-between rounded-xl transition-all ${
                 player.id === currentPlayer?.id ? 'bg-cyan-500/10 border border-cyan-500/30' : 'hover:bg-slate-800/40'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <span className="w-6 text-center font-bold text-xs text-slate-400">#{idx + 1}</span>
+              <div className="flex items-center gap-2 sm:gap-3 truncate">
+                <span className="w-5 text-center font-bold text-xs text-slate-400">#{idx + 1}</span>
                 <NeonAvatarDisplay avatarId={player.avatar} size="sm" />
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-sm text-white">{player.username}</span>
+                <div className="flex items-center gap-1.5 truncate">
+                  <span className="font-bold text-xs sm:text-sm text-white truncate max-w-[110px] sm:max-w-none">{player.username}</span>
                   {player.id === currentPlayer?.id && (
-                    <span className="text-[10px] bg-cyan-500/20 text-cyan-300 px-1.5 py-0.5 rounded font-semibold">
+                    <span className="text-[9px] sm:text-[10px] bg-cyan-500/20 text-cyan-300 px-1 py-0.5 rounded font-semibold">
                       You
                     </span>
                   )}
                   {room.config.isTeamMode && player.team && (
                     <span
-                      className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${
+                      className={`text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${
                         player.team === 'red'
                           ? 'bg-red-950 text-red-300 border border-red-500/30'
                           : player.team === 'blue'
@@ -254,7 +254,7 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
                   )}
                 </div>
               </div>
-              <div className="font-mono font-black text-sm text-yellow-400">
+              <div className="font-mono font-black text-xs sm:text-sm text-yellow-400 flex-shrink-0 ml-2">
                 {player.score || 0} pts
               </div>
             </div>
@@ -263,7 +263,7 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
       </div>
 
       {/* REMATCH / PLAY AGAIN CONTROLS */}
-      <div className="w-full glass-panel-neon rounded-2xl p-6 text-center">
+      <div className="w-full glass-panel-neon rounded-2xl p-4 sm:p-6 text-center">
         {errorMessage && (
           <div className="mb-4 p-3 bg-red-950/80 border border-red-500/40 rounded-xl text-red-300 text-xs">
             {errorMessage}
@@ -272,8 +272,8 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
 
         {isHost ? (
           <div className="space-y-4 max-w-md mx-auto">
-            <h4 className="text-base font-extrabold text-white flex items-center justify-center gap-2">
-              <RotateCcw className="w-5 h-5 text-cyan-400" />
+            <h4 className="text-sm sm:text-base font-extrabold text-white flex items-center justify-center gap-2">
+              <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
               <span>1-Click Rematch (Keep All Players in Room)</span>
             </h4>
             <p className="text-xs text-slate-400">
@@ -288,7 +288,7 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
                     sound.playClick();
                     setSelectedNextGame(g.id);
                   }}
-                  className={`p-2.5 rounded-xl border text-xs font-bold transition-all ${
+                  className={`min-h-[48px] p-2.5 rounded-xl border text-xs font-bold transition-all touch-target flex items-center justify-start ${
                     selectedNextGame === g.id
                       ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300 shadow-neon-cyan'
                       : 'bg-slate-900/50 border-slate-700 text-slate-400 hover:text-white hover:border-slate-500'
@@ -302,7 +302,7 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
             <button
               onClick={handleRematch}
               disabled={isRematching}
-              className="w-full py-4 rounded-2xl bg-gradient-to-r from-cyan-400 via-feto-magenta to-yellow-400 hover:brightness-110 text-black font-black text-base uppercase tracking-wider flex items-center justify-center gap-2 shadow-neon-magenta transition-all active:scale-95 disabled:opacity-50"
+              className="w-full min-h-[52px] py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-cyan-400 via-feto-magenta to-yellow-400 hover:brightness-110 text-black font-black text-sm sm:text-base uppercase tracking-wider flex items-center justify-center gap-2 shadow-neon-magenta transition-all active:scale-95 disabled:opacity-50 touch-target"
             >
               {isRematching ? (
                 <span>Starting Rematch...</span>

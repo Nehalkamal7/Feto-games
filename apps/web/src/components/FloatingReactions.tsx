@@ -92,26 +92,27 @@ export function FloatingReactions() {
       </div>
 
       {/* REACTION BAR ON SCREEN (MOBILE & DESKTOP FRIENDLY) */}
-      <div className="fixed bottom-4 right-4 z-40 flex items-center gap-1.5">
+      <div className="fixed bottom-3 sm:bottom-4 right-3 sm:right-4 z-40 flex items-center gap-1.5 safe-bottom safe-right">
         <AnimatePresence>
           {isExpanded && (
             <motion.div
               initial={{ opacity: 0, scale: 0.8, x: 20 }}
               animate={{ opacity: 1, scale: 1, x: 0 }}
               exit={{ opacity: 0, scale: 0.8, x: 20 }}
-              className="flex items-center gap-1.5 p-1.5 bg-slate-950/80 backdrop-blur-md border border-cyan-500/30 rounded-2xl shadow-neon-cyan"
+              className="flex items-center gap-1 sm:gap-1.5 p-1 sm:p-1.5 bg-slate-950/85 backdrop-blur-md border border-cyan-500/30 rounded-2xl shadow-neon-cyan"
             >
               {REACTION_EMOJIS.map((emoji) => (
                 <button
                   key={emoji}
                   onClick={() => handleSendReaction(emoji)}
                   disabled={cooldown}
-                  className={`w-9 h-9 md:w-10 md:h-10 flex items-center justify-center text-xl md:text-2xl rounded-xl transition-all ${
+                  className={`w-10 h-10 md:w-11 md:h-11 flex items-center justify-center text-xl md:text-2xl rounded-xl transition-all touch-target ${
                     cooldown
                       ? 'opacity-40 cursor-not-allowed scale-90'
                       : 'hover:scale-125 hover:bg-white/10 active:scale-95'
                   }`}
                   title={cooldown ? '1s Cooldown' : `Send ${emoji}`}
+                  aria-label={`Send reaction ${emoji}`}
                 >
                   {emoji}
                 </button>
@@ -122,10 +123,11 @@ export function FloatingReactions() {
 
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className={`p-2.5 rounded-2xl bg-slate-900/90 border border-cyan-500/40 text-cyan-400 hover:text-white hover:border-cyan-400 transition-all shadow-neon-cyan ${
+          className={`min-h-[44px] min-w-[44px] p-2.5 rounded-2xl bg-slate-900/90 border border-cyan-500/40 text-cyan-400 hover:text-white hover:border-cyan-400 transition-all shadow-neon-cyan flex items-center justify-center touch-target ${
             cooldown ? 'animate-pulse' : ''
           }`}
           title={isExpanded ? 'Hide Reactions' : 'Show Reactions'}
+          aria-label="Toggle reactions bar"
         >
           <Sparkles className="w-4 h-4" />
         </button>

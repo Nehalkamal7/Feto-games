@@ -6,6 +6,16 @@ export const metadata: Metadata = {
   description:
     'FETO GAMES is a high-speed, real-time browser party gaming platform supporting up to 15 players per room on mobile, tablet, and desktop.',
   keywords: ['party games', 'multiplayer', 'browser games', 'jackbox alternative', 'feto games', 'socket.io', 'trivia'],
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'FETO GAMES'
+  },
+  icons: {
+    icon: '/icons/icon-192.svg',
+    apple: '/icons/icon-192.svg'
+  },
   openGraph: {
     title: 'FETO GAMES - Multiplayer Party Platform',
     description: 'Instant rooms, neon avatars, and up to 15 players on any device.',
@@ -18,6 +28,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  viewportFit: 'cover',
+  interactiveWidget: 'resizes-content',
   themeColor: '#07080f'
 };
 
@@ -28,7 +40,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className="min-h-screen bg-[#07080f] text-slate-100 antialiased selection:bg-cyan-500 selection:text-black">
+      <body className="min-h-[100dvh] bg-[#07080f] text-slate-100 antialiased selection:bg-cyan-500 selection:text-black">
         {children}
       </body>
     </html>

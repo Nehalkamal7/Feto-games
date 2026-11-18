@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { sound } from '@/lib/sound';
 import { getSocket } from '@/lib/socket';
+import { useVisualViewport } from '@/hooks/useVisualViewport';
 
 interface WordBattleGameViewProps {
   gameState: WordBattlePublicState;
@@ -36,6 +37,7 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
   roomCode: _roomCode
 }) => {
   const socket = getSocket();
+  const { isKeyboardOpen, scaleFactor } = useVisualViewport();
 
   const [inputWord, setInputWord] = useState('');
   const [rejectFeedback, setRejectFeedback] = useState<string | null>(null);
@@ -130,7 +132,10 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
   const progressPercent = Math.max(0, Math.min(100, (gameState.remainingSeconds / 25) * 100));
 
   return (
-    <div className="w-full max-w-5xl mx-auto flex flex-col gap-6 p-2 md:p-4">
+    <div
+      className="w-full max-w-5xl mx-auto flex flex-col gap-4 sm:gap-6 p-2 md:p-4 transition-transform duration-200"
+      style={isKeyboardOpen ? { transform: `scale(${scaleFactor})`, transformOrigin: 'top center' } : undefined}
+    >
       {/* ======================================================== */}
       {/* HEADER: ROUND, LETTER & CATEGORY BANNER                  */}
       {/* ======================================================== */}
@@ -249,9 +254,9 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
                   type="text"
                   value={inputWord}
                   onChange={(e) => setInputWord(e.target.value)}
-                  placeholder={`Type a word starting with "${gameState.startingLetter}" and press Enter...`}
+                  placeholder={`Word starting with "${gameState.startingLetter}"...`}
                   disabled={gameState.phase !== 'word_racing'}
-                  className={`w-full bg-feto-card border-2 rounded-2xl px-5 py-4 text-white text-lg md:text-xl font-bold outline-none transition-all shadow-inner placeholder:text-slate-500 placeholder:text-sm md:placeholder:text-base ${
+                  className={`w-full min-h-[48px] bg-feto-card border-2 rounded-2xl px-4 sm:px-5 py-3 sm:py-4 text-white text-base sm:text-lg md:text-xl font-bold outline-none transition-all shadow-inner placeholder:text-slate-500 placeholder:text-xs sm:placeholder:text-sm md:placeholder:text-base ${
                     rejectFeedback
                       ? 'border-red-500 shadow-neon-pink'
                       : 'border-feto-border focus:border-cyan-400 focus:shadow-neon-cyan'
@@ -263,10 +268,10 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
               <button
                 type="submit"
                 disabled={!inputWord.trim() || gameState.phase !== 'word_racing' || isSubmitting}
-                className="px-6 py-4 bg-gradient-to-r from-cyan-400 to-feto-magenta hover:brightness-110 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-black font-black text-lg rounded-2xl transition-all shadow-neon-cyan flex items-center gap-2"
+                className="min-h-[48px] px-5 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-cyan-400 to-feto-magenta hover:brightness-110 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-black font-black text-sm sm:text-lg rounded-2xl transition-all shadow-neon-cyan flex items-center justify-center gap-1.5 sm:gap-2 touch-target"
               >
                 <span>CLAIM</span>
-                <Send className="w-5 h-5" />
+                <Send className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </motion.div>
 

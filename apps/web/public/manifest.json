@@ -1,0 +1,38 @@
+{
+  "name": "FETO GAMES - Multiplayer Party Platform",
+  "short_name": "FETO GAMES",
+  "description": "High-speed real-time multiplayer party gaming platform supporting up to 15 concurrent players on mobile, tablet, and desktop.",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#07080f",
+  "theme_color": "#00F0FF",
+  "orientation": "any",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Create Room",
+      "url": "/?action=create",
+      "description": "Host a new party game room"
+    },
+    {
+      "name": "Join Game",
+      "url": "/?action=join",
+      "description": "Join an existing game room with a code"
+    }
+  ]
+}

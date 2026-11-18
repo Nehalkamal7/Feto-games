@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { sound } from '@/lib/sound';
 import { getSocket } from '@/lib/socket';
+import { useVisualViewport } from '@/hooks/useVisualViewport';
 
 interface ImposterGameViewProps {
   gameState: ImposterPublicState;
@@ -39,6 +40,7 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
   roomCode: _roomCode
 }) => {
   const socket = getSocket();
+  const { isKeyboardOpen, scaleFactor } = useVisualViewport();
 
   // Role card toggle
   const [showRoleSecret, setShowRoleSecret] = useState(false);
@@ -117,7 +119,10 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6">
+    <div
+      className="w-full max-w-4xl mx-auto space-y-6 transition-transform duration-200"
+      style={isKeyboardOpen ? { transform: `scale(${scaleFactor})`, transformOrigin: 'top center' } : undefined}
+    >
       {/* ======================================================== */}
       {/* TOP PRIVATE ROLE & CATEGORY BANNER                       */}
       {/* ======================================================== */}
@@ -234,12 +239,12 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
                 onChange={(e) => setClueInput(e.target.value)}
                 placeholder="Type your 1-word or short clue..."
                 autoFocus
-                className="flex-1 bg-feto-dark border border-cyan-400 focus:ring-2 focus:ring-cyan-500/40 rounded-2xl px-5 py-3.5 text-white text-base font-bold outline-none"
+                className="flex-1 min-h-[48px] bg-feto-dark border border-cyan-400 focus:ring-2 focus:ring-cyan-500/40 rounded-2xl px-5 py-3 text-white text-base font-bold outline-none"
               />
               <button
                 type="submit"
                 disabled={isSubmittingClue || !clueInput.trim()}
-                className="btn-neon-cyan px-6 py-3.5 rounded-2xl text-white font-black text-base flex items-center gap-1.5"
+                className="btn-neon-cyan min-h-[48px] px-6 py-3 rounded-2xl text-white font-black text-base flex items-center justify-center gap-1.5 touch-target"
               >
                 <Send className="w-4 h-4" />
                 <span>Submit</span>
@@ -350,7 +355,7 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
                   {!isSelf && (
                     <button
                       onClick={() => handleCastVote(p.id)}
-                      className={`w-full py-2 rounded-xl text-xs font-black transition-all ${
+                      className={`w-full min-h-[48px] py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all touch-target flex items-center justify-center ${
                         isMyVote
                           ? 'bg-yellow-400 text-black shadow-neon-yellow'
                           : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
@@ -360,7 +365,7 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
                     </button>
                   )}
                   {isSelf && (
-                    <span className="text-[10px] text-slate-500 uppercase font-bold py-2">
+                    <span className="text-[10px] text-slate-500 uppercase font-bold py-3">
                       (You)
                     </span>
                   )}
@@ -376,22 +381,22 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
       {/* ======================================================== */}
       <AnimatePresence>
         {gameState.suddenDeathActive && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md safe-top safe-bottom">
             <motion.div
               initial={{ scale: 0.85, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.85, opacity: 0 }}
-              className="w-full max-w-lg glass-panel-neon p-6 md:p-8 rounded-3xl border-2 border-red-500 text-center space-y-4 shadow-neon-magenta"
+              className="w-full max-w-lg glass-panel-neon p-5 sm:p-8 rounded-3xl border-2 border-red-500 text-center space-y-4 shadow-neon-magenta"
             >
-              <div className="w-16 h-16 rounded-full bg-red-950/80 border border-red-500/60 flex items-center justify-center mx-auto text-red-400 animate-bounce">
-                <Flame className="w-8 h-8" />
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-red-950/80 border border-red-500/60 flex items-center justify-center mx-auto text-red-400 animate-bounce">
+                <Flame className="w-7 h-7 sm:w-8 sm:h-8" />
               </div>
 
               <div>
                 <span className="text-xs uppercase font-black tracking-widest text-red-400">
                   IMPOSTER CAUGHT!
                 </span>
-                <h3 className="text-2xl md:text-3xl font-black text-white">
+                <h3 className="text-xl sm:text-3xl font-black text-white">
                   10-Second Sudden Death
                 </h3>
                 <p className="text-xs text-slate-300 mt-1">
@@ -410,12 +415,12 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
                     placeholder="Guess the secret word..."
                     autoFocus
                     required
-                    className="w-full bg-feto-dark border-2 border-yellow-400 focus:ring-4 focus:ring-yellow-500/30 rounded-2xl px-5 py-4 text-center text-xl font-black text-white outline-none uppercase"
+                    className="w-full min-h-[48px] bg-feto-dark border-2 border-yellow-400 focus:ring-4 focus:ring-yellow-500/30 rounded-2xl px-4 py-3 sm:py-4 text-center text-lg sm:text-xl font-black text-white outline-none uppercase"
                   />
                   <button
                     type="submit"
                     disabled={isSubmittingGuess || !suddenDeathInput.trim()}
-                    className="w-full py-4 bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-black font-black text-lg rounded-2xl shadow-neon-yellow tracking-wider"
+                    className="w-full min-h-[52px] py-3.5 sm:py-4 bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-black font-black text-base sm:text-lg rounded-2xl shadow-neon-yellow tracking-wider touch-target"
                   >
                     STEAL THE ROUND WIN!
                   </button>

@@ -407,7 +407,7 @@ export default function RoomPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-between max-w-7xl mx-auto px-4 py-6 md:py-8 relative">
+    <div className="min-h-[100dvh] flex flex-col justify-between max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-6 relative safe-top safe-bottom">
       {/* Background Neon Lights */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-feto-magenta/10 rounded-full blur-3xl pointer-events-none" />
@@ -663,8 +663,8 @@ export default function RoomPage() {
               </span>
             </div>
 
-            {/* 15-PLAYER RESPONSIVE GRID */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4 mb-6">
+            {/* 15-PLAYER RESPONSIVE COMPACT GRID */}
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
               {/* Connected / In-Lobby Players */}
               {activePlayers.map((player) => {
                 const isDisconnected = player.connectionStatus === 'disconnected_grace';
@@ -676,7 +676,7 @@ export default function RoomPage() {
                     layout
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className={`relative glass-panel rounded-2xl p-4 flex flex-col items-center justify-between text-center transition-all ${
+                    className={`relative glass-panel rounded-xl sm:rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-between text-center transition-all min-h-[140px] sm:min-h-[170px] ${
                       player.isReady
                         ? 'border-green-500/50 shadow-neon-green'
                         : isDisconnected
@@ -687,35 +687,35 @@ export default function RoomPage() {
                     {/* Host Crown */}
                     {player.isHost && (
                       <div
-                        className="absolute -top-3 -right-2 p-1.5 bg-yellow-400 rounded-full shadow-neon-gold transform rotate-12"
+                        className="absolute -top-2 -right-1 sm:-top-3 sm:-right-2 p-1 sm:p-1.5 bg-yellow-400 rounded-full shadow-neon-gold transform rotate-12"
                         title="Room Host"
                       >
-                        <Crown className="w-4 h-4 text-black fill-black" />
+                        <Crown className="w-3 h-3 sm:w-4 sm:h-4 text-black fill-black" />
                       </div>
                     )}
 
                     {/* Avatar Display */}
-                    <div className="my-2">
+                    <div className="my-1 sm:my-2">
                       <NeonAvatarDisplay
                         avatarId={player.avatar}
-                        size="md"
+                        size="sm"
                         showGlow={player.isReady}
                         isReady={player.isReady}
                       />
                     </div>
 
                     {/* Username & Me tag */}
-                    <div className="w-full truncate mb-2">
-                      <div className="font-bold text-sm text-white truncate">
+                    <div className="w-full truncate mb-1 sm:mb-2">
+                      <div className="font-bold text-[11px] sm:text-sm text-white truncate px-0.5">
                         {player.username}
                         {player.id === currentPlayer?.id && (
-                          <span className="ml-1 text-[10px] text-cyan-400 font-normal">(You)</span>
+                          <span className="ml-0.5 sm:ml-1 text-[9px] sm:text-[10px] text-cyan-400 font-normal">(You)</span>
                         )}
                       </div>
-                      <div className="text-[11px] text-slate-400">Score: {player.score}</div>
+                      <div className="text-[10px] sm:text-[11px] text-slate-400">Score: {player.score}</div>
                       {room.config.isTeamMode && player.team && (
                         <div
-                          className={`mt-1 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase inline-block ${
+                          className={`mt-0.5 text-[9px] sm:text-[10px] font-extrabold px-1.5 sm:px-2 py-0.5 rounded-full uppercase inline-block ${
                             player.team === 'red'
                               ? 'bg-red-950/80 text-red-400 border border-red-500/40'
                               : player.team === 'blue'
@@ -723,7 +723,7 @@ export default function RoomPage() {
                               : 'bg-green-950/80 text-green-400 border border-green-500/40'
                           }`}
                         >
-                          {player.team} team
+                          {player.team}
                         </div>
                       )}
                     </div>
@@ -731,17 +731,17 @@ export default function RoomPage() {
                     {/* Status Badge */}
                     <div className="w-full">
                       {isDisconnected ? (
-                        <div className="w-full py-1 px-2 bg-orange-950/80 border border-orange-500/50 rounded-lg text-orange-300 text-[10px] font-bold flex items-center justify-center gap-1 animate-pulse">
-                          <Clock className="w-3 h-3" />
-                          <span>Reconnecting ({remainingGrace}s)</span>
+                        <div className="w-full py-0.5 sm:py-1 px-1 sm:px-2 bg-orange-950/80 border border-orange-500/50 rounded-lg text-orange-300 text-[9px] sm:text-[10px] font-bold flex items-center justify-center gap-1 animate-pulse">
+                          <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                          <span className="truncate">{remainingGrace}s</span>
                         </div>
                       ) : player.isReady ? (
-                        <div className="w-full py-1 px-2 bg-green-950/60 border border-green-500/40 rounded-lg text-green-300 text-[11px] font-extrabold flex items-center justify-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />
+                        <div className="w-full py-0.5 sm:py-1 px-1 sm:px-2 bg-green-950/60 border border-green-500/40 rounded-lg text-green-300 text-[9px] sm:text-[11px] font-extrabold flex items-center justify-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-green-400 flex-shrink-0" />
                           <span>READY</span>
                         </div>
                       ) : (
-                        <div className="w-full py-1 px-2 bg-slate-800/60 border border-slate-700 rounded-lg text-slate-400 text-[11px] font-semibold">
+                        <div className="w-full py-0.5 sm:py-1 px-1 sm:px-2 bg-slate-800/60 border border-slate-700 rounded-lg text-slate-400 text-[9px] sm:text-[11px] font-semibold truncate">
                           NOT READY
                         </div>
                       )}
@@ -751,47 +751,53 @@ export default function RoomPage() {
                     {isHost && player.id !== currentPlayer?.id && (
                       <button
                         onClick={() => setKickTarget(player)}
-                        className="mt-2 text-[10px] text-slate-500 hover:text-red-400 font-semibold flex items-center gap-1"
+                        className="mt-1 text-[9px] sm:text-[10px] text-slate-500 hover:text-red-400 font-semibold flex items-center gap-0.5 py-1 px-1.5 touch-manipulation"
                       >
-                        <UserX className="w-3 h-3" /> Kick
+                        <UserX className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> Kick
                       </button>
                     )}
                   </motion.div>
                 );
               })}
 
-              {/* Dotted empty slot placeholders up to room's max capacity */}
+              {/* Dotted empty slot placeholders up to room's max capacity (compact on mobile) */}
               {Array.from({ length: Math.max(0, maxPlayers - activePlayers.length) }).map(
-                (_, idx) => (
-                  <div
-                    key={`slot-${idx}`}
-                    className="h-44 rounded-2xl border-2 border-dashed border-slate-800/80 flex flex-col items-center justify-center p-4 text-center text-slate-600 select-none"
-                  >
-                    <div className="w-12 h-12 rounded-xl border border-dashed border-slate-800 flex items-center justify-center mb-2">
-                      <span className="text-xs font-bold text-slate-700">
-                        {activePlayers.length + idx + 1}
-                      </span>
+                (_, idx) => {
+                  const slotNum = activePlayers.length + idx + 1;
+                  const hideOnMobile = idx >= 3;
+                  return (
+                    <div
+                      key={`slot-${idx}`}
+                      className={`h-24 sm:h-44 rounded-xl sm:rounded-2xl border-2 border-dashed border-slate-800/80 flex flex-col items-center justify-center p-2 sm:p-4 text-center text-slate-600 select-none ${
+                        hideOnMobile ? 'hidden sm:flex' : 'flex'
+                      }`}
+                    >
+                      <div className="w-7 h-7 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl border border-dashed border-slate-800 flex items-center justify-center mb-1 sm:mb-2">
+                        <span className="text-[10px] sm:text-xs font-bold text-slate-700">
+                          {slotNum}
+                        </span>
+                      </div>
+                      <span className="text-[9px] sm:text-xs font-medium text-slate-600 truncate">Open</span>
                     </div>
-                    <span className="text-xs font-medium text-slate-600">Waiting for Player</span>
-                  </div>
-                )
+                  );
+                }
               )}
             </div>
           </div>
 
-          {/* BOTTOM CONTROLS DOCK */}
-          <div className="glass-panel-neon rounded-3xl p-4 md:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 border border-cyan-500/30">
+          {/* BOTTOM CONTROLS DOCK (Sticky Safe Area, Min-48px Touch Targets) */}
+          <div className="glass-panel-neon rounded-2xl sm:rounded-3xl p-3 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 border border-cyan-500/30 sticky bottom-2 z-20 shadow-2xl safe-bottom">
             {/* Player Info Preview */}
             <div className="flex items-center gap-3 w-full sm:w-auto">
               {currentPlayer && (
                 <NeonAvatarDisplay avatarId={currentPlayer.avatar} size="sm" showGlow={false} />
               )}
               <div>
-                <div className="text-xs text-slate-400">Playing as</div>
-                <div className="text-base font-bold text-white flex items-center gap-2">
+                <div className="text-[11px] sm:text-xs text-slate-400">Playing as</div>
+                <div className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
                   <span>{currentPlayer?.username}</span>
                   {isHost && (
-                    <span className="px-2 py-0.5 bg-yellow-400/20 text-yellow-300 border border-yellow-400/40 text-[10px] font-extrabold rounded-full">
+                    <span className="px-2 py-0.5 bg-yellow-400/20 text-yellow-300 border border-yellow-400/40 text-[9px] sm:text-[10px] font-extrabold rounded-full">
                       HOST
                     </span>
                   )}
@@ -799,12 +805,12 @@ export default function RoomPage() {
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+            {/* Action Buttons (>= 48px Height) */}
+            <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto justify-end">
               {/* Ready Toggle */}
               <button
                 onClick={handleToggleReady}
-                className={`flex-1 sm:flex-initial px-6 py-4 rounded-2xl font-extrabold text-sm md:text-base tracking-wide transition-all flex items-center justify-center gap-2 ${
+                className={`min-h-[48px] flex-1 sm:flex-initial px-5 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-extrabold text-xs sm:text-sm md:text-base tracking-wide transition-all flex items-center justify-center gap-2 touch-target ${
                   currentPlayer?.isReady
                     ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600'
                     : 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-black shadow-neon-green font-black'
@@ -812,12 +818,12 @@ export default function RoomPage() {
               >
                 {currentPlayer?.isReady ? (
                   <>
-                    <CheckCircle2 className="w-5 h-5 text-green-400" />
+                    <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
                     <span>I'M READY (WAITING)</span>
                   </>
                 ) : (
                   <>
-                    <Zap className="w-5 h-5 fill-black" />
+                    <Zap className="w-4 h-4 sm:w-5 sm:h-5 fill-black" />
                     <span>READY UP!</span>
                   </>
                 )}
@@ -833,13 +839,13 @@ export default function RoomPage() {
                       ? 'All players must be ready and at least 2 players are needed'
                       : 'Start Game'
                   }
-                  className={`flex-1 sm:flex-initial px-8 py-4 rounded-2xl font-black text-sm md:text-base tracking-wider transition-all flex items-center justify-center gap-2 ${
+                  className={`min-h-[48px] flex-1 sm:flex-initial px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm md:text-base tracking-wider transition-all flex items-center justify-center gap-2 touch-target ${
                     allReady
                       ? 'btn-neon-cyan text-white shadow-neon-cyan cursor-pointer'
                       : 'bg-slate-800/60 border border-slate-700 text-slate-500 cursor-not-allowed'
                   }`}
                 >
-                  <Play className="w-5 h-5 fill-current" />
+                  <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
                   <span>START GAME</span>
                 </button>
               )}

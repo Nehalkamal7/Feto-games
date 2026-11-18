@@ -169,9 +169,9 @@ export const TruthOrDareGameView: React.FC<TruthOrDareGameViewProps> = ({
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => handleChooseType('truth')}
-                  className="p-8 rounded-3xl bg-cyan-950/60 hover:bg-cyan-900/80 border-2 border-cyan-400 text-cyan-300 font-black text-3xl shadow-neon-cyan flex flex-col items-center gap-3 transition-all"
+                  className="p-6 sm:p-8 rounded-3xl bg-cyan-950/60 hover:bg-cyan-900/80 border-2 border-cyan-400 text-cyan-300 font-black text-2xl sm:text-3xl shadow-neon-cyan flex flex-col items-center gap-2 sm:gap-3 transition-all min-h-[56px] touch-target"
                 >
-                  <HelpCircle className="w-12 h-12 text-cyan-400" />
+                  <HelpCircle className="w-10 h-10 sm:w-12 sm:h-12 text-cyan-400" />
                   <span>TRUTH</span>
                   <span className="text-xs font-normal text-cyan-200">
                     Reveal an honest answer
@@ -182,9 +182,9 @@ export const TruthOrDareGameView: React.FC<TruthOrDareGameViewProps> = ({
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => handleChooseType('dare')}
-                  className="p-8 rounded-3xl bg-pink-950/60 hover:bg-pink-900/80 border-2 border-feto-magenta text-feto-magenta font-black text-3xl shadow-neon-magenta flex flex-col items-center gap-3 transition-all"
+                  className="p-6 sm:p-8 rounded-3xl bg-pink-950/60 hover:bg-pink-900/80 border-2 border-feto-magenta text-feto-magenta font-black text-2xl sm:text-3xl shadow-neon-magenta flex flex-col items-center gap-2 sm:gap-3 transition-all min-h-[56px] touch-target"
                 >
-                  <Flame className="w-12 h-12 text-feto-magenta" />
+                  <Flame className="w-10 h-10 sm:w-12 sm:h-12 text-feto-magenta" />
                   <span>DARE</span>
                   <span className="text-xs font-normal text-pink-200">
                     Perform a bold party challenge
@@ -207,7 +207,7 @@ export const TruthOrDareGameView: React.FC<TruthOrDareGameViewProps> = ({
       {/* PHASE 3: PERFORMING THE CHALLENGE                        */}
       {/* ======================================================== */}
       {gameState.phase === 'performing' && (
-        <div className="glass-panel p-8 md:p-12 rounded-3xl text-center space-y-6 border border-cyan-500/40 shadow-neon-cyan">
+        <div className="glass-panel p-6 sm:p-8 md:p-12 rounded-3xl text-center space-y-6 border border-cyan-500/40 shadow-neon-cyan">
           <div className="flex items-center justify-center gap-2">
             <span
               className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
@@ -221,7 +221,7 @@ export const TruthOrDareGameView: React.FC<TruthOrDareGameViewProps> = ({
           </div>
 
           <div className="max-w-2xl mx-auto py-4">
-            <h3 className="text-2xl md:text-4xl font-extrabold text-white leading-relaxed">
+            <h3 className="text-xl sm:text-2xl md:text-4xl font-extrabold text-white leading-relaxed">
               &ldquo;{gameState.currentPrompt}&rdquo;
             </h3>
           </div>
@@ -232,7 +232,7 @@ export const TruthOrDareGameView: React.FC<TruthOrDareGameViewProps> = ({
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleCompleteAction}
-                className="px-8 py-4 bg-gradient-to-r from-green-400 to-cyan-400 text-black font-black text-xl rounded-2xl shadow-neon-green flex items-center gap-2"
+                className="min-h-[52px] px-8 py-4 bg-gradient-to-r from-green-400 to-cyan-400 text-black font-black text-lg sm:text-xl rounded-2xl shadow-neon-green flex items-center justify-center gap-2 touch-target"
               >
                 <Sparkles className="w-6 h-6" />
                 <span>I COMPLETED IT!</span>
@@ -250,12 +250,12 @@ export const TruthOrDareGameView: React.FC<TruthOrDareGameViewProps> = ({
       {/* PHASE 4: VOTING VERDICT                                  */}
       {/* ======================================================== */}
       {gameState.phase === 'voting' && (
-        <div className="glass-panel p-8 md:p-10 rounded-3xl text-center space-y-6 border border-yellow-400/40 shadow-neon-yellow">
+        <div className="glass-panel p-6 sm:p-8 md:p-10 rounded-3xl text-center space-y-6 border border-yellow-400/40 shadow-neon-yellow">
           <div>
             <span className="text-xs uppercase tracking-widest text-yellow-400 font-bold">
               Group Judgment Phase
             </span>
-            <h3 className="text-2xl md:text-3xl font-black text-white mt-1">
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-white mt-1">
               Did {gameState.targetUsername} complete the challenge?
             </h3>
           </div>
@@ -266,13 +266,13 @@ export const TruthOrDareGameView: React.FC<TruthOrDareGameViewProps> = ({
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={() => handleCastVote('completed')}
-                className={`p-6 rounded-2xl border-2 flex flex-col items-center gap-2 font-black text-xl transition-all ${
+                className={`min-h-[52px] p-5 sm:p-6 rounded-2xl border-2 flex flex-col items-center justify-center gap-2 font-black text-lg sm:text-xl transition-all touch-target ${
                   myVote === 'completed' || selectedVote === 'completed'
                     ? 'bg-green-950/80 border-green-400 text-green-300 shadow-neon-green'
                     : 'bg-feto-card border-feto-border text-white hover:border-green-400'
                 }`}
               >
-                <ThumbsUp className="w-8 h-8 text-green-400" />
+                <ThumbsUp className="w-7 h-7 sm:w-8 sm:h-8 text-green-400" />
                 <span>COMPLETED</span>
                 <span className="text-xs text-green-300 font-normal">+100 Points</span>
               </motion.button>
@@ -281,13 +281,13 @@ export const TruthOrDareGameView: React.FC<TruthOrDareGameViewProps> = ({
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={() => handleCastVote('refused')}
-                className={`p-6 rounded-2xl border-2 flex flex-col items-center gap-2 font-black text-xl transition-all ${
+                className={`min-h-[52px] p-5 sm:p-6 rounded-2xl border-2 flex flex-col items-center justify-center gap-2 font-black text-lg sm:text-xl transition-all touch-target ${
                   myVote === 'refused' || selectedVote === 'refused'
                     ? 'bg-red-950/80 border-red-500 text-red-300 shadow-neon-pink'
                     : 'bg-feto-card border-feto-border text-white hover:border-red-500'
                 }`}
               >
-                <ThumbsDown className="w-8 h-8 text-red-400" />
+                <ThumbsDown className="w-7 h-7 sm:w-8 sm:h-8 text-red-400" />
                 <span>CHICKEN</span>
                 <span className="text-xs text-red-300 font-normal">-50 Points Penalty</span>
               </motion.button>
