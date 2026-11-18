@@ -1,0 +1,39 @@
+{
+  "name": "feto-games",
+  "version": "1.0.0",
+  "description": "FETO GAMES - Production-ready, real-time multiplayer party gaming platform",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:server": "npm run dev --workspace=@feto-games/server",
+    "dev:web": "npm run dev --workspace=@feto-games/web",
+    "build": "npm run build --workspaces --if-present",
+    "build:types": "npm run build --workspace=@feto-games/shared-types",
+    "build:server": "npm run build --workspace=@feto-games/server",
+    "build:web": "npm run build --workspace=@feto-games/web",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "db:migrate": "npm run db:migrate --workspace=@feto-games/server",
+    "db:generate": "npm run db:generate --workspace=@feto-games/server"
+  },
+  "keywords": [
+    "multiplayer",
+    "socket.io",
+    "redis",
+    "nextjs",
+    "party-games",
+    "feto-games"
+  ],
+  "author": "FETO Games Team",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}

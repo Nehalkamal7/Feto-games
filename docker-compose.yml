@@ -1,0 +1,110 @@
+services:
+  # ========================================================
+  # POSTGRESQL (Permanent data: Profiles, Stats, UGC Decks)
+  # ========================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: feto-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-feto_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-feto_super_secret_pass_2026}
+      POSTGRES_DB: ${POSTGRES_DB:-feto_games_db}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-feto_admin} -d ${POSTGRES_DB:-feto_games_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - feto-network
+
+  # ========================================================
+  # REDIS (Ephemeral: Room states, timers, session tokens, adapter)
+  # ========================================================
+  redis:
+    image: redis:7-alpine
+    container_name: feto-redis
+    restart: unless-stopped
+    command: >
+      redis-server 
+      --requirepass ${REDIS_PASSWORD:-feto_redis_secure_pass_2026}
+      --appendonly yes
+      --save 60 1
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-feto_redis_secure_pass_2026}", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - feto-network
+
+  # ========================================================
+  # BACKEND SERVER (Node.js, Express, Socket.IO, Redis Adapter)
+  # ========================================================
+  server:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
+    container_name: feto-server
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: ${SERVER_PORT:-4000}
+      CLIENT_URL: ${CLIENT_URL:-http://localhost:3000}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-feto_admin}:${POSTGRES_PASSWORD:-feto_super_secret_pass_2026}@postgres:5432/${POSTGRES_DB:-feto_games_db}?schema=public
+      REDIS_URL: redis://:${REDIS_PASSWORD:-feto_redis_secure_pass_2026}@redis:6379
+      JWT_SECRET: ${JWT_SECRET:-feto_games_jwt_reconnection_secret_super_key_32chars!}
+      JWT_RECONNECT_EXPIRY_SECONDS: ${JWT_RECONNECT_EXPIRY_SECONDS:-300}
+      GRACE_PERIOD_SECONDS: ${GRACE_PERIOD_SECONDS:-45}
+      MAX_PLAYERS_PER_ROOM: ${MAX_PLAYERS_PER_ROOM:-15}
+    ports:
+      - "${SERVER_PORT:-4000}:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - feto-network
+
+  # ========================================================
+  # FRONTEND WEB (Next.js App Router, Tailwind, Framer Motion)
+  # ========================================================
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_SERVER_URL: ${NEXT_PUBLIC_SERVER_URL:-http://localhost:4000}
+        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-FETO GAMES}
+        NEXT_PUBLIC_MAX_ROOM_PLAYERS: ${NEXT_PUBLIC_MAX_ROOM_PLAYERS:-15}
+    container_name: feto-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3000
+      NEXT_PUBLIC_SERVER_URL: ${NEXT_PUBLIC_SERVER_URL:-http://localhost:4000}
+    depends_on:
+      - server
+    networks:
+      - feto-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  feto-network:
+    driver: bridge
