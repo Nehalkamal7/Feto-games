@@ -40,10 +40,18 @@ export interface GameEngineResult {
 // 1. GAME INITIALIZATION DISPATCHER
 // ========================================================
 
-export function initGameSession(room: RoomState): GameEngineResult {
+export function initGameSession(room: RoomState, allowSolo = false): GameEngineResult {
   const activePlayers = Object.values(room.players).filter((p) => p.connectionStatus === 'connected');
-  if (activePlayers.length < 2) {
-    return { updatedRoom: room, publicState: null, error: 'At least 2 players are required to start.' };
+  const isSoloAllowed = allowSolo || Boolean((room.config as any).isSoloDevMode);
+
+  if (activePlayers.length < (isSoloAllowed ? 1 : 2)) {
+    return {
+      updatedRoom: room,
+      publicState: null,
+      error: isSoloAllowed
+        ? 'At least 1 player is required to start.'
+        : 'At least 2 players are required to start (or toggle Solo Test / Dev Mode to test alone).'
+    };
   }
 
   const mode = room.config.gameMode;
@@ -86,7 +94,7 @@ function initImposterGame(room: RoomState, players: any[]): GameEngineResult {
   const category = wordItem.category;
   const secretWord = wordItem.word;
 
-  const imposterCount = players.length >= 12 ? 3 : players.length >= 7 ? 2 : 1;
+  const imposterCount = players.length >= 12 ? 3 : players.length >= 7 ? 2 : players.length >= 2 ? 1 : 0;
   const shuffled = [...players].sort(() => 0.5 - Math.random());
   const imposterIds = new Set(shuffled.slice(0, imposterCount).map((p) => p.id));
   const turnOrder = [...players].sort(() => 0.5 - Math.random()).map((p) => p.id);

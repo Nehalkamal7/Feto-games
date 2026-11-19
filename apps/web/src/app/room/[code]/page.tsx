@@ -100,6 +100,14 @@ export default function RoomPage() {
   const [joinAvatar, setJoinAvatar] = useState<NeonAvatarId>('cyber_cat');
   const [joinPin, setJoinPin] = useState('');
   const [difficultySetting, setDifficultySetting] = useState<'casual' | 'standard' | 'wild'>('standard');
+  const [isSoloDevMode, setIsSoloDevMode] = useState(false);
+
+  // Sync isSoloDevMode when room config updates
+  useEffect(() => {
+    if ((room?.config as any)?.isSoloDevMode !== undefined) {
+      setIsSoloDevMode(Boolean((room?.config as any)?.isSoloDevMode));
+    }
+  }, [(room?.config as any)?.isSoloDevMode]);
 
   // Notifications & UI Status
   const [copiedLink, setCopiedLink] = useState(false);
@@ -564,7 +572,7 @@ export default function RoomPage() {
   const handleStartGame = async () => {
     sound.playClick();
     try {
-      await socketStartGame();
+      await socketStartGame(isSoloDevMode);
     } catch (err: any) {
       showToast(`⚠️ ${err.message || 'Could not start game.'}`);
     }
@@ -651,8 +659,9 @@ export default function RoomPage() {
     return deduped;
   }, [room?.players]);
 
-  const maxPlayers = 15;
-  const allReady = activePlayers.length >= 2 && activePlayers.every((p) => p.isReady);
+  const maxPlayers = room?.config?.maxPlayers || 15;
+  const minRequired = isSoloDevMode ? 1 : 2;
+  const allReady = activePlayers.length >= minRequired && activePlayers.every((p) => p.isReady);
 
   if (isInitializing || !room) {
     return (
@@ -1047,55 +1056,123 @@ export default function RoomPage() {
 
             {/* TEAM SQUAD SELECTOR (IF TEAM MODE ENABLED) */}
             {room.config.isTeamMode && (
-              <div className="mb-5 p-3.5 sm:p-4 rounded-2xl glass-panel-neon border border-cyan-500/30">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 mb-2.5">
-                  <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-cyan-300">
+              <div className="mb-5 p-3.5 sm:p-5 rounded-2xl glass-panel-neon border border-cyan-500/30">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm font-black uppercase tracking-wider text-cyan-300">
                     <Shield className="w-4 h-4 text-cyan-400" />
-                    <span>Select Your Squad (Team Mode Active)</span>
+                    <span>Teams Mode Active — Blue vs Red Squad</span>
                   </div>
-                  <span className="text-[11px] text-slate-400">
-                    Squad points aggregate toward victory
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    {
-                      id: 'red',
-                      name: 'Red Squad',
-                      color: 'border-red-500 bg-red-950/40 text-red-300',
-                      activeRing: 'ring-2 ring-red-400 shadow-neon-magenta',
-                      count: room.players.filter((p) => p.team === 'red').length
-                    },
-                    {
-                      id: 'blue',
-                      name: 'Blue Squad',
-                      color: 'border-blue-500 bg-blue-950/40 text-blue-300',
-                      activeRing: 'ring-2 ring-blue-400 shadow-neon-cyan',
-                      count: room.players.filter((p) => p.team === 'blue').length
-                    },
-                    {
-                      id: 'green',
-                      name: 'Green Squad',
-                      color: 'border-green-500 bg-green-950/40 text-green-300',
-                      activeRing: 'ring-2 ring-green-400 shadow-neon-green',
-                      count: room.players.filter((p) => p.team === 'green').length
-                    }
-                  ].map((squad) => (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] text-slate-400">
+                      Your Team:{' '}
+                      <strong className={currentPlayer?.team === 'red' ? 'text-pink-400 font-black' : 'text-cyan-400 font-black'}>
+                        {currentPlayer?.team === 'red' ? 'Team B (Red)' : 'Team A (Blue)'}
+                      </strong>
+                    </span>
                     <button
-                      key={squad.id}
+                      type="button"
                       onClick={() => {
                         sound.playClick();
-                        socketSelectTeam(squad.id as PlayerTeam);
+                        const targetTeam = currentPlayer?.team === 'blue' ? 'red' : 'blue';
+                        socketSelectTeam(targetTeam as PlayerTeam);
                       }}
-                      className={`p-2.5 sm:p-3 rounded-xl border flex flex-col items-center justify-center transition-all ${squad.color} ${
-                        currentPlayer?.team === squad.id ? `${squad.activeRing} scale-102` : 'opacity-70 hover:opacity-100'
-                      }`}
+                      className="px-3 py-1 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 hover:from-cyan-500/40 hover:to-purple-500/40 border border-cyan-400/50 rounded-xl text-xs font-black text-cyan-300 transition-all shadow-neon-cyan flex items-center gap-1.5 touch-target"
                     >
-                      <span className="font-black text-xs uppercase tracking-wide">{squad.name}</span>
-                      <span className="text-[10px] text-slate-300 mt-0.5">{squad.count} Players</span>
+                      <span>Switch Team ⇄</span>
                     </button>
-                  ))}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Team A (Cyan Blue) */}
+                  <div className="p-3.5 rounded-xl border border-cyan-500/50 bg-cyan-950/30 shadow-neon-cyan flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse" />
+                          <span className="font-black text-xs uppercase tracking-wider text-cyan-300">
+                            Team A (Neon Cyan)
+                          </span>
+                        </div>
+                        <span className="text-xs font-mono font-bold text-cyan-300">
+                          {activePlayers.filter((p) => p.team !== 'red').length} Players
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 min-h-[32px] items-center py-1">
+                        {activePlayers
+                          .filter((p) => p.team !== 'red')
+                          .map((p) => (
+                            <span
+                              key={p.id}
+                              className="px-2 py-0.5 rounded-lg bg-cyan-950/80 border border-cyan-500/40 text-[10px] font-bold text-cyan-200 flex items-center gap-1"
+                            >
+                              <span>{NEON_AVATARS[p.avatar]?.emoji || '👾'}</span>
+                              <span>{p.username}</span>
+                              {p.id === currentPlayer?.id && (
+                                <span className="text-[9px] text-cyan-400 font-extrabold">(You)</span>
+                              )}
+                            </span>
+                          ))}
+                      </div>
+                    </div>
+                    {currentPlayer?.team !== 'blue' && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          sound.playClick();
+                          socketSelectTeam('blue');
+                        }}
+                        className="mt-3 w-full py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/50 text-cyan-300 text-[11px] font-black uppercase tracking-wider transition-all"
+                      >
+                        Join Team A (Blue)
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Team B (Pink / Purple Red) */}
+                  <div className="p-3.5 rounded-xl border border-pink-500/50 bg-pink-950/30 shadow-neon-magenta flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full bg-pink-400 animate-pulse" />
+                          <span className="font-black text-xs uppercase tracking-wider text-pink-300">
+                            Team B (Neon Pink)
+                          </span>
+                        </div>
+                        <span className="text-xs font-mono font-bold text-pink-300">
+                          {activePlayers.filter((p) => p.team === 'red').length} Players
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 min-h-[32px] items-center py-1">
+                        {activePlayers
+                          .filter((p) => p.team === 'red')
+                          .map((p) => (
+                            <span
+                              key={p.id}
+                              className="px-2 py-0.5 rounded-lg bg-pink-950/80 border border-pink-500/40 text-[10px] font-bold text-pink-200 flex items-center gap-1"
+                            >
+                              <span>{NEON_AVATARS[p.avatar]?.emoji || '👾'}</span>
+                              <span>{p.username}</span>
+                              {p.id === currentPlayer?.id && (
+                                <span className="text-[9px] text-pink-400 font-extrabold">(You)</span>
+                              )}
+                            </span>
+                          ))}
+                      </div>
+                    </div>
+                    {currentPlayer?.team === 'blue' && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          sound.playClick();
+                          socketSelectTeam('red');
+                        }}
+                        className="mt-3 w-full py-1.5 rounded-lg bg-pink-500/20 hover:bg-pink-500/30 border border-pink-400/50 text-pink-300 text-[11px] font-black uppercase tracking-wider transition-all"
+                      >
+                        Join Team B (Pink)
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -1209,8 +1286,13 @@ export default function RoomPage() {
                           {/* Host Kick Option: never show on host's own card */}
                           {isHost && player.id !== currentPlayer?.id && player.id !== room.hostId && !player.isHost ? (
                             <button
-                              onClick={() => setKickTarget(player)}
-                              className="mt-1 text-[9px] text-slate-500 hover:text-red-400 font-bold flex items-center gap-0.5 py-0.5 px-1 touch-manipulation transition-colors"
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setKickTarget(player);
+                              }}
+                              className="mt-1 text-[10px] text-red-400 hover:text-white bg-red-950/40 hover:bg-red-900/60 font-bold flex items-center gap-1 py-0.5 px-2 rounded-md border border-red-500/30 hover:border-red-400 transition-all relative z-20 pointer-events-auto touch-manipulation"
+                              title={`Kick ${player.username}`}
                             >
                               <UserX className="w-2.5 h-2.5" /> Kick
                             </button>
@@ -1262,12 +1344,59 @@ export default function RoomPage() {
 
                   {/* Settings Controls */}
                   <div className="space-y-4">
-                    {/* 1. GAME MODE DROPDOWN */}
+                    {/* 1. 10-GAME SELECTOR */}
                     <div>
-                      <label className="block text-[11px] font-black uppercase tracking-wider text-slate-300 mb-1.5">
-                        Game Mode
-                      </label>
-                      {isHost ? (
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-[11px] font-black uppercase tracking-wider text-slate-300">
+                          Selected Game (10 Modes)
+                        </label>
+                        <span className="text-[10px] text-cyan-300 font-bold uppercase">
+                          {room.config.gameMode?.replace(/_/g, ' ')}
+                        </span>
+                      </div>
+
+                      {/* Visual Interactive Cards */}
+                      <div className="grid grid-cols-2 gap-1.5 max-h-48 overflow-y-auto pr-1 mb-2">
+                        {[
+                          { id: 'who_is_imposter', title: 'Imposter', emoji: '🎭', players: '3-15p' },
+                          { id: 'draw_and_guess', title: 'Draw & Guess', emoji: '🎨', players: '2-15p' },
+                          { id: 'quiz_battle', title: 'Quiz Battle', emoji: '🧠', players: '2-15p' },
+                          { id: 'word_battle', title: 'Word Battle', emoji: '🔤', players: '2-15p' },
+                          { id: 'truth_or_dare', title: 'Truth / Dare', emoji: '🔥', players: '2-15p' },
+                          { id: 'never_have_i_ever', title: 'Never Have I', emoji: '🤫', players: '2-15p' },
+                          { id: 'most_likely_to', title: 'Most Likely', emoji: '👑', players: '2-15p' },
+                          { id: 'sip_or_spill', title: 'Sip or Spill', emoji: '🥤', players: '2-15p' },
+                          { id: 'silly_roulette', title: 'Silly Roulette', emoji: '🎯', players: '2-15p' },
+                          { id: 'hot_potato', title: 'Hot Potato', emoji: '🥔', players: '2-15p' }
+                        ].map((g) => {
+                          const isSelected = room.config.gameMode === g.id;
+                          return (
+                            <button
+                              key={g.id}
+                              type="button"
+                              disabled={!isHost}
+                              onClick={() => {
+                                sound.playClick();
+                                socketUpdateSettings({ gameMode: g.id as GameMode });
+                              }}
+                              className={`p-2 rounded-xl border text-left flex flex-col justify-between transition-all ${
+                                isSelected
+                                  ? 'border-cyan-400 bg-cyan-950/70 text-white shadow-neon-cyan scale-[1.02]'
+                                  : 'border-slate-800 bg-slate-900/80 text-slate-300 hover:border-slate-700 hover:text-white'
+                              } ${!isHost ? 'cursor-default' : 'cursor-pointer'}`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="text-base">{g.emoji}</span>
+                                <span className="text-[9px] font-mono text-slate-400 font-bold">{g.players}</span>
+                              </div>
+                              <span className="text-[11px] font-black truncate mt-1">{g.title}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {/* Select dropdown fallback / quick-select */}
+                      {isHost && (
                         <div className="relative">
                           <select
                             value={room.config.gameMode}
@@ -1275,29 +1404,100 @@ export default function RoomPage() {
                               sound.playClick();
                               socketUpdateSettings({ gameMode: e.target.value as GameMode });
                             }}
-                            className="w-full bg-slate-900 border border-amber-500/40 rounded-xl px-3 py-2 text-xs font-bold text-white outline-none cursor-pointer appearance-none hover:border-amber-400 transition-all"
+                            className="w-full bg-slate-900 border border-amber-500/40 rounded-xl px-3 py-1.5 text-xs font-bold text-white outline-none cursor-pointer appearance-none hover:border-amber-400 transition-all"
                           >
-                            <option value="who_is_imposter">Who Is The Imposter? (3-15p)</option>
-                            <option value="draw_and_guess">Draw & Guess (2-15p)</option>
-                            <option value="quiz_battle">Quiz Battle (2-15p)</option>
-                            <option value="word_battle">Word Battle (2-15p)</option>
-                            <option value="truth_or_dare">Truth or Dare (2-15p)</option>
-                            <option value="never_have_i_ever">Never Have I Ever (2-15p)</option>
-                            <option value="most_likely_to">Most Likely To... (2-15p)</option>
-                            <option value="sip_or_spill">Sip or Spill 🥤 (2-15p)</option>
-                            <option value="silly_roulette">Silly Roulette (2-15p)</option>
-                            <option value="hot_potato">Hot Potato (2-15p)</option>
+                            <option value="who_is_imposter">🎭 Who Is The Imposter? (3-15p)</option>
+                            <option value="draw_and_guess">🎨 Draw & Guess (2-15p)</option>
+                            <option value="quiz_battle">🧠 Quiz Battle (2-15p)</option>
+                            <option value="word_battle">🔤 Word Battle (2-15p)</option>
+                            <option value="truth_or_dare">🔥 Truth or Dare (2-15p)</option>
+                            <option value="never_have_i_ever">🤫 Never Have I Ever (2-15p)</option>
+                            <option value="most_likely_to">👑 Most Likely To... (2-15p)</option>
+                            <option value="sip_or_spill">🥤 Sip or Spill (2-15p)</option>
+                            <option value="silly_roulette">🎯 Silly Roulette (2-15p)</option>
+                            <option value="hot_potato">🥔 Hot Potato (2-15p)</option>
                           </select>
-                          <ChevronDown className="w-4 h-4 text-amber-400 absolute right-3 top-2.5 pointer-events-none" />
-                        </div>
-                      ) : (
-                        <div className="px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-700 text-xs font-bold text-cyan-300 capitalize">
-                          {room.config.gameMode.replace(/_/g, ' ')}
+                          <ChevronDown className="w-4 h-4 text-amber-400 absolute right-3 top-2 pointer-events-none" />
                         </div>
                       )}
                     </div>
 
-                    {/* VIBE MODE SELECTOR */}
+                    {/* 2. MATCH MODE: SOLO VS TEAMS */}
+                    <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-700/80">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <div className="flex items-center gap-1.5">
+                          <Shield className="w-4 h-4 text-cyan-400" />
+                          <span className="text-xs font-bold text-white">Match Mode</span>
+                        </div>
+                        {isHost ? (
+                          <div className="flex items-center bg-slate-950 p-0.5 rounded-lg border border-slate-800">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                sound.playClick();
+                                socketUpdateSettings({ isTeamMode: false, mode: 'solo' });
+                              }}
+                              className={`px-3 py-1 rounded-md text-[10px] font-black uppercase transition-all ${
+                                !room.config.isTeamMode
+                                  ? 'bg-cyan-500 text-black shadow-neon-cyan'
+                                  : 'text-slate-400 hover:text-white'
+                              }`}
+                            >
+                              Solo
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                sound.playClick();
+                                socketUpdateSettings({ isTeamMode: true, mode: 'teams' });
+                              }}
+                              className={`px-3 py-1 rounded-md text-[10px] font-black uppercase transition-all ${
+                                room.config.isTeamMode
+                                  ? 'bg-purple-500 text-white shadow-neon-purple'
+                                  : 'text-slate-400 hover:text-white'
+                              }`}
+                            >
+                              Teams
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-xs font-black uppercase text-cyan-300">
+                            {room.config.isTeamMode ? 'Teams Mode' : 'Solo FFA'}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-slate-400">
+                        {room.config.isTeamMode
+                          ? 'Blue Squad vs Red Squad (Team victory)'
+                          : 'Free-For-All (Individual points & leaderboard)'}
+                      </p>
+                    </div>
+
+                    {/* 3. SOLO TEST / DEV MODE TOGGLE (HOST ONLY) */}
+                    {isHost && (
+                      <div className="p-2.5 rounded-xl bg-cyan-950/40 border border-cyan-500/40 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="w-4 h-4 text-cyan-400" />
+                          <div>
+                            <div className="text-xs font-bold text-white">Solo Test / Dev Mode</div>
+                            <div className="text-[9px] text-cyan-300/80">Allow 1 player to launch & test any mode</div>
+                          </div>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={isSoloDevMode}
+                          onChange={(e) => {
+                            sound.playClick();
+                            const next = e.target.checked;
+                            setIsSoloDevMode(next);
+                            socketUpdateSettings({ isSoloDevMode: next });
+                          }}
+                          className="w-4 h-4 accent-cyan-400 rounded cursor-pointer"
+                        />
+                      </div>
+                    )}
+
+                    {/* 4. PARTY VIBE MODE */}
                     <div>
                       <div className="flex justify-between items-center mb-1">
                         <label className="text-[11px] font-black uppercase tracking-wider text-slate-300">
@@ -1338,13 +1538,42 @@ export default function RoomPage() {
                       )}
                     </div>
 
-                    {/* 2. ROUNDS SELECTOR */}
+                    {/* 5. ROUNDS SELECTOR */}
                     <div>
                       <div className="flex justify-between items-center mb-1">
                         <label className="text-[11px] font-black uppercase tracking-wider text-slate-300">
                           Rounds
                         </label>
                         <span className="text-amber-300 font-extrabold text-xs">{room.config.totalRounds || 5} Rounds</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <button
+                          type="button"
+                          disabled={!isHost || (room.config.totalRounds || 5) <= 1}
+                          onClick={() => {
+                            sound.playClick();
+                            const next = Math.max(1, (room.config.totalRounds || 5) - 1);
+                            socketUpdateSettings({ totalRounds: next });
+                          }}
+                          className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700 hover:border-amber-400 text-amber-300 font-black flex items-center justify-center disabled:opacity-40"
+                        >
+                          -
+                        </button>
+                        <div className="flex-1 py-1 rounded-lg bg-slate-900 border border-slate-700 text-center font-black text-amber-300 text-xs">
+                          {room.config.totalRounds || 5} Rounds
+                        </div>
+                        <button
+                          type="button"
+                          disabled={!isHost || (room.config.totalRounds || 5) >= 15}
+                          onClick={() => {
+                            sound.playClick();
+                            const next = Math.min(15, (room.config.totalRounds || 5) + 1);
+                            socketUpdateSettings({ totalRounds: next });
+                          }}
+                          className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700 hover:border-amber-400 text-amber-300 font-black flex items-center justify-center disabled:opacity-40"
+                        >
+                          +
+                        </button>
                       </div>
                       <div className="grid grid-cols-4 gap-1.5">
                         {[3, 5, 7, 10].map((rounds) => (
@@ -1356,10 +1585,10 @@ export default function RoomPage() {
                               sound.playClick();
                               socketUpdateSettings({ totalRounds: rounds });
                             }}
-                            className={`py-1.5 rounded-lg border text-xs font-bold transition-all ${
+                            className={`py-1 rounded-lg border text-[11px] font-bold transition-all ${
                               (room.config.totalRounds || 5) === rounds
                                 ? 'border-amber-400 bg-amber-950/50 text-amber-300 shadow-neon-amber'
-                                : 'border-slate-800 bg-slate-900 text-slate-400'
+                                : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
                             }`}
                           >
                             {rounds}
@@ -1368,13 +1597,42 @@ export default function RoomPage() {
                       </div>
                     </div>
 
-                    {/* 3. TIMER SELECTOR */}
+                    {/* 6. TIMER SELECTOR */}
                     <div>
                       <div className="flex justify-between items-center mb-1">
                         <label className="text-[11px] font-black uppercase tracking-wider text-slate-300">
                           Timer (Sec / Turn)
                         </label>
-                        <span className="text-cyan-300 font-extrabold text-xs">{room.config.roundDurationSeconds}s</span>
+                        <span className="text-cyan-300 font-extrabold text-xs">{room.config.roundDurationSeconds || 30}s</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <button
+                          type="button"
+                          disabled={!isHost || (room.config.roundDurationSeconds || 30) <= 10}
+                          onClick={() => {
+                            sound.playClick();
+                            const next = Math.max(10, (room.config.roundDurationSeconds || 30) - 5);
+                            socketUpdateSettings({ roundDurationSeconds: next });
+                          }}
+                          className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700 hover:border-cyan-400 text-cyan-300 font-black flex items-center justify-center disabled:opacity-40"
+                        >
+                          -
+                        </button>
+                        <div className="flex-1 py-1 rounded-lg bg-slate-900 border border-slate-700 text-center font-black text-cyan-300 text-xs">
+                          {room.config.roundDurationSeconds || 30} Seconds
+                        </div>
+                        <button
+                          type="button"
+                          disabled={!isHost || (room.config.roundDurationSeconds || 30) >= 180}
+                          onClick={() => {
+                            sound.playClick();
+                            const next = Math.min(180, (room.config.roundDurationSeconds || 30) + 5);
+                            socketUpdateSettings({ roundDurationSeconds: next });
+                          }}
+                          className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700 hover:border-cyan-400 text-cyan-300 font-black flex items-center justify-center disabled:opacity-40"
+                        >
+                          +
+                        </button>
                       </div>
                       <div className="grid grid-cols-4 gap-1.5">
                         {[20, 30, 45, 60].map((sec) => (
@@ -1386,10 +1644,10 @@ export default function RoomPage() {
                               sound.playClick();
                               socketUpdateSettings({ roundDurationSeconds: sec });
                             }}
-                            className={`py-1.5 rounded-lg border text-xs font-bold transition-all ${
-                              room.config.roundDurationSeconds === sec
+                            className={`py-1 rounded-lg border text-[11px] font-bold transition-all ${
+                              (room.config.roundDurationSeconds || 30) === sec
                                 ? 'border-cyan-400 bg-cyan-950/50 text-cyan-300 shadow-neon-cyan'
-                                : 'border-slate-800 bg-slate-900 text-slate-400'
+                                : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
                             }`}
                           >
                             {sec}s
@@ -1398,7 +1656,66 @@ export default function RoomPage() {
                       </div>
                     </div>
 
-                    {/* 4. DIFFICULTY SELECTOR */}
+                    {/* 7. MAX PLAYERS SELECTOR */}
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <label className="text-[11px] font-black uppercase tracking-wider text-slate-300">
+                          Max Players
+                        </label>
+                        <span className="text-purple-300 font-extrabold text-xs">{room.config.maxPlayers || 15} Players</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <button
+                          type="button"
+                          disabled={!isHost || (room.config.maxPlayers || 15) <= 2}
+                          onClick={() => {
+                            sound.playClick();
+                            const next = Math.max(2, (room.config.maxPlayers || 15) - 1);
+                            socketUpdateSettings({ maxPlayers: next });
+                          }}
+                          className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700 hover:border-purple-400 text-purple-300 font-black flex items-center justify-center disabled:opacity-40"
+                        >
+                          -
+                        </button>
+                        <div className="flex-1 py-1 rounded-lg bg-slate-900 border border-slate-700 text-center font-black text-purple-300 text-xs">
+                          {room.config.maxPlayers || 15} Capacity
+                        </div>
+                        <button
+                          type="button"
+                          disabled={!isHost || (room.config.maxPlayers || 15) >= 15}
+                          onClick={() => {
+                            sound.playClick();
+                            const next = Math.min(15, (room.config.maxPlayers || 15) + 1);
+                            socketUpdateSettings({ maxPlayers: next });
+                          }}
+                          className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700 hover:border-purple-400 text-purple-300 font-black flex items-center justify-center disabled:opacity-40"
+                        >
+                          +
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-4 gap-1.5">
+                        {[4, 8, 12, 15].map((count) => (
+                          <button
+                            key={count}
+                            type="button"
+                            disabled={!isHost}
+                            onClick={() => {
+                              sound.playClick();
+                              socketUpdateSettings({ maxPlayers: count });
+                            }}
+                            className={`py-1 rounded-lg border text-[11px] font-bold transition-all ${
+                              (room.config.maxPlayers || 15) === count
+                                ? 'border-purple-400 bg-purple-950/50 text-purple-300 shadow-neon-purple'
+                                : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
+                            }`}
+                          >
+                            {count}p
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 8. DIFFICULTY SELECTOR */}
                     <div>
                       <label className="block text-[11px] font-black uppercase tracking-wider text-slate-300 mb-1">
                         Match Intensity
@@ -1419,34 +1736,13 @@ export default function RoomPage() {
                             className={`py-1.5 rounded-lg border text-[11px] font-bold transition-all ${
                               difficultySetting === diff.id
                                 ? 'border-purple-400 bg-purple-950/50 text-purple-300 shadow-neon-purple'
-                                : 'border-slate-800 bg-slate-900 text-slate-400'
+                                : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
                             }`}
                           >
                             {diff.label}
                           </button>
                         ))}
                       </div>
-                    </div>
-
-                    {/* 5. TEAM MODE TOGGLE */}
-                    <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-700/80 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Shield className="w-4 h-4 text-cyan-400" />
-                        <div>
-                          <div className="text-xs font-bold text-white">Team Mode</div>
-                          <div className="text-[9px] text-slate-400">Red, Blue & Green Squads</div>
-                        </div>
-                      </div>
-                      <input
-                        type="checkbox"
-                        disabled={!isHost}
-                        checked={Boolean(room.config.isTeamMode)}
-                        onChange={(e) => {
-                          sound.playClick();
-                          socketUpdateSettings({ isTeamMode: e.target.checked });
-                        }}
-                        className="w-4 h-4 accent-cyan-400 rounded cursor-pointer"
-                      />
                     </div>
                   </div>
                 </div>
@@ -1488,11 +1784,15 @@ export default function RoomPage() {
                           </span>
                           {isHost && player.id !== currentPlayer?.id && player.id !== room.hostId && !player.isHost && (
                             <button
-                              onClick={() => setKickTarget(player)}
-                              className="text-slate-500 hover:text-red-400 p-0.5"
-                              title="Kick Player"
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setKickTarget(player);
+                              }}
+                              className="text-red-400 hover:text-white hover:bg-red-950/80 p-1 rounded-md border border-red-500/20 hover:border-red-400/50 transition-all relative z-20 pointer-events-auto"
+                              title={`Kick ${player.username}`}
                             >
-                              <UserX className="w-3 h-3" />
+                              <UserX className="w-3.5 h-3.5" />
                             </button>
                           )}
                         </div>
@@ -1555,7 +1855,11 @@ export default function RoomPage() {
                   disabled={!allReady}
                   title={
                     !allReady
-                      ? 'All players must be ready and at least 2 players are needed'
+                      ? activePlayers.length < minRequired
+                        ? isSoloDevMode
+                          ? 'At least 1 player required'
+                          : 'At least 2 players required (or toggle Solo Test Mode in Game Settings)'
+                        : 'All players must click READY before starting'
                       : 'Launch Match'
                   }
                   className={`w-full sm:w-auto min-w-[240px] px-8 py-3.5 rounded-2xl font-black text-xs sm:text-sm md:text-base uppercase tracking-wider transition-all flex items-center justify-center gap-2 touch-target ${

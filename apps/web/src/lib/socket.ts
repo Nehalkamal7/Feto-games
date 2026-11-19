@@ -191,19 +191,18 @@ export async function socketSetReady(dto: SetReadyDTO): Promise<void> {
   if (!json.success) throw new Error(json.error?.message || 'Failed to toggle ready');
 }
 
-export async function socketUpdateSettings(dto: UpdateRoomSettingsDTO): Promise<void> {
+export async function socketUpdateSettings(dto: UpdateRoomSettingsDTO | any): Promise<void> {
   const roomCode = getActiveRoomCode();
-  const playerId = getSavedPlayerId(roomCode);
+  const playerId = getSavedPlayerId(roomCode) || getPersistentPlayerId();
   if (!playerId) return;
 
-  const res = await fetch('/api/game/action', {
+  const res = await fetch('/api/rooms/update', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       roomCode,
       playerId,
-      actionType: 'UPDATE_SETTINGS',
-      payload: (dto as any).config || dto
+      settings: (dto as any).config || dto
     })
   });
 
@@ -232,18 +231,18 @@ export async function socketKickPlayer(dto: KickPlayerDTO): Promise<void> {
   if (!json.success) throw new Error(json.error?.message || 'Failed to kick player');
 }
 
-export async function socketStartGame(): Promise<void> {
+export async function socketStartGame(isSoloDevMode = false): Promise<void> {
   const roomCode = getActiveRoomCode();
-  const playerId = getSavedPlayerId(roomCode);
+  const playerId = getSavedPlayerId(roomCode) || getPersistentPlayerId();
   if (!playerId) return;
 
-  const res = await fetch('/api/game/action', {
+  const res = await fetch('/api/rooms/start', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       roomCode,
       playerId,
-      actionType: 'START_GAME'
+      isSoloDevMode
     })
   });
 
@@ -253,7 +252,7 @@ export async function socketStartGame(): Promise<void> {
 
 export async function socketLeaveRoom(): Promise<void> {
   const roomCode = getActiveRoomCode();
-  const playerId = getSavedPlayerId(roomCode);
+  const playerId = getSavedPlayerId(roomCode) || getPersistentPlayerId();
   if (!roomCode || !playerId) return;
 
   await fetch('/api/rooms/leave', {
@@ -263,19 +262,18 @@ export async function socketLeaveRoom(): Promise<void> {
   });
 }
 
-export async function socketSelectTeam(team: PlayerTeam): Promise<void> {
+export async function socketSelectTeam(team?: PlayerTeam): Promise<void> {
   const roomCode = getActiveRoomCode();
-  const playerId = getSavedPlayerId(roomCode);
+  const playerId = getSavedPlayerId(roomCode) || getPersistentPlayerId();
   if (!playerId) return;
 
-  const res = await fetch('/api/game/action', {
+  const res = await fetch('/api/rooms/team', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       roomCode,
       playerId,
-      actionType: 'SELECT_TEAM',
-      payload: { team }
+      team
     })
   });
 
@@ -575,19 +573,25 @@ class AblySocketBridge {
         actionType = 'TOGGLE_READY';
         break;
       case 'lobby:start-game':
-        actionType = 'START_GAME';
-        break;
+        socketStartGame(Boolean(payload?.isSoloDevMode))
+          .then(() => { if (callback) callback({ success: true }); })
+          .catch((err) => { if (callback) callback({ success: false, error: { message: err.message } }); });
+        return;
       case 'lobby:update-settings':
-        actionType = 'UPDATE_SETTINGS';
-        actionPayload = payload?.config;
-        break;
+        socketUpdateSettings(payload?.config || payload)
+          .then(() => { if (callback) callback({ success: true }); })
+          .catch((err) => { if (callback) callback({ success: false, error: { message: err.message } }); });
+        return;
       case 'lobby:kick-player':
-        actionType = 'KICK_PLAYER';
-        actionPayload = { targetPlayerId: payload?.playerId };
-        break;
+        socketKickPlayer({ targetPlayerId: payload?.playerId || payload?.targetPlayerId })
+          .then(() => { if (callback) callback({ success: true }); })
+          .catch((err) => { if (callback) callback({ success: false, error: { message: err.message } }); });
+        return;
       case 'room:select-team':
-        actionType = 'SELECT_TEAM';
-        break;
+        socketSelectTeam(payload?.team)
+          .then(() => { if (callback) callback({ success: true }); })
+          .catch((err) => { if (callback) callback({ success: false, error: { message: err.message } }); });
+        return;
       case 'room:rematch':
         actionType = 'REMATCH';
         break;

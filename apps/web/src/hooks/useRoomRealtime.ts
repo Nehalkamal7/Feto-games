@@ -180,6 +180,7 @@ export function useRoomRealtime({
 
     roomChannel.subscribe('room:state', handleRoomState);
     roomChannel.subscribe('room_state', handleRoomState);
+    roomChannel.subscribe('room_state_updated', handleRoomState);
     roomChannel.subscribe('room:updated', handleRoomState);
     roomChannel.subscribe('room:player-joined', handlePlayerJoined);
     roomChannel.subscribe('room:player-left', handlePlayerLeft);
@@ -297,17 +298,51 @@ export function useRoomRealtime({
   );
 
   const updateSettings = useCallback(
-    async (settings: Partial<PublicRoomConfig>) => {
+    async (settings: Partial<PublicRoomConfig> | any) => {
       sound.playClick();
-      await dispatchGameAction('UPDATE_SETTINGS', settings);
+      const res = await fetch('/api/rooms/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          roomCode: normalizedCode,
+          playerId,
+          settings
+        })
+      });
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error?.message || 'Failed to update settings');
+      }
+      if (data.data?.room) {
+        setRoom(data.data.room);
+      }
+      return data;
     },
-    [dispatchGameAction]
+    [normalizedCode, playerId]
   );
 
-  const startGame = useCallback(async () => {
-    sound.playClick();
-    await dispatchGameAction('START_GAME');
-  }, [dispatchGameAction]);
+  const startGame = useCallback(
+    async (isSoloDevMode = false) => {
+      sound.playClick();
+      const res = await fetch('/api/rooms/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          roomCode: normalizedCode,
+          playerId,
+          isSoloDevMode
+        })
+      });
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error?.message || 'Failed to start game');
+      }
+      if (data.data?.room) setRoom(data.data.room);
+      if (data.data?.gameState) setGameState(data.data.gameState);
+      return data;
+    },
+    [normalizedCode, playerId]
+  );
 
   const leaveRoom = useCallback(async () => {
     sound.playClick();
@@ -319,11 +354,25 @@ export function useRoomRealtime({
   }, [normalizedCode, playerId]);
 
   const selectTeam = useCallback(
-    async (team: PlayerTeam) => {
+    async (team?: PlayerTeam) => {
       sound.playClick();
-      await dispatchGameAction('SELECT_TEAM', { team });
+      const res = await fetch('/api/rooms/team', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          roomCode: normalizedCode,
+          playerId,
+          team
+        })
+      });
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error?.message || 'Failed to switch team');
+      }
+      if (data.data?.room) setRoom(data.data.room);
+      return data;
     },
-    [dispatchGameAction]
+    [normalizedCode, playerId]
   );
 
   const kickPlayer = useCallback(
