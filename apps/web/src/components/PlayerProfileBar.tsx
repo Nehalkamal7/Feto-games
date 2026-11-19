@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { NeonAvatarId, NEON_AVATARS } from '@feto-games/shared-types';
 import { NeonAvatarDisplay } from './NeonAvatarDisplay';
-import { User, Dices, Edit3, Check, Sparkles, X } from 'lucide-react';
+import { User, Dices, Edit3, Check, Sparkles, X, Star, Zap } from 'lucide-react';
+import { PINNED_NICKNAMES, rollDynamicNicknames } from '@/lib/nicknames';
 import { sound } from '@/lib/sound';
 
 interface PlayerProfileBarProps {
@@ -24,6 +25,16 @@ export function PlayerProfileBar({
 }: PlayerProfileBarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [tempName, setTempName] = useState(username);
+  const [dynamicChips, setDynamicChips] = useState<string[]>(() =>
+    rollDynamicNicknames([], 4)
+  );
+  const [isRolling, setIsRolling] = useState(false);
+
+  const handleOpen = () => {
+    sound.playClick();
+    setTempName(username);
+    setIsOpen(true);
+  };
 
   const handleSave = () => {
     sound.playClick();
@@ -33,17 +44,37 @@ export function PlayerProfileBar({
     setIsOpen(false);
   };
 
+  const handleRollChips = () => {
+    sound.playClick();
+    sound.triggerHaptic(35);
+    setIsRolling(true);
+
+    const fresh = rollDynamicNicknames(dynamicChips, 4);
+    setDynamicChips(fresh);
+    setTempName(fresh[0]);
+
+    setTimeout(() => {
+      setIsRolling(false);
+    }, 450);
+  };
+
+  const handleSelectChip = (name: string) => {
+    sound.playClick();
+    sound.triggerHaptic(25);
+    setTempName(name);
+  };
+
+  const isSelected = (name: string) => {
+    return tempName.trim().toLowerCase() === name.toLowerCase();
+  };
+
   return (
     <>
       {/* SLEEK COMPACT PROFILE BAR */}
       <div className="inline-flex items-center gap-2.5 p-1.5 pr-3.5 rounded-2xl glass-panel border border-cyan-500/30 hover:border-cyan-400 transition-all shadow-[0_0_15px_rgba(0,240,255,0.15)] group">
         <button
           type="button"
-          onClick={() => {
-            sound.playClick();
-            setTempName(username);
-            setIsOpen(true);
-          }}
+          onClick={handleOpen}
           className="flex items-center gap-2.5 touch-target text-left"
         >
           <NeonAvatarDisplay avatarId={avatar} size="sm" showGlow={false} />
@@ -80,7 +111,7 @@ export function PlayerProfileBar({
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="w-full max-w-md glass-panel-neon rounded-3xl p-5 sm:p-6 border border-cyan-400 shadow-neon-cyan relative"
+              className="w-full max-w-lg glass-panel-neon rounded-3xl p-5 sm:p-6 border border-cyan-400 shadow-neon-cyan relative max-h-[90dvh] overflow-y-auto"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
@@ -97,7 +128,7 @@ export function PlayerProfileBar({
               </div>
 
               {/* Username Input & Randomizer */}
-              <div className="space-y-2 mb-4">
+              <div className="space-y-2 mb-3">
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
                   Player Nickname
                 </label>
@@ -108,19 +139,90 @@ export function PlayerProfileBar({
                     value={tempName}
                     onChange={(e) => setTempName(e.target.value)}
                     placeholder="Enter nickname..."
-                    className="flex-1 min-h-[48px] bg-slate-950 border border-slate-700 focus:border-cyan-400 rounded-xl px-4 text-white font-bold text-sm outline-none"
+                    className="flex-1 min-h-[46px] bg-slate-950 border border-slate-700 focus:border-cyan-400 rounded-xl px-4 text-white font-bold text-sm outline-none"
                   />
-                  <button
+                  <motion.button
                     type="button"
-                    onClick={() => {
-                      sound.playClick();
-                      onRandomize();
-                    }}
-                    className="min-h-[48px] px-3.5 bg-slate-900 border border-slate-700 hover:border-cyan-400 rounded-xl text-cyan-400 flex items-center justify-center gap-1 text-xs font-bold touch-target"
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.94 }}
+                    onClick={handleRollChips}
+                    disabled={isRolling}
+                    className="min-h-[46px] px-3.5 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-xl text-white flex items-center justify-center gap-1.5 text-xs font-bold touch-target shadow-neon-cyan"
                   >
-                    <Dices className="w-4 h-4" />
+                    <motion.div
+                      animate={isRolling ? { rotate: [0, 360] } : { rotate: 0 }}
+                      transition={{ duration: 0.45 }}
+                    >
+                      <Dices className="w-4 h-4 text-cyan-200" />
+                    </motion.div>
                     <span>Roll</span>
-                  </button>
+                  </motion.button>
+                </div>
+              </div>
+
+              {/* 8 Nickname Suggestion Chips */}
+              <div className="mb-4 space-y-2 p-3 bg-slate-950/60 rounded-2xl border border-slate-800">
+                <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  <div className="flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-cyan-400" />
+                    <span>Suggested Gamer Tags (4 Pinned + 4 Dynamic)</span>
+                  </div>
+                </div>
+
+                {/* 4 Pinned Chips */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                  {PINNED_NICKNAMES.map((name, i) => {
+                    const sel = isSelected(name);
+                    return (
+                      <button
+                        key={name}
+                        type="button"
+                        onClick={() => handleSelectChip(name)}
+                        className={`h-8 px-2 rounded-xl text-xs font-black flex items-center justify-between gap-1 border transition-all ${
+                          sel
+                            ? 'bg-amber-500/25 border-amber-400 text-amber-200 shadow-[0_0_10px_rgba(251,191,36,0.4)]'
+                            : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-400/50'
+                        }`}
+                      >
+                        <span className="truncate flex items-center gap-1">
+                          <span className="text-[10px] text-amber-400">#{i + 1}</span>
+                          <span>{name}</span>
+                        </span>
+                        {sel ? (
+                          <Check className="w-3 h-3 text-amber-300 flex-shrink-0" />
+                        ) : (
+                          <Star className="w-2.5 h-2.5 text-amber-400/40 fill-amber-400/20 flex-shrink-0" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* 4 Dynamic Chips */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                  {dynamicChips.map((name, i) => {
+                    const sel = isSelected(name);
+                    return (
+                      <button
+                        key={`${name}-${i}`}
+                        type="button"
+                        onClick={() => handleSelectChip(name)}
+                        className={`h-8 px-2 rounded-xl text-xs font-black flex items-center justify-between gap-1 border transition-all ${
+                          sel
+                            ? 'bg-cyan-500/25 border-cyan-400 text-cyan-200 shadow-[0_0_10px_rgba(56,242,255,0.4)]'
+                            : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-cyan-400/50'
+                        }`}
+                      >
+                        <span className="truncate flex items-center gap-1">
+                          <Zap className="w-2.5 h-2.5 text-cyan-400/60 flex-shrink-0" />
+                          <span>{name}</span>
+                        </span>
+                        {sel && (
+                          <Check className="w-3 h-3 text-cyan-300 flex-shrink-0" />
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 

@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 import { TopNavbar } from '@/components/TopNavbar';
 import { HeroIllustration } from '@/components/HeroIllustration';
-import { PlayerProfileBar } from '@/components/PlayerProfileBar';
+import { PlayerOnboardingCard } from '@/components/PlayerOnboardingCard';
 import { PopularGamesGrid } from '@/components/PopularGamesGrid';
 import { AboutModal } from '@/components/AboutModal';
 import { NeonAvatarDisplay } from '@/components/NeonAvatarDisplay';
@@ -42,13 +42,8 @@ import {
   VibeMode
 } from '@feto-games/shared-types';
 import { socketCreateRoom, socketJoinRoom, socketQuickPlay, BACKEND_URL } from '@/lib/socket';
+import { PINNED_NICKNAMES, rollDynamicNicknames } from '@/lib/nicknames';
 import { sound } from '@/lib/sound';
-
-const RANDOM_NAMES = [
-  'FetoFox', 'Hy00x', 'Rodii', 'ZukoBoko', 'Debra',
-  'Remasland', 'Seragmohema', 'AstroNova', 'HyperDrift', 'ZeroByte',
-  'RetroMatrix', 'BlazeRider', 'SonicWave', 'VoltSpecter', 'VortexAce'
-];
 
 export default function HomePage() {
   const router = useRouter();
@@ -134,12 +129,10 @@ export default function HomePage() {
 
   const randomizeName = () => {
     sound.playClick();
-    const random = RANDOM_NAMES[Math.floor(Math.random() * RANDOM_NAMES.length)];
-    const num = Math.floor(10 + Math.random() * 90);
-    const generated = `${random}${num}`;
-    setUsername(generated);
+    const defaultName = PINNED_NICKNAMES[0];
+    setUsername(defaultName);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('feto_username', generated);
+      localStorage.setItem('feto_username', defaultName);
     }
   };
 
@@ -342,14 +335,13 @@ export default function HomePage() {
             Social deduction, drawing, speed trivia, word battles, and hilarious party challenges with zero downloads.
           </p>
 
-          {/* Sleek Integrated Player Profile Bar */}
+          {/* Player Onboarding & Nickname Selection (8 Chips: 4 Pinned Always First + 4 Dynamic, Working Roll) */}
           <div className="w-full max-w-xl mb-6">
-            <PlayerProfileBar
+            <PlayerOnboardingCard
               username={username}
               avatar={selectedAvatar}
               onUsernameChange={handleUsernameChange}
               onAvatarChange={handleAvatarSelect}
-              onRandomize={randomizeName}
             />
           </div>
 
