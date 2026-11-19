@@ -5,10 +5,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Trash2, Save, Layers, CheckCircle, Sparkles } from 'lucide-react';
 import { GameMode } from '@feto-games/shared-types';
 import { sound } from '@/lib/sound';
+import { BACKEND_URL } from '@/lib/socket';
 
 interface CustomDeckModalProps {
   isOpen: boolean;
   onClose: () => void;
+  gameMode?: GameMode;
   onDeckCreated?: (deckId: string) => void;
 }
 
@@ -20,9 +22,9 @@ interface SavedDeck {
   createdAt: string;
 }
 
-export function CustomDeckModal({ isOpen, onClose, onDeckCreated }: CustomDeckModalProps) {
+export function CustomDeckModal({ isOpen, onClose, gameMode, onDeckCreated }: CustomDeckModalProps) {
   const [deckName, setDeckName] = useState('');
-  const [targetMode, setTargetMode] = useState<GameMode>('who_is_imposter');
+  const [targetMode, setTargetMode] = useState<GameMode>(gameMode || 'who_is_imposter');
   const [cards, setCards] = useState<string[]>([
     'Cyberpunk 2077',
     'Virtual Reality Headset',
@@ -46,8 +48,7 @@ export function CustomDeckModal({ isOpen, onClose, onDeckCreated }: CustomDeckMo
   const fetchSavedDecks = async () => {
     setIsLoadingDecks(true);
     try {
-      const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:4000';
-      const res = await fetch(`${serverUrl}/api/decks`);
+      const res = await fetch(`${BACKEND_URL}/api/decks`);
       const data = await res.json();
       if (data.success) {
         setSavedDecks(data.data);
@@ -87,8 +88,7 @@ export function CustomDeckModal({ isOpen, onClose, onDeckCreated }: CustomDeckMo
     sound.playClick();
 
     try {
-      const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:4000';
-      const res = await fetch(`${serverUrl}/api/decks`, {
+      const res = await fetch(`${BACKEND_URL}/api/decks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

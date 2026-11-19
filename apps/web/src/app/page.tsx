@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -21,11 +21,16 @@ import {
   BookOpen,
   Zap,
   Shield,
-  HelpCircle
+  Plus,
+  Hash,
+  Share2
 } from 'lucide-react';
+import { TopNavbar } from '@/components/TopNavbar';
+import { HeroIllustration } from '@/components/HeroIllustration';
+import { PlayerProfileBar } from '@/components/PlayerProfileBar';
+import { PopularGamesGrid } from '@/components/PopularGamesGrid';
+import { AboutModal } from '@/components/AboutModal';
 import { NeonAvatarDisplay } from '@/components/NeonAvatarDisplay';
-import { NeonLogo } from '@/components/NeonLogo';
-import { SoundToggle } from '@/components/SoundToggle';
 import { GameRulesModal, GAME_RULES_DATA } from '@/components/GameRulesModal';
 import { CustomDeckModal } from '@/components/CustomDeckModal';
 import { LeaderboardProfileModal } from '@/components/LeaderboardProfileModal';
@@ -35,7 +40,7 @@ import {
   NEON_AVATARS,
   PublicRoomDirectoryItem
 } from '@feto-games/shared-types';
-import { socketCreateRoom, socketJoinRoom, socketQuickPlay } from '@/lib/socket';
+import { socketCreateRoom, socketJoinRoom, socketQuickPlay, BACKEND_URL } from '@/lib/socket';
 import { sound } from '@/lib/sound';
 
 const RANDOM_NAMES = [
@@ -46,6 +51,7 @@ const RANDOM_NAMES = [
 
 export default function HomePage() {
   const router = useRouter();
+  const gamesGridRef = useRef<HTMLDivElement>(null);
 
   // Player Profile State
   const [username, setUsername] = useState('');
@@ -55,9 +61,10 @@ export default function HomePage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showRulesModal, setShowRulesModal] = useState(false);
-  const [rulesTargetGame, setRulesTargetGame] = useState<GameMode>('who_is_imposter');
   const [showDeckModal, setShowDeckModal] = useState(false);
   const [showLeaderboardModal, setShowLeaderboardModal] = useState(false);
+  const [showAboutModal, setShowAboutModal] = useState(false);
+  const [rulesTargetGame, setRulesTargetGame] = useState<GameMode>('who_is_imposter');
 
   // Create Room Form State
   const [isPrivate, setIsPrivate] = useState(false);
@@ -80,9 +87,9 @@ export default function HomePage() {
 
   // Live Server Stats
   const [liveStats, setLiveStats] = useState({
-    onlinePlayers: 48,
-    activeRooms: 7,
-    matchesPlayed: 142
+    onlinePlayers: 54,
+    activeRooms: 9,
+    matchesPlayed: 168
   });
 
   // Initialize profile from localStorage and fetch live stats
@@ -109,18 +116,17 @@ export default function HomePage() {
 
   const fetchLiveStats = async () => {
     try {
-      const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:4000';
-      const res = await fetch(`${serverUrl}/api/stats/live`);
+      const res = await fetch(`${BACKEND_URL}/api/stats/live`);
       const data = await res.json();
       if (data.success && data.data) {
         setLiveStats({
-          onlinePlayers: data.data.onlinePlayers || 48,
-          activeRooms: data.data.activeRooms || 7,
-          matchesPlayed: data.data.matchesPlayed || 142
+          onlinePlayers: data.data.onlinePlayers || 54,
+          activeRooms: data.data.activeRooms || 9,
+          matchesPlayed: data.data.matchesPlayed || 168
         });
       }
     } catch {
-      // Fallback stats retained
+      // Fallback default stats retained
     }
   };
 
@@ -143,8 +149,7 @@ export default function HomePage() {
     }
   };
 
-  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value.slice(0, 18);
+  const handleUsernameChange = (val: string) => {
     setUsername(val);
     if (typeof window !== 'undefined') {
       localStorage.setItem('feto_username', val);
@@ -155,8 +160,7 @@ export default function HomePage() {
   const fetchPublicRooms = async () => {
     setIsFetchingRooms(true);
     try {
-      const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:4000';
-      const res = await fetch(`${serverUrl}/api/rooms/public`);
+      const res = await fetch(`${BACKEND_URL}/api/rooms/public`);
       const data = await res.json();
       if (data.success) {
         setPublicRooms(data.data);
@@ -263,362 +267,237 @@ export default function HomePage() {
     }
   };
 
+  const scrollToGames = () => {
+    if (gamesGridRef.current) {
+      gamesGridRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <main className="min-h-[100dvh] px-3 sm:px-4 py-4 sm:py-6 md:py-10 flex flex-col items-center justify-start relative max-w-6xl mx-auto safe-top safe-bottom">
-      {/* Background Neon Accent Glows */}
-      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-1/3 right-10 w-80 h-80 bg-feto-magenta/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-20 left-10 w-80 h-80 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none" />
+    <main className="min-h-[100dvh] bg-feto-dark text-slate-100 px-3 sm:px-6 py-3 sm:py-5 flex flex-col items-center justify-start relative max-w-7xl mx-auto safe-top safe-bottom">
+      {/* Background Neon Ambient Glows */}
+      <div className="fixed top-0 left-1/4 w-[500px] h-[500px] bg-cyan-600/10 rounded-full blur-[140px] pointer-events-none -z-10" />
+      <div className="fixed top-1/3 right-10 w-[550px] h-[550px] bg-purple-600/10 rounded-full blur-[160px] pointer-events-none -z-10" />
+      <div className="fixed bottom-10 left-1/3 w-[450px] h-[450px] bg-feto-magenta/10 rounded-full blur-[130px] pointer-events-none -z-10" />
 
-      {/* TOP NAVIGATION / SOCIAL HEADER */}
-      <header className="w-full flex items-center justify-between mb-8 relative z-20">
-        <div className="flex items-center gap-2">
-          <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-          <span className="text-xs font-bold text-emerald-400 tracking-wider uppercase">
-            Platform Online
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => {
-              sound.playClick();
-              setShowLeaderboardModal(true);
-            }}
-            className="p-2 sm:px-3 sm:py-2 rounded-xl glass-panel border border-yellow-500/30 text-yellow-300 hover:text-white hover:border-yellow-400 transition-all text-xs font-bold flex items-center gap-1.5 shadow-neon-amber"
-            title="Leaderboards & Stats"
-          >
-            <Trophy className="w-4 h-4 text-yellow-400" />
-            <span className="hidden sm:inline">Leaderboards</span>
-          </button>
-
-          <button
-            onClick={() => {
-              sound.playClick();
-              setShowDeckModal(true);
-            }}
-            className="p-2 sm:px-3 sm:py-2 rounded-xl glass-panel border border-feto-magenta/30 text-feto-magenta hover:text-white hover:border-feto-magenta transition-all text-xs font-bold flex items-center gap-1.5 shadow-neon-magenta"
-            title="Custom Deck Builder"
-          >
-            <Layers className="w-4 h-4" />
-            <span className="hidden sm:inline">Custom Decks</span>
-          </button>
-
-          <SoundToggle />
-        </div>
-      </header>
-
-      {/* HERO SECTION WITH CUSTOM BRANDING */}
-      <div className="text-center mb-8 relative z-10">
-        <NeonLogo size="lg" showSubtitle={true} className="mb-4" />
-
-        <p className="text-slate-400 text-sm md:text-base max-w-xl mx-auto mt-2">
-          Real-time browser party gaming platform for up to 15 concurrent players. Play instantly from phone, tablet, or desktop with no app downloads!
-        </p>
-
-        {/* LIVE SERVER STATS COUNTERS */}
-        <div className="inline-flex flex-wrap items-center justify-center gap-3 md:gap-6 mt-6 p-2 px-4 rounded-2xl glass-panel border border-cyan-500/20 text-xs font-semibold">
-          <div className="flex items-center gap-2 text-cyan-300">
-            <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-            <span>
-              <strong className="text-white font-mono text-sm">{liveStats.onlinePlayers}</strong> Online Players
-            </span>
-          </div>
-          <div className="w-1 h-3 bg-slate-700 hidden sm:block" />
-          <div className="flex items-center gap-2 text-pink-300">
-            <Gamepad2 className="w-3.5 h-3.5 text-feto-magenta" />
-            <span>
-              <strong className="text-white font-mono text-sm">{liveStats.activeRooms}</strong> Active Rooms
-            </span>
-          </div>
-          <div className="w-1 h-3 bg-slate-700 hidden sm:block" />
-          <div className="flex items-center gap-2 text-yellow-300">
-            <Flame className="w-3.5 h-3.5 text-yellow-400" />
-            <span>
-              <strong className="text-white font-mono text-sm">{liveStats.matchesPlayed}</strong> Matches Today
-            </span>
-          </div>
-        </div>
-      </div>
+      {/* 1. TOP NAVIGATION BAR */}
+      <TopNavbar
+        onlinePlayersCount={liveStats.onlinePlayers}
+        onOpenLeaderboard={() => setShowLeaderboardModal(true)}
+        onOpenAbout={() => setShowAboutModal(true)}
+        onScrollToGames={scrollToGames}
+        onOpenDecks={() => setShowDeckModal(true)}
+      />
 
       {/* ERROR BANNER */}
       {errorMessage && (
-        <div className="w-full max-w-2xl mb-6 p-3 bg-red-950/80 border border-red-500/40 rounded-2xl text-red-300 text-xs flex items-center gap-2">
-          <ShieldAlert className="w-4 h-4 flex-shrink-0" />
-          <span>{errorMessage}</span>
+        <div className="w-full max-w-3xl mb-4 p-3 bg-red-950/80 border border-red-500/50 rounded-2xl text-red-300 text-xs flex items-center justify-between gap-2 shadow-neon-magenta">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="w-4 h-4 flex-shrink-0 text-red-400" />
+            <span>{errorMessage}</span>
+          </div>
+          <button
+            onClick={() => setErrorMessage(null)}
+            className="text-slate-400 hover:text-white text-base font-bold leading-none px-2"
+          >
+            &times;
+          </button>
         </div>
       )}
 
-      {/* PROFILE & AVATAR CUSTOMIZER CARD */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="w-full max-w-2xl glass-panel-neon rounded-3xl p-6 md:p-8 mb-8 relative z-10"
-      >
-        <div className="flex flex-col md:flex-row items-center gap-6">
-          {/* Active Avatar Large Preview */}
-          <div className="flex flex-col items-center gap-2 flex-shrink-0">
-            <NeonAvatarDisplay avatarId={selectedAvatar} size="lg" showGlow />
-            <span className="text-xs font-semibold text-cyan-300 uppercase tracking-wider">
-              {NEON_AVATARS[selectedAvatar].name}
+      {/* 2. HERO SECTION & GLOWING OUTLINE ACTION BUTTONS */}
+      <section className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center my-2 sm:my-6 md:my-8 relative z-10">
+        {/* Left Column: Esports Branding, Headline, Profile Bar, Action Buttons */}
+        <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
+          {/* Eyebrow Pill */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/40 text-[11px] font-black uppercase tracking-widest text-cyan-300 mb-4 shadow-neon-cyan">
+            <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-spin" />
+            <span>Esports-Grade Party Gaming Platform</span>
+          </div>
+
+          {/* Futuristic Headline */}
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-[1.08] font-display text-white mb-3">
+            The Ultimate{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-cyan-300 to-feto-purple text-glow-cyan">
+              Party Game Hub
             </span>
+          </h1>
+
+          {/* Subtitle */}
+          <p className="text-cyan-300/90 text-sm sm:text-lg font-extrabold uppercase tracking-widest mb-3">
+            PLAY WITH FRIENDS, ANYTIME, ANYWHERE
+          </p>
+
+          <p className="text-slate-400 text-xs sm:text-sm md:text-base max-w-xl mb-6 leading-relaxed">
+            Instant real-time browser party gaming supporting up to 15 concurrent players.
+            Social deduction, drawing, speed trivia, word battles, and hilarious party challenges with zero downloads.
+          </p>
+
+          {/* Sleek Integrated Player Profile Bar */}
+          <div className="w-full max-w-xl mb-6">
+            <PlayerProfileBar
+              username={username}
+              avatar={selectedAvatar}
+              onUsernameChange={handleUsernameChange}
+              onAvatarChange={handleAvatarSelect}
+              onRandomize={randomizeName}
+            />
           </div>
 
-          {/* Username & Avatar Selector */}
-          <div className="flex-1 w-full space-y-4">
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                Player Nickname
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={username}
-                  onChange={handleUsernameChange}
-                  placeholder="Enter your name..."
-                  className="flex-1 bg-feto-card border border-feto-border focus:border-cyan-400 rounded-xl px-4 py-3 text-white text-base font-medium outline-none transition-all focus:ring-2 focus:ring-cyan-500/20"
-                />
-                <button
-                  type="button"
-                  onClick={randomizeName}
-                  title="Randomize Nickname"
-                  className="px-4 py-3 bg-feto-card hover:bg-feto-cardHover border border-feto-border hover:border-cyan-400/50 rounded-xl text-slate-300 hover:text-cyan-400 transition-all flex items-center gap-1.5 text-xs font-semibold"
-                >
-                  <Dice5 className="w-5 h-5 text-cyan-400" />
-                  <span className="hidden sm:inline">Random</span>
-                </button>
+          {/* 3 SLEEK DARK GLASSMORPHIC BUTTONS WITH THICK GLOWING NEON BORDERS */}
+          <div className="w-full max-w-xl grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5">
+            {/* 1. CREATE ROOM (+) -> NEON PURPLE GLOW */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => {
+                sound.playClick();
+                setShowCreateModal(true);
+              }}
+              className="btn-glow-purple px-4 py-3.5 rounded-2xl flex items-center justify-center gap-2 touch-target group"
+              id="btn-create-room"
+            >
+              <div className="p-1 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-400/40 group-hover:bg-purple-500/30">
+                <Plus className="w-4 h-4" />
               </div>
-            </div>
+              <span className="font-black text-xs sm:text-sm tracking-wider uppercase text-purple-200 group-hover:text-white">
+                Create Room
+              </span>
+            </motion.button>
 
-            {/* Neon Avatars Grid */}
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
-                Choose Neon Avatar
-              </label>
-              <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
-                {(Object.keys(NEON_AVATARS) as NeonAvatarId[]).map((avatarKey) => (
-                  <button
-                    key={avatarKey}
-                    type="button"
-                    onClick={() => handleAvatarSelect(avatarKey)}
-                    className={`relative p-1.5 rounded-xl border transition-all flex items-center justify-center ${
-                      selectedAvatar === avatarKey
-                        ? 'border-cyan-400 bg-cyan-950/40 shadow-neon-cyan scale-105'
-                        : 'border-feto-border bg-feto-card hover:border-slate-500 hover:scale-105'
-                    }`}
-                  >
-                    <span className="text-2xl">{NEON_AVATARS[avatarKey].emoji}</span>
-                  </button>
-                ))}
+            {/* 2. JOIN VIA CODE -> NEON CYAN GLOW */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => {
+                sound.playClick();
+                setShowJoinModal(true);
+              }}
+              className="btn-glow-cyan px-4 py-3.5 rounded-2xl flex items-center justify-center gap-2 touch-target group"
+              id="btn-join-code"
+            >
+              <div className="p-1 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 group-hover:bg-cyan-500/30">
+                <Hash className="w-4 h-4" />
               </div>
-            </div>
-          </div>
-        </div>
-      </motion.div>
+              <span className="font-black text-xs sm:text-sm tracking-wider uppercase text-cyan-200 group-hover:text-white">
+                Join Via Code
+              </span>
+            </motion.button>
 
-      {/* HERO MATCHMAKING ACTIONS (CREATE, JOIN, QUICK PLAY) */}
-      <div className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10 relative z-10">
-        {/* ACTION 1: CREATE ROOM */}
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => {
-            sound.playClick();
-            setErrorMessage(null);
-            setShowCreateModal(true);
-          }}
-          className="btn-neon-cyan py-5 px-6 rounded-2xl flex items-center justify-between text-white font-bold group shadow-lg"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
-              <Sparkles className="w-6 h-6 text-white" />
-            </div>
-            <div className="text-left">
-              <div className="text-white font-extrabold text-base leading-tight">Create Room</div>
-              <div className="text-cyan-100 text-xs font-normal">Host up to 15 players</div>
-            </div>
-          </div>
-          <ArrowRight className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
-        </motion.button>
-
-        {/* ACTION 2: QUICK PLAY (AUTO-MATCHMAKING VIA REDIS) */}
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={handleQuickPlay}
-          disabled={isQuickPlaying}
-          className="py-5 px-6 rounded-2xl bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-500 hover:brightness-110 text-black font-extrabold flex items-center justify-between group shadow-neon-amber transition-all active:scale-95 disabled:opacity-50"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-black/20 flex items-center justify-center flex-shrink-0">
-              <Zap className="w-6 h-6 text-black" />
-            </div>
-            <div className="text-left">
-              <div className="font-extrabold text-base leading-tight">
+            {/* 3. QUICK PLAY (▶) -> NEON AMBER/ORANGE GLOW */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleQuickPlay}
+              disabled={isQuickPlaying}
+              className="btn-glow-amber px-4 py-3.5 rounded-2xl flex items-center justify-center gap-2 touch-target group disabled:opacity-60"
+              id="btn-quick-play"
+            >
+              <div className="p-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-400/40 group-hover:bg-amber-500/30">
+                {isQuickPlaying ? (
+                  <div className="w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Play className="w-4 h-4 fill-amber-300" />
+                )}
+              </div>
+              <span className="font-black text-xs sm:text-sm tracking-wider uppercase text-amber-200 group-hover:text-white">
                 {isQuickPlaying ? 'Matching...' : 'Quick Play'}
-              </div>
-              <div className="text-amber-950 text-xs font-medium">Auto-join open room</div>
-            </div>
-          </div>
-          <ArrowRight className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
-        </motion.button>
-
-        {/* ACTION 3: JOIN VIA CODE */}
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => {
-            sound.playClick();
-            setErrorMessage(null);
-            setShowJoinModal(true);
-          }}
-          className="btn-neon-magenta py-5 px-6 rounded-2xl flex items-center justify-between text-white font-bold group shadow-lg"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
-              <Gamepad2 className="w-6 h-6 text-white" />
-            </div>
-            <div className="text-left">
-              <div className="text-white font-extrabold text-base leading-tight">Join with Code</div>
-              <div className="text-pink-100 text-xs font-normal">Enter 6-char PIN/Code</div>
-            </div>
-          </div>
-          <ArrowRight className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
-        </motion.button>
-      </div>
-
-      {/* INTERACTIVE GAME SHOWCASE CARDS (ALL 6 PARTY GAMES) */}
-      <section className="w-full max-w-5xl mb-12 relative z-10">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-black text-white flex items-center gap-2">
-              <Gamepad2 className="w-6 h-6 text-cyan-400" />
-              <span>Party Games Showcase</span>
-            </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
-              6 distinct multiplayer game modes supporting up to 15 concurrent players
-            </p>
+              </span>
+            </motion.button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Object.keys(GAME_RULES_DATA).map((modeKey) => {
-            const info = GAME_RULES_DATA[modeKey];
-            const mode = modeKey as GameMode;
-            return (
-              <motion.div
-                key={mode}
-                whileHover={{ y: -4 }}
-                className="glass-panel hover:border-cyan-400/50 rounded-2xl p-5 flex flex-col justify-between transition-all group"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${info.badgeColor}`}>
-                      {info.playerRange}
-                    </span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">
-                      {info.difficulty}
-                    </span>
-                  </div>
-
-                  <h3 className="font-extrabold text-lg text-white mb-1 group-hover:text-cyan-300 transition-colors">
-                    {info.name}
-                  </h3>
-                  <p className="text-xs text-slate-400 line-clamp-2 mb-4 leading-relaxed">
-                    {info.tagline}
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-between pt-3 border-t border-slate-800/80">
-                  <button
-                    onClick={() => {
-                      sound.playClick();
-                      setRulesTargetGame(mode);
-                      setShowRulesModal(true);
-                    }}
-                    className="text-xs font-bold text-slate-400 hover:text-cyan-300 flex items-center gap-1 transition-colors"
-                  >
-                    <BookOpen className="w-3.5 h-3.5" />
-                    <span>How to Play</span>
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      sound.playClick();
-                      setGameMode(mode);
-                      setShowCreateModal(true);
-                    }}
-                    className="px-3 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-xs font-extrabold flex items-center gap-1 transition-all"
-                  >
-                    <span>Host Game</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </button>
-                </div>
-              </motion.div>
-            );
-          })}
+        {/* Right Column: 3D-Style Neon Gaming Illustration (Desktop / Stacks on Mobile) */}
+        <div className="lg:col-span-5 flex justify-center lg:justify-end w-full">
+          <HeroIllustration />
         </div>
       </section>
 
-      {/* PUBLIC ROOMS DIRECTORY BROWSER */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="w-full max-w-5xl glass-panel rounded-3xl p-6 md:p-8 relative z-10 mb-12"
-      >
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <Globe className="w-5 h-5 text-cyan-400" />
-            <h2 className="text-xl font-bold text-white">Live Public Rooms</h2>
+      {/* 3. "POPULAR PARTY GAMES" INTERACTIVE 6-CARD GRID */}
+      <div ref={gamesGridRef} className="w-full my-6 sm:my-10">
+        <PopularGamesGrid
+          onSelectGame={(mode) => {
+            sound.playClick();
+            setGameMode(mode);
+            setShowCreateModal(true);
+          }}
+          onOpenRules={(mode) => {
+            sound.playClick();
+            setRulesTargetGame(mode);
+            setShowRulesModal(true);
+          }}
+        />
+      </div>
+
+      {/* 4. ACTIVE PUBLIC ROOMS DIRECTORY */}
+      <section className="w-full glass-panel rounded-3xl p-5 sm:p-7 relative z-10 mb-8 border border-cyan-500/20">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+              <Globe className="w-4 h-4" />
+            </div>
+            <div>
+              <h2 className="text-base sm:text-lg font-black text-white uppercase tracking-wider">
+                Live Public Rooms
+              </h2>
+              <p className="text-[11px] sm:text-xs text-slate-400">
+                Jump straight into open community lobbies
+              </p>
+            </div>
           </div>
+
           <button
-            onClick={fetchPublicRooms}
+            onClick={() => {
+              sound.playClick();
+              fetchPublicRooms();
+            }}
             disabled={isFetchingRooms}
-            className="text-xs text-cyan-400 hover:text-cyan-300 underline font-semibold flex items-center gap-1"
+            className="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-cyan-300 flex items-center gap-1.5 transition-all"
           >
-            {isFetchingRooms ? 'Refreshing...' : 'Refresh List'}
+            <Radio className={`w-3.5 h-3.5 text-cyan-400 ${isFetchingRooms ? 'animate-spin' : 'animate-pulse'}`} />
+            <span>{isFetchingRooms ? 'Refreshing...' : 'Refresh Lobbies'}</span>
           </button>
         </div>
 
         {publicRooms.length === 0 ? (
-          <div className="text-center py-12 text-slate-500 space-y-2">
-            <Users className="w-10 h-10 mx-auto text-slate-600 mb-2" />
-            <p className="text-base font-medium text-slate-400">No public rooms active right now.</p>
-            <p className="text-xs text-slate-500">Create the first room and invite your friends!</p>
+          <div className="text-center py-10 text-slate-500 space-y-2">
+            <Gamepad2 className="w-10 h-10 mx-auto text-slate-600 mb-2 opacity-60" />
+            <p className="text-sm font-bold text-slate-300">No public rooms are currently open.</p>
+            <p className="text-xs text-slate-500">
+              Hit "Create Room" above and invite up to 14 friends with your room link!
+            </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
             {publicRooms.map((room) => (
               <div
                 key={room.code}
-                className="bg-feto-card border border-feto-border hover:border-cyan-500/40 rounded-2xl p-4 flex items-center justify-between transition-all group"
+                className="bg-feto-card border border-feto-border hover:border-cyan-500/50 rounded-2xl p-4 flex items-center justify-between transition-all group hover:shadow-neon-cyan"
               >
                 <div className="flex items-center gap-3">
                   <NeonAvatarDisplay avatarId={room.hostAvatar as NeonAvatarId} size="sm" showGlow={false} />
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-white text-base">{room.code}</span>
+                      <span className="font-black text-white text-sm sm:text-base tracking-wider">{room.code}</span>
                       {room.hasPin && (
                         <span title="PIN Protected">
-                          <Lock className="w-3.5 h-3.5 text-yellow-400" />
+                          <Lock className="w-3.5 h-3.5 text-amber-400" />
                         </span>
                       )}
                     </div>
-                    <div className="text-xs text-slate-400">
-                      Host: <span className="text-slate-200">{room.hostUsername}</span> •{' '}
-                      <span className="capitalize">{room.gameMode.replace(/_/g, ' ')}</span>
+                    <div className="text-[11px] text-slate-400">
+                      Host: <span className="text-slate-200 font-semibold">{room.hostUsername}</span> •{' '}
+                      <span className="capitalize text-cyan-300">{room.gameMode.replace(/_/g, ' ')}</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <div className="text-sm font-bold text-cyan-400">
+                    <div className="text-xs font-black text-cyan-400">
                       {room.playerCount}/{room.maxPlayers}
                     </div>
-                    <div className="text-[10px] text-slate-400 uppercase tracking-wider">{room.status}</div>
+                    <div className="text-[9px] text-slate-400 uppercase tracking-widest">{room.status}</div>
                   </div>
                   <button
                     onClick={() => {
@@ -626,7 +505,7 @@ export default function HomePage() {
                       setJoinCode(room.code);
                       setShowJoinModal(true);
                     }}
-                    className="px-3 py-1.5 bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 rounded-xl text-cyan-300 text-xs font-bold transition-all"
+                    className="px-3.5 py-1.5 bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 rounded-xl text-cyan-300 text-xs font-extrabold transition-all"
                   >
                     Join
                   </button>
@@ -635,22 +514,28 @@ export default function HomePage() {
             ))}
           </div>
         )}
-      </motion.div>
+      </section>
 
-      {/* CREATE ROOM MODAL */}
+      {/* ======================================================== */}
+      {/* CREATE ROOM MODAL                                         */}
+      {/* ======================================================== */}
       <AnimatePresence>
         {showCreateModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md safe-top safe-bottom">
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="w-full max-w-lg glass-panel-neon rounded-3xl p-5 sm:p-8 relative max-h-[90dvh] overflow-y-auto"
+              initial={{ opacity: 0, scale: 0.92, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 10 }}
+              className="w-full max-w-lg glass-panel-neon rounded-3xl p-5 sm:p-8 relative max-h-[92dvh] overflow-y-auto border border-purple-500/30"
             >
               <div className="flex items-center justify-between mb-4 sm:mb-6">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400" />
-                  <h3 className="text-xl sm:text-2xl font-extrabold text-white">Create New Room</h3>
+                  <div className="p-2 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/40">
+                    <Sparkles className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <h3 className="text-lg sm:text-2xl font-black text-white uppercase tracking-wider">
+                    Create New Room
+                  </h3>
                 </div>
                 <button
                   onClick={() => setShowCreateModal(false)}
@@ -660,17 +545,10 @@ export default function HomePage() {
                 </button>
               </div>
 
-              {errorMessage && (
-                <div className="mb-4 p-3 bg-red-950/60 border border-red-500/50 rounded-xl text-red-200 text-xs flex items-center gap-2">
-                  <ShieldAlert className="w-4 h-4 flex-shrink-0" />
-                  <span>{errorMessage}</span>
-                </div>
-              )}
-
               <form onSubmit={handleCreateRoom} className="space-y-4 sm:space-y-5">
-                {/* Game Mode */}
+                {/* Select Game Mode */}
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
+                  <label className="block text-xs font-black uppercase tracking-wider text-slate-300 mb-2">
                     Select Game Mode
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -691,18 +569,18 @@ export default function HomePage() {
                         }}
                         className={`min-h-[48px] p-2.5 sm:p-3 rounded-xl border text-left transition-all touch-target ${
                           gameMode === mode.id
-                            ? 'border-cyan-400 bg-cyan-950/40 text-white shadow-neon-cyan'
+                            ? 'border-purple-400 bg-purple-950/40 text-white shadow-neon-purple'
                             : 'border-feto-border bg-feto-card text-slate-300 hover:border-slate-500'
                         }`}
                       >
-                        <div className="font-bold text-xs sm:text-sm text-cyan-300 truncate">{mode.title}</div>
-                        <div className="text-[10px] sm:text-[11px] text-slate-400 truncate">{mode.desc}</div>
+                        <div className="font-extrabold text-xs sm:text-sm text-purple-300 truncate">{mode.title}</div>
+                        <div className="text-[10px] text-slate-400 truncate">{mode.desc}</div>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                {/* TEAM MODE TOGGLE */}
+                {/* Team Mode Toggle */}
                 <div className="p-3 sm:p-3.5 rounded-2xl bg-slate-900/80 border border-cyan-500/30 flex items-center justify-between">
                   <div className="flex items-center gap-2.5 sm:gap-3">
                     <Shield className="w-5 h-5 text-cyan-400" />
@@ -722,7 +600,7 @@ export default function HomePage() {
                 {/* Max Players Slider (2 to 15) */}
                 <div>
                   <div className="flex justify-between items-center mb-1.5">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+                    <label className="text-xs font-black uppercase tracking-wider text-slate-300">
                       Player Capacity (2 - 15)
                     </label>
                     <span className="text-cyan-400 font-extrabold text-sm">{maxPlayers} Players</span>
@@ -737,6 +615,32 @@ export default function HomePage() {
                   />
                 </div>
 
+                {/* Round Duration */}
+                <div>
+                  <label className="block text-xs font-black uppercase tracking-wider text-slate-300 mb-1.5">
+                    Round Timer
+                  </label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[20, 30, 45, 60].map((sec) => (
+                      <button
+                        key={sec}
+                        type="button"
+                        onClick={() => {
+                          sound.playClick();
+                          setRoundDuration(sec);
+                        }}
+                        className={`py-2 rounded-xl border text-xs font-bold transition-all ${
+                          roundDuration === sec
+                            ? 'border-cyan-400 bg-cyan-950/40 text-cyan-300 shadow-neon-cyan'
+                            : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        {sec}s
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Privacy & PIN */}
                 <div className="space-y-3 pt-2 border-t border-feto-border">
                   <div className="flex items-center justify-between">
@@ -748,33 +652,38 @@ export default function HomePage() {
                       type="checkbox"
                       checked={isPrivate}
                       onChange={(e) => setIsPrivate(e.target.checked)}
-                      className="w-5 h-5 accent-cyan-400 rounded cursor-pointer touch-manipulation"
+                      className="w-5 h-5 accent-purple-400 rounded cursor-pointer"
                     />
                   </div>
 
                   {isPrivate && (
-                    <div>
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1">
-                        4-Digit PIN
-                      </label>
+                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
                       <input
-                        type="password"
+                        type="text"
                         maxLength={4}
+                        placeholder="Enter 4-digit numeric PIN..."
                         value={pin}
                         onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
-                        placeholder="e.g. 1234"
-                        className="w-full min-h-[48px] bg-feto-card border border-feto-border rounded-xl px-4 py-2.5 text-white font-mono tracking-widest text-center text-lg focus:border-cyan-400 outline-none"
+                        className="w-full bg-slate-900 border border-slate-700 focus:border-purple-400 rounded-xl px-4 py-2.5 text-white text-center font-mono tracking-widest text-lg outline-none"
                       />
-                    </div>
+                    </motion.div>
                   )}
                 </div>
 
+                {/* Create Room Submit Button */}
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full min-h-[52px] btn-neon-cyan py-3.5 sm:py-4 rounded-xl text-white font-extrabold text-sm sm:text-base uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 touch-target"
+                  className="w-full py-4 rounded-2xl font-black text-sm uppercase tracking-wider text-white bg-gradient-to-r from-purple-600 via-feto-purple to-cyan-500 hover:brightness-110 shadow-neon-purple transition-all flex items-center justify-center gap-2 touch-target"
                 >
-                  {isLoading ? 'Creating Room...' : 'Launch Room'}
+                  {isLoading ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <Plus className="w-5 h-5" />
+                      <span>Launch Room Now</span>
+                    </>
+                  )}
                 </button>
               </form>
             </motion.div>
@@ -782,20 +691,26 @@ export default function HomePage() {
         )}
       </AnimatePresence>
 
-      {/* JOIN ROOM MODAL */}
+      {/* ======================================================== */}
+      {/* JOIN VIA CODE MODAL                                      */}
+      {/* ======================================================== */}
       <AnimatePresence>
         {showJoinModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md safe-top safe-bottom">
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="w-full max-w-md glass-panel-neon rounded-3xl p-5 sm:p-8 relative max-h-[90dvh] overflow-y-auto"
+              initial={{ opacity: 0, scale: 0.92, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 10 }}
+              className="w-full max-w-md glass-panel-neon rounded-3xl p-5 sm:p-8 relative border border-cyan-500/30"
             >
-              <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <Gamepad2 className="w-5 h-5 sm:w-6 sm:h-6 text-feto-magenta" />
-                  <h3 className="text-xl sm:text-2xl font-extrabold text-white">Join Room</h3>
+                  <div className="p-2 rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
+                    <Hash className="w-5 h-5 text-cyan-400" />
+                  </div>
+                  <h3 className="text-lg sm:text-2xl font-black text-white uppercase tracking-wider">
+                    Join Room
+                  </h3>
                 </div>
                 <button
                   onClick={() => setShowJoinModal(false)}
@@ -805,48 +720,48 @@ export default function HomePage() {
                 </button>
               </div>
 
-              {errorMessage && (
-                <div className="mb-4 p-3 bg-red-950/60 border border-red-500/50 rounded-xl text-red-200 text-xs flex items-center gap-2">
-                  <ShieldAlert className="w-4 h-4 flex-shrink-0" />
-                  <span>{errorMessage}</span>
-                </div>
-              )}
-
               <form onSubmit={handleJoinRoom} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                  <label className="block text-xs font-black uppercase tracking-wider text-slate-300 mb-1.5">
                     Room Code
                   </label>
                   <input
                     type="text"
                     maxLength={7}
+                    placeholder="FG-XXXX"
                     value={joinCode}
                     onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                    placeholder="e.g. FG-ABCD"
-                    className="w-full min-h-[48px] bg-feto-card border border-feto-border rounded-xl px-4 py-3 text-white font-mono tracking-widest text-center text-lg sm:text-xl uppercase focus:border-feto-magenta outline-none"
+                    className="w-full bg-slate-900 border border-slate-700 focus:border-cyan-400 rounded-xl px-4 py-3 text-white text-center font-mono tracking-widest text-2xl outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                    PIN (If Required)
+                  <label className="block text-xs font-black uppercase tracking-wider text-slate-300 mb-1.5">
+                    Room PIN (If Private)
                   </label>
                   <input
                     type="password"
                     maxLength={4}
+                    placeholder="Optional 4-digit PIN"
                     value={joinPin}
                     onChange={(e) => setJoinPin(e.target.value.replace(/\D/g, ''))}
-                    placeholder="Optional 4-digit PIN"
-                    className="w-full min-h-[48px] bg-feto-card border border-feto-border rounded-xl px-4 py-2.5 text-white font-mono tracking-widest text-center text-sm focus:border-feto-magenta outline-none"
+                    className="w-full bg-slate-900 border border-slate-700 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-white text-center font-mono tracking-widest text-base outline-none"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full min-h-[52px] btn-neon-magenta py-3.5 sm:py-4 rounded-xl text-white font-extrabold text-sm sm:text-base uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 mt-2 touch-target"
+                  className="w-full py-4 rounded-2xl font-black text-sm uppercase tracking-wider text-black bg-gradient-to-r from-cyan-400 to-cyan-300 hover:brightness-110 shadow-neon-cyan transition-all flex items-center justify-center gap-2 touch-target"
                 >
-                  {isLoading ? 'Connecting...' : 'Join Game'}
+                  {isLoading ? (
+                    <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <ArrowRight className="w-5 h-5" />
+                      <span>Enter Game Lobby</span>
+                    </>
+                  )}
                 </button>
               </form>
             </motion.div>
@@ -854,20 +769,23 @@ export default function HomePage() {
         )}
       </AnimatePresence>
 
-      {/* GAME RULES MODAL */}
+      {/* ======================================================== */}
+      {/* OTHER MODALS: ABOUT, RULES, DECKS, LEADERBOARDS           */}
+      {/* ======================================================== */}
+      <AboutModal isOpen={showAboutModal} onClose={() => setShowAboutModal(false)} />
+
       <GameRulesModal
         isOpen={showRulesModal}
+        gameMode={rulesTargetGame}
         onClose={() => setShowRulesModal(false)}
-        initialGameMode={rulesTargetGame}
       />
 
-      {/* CUSTOM DECK MODAL */}
       <CustomDeckModal
         isOpen={showDeckModal}
         onClose={() => setShowDeckModal(false)}
+        gameMode={gameMode}
       />
 
-      {/* LEADERBOARD & PROFILE MODAL */}
       <LeaderboardProfileModal
         isOpen={showLeaderboardModal}
         onClose={() => setShowLeaderboardModal(false)}

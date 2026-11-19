@@ -9,19 +9,24 @@ import { socialRouter } from './routes/socialRoutes.js';
 import { redisClient, pubClient, subClient } from './config/redis.js';
 import { prisma } from './config/prisma.js';
 
+import { expressCorsOptions } from './config/cors.js';
+
 const app = express();
 const httpServer = http.createServer(app);
 
-// Cross-Origin Resource Sharing
-app.use(
-  cors({
-    origin: [env.CLIENT_URL, 'http://localhost:3000', 'http://127.0.0.1:3000'],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
-  })
-);
+// Cross-Origin Resource Sharing (Supports FRONTEND_URL, Vercel deployments, and localhost)
+app.use(cors(expressCorsOptions));
 
 app.use(express.json());
+
+// Standalone Cloud Hosting Health Check Endpoint (Railway, Render, Fly.io, ALB)
+app.get('/health', (_req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: Math.floor(process.uptime())
+  });
+});
 
 // API Routes
 app.use('/api', healthRouter);
@@ -34,18 +39,20 @@ app.get('/', (_req, res) => {
     app: 'FETO GAMES Backend Engine',
     version: '1.0.0',
     status: 'online',
-    docs: '/api/health'
+    health: '/health',
+    apiHealth: '/api/health'
   });
 });
 
 // Initialize Socket.IO with Redis Adapter
 export const io = initSocketServer(httpServer);
 
-// Start HTTP & Socket server
-httpServer.listen(env.PORT, () => {
+// Start HTTP & Socket server (Bind to 0.0.0.0 for containerized / cloud hosting)
+const PORT = Number(process.env.PORT) || env.PORT || 4000;
+httpServer.listen(PORT, '0.0.0.0', () => {
   console.log(`
   ======================================================
-  🚀 FETO GAMES Server running on http://localhost:${env.PORT}
+  🚀 FETO GAMES Server running on http://0.0.0.0:${PORT}
   🕹️  Environment: ${env.NODE_ENV}
   ⚡ Redis: Connected (${env.REDIS_URL.split('@')[1] || 'localhost'})
   👥 Max Players per Room: ${env.MAX_PLAYERS_PER_ROOM}

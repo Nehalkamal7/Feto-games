@@ -2,7 +2,6 @@ import { Server as HttpServer } from 'http';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { pubClient, subClient } from '../config/redis.js';
-import { env } from '../config/env.js';
 import { socketAuthMiddleware, attachPacketRateLimiter, cleanupSocketRateLimit } from './middleware.js';
 import { registerLobbyHandlers } from './lobbyHandler.js';
 import { registerConnectionHandlers } from './connectionHandler.js';
@@ -13,6 +12,8 @@ import {
   SocketData
 } from '@feto-games/shared-types';
 
+import { isOriginAllowed } from '../config/cors.js';
+
 export const initSocketServer = (httpServer: HttpServer) => {
   const io = new Server<
     ClientToServerEvents,
@@ -21,7 +22,18 @@ export const initSocketServer = (httpServer: HttpServer) => {
     SocketData
   >(httpServer, {
     cors: {
-      origin: [env.CLIENT_URL, 'http://localhost:3000', 'http://127.0.0.1:3000'],
+      origin: (origin, callback) => {
+        if (isOriginAllowed(origin)) {
+          callback(null, true);
+        } else {
+          console.warn(`⚠️ [Socket.IO CORS] Blocked connection attempt from: ${origin}`);
+          if (process.env.NODE_ENV !== 'production') {
+            callback(null, true);
+          } else {
+            callback(new Error(`Socket connection not allowed by CORS from ${origin}`));
+          }
+        }
+      },
       methods: ['GET', 'POST'],
       credentials: true
     },

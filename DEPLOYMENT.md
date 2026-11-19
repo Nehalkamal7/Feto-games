@@ -129,16 +129,28 @@ docker-compose -f docker-compose.prod.yml logs -f
 1. Connect your GitHub repository to [Vercel](https://vercel.com).
 2. Set Root Directory to `apps/web`.
 3. Add Environment Variables:
+   - `NEXT_PUBLIC_SOCKET_URL`: `https://api.fetogames.com` (or your Railway/Render URL, e.g. `https://feto-server.up.railway.app`)
    - `NEXT_PUBLIC_SERVER_URL`: `https://api.fetogames.com`
    - `NEXT_PUBLIC_APP_NAME`: `FETO GAMES`
    - `NEXT_PUBLIC_MAX_ROOM_PLAYERS`: `15`
 4. Deploy!
 
-### Backend on Railway / Render:
+> **Note on Vercel WebSocket Limitation:**
+> Vercel Serverless and Edge runtimes terminate HTTP connections after request resolution and do not maintain persistent WebSockets. Therefore, the frontend connects directly to the standalone Node.js backend specified in `NEXT_PUBLIC_SOCKET_URL` with `transports: ['websocket', 'polling']` and `withCredentials: true`.
+
+### Standalone Backend on Railway / Render / Fly.io / VPS:
 1. Deploy Redis instance (enable persistence).
 2. Deploy PostgreSQL instance.
-3. Deploy Node.js server from root with Dockerfile `apps/server/Dockerfile`.
-4. Inject `DATABASE_URL`, `REDIS_URL`, `CLIENT_URL`, `JWT_SECRET`.
+3. Deploy Node.js server:
+   - Build command: `npm run build`
+   - Start command: `npm start` (runs standalone `node dist/server.js` on `process.env.PORT || 4000`)
+   - Health check path: `/health` (returns `{ status: "ok" }`)
+4. Inject Environment Variables:
+   - `PORT`: (provided automatically by cloud provider or set to `4000`)
+   - `FRONTEND_URL`: `https://your-feto-games.vercel.app` (your Vercel frontend domain; multiple domains can be comma-separated)
+   - `DATABASE_URL`: `postgresql://...`
+   - `REDIS_URL`: `redis://...`
+   - `JWT_SECRET`: (secure 32+ character random secret)
 5. Run release command: `npx prisma migrate deploy`.
 
 ---

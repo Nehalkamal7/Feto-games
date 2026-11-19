@@ -133,6 +133,33 @@ class SoundEffects {
     osc.stop(ctx.currentTime + 0.12);
   }
 
+  public playCountdownTick(): void {
+    this.playCountdown();
+  }
+
+  public playGameStart(): void {
+    const ctx = this.getContext();
+    if (!ctx) return;
+    const notes = [440, 554.37, 659.25, 880];
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      const startTime = ctx.currentTime + idx * 0.08;
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      gain.gain.setValueAtTime(0.18, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.3);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + 0.3);
+    });
+  }
+
   public playFanfare(): void {
     const ctx = this.getContext();
     if (!ctx) return;

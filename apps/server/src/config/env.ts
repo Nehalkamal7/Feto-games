@@ -11,7 +11,8 @@ dotenv.config();
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  PORT: z.string().transform(Number).default('4000'),
+  PORT: z.union([z.string(), z.number()]).transform((val) => Number(val)).default(4000),
+  FRONTEND_URL: z.string().optional(),
   CLIENT_URL: z.string().default('http://localhost:3000'),
   DATABASE_URL: z.string().default('postgresql://feto_admin:feto_super_secret_pass_2026@localhost:5432/feto_games_db?schema=public'),
   REDIS_URL: z.string().default('redis://:feto_redis_secure_pass_2026@localhost:6379'),

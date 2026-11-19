@@ -156,11 +156,21 @@ export const GAME_RULES_DATA: Record<string, GameRuleDetails> = {
 interface GameRulesModalProps {
   isOpen: boolean;
   onClose: () => void;
+  gameMode?: GameMode;
   initialGameMode?: GameMode;
 }
 
-export function GameRulesModal({ isOpen, onClose, initialGameMode = 'who_is_imposter' }: GameRulesModalProps) {
-  const [activeMode, setActiveMode] = useState<GameMode>(initialGameMode);
+export function GameRulesModal({
+  isOpen,
+  onClose,
+  gameMode,
+  initialGameMode = 'who_is_imposter'
+}: GameRulesModalProps) {
+  const [activeMode, setActiveMode] = useState<GameMode>(gameMode || initialGameMode);
+
+  React.useEffect(() => {
+    if (gameMode) setActiveMode(gameMode);
+  }, [gameMode]);
 
   if (!isOpen) return null;
 

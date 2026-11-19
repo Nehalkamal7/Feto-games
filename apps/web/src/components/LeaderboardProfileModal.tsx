@@ -18,6 +18,7 @@ import {
 import { NeonAvatarDisplay } from '@/components/NeonAvatarDisplay';
 import { NeonAvatarId } from '@feto-games/shared-types';
 import { sound } from '@/lib/sound';
+import { BACKEND_URL } from '@/lib/socket';
 
 interface LeaderboardProfileModalProps {
   isOpen: boolean;
@@ -65,8 +66,7 @@ export function LeaderboardProfileModal({
   const fetchLeaderboard = async () => {
     setIsLoading(true);
     try {
-      const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:4000';
-      const res = await fetch(`${serverUrl}/api/leaderboard`);
+      const res = await fetch(`${BACKEND_URL}/api/leaderboard`);
       const data = await res.json();
       if (data.success) {
         setLeaderboard(data.data);
