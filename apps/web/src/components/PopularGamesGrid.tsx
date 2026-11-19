@@ -192,6 +192,108 @@ export function PopularGamesGrid({ onSelectGame, onOpenRules }: PopularGamesGrid
           </svg>
         </div>
       )
+    },
+    {
+      id: 'most_likely_to',
+      title: 'Most Likely To...',
+      category: 'Roast & Votes',
+      players: '2-15 Players',
+      tagline: 'Vote on friends for crazy scenarios, roast the winner & dish penalties!',
+      glowBorderColor: 'hover:border-yellow-400 hover:shadow-[0_0_25px_rgba(250,204,21,0.5)]',
+      badgeColor: 'border-yellow-400/50 text-yellow-300 bg-yellow-950/60',
+      renderArtwork: () => (
+        <div className="relative w-full h-32 flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-b from-yellow-950/40 to-[#070a18]/80">
+          <div className="absolute w-20 h-20 bg-yellow-500/20 rounded-full blur-xl animate-pulse" />
+          <svg viewBox="0 0 120 120" className="w-24 h-24 filter drop-shadow-[0_0_12px_rgba(250,204,21,0.7)]">
+            {/* Megaphone / Ballot Icon */}
+            <rect x="25" y="35" width="50" height="60" rx="8" fill="#1c190a" stroke="#FACC15" strokeWidth="3" />
+            <line x1="35" y1="50" x2="65" y2="50" stroke="#FACC15" strokeWidth="2.5" strokeLinecap="round" />
+            <line x1="35" y1="65" x2="65" y2="65" stroke="#FACC15" strokeWidth="2.5" strokeLinecap="round" />
+            <line x1="35" y1="80" x2="55" y2="80" stroke="#00F0FF" strokeWidth="2.5" strokeLinecap="round" />
+            {/* Glowing Pointer Star */}
+            <polygon points="85,35 90,47 103,48 93,57 96,70 85,63 74,70 77,57 67,48 80,47" fill="#FACC15" stroke="#FFE600" strokeWidth="1.5" />
+          </svg>
+        </div>
+      )
+    },
+    {
+      id: 'sip_or_spill',
+      title: 'Sip or Spill 🥤',
+      category: 'Party Dilemmas',
+      players: '2-15 Players',
+      tagline: 'Confess wild secrets or take a sip to skip! Dynamic live sip counter.',
+      glowBorderColor: 'hover:border-cyan-400 hover:shadow-[0_0_25px_rgba(56,242,255,0.5)]',
+      badgeColor: 'border-cyan-400/50 text-cyan-300 bg-cyan-950/60',
+      renderArtwork: () => (
+        <div className="relative w-full h-32 flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-b from-cyan-950/40 to-[#070a18]/80">
+          <div className="absolute w-20 h-20 bg-cyan-500/20 rounded-full blur-xl animate-pulse" />
+          <svg viewBox="0 0 120 120" className="w-24 h-24 filter drop-shadow-[0_0_12px_rgba(0,240,255,0.7)]">
+            {/* Neon Drink Cup */}
+            <polygon points="38,40 82,40 74,95 46,95" fill="#0b1b2b" stroke="#38F2FF" strokeWidth="3" strokeLinejoin="round" />
+            {/* Liquid Fill Line */}
+            <polygon points="41,55 79,55 74,93 46,93" fill="#A855F7" fillOpacity="0.4" />
+            {/* Diagonal Straw */}
+            <line x1="60" y1="65" x2="85" y2="15" stroke="#FF007A" strokeWidth="4" strokeLinecap="round" />
+            {/* Sparkles / Ice Cubes */}
+            <rect x="50" y="62" width="10" height="10" rx="2" fill="#38F2FF" fillOpacity="0.6" />
+            <circle cx="68" cy="72" r="3" fill="#FFE600" />
+            <circle cx="75" cy="48" r="2" fill="#FFFFFF" />
+          </svg>
+        </div>
+      )
+    },
+    {
+      id: 'silly_roulette',
+      title: 'Silly Roulette',
+      category: 'Spin the Chaos',
+      players: '2-15 Players',
+      tagline: 'Spin the synced neon wheel for absurd vocal impressions & physical acts!',
+      glowBorderColor: 'hover:border-purple-400 hover:shadow-[0_0_25px_rgba(168,85,247,0.5)]',
+      badgeColor: 'border-purple-400/50 text-purple-300 bg-purple-950/60',
+      renderArtwork: () => (
+        <div className="relative w-full h-32 flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-b from-purple-950/40 to-[#070a18]/80">
+          <div className="absolute w-20 h-20 bg-purple-500/20 rounded-full blur-xl animate-pulse" />
+          <svg viewBox="0 0 120 120" className="w-24 h-24 filter drop-shadow-[0_0_12px_rgba(168,85,247,0.7)]">
+            {/* Neon Wheel Outer Ring */}
+            <circle cx="60" cy="60" r="38" fill="#130922" stroke="#A855F7" strokeWidth="3.5" />
+            {/* Wheel Spokes */}
+            <line x1="60" y1="22" x2="60" y2="98" stroke="#38F2FF" strokeWidth="1.5" />
+            <line x1="22" y1="60" x2="98" y2="60" stroke="#38F2FF" strokeWidth="1.5" />
+            <line x1="33" y1="33" x2="87" y2="87" stroke="#FF007A" strokeWidth="1.5" />
+            <line x1="33" y1="87" x2="87" y2="33" stroke="#FF007A" strokeWidth="1.5" />
+            {/* Hub and Top Pin */}
+            <circle cx="60" cy="60" r="10" fill="#FFE600" stroke="#000000" strokeWidth="2" />
+            <polygon points="60,14 66,26 54,26" fill="#38F2FF" />
+          </svg>
+        </div>
+      )
+    },
+    {
+      id: 'hot_potato',
+      title: 'Hot Potato (Bomb Pass)',
+      category: 'Speed Reflexes',
+      players: '2-15 Players',
+      tagline: '8 seconds to type and pass the ticking bomb before it detonates!',
+      glowBorderColor: 'hover:border-orange-500 hover:shadow-[0_0_25px_rgba(249,115,22,0.5)]',
+      badgeColor: 'border-orange-500/50 text-orange-300 bg-orange-950/60',
+      renderArtwork: () => (
+        <div className="relative w-full h-32 flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-b from-orange-950/40 to-[#070a18]/80">
+          <div className="absolute w-20 h-20 bg-orange-500/20 rounded-full blur-xl animate-pulse" />
+          <svg viewBox="0 0 120 120" className="w-24 h-24 filter drop-shadow-[0_0_12px_rgba(249,115,22,0.7)]">
+            {/* Bomb Body */}
+            <circle cx="60" cy="68" r="30" fill="#180e07" stroke="#F97316" strokeWidth="3.5" />
+            {/* Bomb Cap */}
+            <rect x="52" y="32" width="16" height="8" rx="2" fill="#F97316" />
+            {/* Fuse Curve */}
+            <path d="M 60 32 Q 72 18, 82 24" fill="none" stroke="#FFE600" strokeWidth="3" strokeLinecap="round" />
+            {/* Spark at Fuse End */}
+            <circle cx="82" cy="24" r="5" fill="#EF4444" className="animate-ping" />
+            <circle cx="82" cy="24" r="3" fill="#FFE600" />
+            {/* Countdown Badge on Bomb */}
+            <text x="60" y="74" fontSize="16" fontWeight="900" fill="#F97316" textAnchor="middle" fontFamily="monospace">8s</text>
+          </svg>
+        </div>
+      )
     }
   ];
 
@@ -212,12 +314,12 @@ export function PopularGamesGrid({ onSelectGame, onOpenRules }: PopularGamesGrid
         </div>
 
         <div className="text-xs font-bold text-cyan-300/80 px-3 py-1 rounded-full bg-cyan-950/40 border border-cyan-500/30">
-          6 Live Party Modes
+          10 Live Party Modes
         </div>
       </div>
 
-      {/* 6-CARD RESPONSIVE GRID (2 cols mobile, 3 cols tablet, 6 cols desktop) */}
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
+      {/* 10-CARD RESPONSIVE GRID (2 cols mobile, 3 cols tablet, 5 cols desktop) */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         {games.map((g, idx) => (
           <motion.div
             key={g.id}

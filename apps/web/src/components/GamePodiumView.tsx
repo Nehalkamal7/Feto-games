@@ -1,20 +1,43 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Trophy, Crown, Medal, RotateCcw, Sparkles, Users, ArrowRight, Shield } from 'lucide-react';
-import { GameMode, PlayerSummary, PublicRoomState } from '@feto-games/shared-types';
+import React, { useEffect, useState, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Trophy,
+  Crown,
+  Medal,
+  RotateCcw,
+  Sparkles,
+  Users,
+  ArrowRight,
+  Shield,
+  Share2,
+  Check,
+  Wine,
+  Flame,
+  Award,
+  Zap,
+  Copy
+} from 'lucide-react';
+import { GameMode, PartyAward, PlayerSummary, PublicRoomState } from '@feto-games/shared-types';
 import { NeonAvatarDisplay } from '@/components/NeonAvatarDisplay';
+import { BrandLogo } from '@/components/BrandLogo';
+import { ShareRecapCard } from '@/components/ShareRecapCard';
 import { socketRematch } from '@/lib/socket';
 import { sound } from '@/lib/sound';
+import confetti from 'canvas-confetti';
 
 const GAME_OPTIONS: { id: GameMode; name: string }[] = [
-  { id: 'who_is_imposter', name: 'Who Is The Imposter?' },
+  { id: 'who_is_imposter', name: 'Who Is Imposter?' },
   { id: 'draw_and_guess', name: 'Draw & Guess' },
   { id: 'quiz_battle', name: 'Quiz Battle' },
   { id: 'word_battle', name: 'Word Battle' },
   { id: 'truth_or_dare', name: 'Truth or Dare' },
-  { id: 'never_have_i_ever', name: 'Never Have I Ever' }
+  { id: 'never_have_i_ever', name: 'Never Have I Ever' },
+  { id: 'most_likely_to', name: 'Most Likely To...' },
+  { id: 'sip_or_spill', name: 'Sip or Spill 🥤' },
+  { id: 'silly_roulette', name: 'Silly Roulette' },
+  { id: 'hot_potato', name: 'Hot Potato' }
 ];
 
 interface GamePodiumViewProps {
@@ -27,19 +50,86 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
   const [isRematching, setIsRematching] = useState(false);
   const [selectedNextGame, setSelectedNextGame] = useState<GameMode>(room.config.gameMode);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [copiedShareLink, setCopiedShareLink] = useState(false);
+  const [copiedStats, setCopiedStats] = useState(false);
+  const [showStoryModal, setShowStoryModal] = useState(false);
 
   const isHost = currentPlayer?.isHost ?? false;
 
   // Sort players by score descending
   const sortedPlayers = [...room.players].sort((a, b) => (b.score || 0) - (a.score || 0));
-
   const firstPlace = sortedPlayers[0];
   const secondPlace = sortedPlayers[1];
   const thirdPlace = sortedPlayers[2];
 
-  // Play fanfare sound upon mounting podium
+  // Current player rank
+  const myRank = currentPlayer ? sortedPlayers.findIndex((p) => p.id === currentPlayer.id) + 1 : 1;
+
+  // Party Awards
+  const partyAwards: PartyAward[] = room.awards && room.awards.length > 0
+    ? room.awards
+    : [
+        {
+          id: 'award_mvp',
+          title: 'Player of the Night (MVP)',
+          description: 'Dominated the matches with supreme arcade brilliance!',
+          recipientId: firstPlace?.id || 'p1',
+          recipientUsername: firstPlace?.username || 'Champion',
+          recipientAvatar: firstPlace?.avatar || 'cyber_cat',
+          badgeIcon: '👑',
+          scoreOrStat: `${firstPlace?.score || 0} PTS`
+        },
+        {
+          id: 'award_sips',
+          title: 'Most Sips Taken 🥤',
+          description: 'Drank through all the spicy dilemmas with unflinching cheer!',
+          recipientId: sortedPlayers[1]?.id || 'p2',
+          recipientUsername: sortedPlayers[1]?.username || 'Party Legend',
+          recipientAvatar: sortedPlayers[1]?.avatar || 'neon_fox',
+          badgeIcon: '🥤',
+          scoreOrStat: `${room.sipsCount?.[sortedPlayers[1]?.id || ''] || 4} SIPS`
+        },
+        {
+          id: 'award_chaos',
+          title: 'The Chaos Agent 🔥',
+          description: 'Brought the loudest laughs and unpredictable party energy!',
+          recipientId: sortedPlayers[2]?.id || 'p3',
+          recipientUsername: sortedPlayers[2]?.username || 'Wild Card',
+          recipientAvatar: sortedPlayers[2]?.avatar || 'toxic_frog',
+          badgeIcon: '⚡',
+          scoreOrStat: '100% CHAOS'
+        }
+      ];
+
+  // Play fanfare sound and launch confetti cascade on mount
   useEffect(() => {
     sound.playFanfare();
+    sound.triggerHaptic(80);
+
+    const duration = 3.5 * 1000;
+    const end = Date.now() + duration;
+
+    const frame = () => {
+      confetti({
+        particleCount: 4,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0, y: 0.7 },
+        colors: ['#00F0FF', '#A855F7', '#FFE600', '#FF007A']
+      });
+      confetti({
+        particleCount: 4,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1, y: 0.7 },
+        colors: ['#00F0FF', '#A855F7', '#FFE600', '#FF007A']
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    };
+    frame();
   }, []);
 
   const handleRematch = async () => {
@@ -54,6 +144,37 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
       setErrorMessage(err.message || 'Failed to start rematch.');
       setIsRematching(false);
     }
+  };
+
+  // Viral Share Handler (Instagram / TikTok / WhatsApp / Direct Link)
+  const handleShareVictory = async () => {
+    sound.playClick();
+    const shareText = `🎮 FETO GAMES VICTORY!\n🏆 ${firstPlace?.username} won 1st Place with ${firstPlace?.score || 0} pts!\n✨ Join our 15-player party room: ${window.location.origin}/room/${room.code}\n#FETOGAMES #PartyGames #EsportsArcade`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'FETO GAMES Match Victory',
+          text: shareText,
+          url: `${window.location.origin}/room/${room.code}`
+        });
+        return;
+      } catch {
+        // Fallback to clipboard
+      }
+    }
+
+    navigator.clipboard.writeText(shareText);
+    setCopiedStats(true);
+    setTimeout(() => setCopiedStats(false), 2500);
+  };
+
+  const handleCopyInviteLink = () => {
+    sound.playClick();
+    const url = `${window.location.origin}/room/${room.code}`;
+    navigator.clipboard.writeText(url);
+    setCopiedShareLink(true);
+    setTimeout(() => setCopiedShareLink(false), 2000);
   };
 
   // Team score aggregates if in Team Mode
@@ -84,7 +205,7 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
           FINAL PODIUM
         </h1>
         <p className="text-slate-400 text-sm mt-1">
-          {room.config.isTeamMode ? 'Team & Individual Standings' : 'All 15 players ranked by arcade glory'}
+          {room.config.isTeamMode ? 'Team & Individual Standings' : 'All players ranked by arcade party glory'}
         </p>
       </motion.div>
 
@@ -214,6 +335,166 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
         )}
       </div>
 
+      {/* ======================================================== */}
+      {/* 2. SPECIALIZED FUNNY PARTY AWARDS & MVP                   */}
+      {/* ======================================================== */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="w-full glass-panel-neon rounded-3xl p-4 sm:p-6 mb-8 border border-purple-500/30"
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Award className="w-5 h-5 text-purple-400" />
+            <h3 className="text-sm sm:text-base font-black text-white uppercase tracking-wider">
+              Party Awards & MVP Ceremony
+            </h3>
+          </div>
+          <span className="text-[11px] text-purple-300 font-bold">Hall of Fame</span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {partyAwards.map((award) => (
+            <div
+              key={award.id}
+              className="bg-slate-900/80 border border-purple-500/30 hover:border-purple-400/60 rounded-2xl p-4 flex flex-col justify-between transition-all group shadow-neon-purple"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-2xl">{award.badgeIcon}</span>
+                  <span className="px-2 py-0.5 rounded-full bg-purple-950 border border-purple-500/40 text-[10px] font-black text-purple-300 font-mono">
+                    {award.scoreOrStat}
+                  </span>
+                </div>
+                <h4 className="text-xs sm:text-sm font-black text-white group-hover:text-cyan-300 transition-colors">
+                  {award.title}
+                </h4>
+                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                  {award.description}
+                </p>
+                {award.thumbnail && (
+                  <div className="mt-2.5 p-1.5 rounded-xl border border-purple-500/50 bg-black/60 flex flex-col items-center">
+                    <img src={award.thumbnail} alt="Masterpiece" className="w-full h-24 object-contain rounded" />
+                    <span className="text-[9px] text-purple-300 font-mono mt-1 font-bold">Hall of Shame Snapshot 🎨</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-3 pt-2 border-t border-slate-800 flex items-center gap-2">
+                <NeonAvatarDisplay avatarId={award.recipientAvatar} size="sm" showGlow={false} />
+                <span className="text-xs font-black text-amber-300 truncate">
+                  {award.recipientUsername}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* ======================================================== */}
+      {/* 3. SHAREABLE VICTORY CARD (VIRAL MARKETING READY)        */}
+      {/* ======================================================== */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.4 }}
+        className="w-full glass-panel-neon rounded-3xl p-5 sm:p-7 mb-8 border border-cyan-500/40 shadow-neon-cyan relative overflow-hidden"
+      >
+        {/* Glow backdrop */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          {/* Left: The Card Blueprint */}
+          <div className="w-full md:w-3/5 bg-gradient-to-br from-[#060a14] via-[#091224] to-[#140b26] border-2 border-cyan-400/50 rounded-2xl p-5 shadow-[0_0_30px_rgba(0,240,255,0.25)] relative">
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-cyan-500/20">
+              <BrandLogo size="nav" showSubtitle={false} />
+              <div className="px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-[10px] font-black uppercase text-cyan-300 tracking-wider">
+                Official Match Card
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 my-3">
+              <div className="relative">
+                <NeonAvatarDisplay
+                  avatarId={currentPlayer?.avatar || firstPlace?.avatar || 'cyber_cat'}
+                  size="md"
+                  showGlow
+                />
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-yellow-400 text-black font-black text-xs flex items-center justify-center">
+                  #{myRank}
+                </div>
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">
+                  Party Contestant
+                </div>
+                <div className="text-lg font-black text-white truncate">
+                  {currentPlayer?.username || firstPlace?.username}
+                </div>
+                <div className="text-xs font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 font-mono">
+                  Score: {currentPlayer?.score || firstPlace?.score || 0} PTS
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-slate-800 text-center">
+              <div className="bg-slate-900/60 p-2 rounded-xl">
+                <div className="text-[9px] uppercase font-bold text-slate-400">Room</div>
+                <div className="text-xs font-black text-cyan-300 font-mono">{room.code}</div>
+              </div>
+              <div className="bg-slate-900/60 p-2 rounded-xl">
+                <div className="text-[9px] uppercase font-bold text-slate-400">Players</div>
+                <div className="text-xs font-black text-white font-mono">{room.players.length}</div>
+              </div>
+              <div className="bg-slate-900/60 p-2 rounded-xl">
+                <div className="text-[9px] uppercase font-bold text-slate-400">Total Sips</div>
+                <div className="text-xs font-black text-pink-400 font-mono">
+                  {Object.values(room.sipsCount || {}).reduce((a, b) => a + b, 0)} 🥤
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Quick Viral Share Buttons */}
+          <div className="w-full md:w-2/5 flex flex-col gap-3">
+            <div>
+              <h4 className="text-base font-black text-white">Share Your Victory</h4>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Post your match stats directly to Instagram, TikTok or WhatsApp and challenge your crew!
+              </p>
+            </div>
+
+            <button
+              onClick={() => {
+                sound.playClick();
+                setShowStoryModal(true);
+              }}
+              className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-400 hover:brightness-110 text-white font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-neon-purple transition-all active:scale-95"
+            >
+              <Sparkles className="w-4 h-4 text-yellow-300" />
+              <span>Export 9:16 Story Card (PNG)</span>
+            </button>
+
+            <button
+              onClick={handleShareVictory}
+              className="w-full py-3 px-4 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-cyan-500/40 text-cyan-300 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-neon-cyan transition-all active:scale-95"
+            >
+              {copiedStats ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
+              <span>{copiedStats ? 'Victory Copied!' : 'Share Match Recap'}</span>
+            </button>
+
+            <button
+              onClick={handleCopyInviteLink}
+              className="w-full py-2.5 px-4 rounded-xl bg-slate-900/60 hover:bg-slate-800 border border-slate-700 text-slate-300 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all"
+            >
+              {copiedShareLink ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+              <span>{copiedShareLink ? 'Invite Link Copied!' : 'Copy Room Invite Link'}</span>
+            </button>
+          </div>
+        </div>
+      </motion.div>
+
       {/* FULL 15-PLAYER SCOREBOARD LIST */}
       <div className="w-full glass-panel rounded-2xl p-3 sm:p-6 mb-6 sm:mb-8">
         <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-300 mb-3 sm:mb-4 flex items-center gap-2">
@@ -254,8 +535,15 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
                   )}
                 </div>
               </div>
-              <div className="font-mono font-black text-xs sm:text-sm text-yellow-400 flex-shrink-0 ml-2">
-                {player.score || 0} pts
+              <div className="flex items-center gap-3">
+                {room.sipsCount?.[player.id] !== undefined && (
+                  <span className="text-[10px] font-bold text-pink-300 bg-pink-950/40 px-2 py-0.5 rounded-full border border-pink-500/30">
+                    {room.sipsCount[player.id]} Sips 🥤
+                  </span>
+                )}
+                <div className="font-mono font-black text-xs sm:text-sm text-yellow-400 flex-shrink-0">
+                  {player.score || 0} pts
+                </div>
               </div>
             </div>
           ))}
@@ -326,6 +614,14 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
           </div>
         )}
       </div>
+      {/* 9:16 Story Recap Modal */}
+      <ShareRecapCard
+        room={room}
+        currentPlayer={currentPlayer}
+        awards={partyAwards}
+        isOpen={showStoryModal}
+        onClose={() => setShowStoryModal(false)}
+      />
     </div>
   );
 }

@@ -248,6 +248,7 @@ export function sanitizeRoomState(room: RoomState): PublicRoomState {
       roundDurationSeconds: room.config.roundDurationSeconds,
       totalRounds: room.config.totalRounds,
       gameMode: room.config.gameMode,
+      vibeMode: room.config.vibeMode || 'chill',
       customDeckId: room.config.customDeckId,
       allowSpectators: room.config.allowSpectators,
       isTeamMode: room.config.isTeamMode
@@ -259,6 +260,9 @@ export function sanitizeRoomState(room: RoomState): PublicRoomState {
     currentRound: room.currentRound,
     createdAt: room.createdAt,
     updatedAt: room.updatedAt,
-    teamScores: room.teamScores
+    teamScores: room.teamScores,
+    sipsCount: room.sipsCount || {},
+    customCardsCount: room.customCards?.length || 0,
+    awards: room.gameData?.awards || []
   };
 }

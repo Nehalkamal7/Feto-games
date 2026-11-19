@@ -66,6 +66,7 @@ export async function POST(req: NextRequest) {
 
       const settings = payload;
       if (settings.gameMode) room.config.gameMode = settings.gameMode;
+      if (settings.vibeMode) room.config.vibeMode = settings.vibeMode;
       if (settings.roundDurationSeconds) room.config.roundDurationSeconds = Math.max(10, Math.min(120, settings.roundDurationSeconds));
       if (settings.totalRounds) room.config.totalRounds = Math.max(1, Math.min(10, settings.totalRounds));
       if (settings.isTeamMode !== undefined) room.config.isTeamMode = Boolean(settings.isTeamMode);
@@ -299,6 +300,7 @@ export async function POST(req: NextRequest) {
 
     // Sync public state to entire room
     const publicRoom = sanitizeRoomState(actionResult.updatedRoom);
+    await publishToRoom(roomCode, 'room:state', publicRoom);
     await publishToRoom(roomCode, 'game:state_sync', {
       gameMode: room.config.gameMode,
       state: actionResult.publicState

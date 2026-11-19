@@ -38,7 +38,8 @@ import {
   GameMode,
   NeonAvatarId,
   NEON_AVATARS,
-  PublicRoomDirectoryItem
+  PublicRoomDirectoryItem,
+  VibeMode
 } from '@feto-games/shared-types';
 import { socketCreateRoom, socketJoinRoom, socketQuickPlay, BACKEND_URL } from '@/lib/socket';
 import { sound } from '@/lib/sound';
@@ -73,6 +74,7 @@ export default function HomePage() {
   const [maxPlayers, setMaxPlayers] = useState(15);
   const [roundDuration, setRoundDuration] = useState(30);
   const [gameMode, setGameMode] = useState<GameMode>('who_is_imposter');
+  const [vibeMode, setVibeMode] = useState<VibeMode>('chill');
 
   // Join Room Form State
   const [joinCode, setJoinCode] = useState('');
@@ -218,6 +220,7 @@ export default function HomePage() {
         isPrivate,
         pin: isPrivate ? pin.trim() : undefined,
         gameMode,
+        vibeMode,
         roundDurationSeconds: roundDuration,
         totalRounds: 5,
         allowSpectators: true,
@@ -324,9 +327,15 @@ export default function HomePage() {
           </h1>
 
           {/* Subtitle */}
-          <p className="text-cyan-300/90 text-sm sm:text-lg font-extrabold uppercase tracking-widest mb-3">
+          <p className="text-cyan-300/90 text-sm sm:text-lg font-extrabold uppercase tracking-widest mb-2">
             PLAY WITH FRIENDS, ANYTIME, ANYWHERE
           </p>
+
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-purple-950/60 border border-purple-500/40 text-xs font-black text-purple-200 mb-4 shadow-neon-purple">
+            <Flame className="w-4 h-4 text-pink-400 animate-pulse" />
+            <span>Invite your crew for 15-player madness!</span>
+            <span className="text-cyan-300 ml-1 font-mono font-bold">• 10 Party Modes</span>
+          </div>
 
           <p className="text-slate-400 text-xs sm:text-sm md:text-base max-w-xl mb-6 leading-relaxed">
             Instant real-time browser party gaming supporting up to 15 concurrent players.
@@ -401,7 +410,7 @@ export default function HomePage() {
                 )}
               </div>
               <span className="font-black text-xs sm:text-sm tracking-wider uppercase text-amber-200 group-hover:text-white">
-                {isQuickPlaying ? 'Matching...' : 'Quick Play'}
+                {isQuickPlaying ? 'Finding Party...' : 'Play With Strangers (Public Match)'}
               </span>
             </motion.button>
           </div>
@@ -558,7 +567,11 @@ export default function HomePage() {
                       { id: 'quiz_battle', title: 'Quiz Battle', desc: 'Speed trivia (2-15p)' },
                       { id: 'word_battle', title: 'Word Battle', desc: 'Word race (2-15p)' },
                       { id: 'truth_or_dare', title: 'Truth or Dare', desc: 'Party voting (2-15p)' },
-                      { id: 'never_have_i_ever', title: 'Never Have I Ever', desc: 'Confessions (2-15p)' }
+                      { id: 'never_have_i_ever', title: 'Never Have I Ever', desc: 'Confessions (2-15p)' },
+                      { id: 'most_likely_to', title: 'Most Likely To...', desc: 'Roast & votes (2-15p)' },
+                      { id: 'sip_or_spill', title: 'Sip or Spill 🥤', desc: 'Party drink dilemma (2-15p)' },
+                      { id: 'silly_roulette', title: 'Silly Roulette', desc: 'Spin the chaos (2-15p)' },
+                      { id: 'hot_potato', title: 'Hot Potato', desc: 'Bomb pass panic (2-15p)' }
                     ].map((mode) => (
                       <button
                         key={mode.id}
@@ -574,6 +587,41 @@ export default function HomePage() {
                       >
                         <div className="font-extrabold text-xs sm:text-sm text-purple-300 truncate">{mode.title}</div>
                         <div className="text-[10px] text-slate-400 truncate">{mode.desc}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Vibe Mode Selector */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>Party Vibe Mode</span>
+                    </label>
+                    <span className="text-[10px] text-cyan-300 font-bold uppercase">{vibeMode.replace('_', ' ')}</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { id: 'chill', label: 'Chill & Funny', desc: 'Safe & lighthearted party fun' },
+                      { id: 'chaotic', label: 'Silly & Chaotic', desc: 'Absurd dares & accents' },
+                      { id: 'sip_edition', label: 'Sip Edition 🥤', desc: 'Live sip counters & skips' }
+                    ].map((v) => (
+                      <button
+                        key={v.id}
+                        type="button"
+                        onClick={() => {
+                          sound.playClick();
+                          setVibeMode(v.id as VibeMode);
+                        }}
+                        className={`p-2.5 rounded-xl border text-left transition-all ${
+                          vibeMode === v.id
+                            ? 'border-cyan-400 bg-cyan-950/40 text-white shadow-neon-cyan'
+                            : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        <div className="text-xs font-bold text-cyan-300 truncate">{v.label}</div>
+                        <div className="text-[9px] text-slate-400 leading-tight mt-0.5 line-clamp-2">{v.desc}</div>
                       </button>
                     ))}
                   </div>

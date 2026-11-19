@@ -260,3 +260,50 @@ canvas.canvas-touch-safe {
 ::-webkit-scrollbar-thumb:hover {
   background: #00f0ff;
 }
+
+/* Screen Shake Arcade Effect */
+@keyframes screenShake {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  10% { transform: translate(-8px, -6px) rotate(-1.5deg); }
+  20% { transform: translate(7px, 5px) rotate(1.2deg); }
+  30% { transform: translate(-7px, 6px) rotate(-1deg); }
+  40% { transform: translate(6px, -5px) rotate(1deg); }
+  50% { transform: translate(-4px, 3px) rotate(-0.5deg); }
+  60% { transform: translate(4px, -3px) rotate(0.5deg); }
+  70% { transform: translate(-2px, 2px) rotate(0deg); }
+  80% { transform: translate(2px, -1px) rotate(0deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+.shake-screen {
+  animation: screenShake 0.65s cubic-bezier(0.36, 0.07, 0.19, 0.97) both !important;
+}
+
+/* Viral Sip Edition Glowing Modal Pulse */
+@keyframes sipPulse {
+  0%, 100% {
+    box-shadow: 0 0 25px rgba(56, 242, 255, 0.6), inset 0 0 20px rgba(168, 85, 247, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 50px rgba(56, 242, 255, 0.95), inset 0 0 35px rgba(255, 0, 122, 0.5);
+  }
+}
+
+.sip-modal-glow {
+  animation: sipPulse 1.8s infinite ease-in-out;
+}
+
+/* Tension Pulse Screen Border Vignette (Final 5 Seconds) */
+@keyframes tensionVignette {
+  0%, 100% {
+    box-shadow: inset 0 0 30px rgba(239, 68, 68, 0.4), inset 0 0 60px rgba(220, 38, 38, 0.2);
+  }
+  50% {
+    box-shadow: inset 0 0 80px rgba(239, 68, 68, 0.85), inset 0 0 140px rgba(220, 38, 38, 0.5);
+  }
+}
+
+.tension-pulse {
+  animation: tensionVignette 0.8s infinite ease-in-out !important;
+}
+

@@ -1,4 +1,5 @@
 import { Player, PlayerSummary } from './player';
+import { PartyAward } from './game';
 
 export type RoomVisibility = 'public' | 'private';
 
@@ -16,10 +17,24 @@ export type GameMode =
   | 'word_battle'
   | 'truth_or_dare'
   | 'never_have_i_ever'
+  | 'most_likely_to'
+  | 'sip_or_spill'
+  | 'silly_roulette'
+  | 'hot_potato'
   | 'party_trivia'
   | 'bluff_master'
   | 'secret_imposter'
   | 'speed_draw';
+
+export type VibeMode = 'chill' | 'chaotic' | 'sip_edition';
+
+export interface CustomCardItem {
+  id: string;
+  type: string;
+  prompt: string;
+  authorUsername: string;
+  submittedAt: number;
+}
 
 export interface RoomConfig {
   maxPlayers: number; // 2 - 15
@@ -29,6 +44,7 @@ export interface RoomConfig {
   roundDurationSeconds: number; // 15 - 90 seconds
   totalRounds: number; // 3 - 10
   gameMode: GameMode;
+  vibeMode?: VibeMode;
   customDeckId?: string | null;
   allowSpectators: boolean;
   isTeamMode?: boolean;
@@ -51,6 +67,8 @@ export interface RoomState {
   currentRound: number;
   gameData?: any; // Dynamic state for the active mini-game
   teamScores?: Record<string, number>;
+  sipsCount?: Record<string, number>; // Live Sip Counter across the session
+  customCards?: CustomCardItem[];
 }
 
 /**
@@ -69,6 +87,9 @@ export interface PublicRoomState {
   createdAt: number;
   updatedAt: number;
   teamScores?: Record<string, number>;
+  sipsCount?: Record<string, number>;
+  customCardsCount?: number;
+  awards?: PartyAward[];
 }
 
 /**

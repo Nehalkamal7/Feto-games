@@ -288,34 +288,50 @@ export async function socketSendReaction(emoji: string): Promise<void> {
   });
 }
 
+export async function socketSendSabotagePowerUp(
+  type: 'blindfold' | 'double_trouble' | 'steal_turn',
+  targetId: string
+): Promise<void> {
+  const roomCode = getActiveRoomCode();
+  const playerId = getSavedPlayerId(roomCode);
+  if (!playerId) return;
+
+  const res = await fetch('/api/game/action', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      roomCode,
+      playerId,
+      actionType: 'USE_SABOTAGE_POWERUP',
+      payload: { type, targetId }
+    })
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error?.message || 'Failed to use sabotage power-up');
+}
+
 export async function socketQuickPlay(dto: { username: string; avatar: any }): Promise<{ roomCode: string }> {
-  try {
-    const listRes = await fetch('/api/rooms/public');
-    const listData = await listRes.json();
-    if (listData.success && listData.data?.rooms?.length > 0) {
-      const available = listData.data.rooms.find((r: any) => !r.hasPin && (r.playerCount || 1) < (r.maxPlayers || 15));
-      if (available) {
-        const joinRes = await socketJoinRoom({
-          roomCode: available.code,
-          username: dto.username,
-          avatar: dto.avatar
-        });
-        return { roomCode: joinRes.roomCode };
-      }
-    }
-  } catch {
-    // fallback to creating new room
+  const res = await fetch('/api/rooms/quick-match', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dto)
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error?.message || 'Quick match failed.');
+
+  if (json.data.isNewRoom && json.data.sessionToken) {
+    saveReconnectSession(json.data.roomCode, json.data.sessionToken, json.data.playerId);
+    getSocket().bindRoom(json.data.roomCode, json.data.playerId);
+    return { roomCode: json.data.roomCode };
   }
 
-  const createRes = await socketCreateRoom({
+  // Join the existing matched candidate room
+  const joinRes = await socketJoinRoom({
+    roomCode: json.data.roomCode,
     username: dto.username,
-    avatar: dto.avatar,
-    isPrivate: false,
-    maxPlayers: 15,
-    gameMode: 'who_is_imposter'
+    avatar: dto.avatar
   });
-
-  return { roomCode: createRes.roomCode };
+  return { roomCode: joinRes.roomCode };
 }
 
 function getActiveRoomCode(): string {
@@ -515,6 +531,10 @@ class AblySocketBridge {
         break;
       case 'room:rematch':
         actionType = 'REMATCH';
+        break;
+      case 'chaos:use_powerup':
+        actionType = 'USE_SABOTAGE_POWERUP';
+        actionPayload = payload;
         break;
     }
 

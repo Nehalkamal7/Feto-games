@@ -1,5 +1,5 @@
 import { NeonAvatarId, PlayerSummary, PlayerTeam } from './player';
-import { GameMode, PublicRoomConfig, PublicRoomState } from './room';
+import { GameMode, PublicRoomConfig, PublicRoomState, VibeMode } from './room';
 import {
   ChatMessage,
   DrawStroke,
@@ -29,6 +29,7 @@ export interface CreateRoomDTO {
   isPrivate?: boolean; // default: false
   pin?: string; // 4-digit PIN password
   gameMode?: GameMode;
+  vibeMode?: VibeMode;
   roundDurationSeconds?: number;
   totalRounds?: number;
   allowSpectators?: boolean;
@@ -88,6 +89,7 @@ export interface UpdateRoomSettingsDTO {
   roundDurationSeconds?: number;
   totalRounds?: number;
   gameMode?: GameMode;
+  vibeMode?: VibeMode;
   allowSpectators?: boolean;
   isTeamMode?: boolean;
 }

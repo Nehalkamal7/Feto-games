@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Gamepad2, Users, Zap, Shield, Sparkles, Cpu, Award } from 'lucide-react';
-import { NeonLogo } from './NeonLogo';
+import { BrandLogo } from './BrandLogo';
 import { sound } from '@/lib/sound';
 
 interface AboutModalProps {
@@ -37,7 +37,7 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
 
           {/* Modal Header */}
           <div className="flex flex-col items-center text-center mb-6">
-            <NeonLogo size="md" showSubtitle={false} className="mb-3" />
+            <BrandLogo size="md" showSubtitle={false} className="mb-3" />
             <h2 className="text-xl sm:text-2xl font-black text-white uppercase tracking-wider">
               The Ultimate Party Game Hub
             </h2>
@@ -55,7 +55,7 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
               <div>
                 <h3 className="text-xs sm:text-sm font-extrabold text-white">Up to 15 Players</h3>
                 <p className="text-[11px] sm:text-xs text-slate-300 mt-1">
-                  Connect friends instantly across mobile, tablet, or desktop with 1-click room code or invite link.
+                  Connect friends instantly across mobile, tablet, or desktop with 1-click room code, QR code, or invite link.
                 </p>
               </div>
             </div>
@@ -65,9 +65,9 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
                 <Zap className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-xs sm:text-sm font-extrabold text-white">Real-Time Engine</h3>
+                <h3 className="text-xs sm:text-sm font-extrabold text-white">Serverless Real-Time Engine</h3>
                 <p className="text-[11px] sm:text-xs text-slate-300 mt-1">
-                  Powered by Socket.IO & Redis with sub-50ms synchronized game clocks, live buzzers, and real-time canvas drawing.
+                  Powered by Ably Realtime & Upstash Redis with sub-30ms synchronized clocks, live buzzers, and stroke sync.
                 </p>
               </div>
             </div>
@@ -77,9 +77,9 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
                 <Gamepad2 className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-xs sm:text-sm font-extrabold text-white">6 High-Stakes Games</h3>
+                <h3 className="text-xs sm:text-sm font-extrabold text-white">10 High-Stakes Party Games</h3>
                 <p className="text-[11px] sm:text-xs text-slate-300 mt-1">
-                  Imposter deduction, Draw & Guess, Quiz Battle, Word Battle, Truth or Dare, and Never Have I Ever.
+                  Imposter deduction, Draw & Guess, Quiz Battle, Word Battle, Truth or Dare, Never Have I Ever, Most Likely To, Sip or Spill, Silly Roulette & Hot Potato!
                 </p>
               </div>
             </div>
@@ -91,7 +91,7 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
               <div>
                 <h3 className="text-xs sm:text-sm font-extrabold text-white">Anti-Cheat & Grace Reconnect</h3>
                 <p className="text-[11px] sm:text-xs text-slate-300 mt-1">
-                  Server-validated secret roles, private socket broadcasts, and 45-second reconnect protection so nobody drops.
+                  Server-validated secret roles, private channel broadcasts, and automatic session reconnection so nobody drops.
                 </p>
               </div>
             </div>
@@ -103,10 +103,10 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
               Engineered with High-Performance Technologies
             </span>
             <div className="flex flex-wrap items-center justify-center gap-2 text-xs font-bold text-slate-200">
-              <span className="px-2.5 py-1 rounded-lg bg-cyan-950/60 border border-cyan-500/30 text-cyan-300">Next.js App Router</span>
-              <span className="px-2.5 py-1 rounded-lg bg-purple-950/60 border border-purple-500/30 text-purple-300">Socket.IO & Redis</span>
+              <span className="px-2.5 py-1 rounded-lg bg-cyan-950/60 border border-cyan-500/30 text-cyan-300">Next.js 14 App Router</span>
+              <span className="px-2.5 py-1 rounded-lg bg-purple-950/60 border border-purple-500/30 text-purple-300">Ably Realtime</span>
+              <span className="px-2.5 py-1 rounded-lg bg-red-950/60 border border-red-500/30 text-red-300">Upstash Redis REST</span>
               <span className="px-2.5 py-1 rounded-lg bg-pink-950/60 border border-pink-500/30 text-pink-300">Framer Motion</span>
-              <span className="px-2.5 py-1 rounded-lg bg-emerald-950/60 border border-emerald-500/30 text-emerald-300">Tailwind CSS</span>
               <span className="px-2.5 py-1 rounded-lg bg-amber-950/60 border border-amber-500/30 text-amber-300">Web Audio API</span>
             </div>
           </div>

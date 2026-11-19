@@ -150,6 +150,90 @@ export const GAME_RULES_DATA: Record<string, GameRuleDetails> = {
       'Surviving each round without losing a heart awards +50 survival points.',
       'Last remaining player with hearts intact wins +300 champion points.'
     ]
+  },
+  most_likely_to: {
+    id: 'most_likely_to',
+    name: 'Most Likely To...',
+    tagline: 'Social roast and consensus voting game',
+    playerRange: '2-15 Players',
+    difficulty: 'Casual',
+    roundDuration: '30s per round',
+    badgeColor: 'border-yellow-400/40 text-yellow-300 bg-yellow-950/20',
+    overview:
+      'A wild scenario appears on screen. Everyone secretly votes on which player in the room is most likely to do it!',
+    howToPlay: [
+      'A prompt card appears (e.g., "Who is most likely to order takeout 3 times in one day?").',
+      'All players cast a secret vote on any player in the room.',
+      'Live animated bar charts reveal the vote tallies.',
+      'The top-voted player takes the hot seat, gets roasted, and faces a goofy penalty!'
+    ],
+    scoringTips: [
+      'Guessing the majority consensus awards +100 alignment points.',
+      'Receiving the most votes awards +150 crowd-favorite points.'
+    ]
+  },
+  sip_or_spill: {
+    id: 'sip_or_spill',
+    name: 'Sip or Spill 🥤',
+    tagline: 'High-energy party confessions and drink dilemmas',
+    playerRange: '2-15 Players',
+    difficulty: 'Casual',
+    roundDuration: '35s per turn',
+    badgeColor: 'border-cyan-400/40 text-cyan-300 bg-cyan-950/20',
+    overview:
+      'Face spicy dilemmas and deep confessions. Answer truthfully to score points, or tap "Take a Sip! 🥤" to safely skip!',
+    howToPlay: [
+      'One active player takes the center stage each turn with a spicy dilemma card.',
+      'Player must either type their confession on-screen OR tap "Take a Sip! 🥤" to skip.',
+      'Other players react in real time with floating emojis and cheers.',
+      'Active Sip Counter Leaderboard tracks drinks across the entire room!'
+    ],
+    scoringTips: [
+      'Spilling a confession awards +120 bravery points.',
+      'Taking a sip counts toward the legendary "Most Sips Taken 🥤" award.'
+    ]
+  },
+  silly_roulette: {
+    id: 'silly_roulette',
+    name: 'Silly Roulette',
+    tagline: 'Spin the neon wheel for absurd vocal impressions and physical chaos',
+    playerRange: '2-15 Players',
+    difficulty: 'Fast-Paced',
+    roundDuration: '30s per spin',
+    badgeColor: 'border-purple-400/40 text-purple-300 bg-purple-950/20',
+    overview:
+      'A synced neon roulette wheel spins and picks a random player to perform an absurd challenge or hilarious dare!',
+    howToPlay: [
+      'The host or system spins the wheel; all players watch it decelerate in real-time.',
+      'The wheel locks onto a player and reveals a goofy physical/vocal dare.',
+      'The selected player performs the challenge live on voice or camera.',
+      'Room votes "CRUSHED IT! 🎉" or "FAILED! 💀" to evaluate performance.'
+    ],
+    scoringTips: [
+      'Passing group review awards +150 chaos mastery points.',
+      'Unanimous praise triggers double bonus points!'
+    ]
+  },
+  hot_potato: {
+    id: 'hot_potato',
+    name: 'Hot Potato (Bomb Pass)',
+    tagline: 'Ticking bomb adrenaline word challenge',
+    playerRange: '2-15 Players',
+    difficulty: 'Fast-Paced',
+    roundDuration: '8s per pass',
+    badgeColor: 'border-orange-500/40 text-orange-300 bg-orange-950/20',
+    overview:
+      'A ticking neon bomb is passed from player to player. You have 8 seconds to type a word matching the category and hit PASS before detonation!',
+    howToPlay: [
+      'A category is announced (e.g. "Things found in a messy room", "Superheroes").',
+      'The player holding the bomb has 8 seconds to type a valid word and click PASS.',
+      'The bomb passes instantly to the next player as the ticking gets faster and louder.',
+      'Whoever holds the bomb when it explodes gets roasted with dynamic screen shake and a penalty consequence!'
+    ],
+    scoringTips: [
+      'Each successful pass awards +50 speed reflex points.',
+      'Exploding player loses 100 points and performs the consequence.'
+    ]
   }
 };
 

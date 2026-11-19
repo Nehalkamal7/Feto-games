@@ -285,3 +285,142 @@ export interface NeverHaveIEverPublicState {
   remainingSeconds: number;
 }
 
+// ========================================================
+// GAME G: MOST LIKELY TO... (Live Voting & Roasts, 2-15 players)
+// ========================================================
+
+export type MostLikelyToPhase = 'voting' | 'reveal' | 'penalty' | 'round_results' | 'game_over';
+
+export interface MostLikelyToPromptItem {
+  id: string;
+  prompt: string;
+  category: string;
+  penaltyDare: string;
+}
+
+export interface MostLikelyToPublicState {
+  phase: MostLikelyToPhase;
+  round: number;
+  totalRounds: number;
+  prompt: string;
+  category: string;
+  penaltyDare: string;
+  votes: Record<string, string>; // voterId -> targetPlayerId
+  voteTallies: Record<string, number>; // targetPlayerId -> count
+  votedOutPlayerId?: string;
+  votedOutUsername?: string;
+  votedOutAvatar?: NeonAvatarId;
+  roastMessage?: string;
+  phaseEndsAt: number;
+  remainingSeconds: number;
+}
+
+// ========================================================
+// GAME H: SIP OR SPILL (Confessions vs Sips, 2-15 players)
+// ========================================================
+
+export type SipOrSpillPhase = 'dilemma' | 'answer_or_sip' | 'reaction' | 'round_results' | 'game_over';
+
+export interface SipOrSpillItem {
+  id: string;
+  dilemma: string;
+  question: string;
+  spicyLevel: 1 | 2 | 3;
+}
+
+export interface SipOrSpillPublicState {
+  phase: SipOrSpillPhase;
+  round: number;
+  totalRounds: number;
+  targetPlayerId: string;
+  targetUsername: string;
+  targetAvatar: NeonAvatarId;
+  dilemma: string;
+  question: string;
+  spicyLevel: number;
+  chosenAction?: 'spill' | 'sip';
+  confessionText?: string;
+  reactions: Record<string, string>; // playerId -> emoji
+  phaseEndsAt: number;
+  remainingSeconds: number;
+}
+
+// ========================================================
+// GAME I: SILLY ROULETTE / SPIN THE CHAOS (2-15 players)
+// ========================================================
+
+export type SillyRoulettePhase = 'spinning' | 'challenge' | 'voting' | 'round_results' | 'game_over';
+
+export interface SillyChallengeItem {
+  id: string;
+  title: string;
+  challenge: string;
+  category: 'physical' | 'vocal' | 'acting' | 'absurd';
+  timeSeconds: number;
+}
+
+export interface SillyRoulettePublicState {
+  phase: SillyRoulettePhase;
+  round: number;
+  totalRounds: number;
+  targetPlayerId: string;
+  targetUsername: string;
+  targetAvatar: NeonAvatarId;
+  challengeTitle: string;
+  challengeText: string;
+  challengeCategory: string;
+  targetAngle: number; // Synchronized roulette rotation angle
+  isSpinning: boolean;
+  votes: Record<string, 'nailed_it' | 'shame_penalty'>;
+  voteTallies: { nailed_it: number; shame_penalty: number };
+  phaseEndsAt: number;
+  remainingSeconds: number;
+}
+
+// ========================================================
+// GAME J: HOT POTATO / BOMB PASS (Fast Typing Panic, 2-15 players)
+// ========================================================
+
+export type HotPotatoPhase = 'bomb_ticking' | 'exploded' | 'penalty_round' | 'round_results' | 'game_over';
+
+export interface HotPotatoCategoryItem {
+  id: string;
+  category: string;
+  goofyConsequence: string;
+}
+
+export interface HotPotatoPublicState {
+  phase: HotPotatoPhase;
+  round: number;
+  totalRounds: number;
+  activeHolderId: string;
+  activeHolderUsername: string;
+  activeHolderAvatar: NeonAvatarId;
+  category: string;
+  goofyConsequence: string;
+  passCount: number;
+  recentWords: string[];
+  bombTimerRemainingMs: number; // Dynamic fuse timer
+  explodedPlayerId?: string;
+  explodedUsername?: string;
+  phaseEndsAt: number;
+  remainingSeconds: number;
+}
+
+// ========================================================
+// PARTY SPECIAL AWARDS & MVP
+// ========================================================
+
+export interface PartyAward {
+  id: string;
+  title: string; // e.g. "The Certified Liar", "Picasso From Wish 🎨", "Sip Champion 🥤"
+  description: string;
+  recipientId: string;
+  recipientUsername: string;
+  recipientAvatar: NeonAvatarId;
+  badgeIcon: string;
+  scoreOrStat: string;
+  thumbnail?: string; // Optional saved drawing thumbnail for Hall of Shame
+}
+
+

@@ -1,0 +1,562 @@
+[
+  {
+    "id": "src_01",
+    "title": "Nature Documentary Host",
+    "challenge": "Narrate everything you and other players do like David Attenborough until the next round begins!",
+    "category": "vocal",
+    "timeSeconds": 30
+  },
+  {
+    "id": "src_02",
+    "title": "The $1,000 Pencil Pitch",
+    "challenge": "Pick up a pen, pencil, or spoon nearby and pitch it to the room like a frantic $1,000 luxury infomercial product!",
+    "category": "acting",
+    "timeSeconds": 30
+  },
+  {
+    "id": "src_03",
+    "title": "The Poker Face Gauntlet",
+    "challenge": "Keep an absolute deadpan poker face for 25 seconds while every other player makes weird sounds and faces to break you!",
+    "category": "absurd",
+    "timeSeconds": 25
+  },
+  {
+    "id": "src_04",
+    "title": "Dramatic Opera Order",
+    "challenge": "Sing your favorite fast-food order in maximum theatrical opera vibrato!",
+    "category": "vocal",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_05",
+    "title": "Air Guitar Solo Master",
+    "challenge": "Drop to your knees and deliver an epic 15-second air guitar rock solo with intense headbanging!",
+    "category": "physical",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_06",
+    "title": "The Robot Waiter",
+    "challenge": "Act like a malfunctioning robot taking beverage orders from 2 players of your choice!",
+    "category": "acting",
+    "timeSeconds": 25
+  },
+  {
+    "id": "src_07",
+    "title": "Slow Motion Replay",
+    "challenge": "Do everything in ultra-slow motion for the next 20 seconds, including speech!",
+    "category": "physical",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_08",
+    "title": "The Sarcastic Butler",
+    "challenge": "Address the player with the lowest score as 'Your Royal Highness' and offer them imaginary champagne with witty sarcasm!",
+    "category": "acting",
+    "timeSeconds": 25
+  },
+  {
+    "id": "src_09",
+    "title": "Tongue Twister Sprint",
+    "challenge": "Repeat 'Toy boat, toy boy, toy boat' 5 times as fast as humanly possible without messing up!",
+    "category": "vocal",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_10",
+    "title": "The Mime Trapped in a Box",
+    "challenge": "Pretend you are trapped inside an invisible glass cube and struggle against the walls for 15 seconds!",
+    "category": "physical",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_11",
+    "title": "Pirate Captain Command",
+    "challenge": "Deliver an inspirational battle speech to your pirate crew in your gruffest pirate accent!",
+    "category": "vocal",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_12",
+    "title": "Action Movie Stuntman",
+    "challenge": "Pretend you just took a laser blast to the shoulder and deliver a melodramatic dying gasp monologue!",
+    "category": "acting",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_13",
+    "title": "Chicken Dance Tribute",
+    "challenge": "Flap your elbows and do the chicken dance vigorously for 12 seconds with full facial dedication!",
+    "category": "physical",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_14",
+    "title": "Sports Commentator Blitz",
+    "challenge": "Rapid-fire commentate on someone's breathing or blinking like it is the World Cup final!",
+    "category": "vocal",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_15",
+    "title": "The Secret Spy",
+    "challenge": "Whisper all your responses like you are a secret agent reporting to headquarters through an invisible earpiece!",
+    "category": "acting",
+    "timeSeconds": 25
+  },
+  {
+    "id": "src_16",
+    "title": "Animal Orchestra",
+    "challenge": "Make 4 different animal noises in under 6 seconds (e.g. dolphin, goat, rooster, donkey)!",
+    "category": "vocal",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_17",
+    "title": "Statue of Liberty Freeze",
+    "challenge": "Hold an intense heroic pose with one arm high in the air without moving a muscle for 20 seconds!",
+    "category": "physical",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_18",
+    "title": "The Confused Time Traveler",
+    "challenge": "Act like a time traveler from 1450 who just discovered the internet and a computer screen!",
+    "category": "acting",
+    "timeSeconds": 25
+  },
+  {
+    "id": "src_19",
+    "title": "Whistle Maestro",
+    "challenge": "Whistle the theme song to a popular movie or cartoon until another player guesses it correctly!",
+    "category": "vocal",
+    "timeSeconds": 25
+  },
+  {
+    "id": "src_20",
+    "title": "The High-Fashion Model",
+    "challenge": "Treat your desk as a runway: strike 4 fierce editorial fashion poses directly into the camera!",
+    "category": "physical",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_21",
+    "title": "Vampire Awakening",
+    "challenge": "Act like Dracula waking up at dusk and demanding a fresh glass of orange juice with dramatic cape flair!",
+    "category": "acting",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_22",
+    "title": "Question-Only Curse",
+    "challenge": "You can ONLY speak in questions for the next 45 seconds! Any statement is a failure!",
+    "category": "absurd",
+    "timeSeconds": 45
+  },
+  {
+    "id": "src_23",
+    "title": "Aggressive Cheerleader",
+    "challenge": "Spell out FETO GAMES with cheerleader arm snaps and high energy jumps!",
+    "category": "physical",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_24",
+    "title": "The T-Rex Challenge",
+    "challenge": "Tuck your elbows to your sides like tiny T-Rex arms and try to pick up your phone or drink!",
+    "category": "physical",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_25",
+    "title": "Undercover Alien",
+    "challenge": "Explain human hugs to your alien overlords in a cold mechanical report!",
+    "category": "vocal",
+    "timeSeconds": 25
+  },
+  {
+    "id": "src_26",
+    "title": "The Master Chef Critique",
+    "challenge": "Gordon Ramsay-style roast an imaginary undercooked dish prepared by the room host!",
+    "category": "acting",
+    "timeSeconds": 25
+  },
+  {
+    "id": "src_27",
+    "title": "The Speed Alphabet",
+    "challenge": "Recite the English alphabet backwards from Z to A in under 15 seconds!",
+    "category": "vocal",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_28",
+    "title": "Disco Fever",
+    "challenge": "Do the classic Saturday Night Fever finger-point disco dance for 15 seconds without laughing!",
+    "category": "physical",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_29",
+    "title": "The Evil Villain Monologue",
+    "challenge": "Spin in your chair, stroke an imaginary cat, and deliver your master plan to steal the world's chocolate supply!",
+    "category": "acting",
+    "timeSeconds": 25
+  },
+  {
+    "id": "src_30",
+    "title": "Beatbox Debut",
+    "challenge": "Drop a 12-second freestyle beatbox rhythm with bass drums and snare clicks!",
+    "category": "vocal",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_31",
+    "title": "The Hypnotist",
+    "challenge": "Try to hypnotize the player with the highest score into believing they are a slice of sourdough bread!",
+    "category": "absurd",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_32",
+    "title": "Helicopter Whir",
+    "challenge": "Spin around 5 times quickly and try to walk in a perfectly straight line for 3 steps!",
+    "category": "physical",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_33",
+    "title": "The Broken GPS",
+    "challenge": "Give another player directions to the bathroom like a glitching GPS navigator recalculating routes!",
+    "category": "acting",
+    "timeSeconds": 25
+  },
+  {
+    "id": "src_34",
+    "title": "Shakespearean Gamer",
+    "challenge": "Quote a gaming triumph or rage-quit in pure Elizabethan Shakespearean verse (e.g. 'Alas, poor ping!')!",
+    "category": "vocal",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_35",
+    "title": "Finger Ballet",
+    "challenge": "Perform an intricate miniature ballet routine on your desk using only two fingers as dancers!",
+    "category": "absurd",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_36",
+    "title": "The Screaming Goat",
+    "challenge": "Impersonate the viral screaming goat video at 70% volume!",
+    "category": "vocal",
+    "timeSeconds": 10
+  },
+  {
+    "id": "src_37",
+    "title": "Olympic Synchronized Swimmer",
+    "challenge": "Do a routine of synchronized swimmer hand gestures with a dramatic frozen smile!",
+    "category": "physical",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_38",
+    "title": "The Auctioneer Sprint",
+    "challenge": "Speak like a 100-words-per-minute fast-talking cattle auctioneer selling a mystery box!",
+    "category": "vocal",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_39",
+    "title": "The Silent Film Star",
+    "challenge": "Communicate that you are starving using only dramatic facial expressions and wild hand gestures, zero sound!",
+    "category": "acting",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_40",
+    "title": "Balancing Act",
+    "challenge": "Balance a pen or pencil horizontally on your upper lip for 15 seconds straight!",
+    "category": "physical",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_41",
+    "title": "The Wrestling Promo",
+    "challenge": "Cut a high-octane 90s WWE wrestling promo against the player ranked #1 on the leaderboard!",
+    "category": "acting",
+    "timeSeconds": 25
+  },
+  {
+    "id": "src_42",
+    "title": "Baby Talk Translate",
+    "challenge": "Translate a complex philosophical quote or daily news item using exclusively toddler words!",
+    "category": "absurd",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_43",
+    "title": "The Cat Cleanse",
+    "challenge": "Pretend to lick your hand like a paw and smooth down your hair like a grooming housecat!",
+    "category": "physical",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_44",
+    "title": "Movie Trailer Voiceover",
+    "challenge": "Say 'In a world where party games turn deadly...' in the lowest, raspiest movie trailer voice you have!",
+    "category": "vocal",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_45",
+    "title": "The Fitness Guru",
+    "challenge": "Lead the room through 3 ridiculous made-up yoga poses (e.g. 'The Wobbly Flamingo')!",
+    "category": "physical",
+    "timeSeconds": 25
+  },
+  {
+    "id": "src_46",
+    "title": "The Detective Interrogation",
+    "challenge": "Interrogate a random player like a grizzled 1940s film noir detective asking who ate your donut!",
+    "category": "acting",
+    "timeSeconds": 25
+  },
+  {
+    "id": "src_47",
+    "title": "The Dial-Up Modem",
+    "challenge": "Vocalize the screeching dial-up tones of a 1998 56k internet modem for 10 seconds!",
+    "category": "vocal",
+    "timeSeconds": 12
+  },
+  {
+    "id": "src_48",
+    "title": "The Karate Chop Master",
+    "challenge": "Deliver 6 swift karate chops into the air with authentic martial arts kiais ('HI-YAH!')!",
+    "category": "physical",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_49",
+    "title": "The Weather Forecaster",
+    "challenge": "Report tomorrow's weather forecast for the room: predict heavy rain of snacks and high winds of drama!",
+    "category": "acting",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_50",
+    "title": "Vocal Sound Effects",
+    "challenge": "Make laser blaster, ricochet, and spaceship swoosh sounds non-stop for 12 seconds!",
+    "category": "vocal",
+    "timeSeconds": 12
+  },
+  {
+    "id": "src_51",
+    "title": "The Staring Contest",
+    "challenge": "Challenge the player across from you to a staring duel: first person to blink or smile takes a sip!",
+    "category": "absurd",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_52",
+    "title": "The Royalty Walk",
+    "challenge": "Walk across your room with imaginary heavy crown posture and wave gracefully to your loyal subjects!",
+    "category": "physical",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_53",
+    "title": "The Opera Tragedy",
+    "challenge": "Sing about dropping your ice cream cone on the ground with tragic operatic tears!",
+    "category": "vocal",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_54",
+    "title": "The Sleepwalker",
+    "challenge": "Pretend you are fast asleep sleepwalking into the kitchen hunting for midnight shredded cheese!",
+    "category": "acting",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_55",
+    "title": "Rapid Rhyme Challenge",
+    "challenge": "Give 5 words that rhyme with 'CAT' in 4 seconds without repeating!",
+    "category": "vocal",
+    "timeSeconds": 10
+  },
+  {
+    "id": "src_56",
+    "title": "The Bodyguard",
+    "challenge": "Stand up, cross your arms, put on sunglasses if nearby, and guard your computer screen menacingly!",
+    "category": "physical",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_57",
+    "title": "The Excited Puppy",
+    "challenge": "Pant happily, tilt your head sideways, and act like a golden retriever seeing its human return home!",
+    "category": "acting",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_58",
+    "title": "Alien Translation",
+    "challenge": "Translate this phrase into an alien language: 'FETO GAMES is the ultimate party hub!'",
+    "category": "vocal",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_59",
+    "title": "The Flailing Inflatable Man",
+    "challenge": "Imitate an inflatable tube dancer outside a car dealership for 12 seconds!",
+    "category": "physical",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_60",
+    "title": "The Secret Message",
+    "challenge": "Blink a secret message in Morse code with your eyes while looking intently at the camera!",
+    "category": "absurd",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_61",
+    "title": "The High Pitch Scream",
+    "challenge": "Do a 2-second horror movie screech like you just saw a tiny harmless moth!",
+    "category": "vocal",
+    "timeSeconds": 8
+  },
+  {
+    "id": "src_62",
+    "title": "The Slow Clap",
+    "challenge": "Start a single, excruciatingly slow sarcastic clap and build it into a crescendo!",
+    "category": "acting",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_63",
+    "title": "The Invisible Lasso",
+    "challenge": "Swing an invisible lasso overhead and rope in the current party leader!",
+    "category": "physical",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_64",
+    "title": "The Game Show Host",
+    "challenge": "Introduce the next mini-game round like a glittery 1970s game show host with wild hand gestures!",
+    "category": "acting",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_65",
+    "title": "The Grand Finale Bow",
+    "challenge": "Take a lavish 3-part theatrical bow and blow kisses to your adoring audience!",
+    "category": "physical",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_66",
+    "title": "The Nature Documentary",
+    "challenge": "Narrate what every player is doing on their screens like Sir David Attenborough observing rare jungle beasts!",
+    "category": "vocal",
+    "timeSeconds": 25
+  },
+  {
+    "id": "src_67",
+    "title": "The Auctioneer Speedrun",
+    "challenge": "Try to sell an ordinary pen to the room talking as fast as an Olympic auctioneer for 15 seconds!",
+    "category": "vocal",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_68",
+    "title": "The Stone Cold Statue",
+    "challenge": "Freeze completely without blinking or smiling while the entire room makes weird noises at you!",
+    "category": "physical",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_69",
+    "title": "The Infomercial Overachiever",
+    "challenge": "Pretend you are showing an infomercial problem: struggle comically trying to open an imaginary bottle of water!",
+    "category": "acting",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_70",
+    "title": "The Microwave Countdown",
+    "challenge": "Make the humming noise of a microwave oven, count down from 5, and do the loud 'BEEP BEEP BEEP' finish!",
+    "category": "vocal",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_71",
+    "title": "The Pirate Declaration",
+    "challenge": "Demand that the entire lobby address you as Captain Barnacle and speak in pirate slang until next round!",
+    "category": "vocal",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_72",
+    "title": "The Secret Agent Mission",
+    "challenge": "Pretend you have an earpiece and report back to HQ that the target has been spotted in the lobby!",
+    "category": "acting",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_73",
+    "title": "The Air Guitar Solo",
+    "challenge": "Unleash a face-melting 15-second electric air guitar solo with maximum rockstar facial expressions!",
+    "category": "physical",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_74",
+    "title": "The French Chef",
+    "challenge": "Kiss your fingers and passionately describe a gourmet bowl of instant ramen in an exaggerated French accent!",
+    "category": "vocal",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_75",
+    "title": "The Dramatic Slow-Motion Run",
+    "challenge": "Pretend you are running through a field of flowers in slow motion toward the host of the room!",
+    "category": "acting",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_76",
+    "title": "The Mumble Rap Sensation",
+    "challenge": "Drop a 15-second freestyle rap using only syllables that sound like 'skrrrt', 'yeet', and 'boba'!",
+    "category": "vocal",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_77",
+    "title": "The Weather Forecaster",
+    "challenge": "Give a live weather forecast reporting 100% chance of neon cyber lightning storms over the room!",
+    "category": "acting",
+    "timeSeconds": 20
+  },
+  {
+    "id": "src_78",
+    "title": "The Penguin Waddle",
+    "challenge": "Tuck your arms in like penguin flippers and do a 10-second waddle in place!",
+    "category": "physical",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_79",
+    "title": "The Soap Opera Betrayal",
+    "challenge": "Gasp loudly, clutch your chest, and scream: 'How could you do this to me after all these years?!'",
+    "category": "acting",
+    "timeSeconds": 15
+  },
+  {
+    "id": "src_80",
+    "title": "The Cyberpunk AI Reboot",
+    "challenge": "Pretend your system crashed: buzz, glitch your head, and declare 'SYSTEM 404: REBOOTING HUMAN PROTOCOLS'!",
+    "category": "vocal",
+    "timeSeconds": 15
+  }
+]

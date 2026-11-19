@@ -18,6 +18,7 @@ import {
   AlertTriangle,
   Lock,
   Eye,
+  EyeOff,
   Zap,
   Sparkles,
   Users,
@@ -26,7 +27,9 @@ import {
   ChevronDown,
   Gamepad2,
   Flame,
-  Radio
+  Radio,
+  Wine,
+  PlusCircle
 } from 'lucide-react';
 import {
   GameMode,
@@ -46,12 +49,18 @@ import { NeonAvatarDisplay } from '@/components/NeonAvatarDisplay';
 import { FloatingReactions } from '@/components/FloatingReactions';
 import { GamePodiumView } from '@/components/GamePodiumView';
 import { SoundToggle } from '@/components/SoundToggle';
+import { RoomLobbyQRCode } from '@/components/RoomLobbyQRCode';
+import { SabotageDrawer, SabotageType } from '@/components/SabotageDrawer';
 import { ImposterGameView } from '@/components/games/ImposterGameView';
 import { DrawAndGuessGameView } from '@/components/games/DrawAndGuessGameView';
 import { QuizBattleGameView } from '@/components/games/QuizBattleGameView';
 import { WordBattleGameView } from '@/components/games/WordBattleGameView';
 import { TruthOrDareGameView } from '@/components/games/TruthOrDareGameView';
 import { NeverHaveIEverGameView } from '@/components/games/NeverHaveIEverGameView';
+import { MostLikelyToGameView } from '@/components/games/MostLikelyToGameView';
+import { SipOrSpillGameView } from '@/components/games/SipOrSpillGameView';
+import { SillyRouletteGameView } from '@/components/games/SillyRouletteGameView';
+import { HotPotatoGameView } from '@/components/games/HotPotatoGameView';
 import {
   clearReconnectSession,
   getReconnectToken,
@@ -95,12 +104,18 @@ export default function RoomPage() {
   // Notifications & UI Status
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
+  const [isStreamerMode, setIsStreamerMode] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
 
   // Kick modal
   const [kickTarget, setKickTarget] = useState<PlayerSummary | null>(null);
+
+  // Tactical Sabotage Power-Ups
+  const [isBlindfolded, setIsBlindfolded] = useState(false);
+  const [hasUsedSabotage, setHasUsedSabotage] = useState(false);
+  const [sabotageAlertBanner, setSabotageAlertBanner] = useState<string | null>(null);
 
   // Grace period countdown state map for disconnected players
   const [graceCountdowns, setGraceCountdowns] = useState<Record<string, number>>({});
@@ -109,6 +124,88 @@ export default function RoomPage() {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 4000);
   }, []);
+
+  // Custom Deck Submission & Sip Edition Controls
+  const [showCustomCardModal, setShowCustomCardModal] = useState(false);
+  const [customCardPrompt, setCustomCardPrompt] = useState('');
+  const [customCardType, setCustomCardType] = useState('general');
+  const [isSubmittingCard, setIsSubmittingCard] = useState(false);
+
+  const handleGameAction = useCallback(
+    async (actionType: string, payload: any = {}) => {
+      if (!currentPlayer) return;
+      try {
+        const res = await fetch('/api/game/action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            roomCode,
+            playerId: currentPlayer.id,
+            actionType,
+            payload
+          })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error?.message || data.error || 'Action failed.');
+        }
+        if (data.room) setRoom(data.room);
+        if (data.gameState) {
+          setGameStateSync({
+            gameMode: room?.config.gameMode || 'who_is_imposter',
+            state: data.gameState
+          });
+        }
+      } catch (err: any) {
+        console.error('Error executing game action:', err);
+        showToast(err.message || 'Action error');
+        throw err;
+      }
+    },
+    [currentPlayer, roomCode, room?.config.gameMode, showToast]
+  );
+
+  const handleSubmitCustomCard = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customCardPrompt.trim()) return;
+    setIsSubmittingCard(true);
+    try {
+      await handleGameAction('SUBMIT_CUSTOM_CARD', {
+        prompt: customCardPrompt.trim(),
+        type: customCardType
+      });
+      sound.playClick();
+      showToast('Custom card injected into party rotation!');
+      setCustomCardPrompt('');
+      setShowCustomCardModal(false);
+    } catch (err: any) {
+      showToast(err.message || 'Failed to submit card.');
+    } finally {
+      setIsSubmittingCard(false);
+    }
+  };
+
+  const handleQuickTakeSip = async () => {
+    sound.playSipGlug();
+    sound.triggerHaptic(50);
+    try {
+      await handleGameAction('TAKE_SIP', { amount: 1 });
+      showToast('You took a sip! 🥤 Stay hydrated!');
+    } catch {
+      showToast('Could not record sip.');
+    }
+  };
+
+  const handleUseSabotage = async (type: SabotageType, targetId: string) => {
+    try {
+      await handleGameAction('USE_SABOTAGE_POWERUP', { type, targetId });
+      setHasUsedSabotage(true);
+      showToast(`Tactical Sabotage unleashed! ⚡`);
+    } catch (err: any) {
+      showToast(err.message || 'Failed to use sabotage.');
+      throw err;
+    }
+  };
 
   // Update live grace period countdown timers every second
   useEffect(() => {
@@ -147,6 +244,11 @@ export default function RoomPage() {
         phase: (gameStateSync?.state?.phase as any) || 'question',
         round: room.currentRound
       });
+
+      // Tension heartbeat & haptic in final 5 seconds of active round
+      if (diff > 0 && diff <= 5 && room.status === 'in_game') {
+        sound.playHeartbeat(diff);
+      }
 
       // Auto resolve phase if timer hit 0
       const phaseKey = `${roomCode}:${room.currentRound}:${gameStateSync?.state?.phase}`;
@@ -245,6 +347,35 @@ export default function RoomPage() {
       setGameStateSync(data);
     };
 
+    const handleChaosSabotage = (data: {
+      attackerId: string;
+      attackerUsername: string;
+      targetId: string;
+      targetUsername: string;
+      type: string;
+      durationMs: number;
+    }) => {
+      sound.playSabotage();
+      const typeLabel =
+        data.type === 'blindfold'
+          ? 'Blindfold 🕶️'
+          : data.type === 'double_trouble'
+          ? 'Double Trouble 🔥'
+          : 'Steal Turn ⚡';
+
+      setSabotageAlertBanner(`⚡ ${data.attackerUsername} used ${typeLabel} on ${data.targetUsername}!`);
+      setTimeout(() => setSabotageAlertBanner(null), 4500);
+
+      const savedPid = typeof window !== 'undefined' ? sessionStorage.getItem(`feto_player_id_${roomCode}`) : null;
+      if (data.type === 'blindfold' && (data.targetId === currentPlayer?.id || data.targetId === savedPid)) {
+        setIsBlindfolded(true);
+        sound.triggerHaptic([120, 80, 120]);
+        setTimeout(() => {
+          setIsBlindfolded(false);
+        }, 5000);
+      }
+    };
+
     const handleKicked = (data: { reason: string }) => {
       sound.playUnready();
       alert(`You were removed from room ${roomCode}: ${data.reason}`);
@@ -263,6 +394,7 @@ export default function RoomPage() {
     socket.on('game:private_role', handlePrivateRole);
     socket.on('game:timer-tick', handleTimerTick);
     socket.on('game:state_sync', handleGameStateSync);
+    socket.on('chaos:sabotage', handleChaosSabotage);
     socket.on('room:kicked', handleKicked);
 
     // Initial Join / Reconnect Flow
@@ -333,6 +465,7 @@ export default function RoomPage() {
       socket.off('game:private_role', handlePrivateRole);
       socket.off('game:timer-tick', handleTimerTick);
       socket.off('game:state_sync', handleGameStateSync);
+      socket.off('chaos:sabotage', handleChaosSabotage);
       socket.off('room:kicked', handleKicked);
     };
   }, [roomCode, router, showToast]);
@@ -452,7 +585,13 @@ export default function RoomPage() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-feto-dark text-slate-100 flex flex-col justify-between max-w-7xl mx-auto px-3 sm:px-6 py-3 sm:py-5 relative safe-top safe-bottom">
+    <div
+      className={`min-h-[100dvh] bg-feto-dark text-slate-100 flex flex-col justify-between max-w-7xl mx-auto px-3 sm:px-6 py-3 sm:py-5 relative safe-top safe-bottom transition-all ${
+        timerState && timerState.remainingSeconds <= 5 && timerState.remainingSeconds > 0 && room.status === 'in_game'
+          ? 'tension-pulse'
+          : ''
+      }`}
+    >
       {/* Background Neon Glows */}
       <div className="fixed top-0 left-1/4 w-[450px] h-[450px] bg-cyan-600/10 rounded-full blur-[140px] pointer-events-none -z-10" />
       <div className="fixed bottom-10 right-1/4 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[150px] pointer-events-none -z-10" />
@@ -472,12 +611,106 @@ export default function RoomPage() {
         )}
       </AnimatePresence>
 
+      {/* Sabotage Chaos Strike Alert Banner */}
+      <AnimatePresence>
+        {sabotageAlertBanner && (
+          <motion.div
+            initial={{ opacity: 0, y: -40, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -40, scale: 0.9 }}
+            className="fixed top-16 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 bg-slate-950/95 border-2 border-pink-500 rounded-full text-white text-xs sm:text-sm font-black uppercase tracking-wider shadow-[0_0_30px_rgba(255,0,122,0.65)] flex items-center gap-2.5 backdrop-blur-md"
+          >
+            <Zap className="w-4 h-4 text-yellow-300 animate-pulse" />
+            <span>{sabotageAlertBanner}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Blindfold Full-Screen Sabotage Impact Overlay */}
+      <AnimatePresence>
+        {isBlindfolded && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 backdrop-blur-2xl bg-black/75 flex flex-col items-center justify-center p-6 text-center select-none"
+          >
+            <span className="text-6xl mb-4 animate-bounce">🕶️</span>
+            <h2 className="text-2xl sm:text-3xl font-black text-cyan-300 uppercase tracking-widest mb-2 shadow-neon-cyan">
+              BLINDFOLD ACTIVE!
+            </h2>
+            <p className="text-sm text-slate-300 max-w-sm">
+              An opponent fogged your vision with a tactical sabotage! Clearing up in 5 seconds...
+            </p>
+            <div className="w-56 h-2.5 bg-slate-800 rounded-full mt-6 overflow-hidden border border-cyan-500/40">
+              <motion.div
+                initial={{ width: '100%' }}
+                animate={{ width: '0%' }}
+                transition={{ duration: 5, ease: 'linear' }}
+                className="h-full bg-gradient-to-r from-cyan-400 to-purple-500"
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ======================================================== */}
       {/* 4. 15-PLAYER WAITING LOBBY REDESIGN                      */}
       {/* ======================================================== */}
       {room.status === 'in_game' || room.status === 'countdown' ? (
         /* IN-GAME ACTIVE SCREEN */
         <div className="flex-1 flex flex-col items-center justify-start py-2 relative z-10 w-full min-h-[600px]">
+          {/* IN-GAME HUD BAR */}
+          <div className="w-full glass-panel rounded-2xl px-3 sm:px-5 py-2 mb-3 flex items-center justify-between border border-cyan-500/25 shadow-neon-cyan">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <NeonLogo size="nav" showSubtitle={false} />
+              <span className="text-slate-600 font-bold hidden sm:inline">|</span>
+              <div className="px-2.5 py-0.5 rounded-lg bg-cyan-950/80 border border-cyan-500/30 text-[10px] sm:text-xs font-black text-cyan-300 font-mono">
+                ROOM: {roomCode}
+              </div>
+              <div className="px-2.5 py-0.5 rounded-lg bg-purple-950/80 border border-purple-500/40 text-[10px] sm:text-xs font-black text-purple-300 uppercase">
+                Round {room.currentRound} / {room.config.totalRounds}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {room.config.vibeMode === 'sip_edition' && (
+                <button
+                  onClick={handleQuickTakeSip}
+                  className="px-2.5 py-1 rounded-xl bg-pink-950/80 hover:bg-pink-900 border border-pink-500/50 text-pink-300 text-[11px] font-black flex items-center gap-1 shadow-neon-magenta animate-pulse touch-target"
+                  title="Take a drink & log on leaderboard"
+                >
+                  <Wine className="w-3 h-3 text-pink-400" />
+                  <span className="hidden sm:inline">Take Sip! 🥤</span>
+                  <span className="font-mono text-[10px] text-white">
+                    ({room.sipsCount?.[currentPlayer?.id || ''] || 0})
+                  </span>
+                </button>
+              )}
+
+              <button
+                onClick={() => {
+                  sound.playClick();
+                  setShowCustomCardModal(true);
+                }}
+                className="p-1.5 sm:px-2.5 sm:py-1 rounded-xl bg-purple-950/60 hover:bg-purple-900/60 border border-purple-500/40 text-purple-300 text-[11px] font-bold flex items-center gap-1"
+                title="Submit Custom Card"
+              >
+                <PlusCircle className="w-3.5 h-3.5 text-purple-400" />
+                <span className="hidden sm:inline">Custom Card</span>
+              </button>
+
+              <SoundToggle />
+
+              <button
+                onClick={handleLeaveRoom}
+                className="p-1.5 rounded-xl bg-red-950/40 hover:bg-red-900/50 border border-red-500/40 text-red-400"
+                title="Leave Room"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
           {countdown !== null && countdown > 0 ? (
             <motion.div
               initial={{ scale: 0.5, opacity: 0 }}
@@ -548,6 +781,42 @@ export default function RoomPage() {
               players={room.players}
               roomCode={roomCode}
             />
+          ) : room.config.gameMode === 'most_likely_to' ? (
+            <MostLikelyToGameView
+              state={gameStateSync.state}
+              players={room.players}
+              currentPlayerId={currentPlayer.id}
+              isHost={isHost}
+              vibeMode={room.config.vibeMode}
+              onAction={handleGameAction}
+            />
+          ) : room.config.gameMode === 'sip_or_spill' ? (
+            <SipOrSpillGameView
+              state={gameStateSync.state}
+              players={room.players}
+              currentPlayerId={currentPlayer.id}
+              isHost={isHost}
+              vibeMode={room.config.vibeMode}
+              onAction={handleGameAction}
+            />
+          ) : room.config.gameMode === 'silly_roulette' ? (
+            <SillyRouletteGameView
+              state={gameStateSync.state}
+              players={room.players}
+              currentPlayerId={currentPlayer.id}
+              isHost={isHost}
+              vibeMode={room.config.vibeMode}
+              onAction={handleGameAction}
+            />
+          ) : room.config.gameMode === 'hot_potato' ? (
+            <HotPotatoGameView
+              state={gameStateSync.state}
+              players={room.players}
+              currentPlayerId={currentPlayer.id}
+              isHost={isHost}
+              vibeMode={room.config.vibeMode}
+              onAction={handleGameAction}
+            />
           ) : (
             <div className="w-full max-w-xl glass-panel p-8 rounded-3xl text-center space-y-4 my-auto">
               <h3 className="text-2xl font-bold text-white">Party Mode Active</h3>
@@ -573,6 +842,24 @@ export default function RoomPage() {
               </div>
 
               <div className="flex items-center gap-2 sm:gap-3">
+                {/* Streamer Mode (Hide Code) Toggle */}
+                <button
+                  onClick={() => {
+                    sound.playClick();
+                    setIsStreamerMode(!isStreamerMode);
+                    showToast(isStreamerMode ? 'Streamer Mode Disabled (Code Visible)' : 'Streamer Mode Active (Code Hidden for Streaming)');
+                  }}
+                  className={`px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition-all ${
+                    isStreamerMode
+                      ? 'bg-amber-950/80 border border-amber-500/50 text-amber-300 shadow-neon-amber'
+                      : 'bg-slate-900/90 border border-slate-700/80 text-slate-400 hover:text-white'
+                  }`}
+                  title="Toggle Streamer Mode to hide room code & invite links for Twitch / YouTube / TikTok streaming"
+                >
+                  {isStreamerMode ? <EyeOff className="w-3.5 h-3.5 text-amber-400" /> : <Eye className="w-3.5 h-3.5" />}
+                  <span className="hidden sm:inline">Streamer Mode</span>
+                </button>
+
                 <div className="flex items-center gap-1.5 sm:gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-[11px] sm:text-xs font-black uppercase tracking-wider">
                   <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
                   <span className="hidden sm:inline">WAITING FOR PLAYERS...</span>
@@ -595,7 +882,7 @@ export default function RoomPage() {
                     title="Click to copy Room Code"
                   >
                     <span className="text-xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-white to-purple-400 tracking-widest font-mono">
-                      {roomCode}
+                      {isStreamerMode ? 'FG-••••' : roomCode}
                     </span>
                     {copiedCode ? (
                       <Check className="w-4 h-4 text-emerald-400" />
@@ -620,24 +907,57 @@ export default function RoomPage() {
                 )}
               </div>
 
-              {/* Action Controls: Copy Invite Link, Sound Toggle, Leave Room */}
-              <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end">
+              {/* Action Controls: Copy Invite Link, Custom Cards, Sip Button, Sound Toggle, Leave Room */}
+              <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 w-full sm:w-auto justify-end">
+                {room.config.vibeMode === 'sip_edition' && (
+                  <button
+                    onClick={handleQuickTakeSip}
+                    className="px-3 py-2 rounded-xl bg-pink-950/70 hover:bg-pink-900/80 border border-pink-500/50 text-pink-300 text-xs font-black flex items-center gap-1.5 transition-all shadow-neon-magenta touch-target animate-pulse"
+                    title="Take a drink & log it on the leaderboard!"
+                  >
+                    <Wine className="w-3.5 h-3.5 text-pink-400" />
+                    <span>Take Sip! 🥤</span>
+                    <span className="font-mono text-[10px] px-1.5 py-0.2 bg-pink-900/90 rounded-full border border-pink-500/40 text-white font-bold">
+                      {room.sipsCount?.[currentPlayer?.id || ''] || 0}
+                    </span>
+                  </button>
+                )}
+
+                <button
+                  onClick={() => {
+                    sound.playClick();
+                    setShowCustomCardModal(true);
+                  }}
+                  className="px-3 py-2 rounded-xl bg-purple-950/60 hover:bg-purple-900/60 border border-purple-500/40 text-purple-300 text-xs font-bold flex items-center gap-1.5 transition-all shadow-neon-purple touch-target"
+                  title="Submit your own question or dare"
+                >
+                  <PlusCircle className="w-3.5 h-3.5 text-purple-400" />
+                  <span className="hidden sm:inline">Custom Card</span>
+                  {room.customCardsCount ? (
+                    <span className="font-mono text-[10px] px-1 py-0.2 bg-purple-900 rounded-full text-purple-200">
+                      +{room.customCardsCount}
+                    </span>
+                  ) : null}
+                </button>
+
+                <RoomLobbyQRCode roomCode={roomCode} isStreamerMode={isStreamerMode} />
+
                 <SoundToggle />
 
                 <button
                   onClick={handleCopyInviteLink}
-                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500/20 to-purple-500/20 hover:from-cyan-500/30 hover:to-purple-500/30 border border-cyan-400/50 text-cyan-300 text-xs sm:text-sm font-extrabold flex items-center gap-2 shadow-neon-cyan transition-all touch-target"
+                  className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-500/20 to-purple-500/20 hover:from-cyan-500/30 hover:to-purple-500/30 border border-cyan-400/50 text-cyan-300 text-xs font-extrabold flex items-center gap-1.5 shadow-neon-cyan transition-all touch-target"
                 >
-                  {copiedLink ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4" />}
-                  <span>{copiedLink ? 'Link Copied!' : 'Copy Invite Link'}</span>
+                  {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
+                  <span>{copiedLink ? 'Copied!' : 'Invite'}</span>
                 </button>
 
                 <button
                   onClick={handleLeaveRoom}
-                  className="p-2.5 rounded-xl bg-red-950/40 hover:bg-red-900/50 border border-red-500/40 text-red-400 transition-all touch-target"
+                  className="p-2 rounded-xl bg-red-950/40 hover:bg-red-900/50 border border-red-500/40 text-red-400 transition-all touch-target"
                   title="Leave Room"
                 >
-                  <LogOut className="w-4 h-4" />
+                  <LogOut className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
@@ -880,12 +1200,57 @@ export default function RoomPage() {
                             <option value="word_battle">Word Battle (2-15p)</option>
                             <option value="truth_or_dare">Truth or Dare (2-15p)</option>
                             <option value="never_have_i_ever">Never Have I Ever (2-15p)</option>
+                            <option value="most_likely_to">Most Likely To... (2-15p)</option>
+                            <option value="sip_or_spill">Sip or Spill 🥤 (2-15p)</option>
+                            <option value="silly_roulette">Silly Roulette (2-15p)</option>
+                            <option value="hot_potato">Hot Potato (2-15p)</option>
                           </select>
                           <ChevronDown className="w-4 h-4 text-amber-400 absolute right-3 top-2.5 pointer-events-none" />
                         </div>
                       ) : (
                         <div className="px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-700 text-xs font-bold text-cyan-300 capitalize">
                           {room.config.gameMode.replace(/_/g, ' ')}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* VIBE MODE SELECTOR */}
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <label className="text-[11px] font-black uppercase tracking-wider text-slate-300">
+                          Party Vibe Mode
+                        </label>
+                        <span className="text-cyan-300 font-extrabold text-[10px] uppercase">
+                          {room.config.vibeMode?.replace('_', ' ') || 'chill'}
+                        </span>
+                      </div>
+                      {isHost ? (
+                        <div className="grid grid-cols-3 gap-1.5">
+                          {[
+                            { id: 'chill', label: 'Chill' },
+                            { id: 'chaotic', label: 'Chaos' },
+                            { id: 'sip_edition', label: 'Sips 🥤' }
+                          ].map((vibe) => (
+                            <button
+                              key={vibe.id}
+                              type="button"
+                              onClick={() => {
+                                sound.playClick();
+                                socketUpdateSettings({ vibeMode: vibe.id as any });
+                              }}
+                              className={`py-1.5 rounded-lg border text-[11px] font-bold transition-all ${
+                                (room.config.vibeMode || 'chill') === vibe.id
+                                  ? 'border-cyan-400 bg-cyan-950/60 text-cyan-300 shadow-neon-cyan'
+                                  : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
+                              }`}
+                            >
+                              {vibe.label}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-700 text-xs font-bold text-cyan-300 capitalize">
+                          {room.config.vibeMode?.replace('_', ' ') || 'Chill & Funny'}
                         </div>
                       )}
                     </div>
@@ -1276,6 +1641,112 @@ export default function RoomPage() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* ======================================================== */}
+      {/* CUSTOM CARDS SUBMISSION MODAL                            */}
+      {/* ======================================================== */}
+      <AnimatePresence>
+        {showCustomCardModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.92 }}
+              className="w-full max-w-md glass-panel-neon rounded-3xl p-6 border border-purple-500/40 shadow-neon-purple"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/40">
+                    <PlusCircle className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-white uppercase tracking-wider">
+                      Submit Custom Card
+                    </h3>
+                    <p className="text-[11px] text-purple-300/80">
+                      Inject your question or dare live into this room
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowCustomCardModal(false)}
+                  className="text-slate-400 hover:text-white text-2xl font-bold leading-none p-1"
+                >
+                  &times;
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmitCustomCard} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-black uppercase tracking-wider text-slate-300 mb-1.5">
+                    Card Category
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { id: 'general', label: 'Prompt' },
+                      { id: 'dare', label: 'Dare' },
+                      { id: 'confession', label: 'Spicy' }
+                    ].map((cat) => (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => {
+                          sound.playClick();
+                          setCustomCardType(cat.id);
+                        }}
+                        className={`py-2 rounded-xl border text-xs font-bold transition-all ${
+                          customCardType === cat.id
+                            ? 'border-purple-400 bg-purple-950/50 text-purple-300 shadow-neon-purple'
+                            : 'border-slate-800 bg-slate-900 text-slate-400'
+                        }`}
+                      >
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-black uppercase tracking-wider text-slate-300 mb-1.5">
+                    Your Party Prompt / Challenge (English)
+                  </label>
+                  <textarea
+                    rows={3}
+                    maxLength={160}
+                    value={customCardPrompt}
+                    onChange={(e) => setCustomCardPrompt(e.target.value)}
+                    placeholder="e.g., Who is most likely to win a reality TV show? or Do an impression of your favorite movie villain..."
+                    required
+                    className="w-full bg-slate-900 border border-slate-700 focus:border-purple-400 rounded-xl p-3 text-white text-xs outline-none resize-none leading-relaxed"
+                  />
+                  <div className="text-right text-[10px] text-slate-500 mt-1">
+                    {customCardPrompt.length}/160
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmittingCard || !customCardPrompt.trim()}
+                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-purple-500 to-cyan-500 hover:brightness-110 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-neon-purple transition-all disabled:opacity-50"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>{isSubmittingCard ? 'Injecting Card...' : 'Add to Match Rotation'}</span>
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* TACTICAL SABOTAGE POWER-UP DRAWER (DURING ACTIVE MATCHES) */}
+      {room.status === 'in_game' && currentPlayer && (
+        <SabotageDrawer
+          room={room}
+          currentPlayer={currentPlayer}
+          hasUsedPowerUp={hasUsedSabotage}
+          onUsePowerUp={handleUseSabotage}
+        />
+      )}
 
       {/* FLOATING EMOJI REACTIONS OVERLAY */}
       <FloatingReactions />

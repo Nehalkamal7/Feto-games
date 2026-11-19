@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Radio, Trophy, Sparkles, Menu, X, Info, Gamepad2, Volume2 } from 'lucide-react';
-import { NeonLogo } from './NeonLogo';
+import { BrandLogo } from './BrandLogo';
 import { SoundToggle } from './SoundToggle';
 import { sound } from '@/lib/sound';
 
@@ -29,7 +29,7 @@ export function TopNavbar({
       <div className="flex items-center justify-between">
         {/* LEFT: CUSTOM NEON LOGO */}
         <div className="flex items-center">
-          <NeonLogo size="nav" showSubtitle={false} />
+          <BrandLogo size="nav" showSubtitle={false} />
         </div>
 
         {/* CENTER: DESKTOP NAVIGATION LINKS */}

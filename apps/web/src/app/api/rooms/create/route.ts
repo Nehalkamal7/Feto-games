@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
       roundDurationSeconds: body.roundDurationSeconds || 30,
       totalRounds: body.totalRounds || 5,
       gameMode: body.gameMode || 'who_is_imposter',
+      vibeMode: (body as any).vibeMode || 'chill',
       allowSpectators: body.allowSpectators ?? true,
       isTeamMode: body.isTeamMode ?? false,
       customDeckId: body.customDeckId
@@ -81,7 +82,9 @@ export async function POST(req: NextRequest) {
       spectators: {},
       createdAt: Date.now(),
       updatedAt: Date.now(),
-      currentRound: 0
+      currentRound: 0,
+      sipsCount: {},
+      customCards: []
     };
 
     // Save to Upstash Redis with 2-hour TTL (7200s)
