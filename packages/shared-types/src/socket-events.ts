@@ -33,6 +33,7 @@ export interface CreateRoomDTO {
   totalRounds?: number;
   allowSpectators?: boolean;
   isTeamMode?: boolean;
+  customDeckId?: string | null;
 }
 
 export interface CreateRoomResponse {
@@ -47,6 +48,7 @@ export interface JoinRoomDTO {
   username: string;
   avatar: NeonAvatarId;
   pin?: string; // 4-digit PIN if room is password-protected
+  asSpectator?: boolean;
 }
 
 export interface JoinRoomResponse {

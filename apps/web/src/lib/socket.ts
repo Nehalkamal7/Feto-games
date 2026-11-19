@@ -1,66 +1,24 @@
-import { io, Socket } from 'socket.io-client';
 import {
   ClientToServerEvents,
   CreateRoomDTO,
   CreateRoomResponse,
+  GameMode,
   JoinRoomDTO,
   JoinRoomResponse,
   KickPlayerDTO,
+  PlayerSummary,
+  PlayerTeam,
+  PublicRoomState,
   ReconnectDTO,
   ReconnectResponse,
   ServerToClientEvents,
   SetReadyDTO,
-  SocketApiResponse,
   UpdateRoomSettingsDTO
 } from '@feto-games/shared-types';
+import { getAblyRealtime, publishDirectToChannel } from './ably-client';
 
-export type FetoSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
-
-let socket: FetoSocket | null = null;
-let lastSocketError: string | null = null;
-
-// Standalone Socket.IO backend URL configured via NEXT_PUBLIC_SOCKET_URL
-export const SOCKET_URL =
-  process.env.NEXT_PUBLIC_SOCKET_URL ||
-  process.env.NEXT_PUBLIC_SERVER_URL ||
-  'http://localhost:4000';
-
-export const BACKEND_URL = SOCKET_URL;
-
-/**
- * Initializes and returns the singleton Socket.IO client instance.
- * Transports are configured for persistent WebSocket with polling fallback,
- * credentials enabled for cross-origin Vercel-to-backend deployments.
- */
-export const getSocket = (): FetoSocket => {
-  if (!socket) {
-    socket = io(SOCKET_URL, {
-      autoConnect: true,
-      transports: ['websocket', 'polling'],
-      withCredentials: true,
-      reconnection: true,
-      reconnectionAttempts: 10,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
-      timeout: 10000
-    });
-
-    socket.on('connect', () => {
-      lastSocketError = null;
-      console.log(`⚡ [Socket.IO] Connected to backend at ${SOCKET_URL} (ID: ${socket?.id})`);
-    });
-
-    socket.on('disconnect', (reason) => {
-      console.log('🔌 [Socket.IO] Disconnected:', reason);
-    });
-
-    socket.on('connect_error', (err) => {
-      lastSocketError = err.message;
-      console.warn(`⚠️ [Socket.IO] Connection error to ${SOCKET_URL}:`, err.message);
-    });
-  }
-  return socket;
-};
+export const SOCKET_URL = '';
+export const BACKEND_URL = '';
 
 // ==========================================
 // Session Reconnect Storage (sessionStorage)
@@ -68,9 +26,13 @@ export const getSocket = (): FetoSocket => {
 
 const SESSION_TOKEN_KEY = 'feto_reconnect_token_';
 const SESSION_PLAYER_ID_KEY = 'feto_player_id_';
+let activeRoomCode: string = '';
+let activePlayerId: string = '';
 
 export const saveReconnectSession = (roomCode: string, token: string, playerId: string): void => {
   if (typeof window === 'undefined') return;
+  activeRoomCode = roomCode.toUpperCase();
+  activePlayerId = playerId;
   try {
     sessionStorage.setItem(`${SESSION_TOKEN_KEY}${roomCode.toUpperCase()}`, token);
     sessionStorage.setItem(`${SESSION_PLAYER_ID_KEY}${roomCode.toUpperCase()}`, playerId);
@@ -88,6 +50,15 @@ export const getReconnectToken = (roomCode: string): string | null => {
   }
 };
 
+export const getSavedPlayerId = (roomCode: string): string | null => {
+  if (typeof window === 'undefined') return activePlayerId || null;
+  try {
+    return sessionStorage.getItem(`${SESSION_PLAYER_ID_KEY}${roomCode.toUpperCase()}`) || activePlayerId || null;
+  } catch {
+    return activePlayerId || null;
+  }
+};
+
 export const clearReconnectSession = (roomCode: string): void => {
   if (typeof window === 'undefined') return;
   try {
@@ -99,198 +70,485 @@ export const clearReconnectSession = (roomCode: string): void => {
 };
 
 // ==========================================
-// Timeout Guard for Socket Calls
+// Serverless REST Room Invocations
 // ==========================================
 
-const SOCKET_OP_TIMEOUT_MS = 8000;
+export async function socketCreateRoom(dto: CreateRoomDTO): Promise<CreateRoomResponse> {
+  const res = await fetch('/api/rooms/create', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dto)
+  });
 
-/**
- * Wraps a Socket.IO acknowledgement call with an 8-second timeout guard.
- * Prevents UI from hanging forever on "Create Room" / "Join" when backend is unreachable.
- */
-function withSocketTimeout<T>(
-  actionName: string,
-  executor: (resolve: (val: T) => void, reject: (err: Error) => void) => void,
-  timeoutMs: number = SOCKET_OP_TIMEOUT_MS
-): Promise<T> {
-  return new Promise((resolve, reject) => {
-    const s = getSocket();
-    let isSettled = false;
+  const json = await res.json();
+  if (!json.success) {
+    throw new Error(json.error?.message || 'Failed to create room.');
+  }
 
-    // Trigger connect if client is currently disconnected
-    if (!s.connected) {
-      s.connect();
-    }
+  saveReconnectSession(json.data.roomCode, json.data.reconnectToken, json.data.player.id);
+  getSocket().bindRoom(json.data.roomCode, json.data.player.id);
 
-    const timer = setTimeout(() => {
-      if (!isSettled) {
-        isSettled = true;
-        const errorDetail = lastSocketError
-          ? ` (${lastSocketError})`
-          : !s.connected
-          ? ' (Socket is not connected)'
-          : '';
-        reject(
-          new Error(
-            `Multiplayer server unreachable at ${SOCKET_URL}${errorDetail}. Please verify the standalone backend is running and NEXT_PUBLIC_SOCKET_URL is configured.`
-          )
-        );
-      }
-    }, timeoutMs);
+  return json.data;
+}
 
-    const safeResolve = (val: T) => {
-      if (!isSettled) {
-        isSettled = true;
-        clearTimeout(timer);
-        resolve(val);
-      }
-    };
+export async function socketJoinRoom(dto: JoinRoomDTO): Promise<JoinRoomResponse> {
+  const res = await fetch('/api/rooms/join', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dto)
+  });
 
-    const safeReject = (err: Error) => {
-      if (!isSettled) {
-        isSettled = true;
-        clearTimeout(timer);
-        reject(err);
-      }
-    };
+  const json = await res.json();
+  if (!json.success) {
+    throw new Error(json.error?.message || 'Failed to join room.');
+  }
 
-    try {
-      executor(safeResolve, safeReject);
-    } catch (err: any) {
-      safeReject(err instanceof Error ? err : new Error(String(err)));
-    }
+  saveReconnectSession(json.data.roomCode, json.data.reconnectToken, json.data.player.id);
+  getSocket().bindRoom(json.data.roomCode, json.data.player.id);
+
+  return json.data;
+}
+
+export async function socketReconnectRoom(dto: ReconnectDTO): Promise<ReconnectResponse> {
+  // Extract roomCode from URL if possible or activeRoomCode
+  const roomCodeMatch = typeof window !== 'undefined' ? window.location.pathname.match(/\/room\/([a-zA-Z0-9_-]+)/) : null;
+  const roomCode = roomCodeMatch ? roomCodeMatch[1].toUpperCase() : activeRoomCode;
+  const playerId = getSavedPlayerId(roomCode);
+
+  const res = await fetch('/api/rooms/join', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      roomCode,
+      username: typeof window !== 'undefined' ? localStorage.getItem('feto_username') || 'Player' : 'Player',
+      avatar: typeof window !== 'undefined' ? localStorage.getItem('feto_avatar') || 'cyber_cat' : 'cyber_cat'
+    })
+  });
+
+  const json = await res.json();
+  if (!json.success) {
+    throw new Error(json.error?.message || 'Failed to reconnect.');
+  }
+
+  getSocket().bindRoom(roomCode, playerId || json.data.player.id);
+
+  return {
+    roomCode,
+    room: json.data.room,
+    player: json.data.player,
+    gameState: null
+  };
+}
+
+export async function socketSetReady(dto: SetReadyDTO): Promise<void> {
+  const roomCode = getActiveRoomCode();
+  const playerId = getSavedPlayerId(roomCode);
+  if (!playerId) return;
+
+  const res = await fetch('/api/game/action', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      roomCode,
+      playerId,
+      actionType: 'TOGGLE_READY',
+      payload: dto
+    })
+  });
+
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error?.message || 'Failed to toggle ready');
+}
+
+export async function socketUpdateSettings(dto: UpdateRoomSettingsDTO): Promise<void> {
+  const roomCode = getActiveRoomCode();
+  const playerId = getSavedPlayerId(roomCode);
+  if (!playerId) return;
+
+  const res = await fetch('/api/game/action', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      roomCode,
+      playerId,
+      actionType: 'UPDATE_SETTINGS',
+      payload: (dto as any).config || dto
+    })
+  });
+
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error?.message || 'Failed to update settings');
+}
+
+export async function socketKickPlayer(dto: KickPlayerDTO): Promise<void> {
+  const roomCode = getActiveRoomCode();
+  const playerId = getSavedPlayerId(roomCode);
+  if (!playerId) return;
+
+  const res = await fetch('/api/game/action', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      roomCode,
+      playerId,
+      actionType: 'KICK_PLAYER',
+      payload: { targetPlayerId: (dto as any).targetPlayerId || (dto as any).playerId }
+    })
+  });
+
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error?.message || 'Failed to kick player');
+}
+
+export async function socketStartGame(): Promise<void> {
+  const roomCode = getActiveRoomCode();
+  const playerId = getSavedPlayerId(roomCode);
+  if (!playerId) return;
+
+  const res = await fetch('/api/game/action', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      roomCode,
+      playerId,
+      actionType: 'START_GAME'
+    })
+  });
+
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error?.message || 'Failed to start game');
+}
+
+export async function socketLeaveRoom(): Promise<void> {
+  const roomCode = getActiveRoomCode();
+  const playerId = getSavedPlayerId(roomCode);
+  if (!roomCode || !playerId) return;
+
+  await fetch('/api/rooms/leave', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ roomCode, playerId })
   });
 }
 
+export async function socketSelectTeam(team: PlayerTeam): Promise<void> {
+  const roomCode = getActiveRoomCode();
+  const playerId = getSavedPlayerId(roomCode);
+  if (!playerId) return;
+
+  const res = await fetch('/api/game/action', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      roomCode,
+      playerId,
+      actionType: 'SELECT_TEAM',
+      payload: { team }
+    })
+  });
+
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error?.message || 'Failed to select team');
+}
+
+export async function socketRematch(nextGameMode?: GameMode): Promise<void> {
+  const roomCode = getActiveRoomCode();
+  const playerId = getSavedPlayerId(roomCode);
+  if (!playerId) return;
+
+  const res = await fetch('/api/game/action', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      roomCode,
+      playerId,
+      actionType: 'REMATCH',
+      payload: { nextGameMode }
+    })
+  });
+
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error?.message || 'Failed to rematch');
+}
+
+export async function socketSendReaction(emoji: string): Promise<void> {
+  const roomCode = getActiveRoomCode();
+  const playerId = getSavedPlayerId(roomCode);
+  if (!playerId) return;
+
+  await fetch('/api/game/action', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      roomCode,
+      playerId,
+      actionType: 'EMOJI_REACTION',
+      payload: { emoji }
+    })
+  });
+}
+
+export async function socketQuickPlay(dto: { username: string; avatar: any }): Promise<{ roomCode: string }> {
+  try {
+    const listRes = await fetch('/api/rooms/public');
+    const listData = await listRes.json();
+    if (listData.success && listData.data?.rooms?.length > 0) {
+      const available = listData.data.rooms.find((r: any) => !r.hasPin && (r.playerCount || 1) < (r.maxPlayers || 15));
+      if (available) {
+        const joinRes = await socketJoinRoom({
+          roomCode: available.code,
+          username: dto.username,
+          avatar: dto.avatar
+        });
+        return { roomCode: joinRes.roomCode };
+      }
+    }
+  } catch {
+    // fallback to creating new room
+  }
+
+  const createRes = await socketCreateRoom({
+    username: dto.username,
+    avatar: dto.avatar,
+    isPrivate: false,
+    maxPlayers: 15,
+    gameMode: 'who_is_imposter'
+  });
+
+  return { roomCode: createRes.roomCode };
+}
+
+function getActiveRoomCode(): string {
+  if (typeof window !== 'undefined') {
+    const match = window.location.pathname.match(/\/room\/([a-zA-Z0-9_-]+)/);
+    if (match) return match[1].toUpperCase();
+  }
+  return activeRoomCode;
+}
+
 // ==========================================
-// Promise-based Socket Event Invokers
+// Ably Realtime Event Bridge
 // ==========================================
 
-export const socketCreateRoom = (dto: CreateRoomDTO): Promise<CreateRoomResponse> => {
-  return withSocketTimeout('Create Room', (resolve, reject) => {
-    const s = getSocket();
-    s.emit('room:create', dto, (res: SocketApiResponse<CreateRoomResponse>) => {
-      if (res.success) {
-        saveReconnectSession(res.data.roomCode, res.data.reconnectToken, res.data.player.id);
-        resolve(res.data);
-      } else {
-        reject(new Error(res.error.message));
-      }
-    });
-  });
-};
+class AblySocketBridge {
+  public connected: boolean = true;
+  public id: string = `client_${Math.random().toString(36).substring(2, 9)}`;
+  private listeners: Map<string, Set<Function>> = new Map();
+  private boundRoomCode: string = '';
+  private boundPlayerId: string = '';
+  private isSubscribed: boolean = false;
 
-export const socketJoinRoom = (dto: JoinRoomDTO): Promise<JoinRoomResponse> => {
-  return withSocketTimeout('Join Room', (resolve, reject) => {
-    const s = getSocket();
-    s.emit('room:join', dto, (res: SocketApiResponse<JoinRoomResponse>) => {
-      if (res.success) {
-        saveReconnectSession(res.data.roomCode, res.data.reconnectToken, res.data.player.id);
-        resolve(res.data);
-      } else {
-        reject(new Error(res.error.message));
-      }
-    });
-  });
-};
+  constructor() {
+    if (typeof window !== 'undefined') {
+      setTimeout(() => {
+        const code = getActiveRoomCode();
+        const pid = getSavedPlayerId(code);
+        if (code) this.bindRoom(code, pid || undefined);
+      }, 100);
+    }
+  }
 
-export const socketReconnectRoom = (dto: ReconnectDTO): Promise<ReconnectResponse> => {
-  return withSocketTimeout('Reconnect Room', (resolve, reject) => {
-    const s = getSocket();
-    s.emit('room:reconnect', dto, (res: SocketApiResponse<ReconnectResponse>) => {
-      if (res.success) {
-        resolve(res.data);
-      } else {
-        reject(new Error(res.error.message));
-      }
-    });
-  });
-};
+  public bindRoom(roomCode: string, playerId?: string) {
+    const normalized = roomCode.toUpperCase().trim();
+    if (this.boundRoomCode === normalized && this.isSubscribed && playerId === this.boundPlayerId) {
+      return;
+    }
 
-export const socketSetReady = (dto: SetReadyDTO): Promise<void> => {
-  return withSocketTimeout('Set Ready', (resolve, reject) => {
-    const s = getSocket();
-    s.emit('lobby:set-ready', dto, (res) => {
-      if (!res || res.success) resolve();
-      else reject(new Error(res.error.message));
-    });
-  });
-};
+    this.boundRoomCode = normalized;
+    if (playerId) this.boundPlayerId = playerId;
 
-export const socketUpdateSettings = (dto: UpdateRoomSettingsDTO): Promise<void> => {
-  return withSocketTimeout('Update Settings', (resolve, reject) => {
-    const s = getSocket();
-    s.emit('lobby:update-settings', dto, (res) => {
-      if (!res || res.success) resolve();
-      else reject(new Error(res.error.message));
-    });
-  });
-};
+    const ably = getAblyRealtime(playerId || this.boundPlayerId || undefined);
+    if (!ably) return;
 
-export const socketKickPlayer = (dto: KickPlayerDTO): Promise<void> => {
-  return withSocketTimeout('Kick Player', (resolve, reject) => {
-    const s = getSocket();
-    s.emit('lobby:kick-player', dto, (res) => {
-      if (!res || res.success) resolve();
-      else reject(new Error(res.error.message));
-    });
-  });
-};
+    const roomChannel = ably.channels.get(`feto:room:${normalized}`);
 
-export const socketStartGame = (): Promise<void> => {
-  return withSocketTimeout('Start Game', (resolve, reject) => {
-    const s = getSocket();
-    s.emit('lobby:start-game', (res) => {
-      if (!res || res.success) resolve();
-      else reject(new Error(res.error.message));
+    // Subscribe to all public events
+    roomChannel.subscribe((msg: any) => {
+      this.dispatch(msg.name, msg.data);
     });
-  });
-};
 
-export const socketLeaveRoom = (): Promise<void> => {
-  return withSocketTimeout(
-    'Leave Room',
-    (resolve) => {
-      const s = getSocket();
-      s.emit('room:leave', () => {
-        resolve();
+    if (playerId || this.boundPlayerId) {
+      const pChannel = ably.channels.get(`feto:player:${playerId || this.boundPlayerId}`);
+      pChannel.subscribe((msg: any) => {
+        this.dispatch(msg.name, msg.data);
       });
-    },
-    3000
-  );
+    }
+
+    this.isSubscribed = true;
+  }
+
+  public on(event: string, callback: Function) {
+    if (!this.listeners.has(event)) {
+      this.listeners.set(event, new Set());
+    }
+    this.listeners.get(event)!.add(callback);
+    return this;
+  }
+
+  public off(event: string, callback: Function) {
+    const set = this.listeners.get(event);
+    if (set) {
+      set.delete(callback);
+    }
+    return this;
+  }
+
+  public dispatch(event: string, data: any) {
+    const set = this.listeners.get(event);
+    if (set) {
+      set.forEach((cb) => {
+        try {
+          cb(data);
+        } catch (err) {
+          console.error(`Error in socket listener for ${event}:`, err);
+        }
+      });
+    }
+  }
+
+  public connect() {
+    this.connected = true;
+    const code = getActiveRoomCode();
+    const pid = getSavedPlayerId(code);
+    if (code) this.bindRoom(code, pid || undefined);
+    return this;
+  }
+
+  public disconnect() {
+    this.connected = false;
+    return this;
+  }
+
+  /**
+   * Translates socket.emit() calls into direct Ably broadcasts (for canvas strokes)
+   * or serverless API dispatches (for server-authoritative game actions).
+   */
+  public emit(event: string, ...args: any[]) {
+    const payload = args[0];
+    const callback = typeof args[args.length - 1] === 'function' ? args[args.length - 1] : null;
+
+    const roomCode = getActiveRoomCode();
+    const playerId = getSavedPlayerId(roomCode);
+
+    // 1. High-frequency canvas strokes: Direct Ably Realtime broadcast (<30ms global latency)
+    if (event === 'draw:stroke') {
+      publishDirectToChannel(`feto:room:${roomCode}`, 'draw:stroke', payload);
+      if (callback) callback({ success: true });
+      return;
+    }
+
+    if (event === 'draw:clear') {
+      publishDirectToChannel(`feto:room:${roomCode}`, 'draw:clear', {});
+      if (callback) callback({ success: true });
+      return;
+    }
+
+    if (event === 'draw:undo') {
+      publishDirectToChannel(`feto:room:${roomCode}`, 'draw:undo', {});
+      if (callback) callback({ success: true });
+      return;
+    }
+
+    // 2. Server-Authoritative Game Actions
+    let actionType: string | null = null;
+    let actionPayload: any = payload;
+
+    switch (event) {
+      case 'imposter:submit_clue':
+        actionType = 'SUBMIT_CLUE';
+        break;
+      case 'imposter:cast_vote':
+        actionType = 'SUBMIT_VOTE';
+        break;
+      case 'imposter:sudden_death_guess':
+        actionType = 'GUESS_WORD';
+        actionPayload = { guess: payload?.guessedWord };
+        break;
+      case 'chat:send':
+        actionType = 'GUESS_WORD';
+        actionPayload = { guess: payload?.message };
+        break;
+      case 'draw:select_word':
+        actionType = 'GUESS_WORD';
+        break;
+      case 'quiz:submit_answer':
+        actionType = 'SUBMIT_ANSWER';
+        break;
+      case 'word_battle:submit_word':
+        actionType = 'SUBMIT_WORD';
+        break;
+      case 'tod:choose_type':
+        actionType = 'TOD_VOTE';
+        actionPayload = { choice: payload?.choice };
+        break;
+      case 'tod:complete_action':
+        actionType = 'TOD_VOTE';
+        actionPayload = { action: 'completed' };
+        break;
+      case 'tod:vote':
+        actionType = 'TOD_VOTE';
+        actionPayload = { vote: payload?.vote };
+        break;
+      case 'nhie:submit_choice':
+        actionType = 'NHIE_CHOICE';
+        actionPayload = { choice: payload?.choice };
+        break;
+      case 'reaction:send':
+        actionType = 'EMOJI_REACTION';
+        break;
+      case 'lobby:set-ready':
+        actionType = 'TOGGLE_READY';
+        break;
+      case 'lobby:start-game':
+        actionType = 'START_GAME';
+        break;
+      case 'lobby:update-settings':
+        actionType = 'UPDATE_SETTINGS';
+        actionPayload = payload?.config;
+        break;
+      case 'lobby:kick-player':
+        actionType = 'KICK_PLAYER';
+        actionPayload = { targetPlayerId: payload?.playerId };
+        break;
+      case 'room:select-team':
+        actionType = 'SELECT_TEAM';
+        break;
+      case 'room:rematch':
+        actionType = 'REMATCH';
+        break;
+    }
+
+    if (actionType && roomCode && playerId) {
+      fetch('/api/game/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          roomCode,
+          playerId,
+          actionType,
+          payload: actionPayload
+        })
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          if (callback) callback(res);
+        })
+        .catch((err) => {
+          if (callback) callback({ success: false, error: { message: err.message } });
+        });
+    } else if (callback) {
+      callback({ success: true });
+    }
+  }
+}
+
+let socketBridgeInstance: AblySocketBridge | null = null;
+
+export const getSocket = (): any => {
+  if (!socketBridgeInstance) {
+    socketBridgeInstance = new AblySocketBridge();
+  }
+  return socketBridgeInstance;
 };
 
-export const socketSelectTeam = (team: import('@feto-games/shared-types').PlayerTeam): Promise<void> => {
-  return withSocketTimeout('Select Team', (resolve, reject) => {
-    const s = getSocket();
-    s.emit('room:select-team', { team }, (res) => {
-      if (!res || res.success) resolve();
-      else reject(new Error(res.error?.message || 'Failed to select team'));
-    });
-  });
-};
-
-export const socketRematch = (nextGameMode?: import('@feto-games/shared-types').GameMode): Promise<void> => {
-  return withSocketTimeout('Rematch', (resolve, reject) => {
-    const s = getSocket();
-    s.emit('room:rematch', { nextGameMode }, (res) => {
-      if (!res || res.success) resolve();
-      else reject(new Error(res.error?.message || 'Failed to rematch'));
-    });
-  });
-};
-
-export const socketSendReaction = (emoji: string): void => {
-  const s = getSocket();
-  s.emit('reaction:send', { emoji });
-};
-
-export const socketQuickPlay = (dto: { username: string; avatar: any }): Promise<{ roomCode: string }> => {
-  return withSocketTimeout('Quick Play', (resolve, reject) => {
-    const s = getSocket();
-    s.emit('room:quick-play', dto, (res) => {
-      if (res && res.success) resolve(res.data);
-      else reject(new Error(res.error?.message || 'Quick play failed'));
-    });
-  });
-};
+export type FetoSocket = any;

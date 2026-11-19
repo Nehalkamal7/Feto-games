@@ -117,7 +117,7 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
 
     setRejectFeedback(null);
     setIsSubmitting(true);
-    socket.emit('word_battle:submit_word', { word: clean }, (res) => {
+    socket.emit('word_battle:submit_word', { word: clean }, (res: any) => {
       setIsSubmitting(false);
       if (res && res.success && res.data?.accepted) {
         setInputWord('');

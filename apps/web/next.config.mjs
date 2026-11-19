@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  transpilePackages: ['@feto-games/shared-types'],
+  transpilePackages: ['@feto-games/shared-types', 'ably'],
   images: {
     domains: ['localhost']
   }

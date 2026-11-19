@@ -130,6 +130,50 @@ export default function RoomPage() {
     return () => clearInterval(interval);
   }, [room]);
 
+  // Synchronized countdown timer with server phaseEndsAt and automatic phase resolution
+  const isResolvingPhaseRef = useRef(false);
+  const lastResolvedKeyRef = useRef<string>('');
+
+  useEffect(() => {
+    const phaseEndsAt = gameStateSync?.state?.phaseEndsAt;
+    if (!phaseEndsAt || room?.status !== 'in_game') return;
+
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const diff = Math.max(0, Math.ceil((phaseEndsAt - now) / 1000));
+      setTimerState({
+        remainingSeconds: diff,
+        totalDurationSeconds: room.config.roundDurationSeconds || 30,
+        phase: (gameStateSync?.state?.phase as any) || 'question',
+        round: room.currentRound
+      });
+
+      // Auto resolve phase if timer hit 0
+      const phaseKey = `${roomCode}:${room.currentRound}:${gameStateSync?.state?.phase}`;
+      if (diff === 0 && !isResolvingPhaseRef.current && lastResolvedKeyRef.current !== phaseKey) {
+        lastResolvedKeyRef.current = phaseKey;
+        isResolvingPhaseRef.current = true;
+
+        const pid = typeof window !== 'undefined' ? sessionStorage.getItem(`feto_player_id_${roomCode}`) : null;
+        fetch('/api/game/action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            roomCode,
+            playerId: pid,
+            actionType: 'RESOLVE_PHASE'
+          })
+        }).finally(() => {
+          setTimeout(() => {
+            isResolvingPhaseRef.current = false;
+          }, 1500);
+        });
+      }
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, [gameStateSync?.state?.phaseEndsAt, gameStateSync?.state?.phase, room?.status, room?.currentRound, room?.config.roundDurationSeconds, roomCode]);
+
   // Handle Socket.IO events and initial connection
   useEffect(() => {
     if (!roomCode) return;

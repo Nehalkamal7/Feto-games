@@ -44,8 +44,8 @@ import { socketCreateRoom, socketJoinRoom, socketQuickPlay, BACKEND_URL } from '
 import { sound } from '@/lib/sound';
 
 const RANDOM_NAMES = [
-  'CyberViper', 'NeonPulse', 'PixelGhost', 'LaserShadow', 'GlitchSurge',
-  'QuantumFox', 'SolarFlare', 'AstroNova', 'HyperDrift', 'ZeroByte',
+  'FetoFox', 'Hy00x', 'Rodii', 'ZukoBoko', 'Debra',
+  'Remasland', 'Seragmohema', 'AstroNova', 'HyperDrift', 'ZeroByte',
   'RetroMatrix', 'BlazeRider', 'SonicWave', 'VoltSpecter', 'VortexAce'
 ];
 
@@ -163,7 +163,7 @@ export default function HomePage() {
       const res = await fetch(`${BACKEND_URL}/api/rooms/public`);
       const data = await res.json();
       if (data.success) {
-        setPublicRooms(data.data);
+        setPublicRooms(data.data?.rooms || (Array.isArray(data.data) ? data.data : []));
       }
     } catch {
       // Server launching
@@ -567,11 +567,10 @@ export default function HomePage() {
                           sound.playClick();
                           setGameMode(mode.id as GameMode);
                         }}
-                        className={`min-h-[48px] p-2.5 sm:p-3 rounded-xl border text-left transition-all touch-target ${
-                          gameMode === mode.id
+                        className={`min-h-[48px] p-2.5 sm:p-3 rounded-xl border text-left transition-all touch-target ${gameMode === mode.id
                             ? 'border-purple-400 bg-purple-950/40 text-white shadow-neon-purple'
                             : 'border-feto-border bg-feto-card text-slate-300 hover:border-slate-500'
-                        }`}
+                          }`}
                       >
                         <div className="font-extrabold text-xs sm:text-sm text-purple-300 truncate">{mode.title}</div>
                         <div className="text-[10px] text-slate-400 truncate">{mode.desc}</div>
@@ -629,11 +628,10 @@ export default function HomePage() {
                           sound.playClick();
                           setRoundDuration(sec);
                         }}
-                        className={`py-2 rounded-xl border text-xs font-bold transition-all ${
-                          roundDuration === sec
+                        className={`py-2 rounded-xl border text-xs font-bold transition-all ${roundDuration === sec
                             ? 'border-cyan-400 bg-cyan-950/40 text-cyan-300 shadow-neon-cyan'
                             : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
-                        }`}
+                          }`}
                       >
                         {sec}s
                       </button>

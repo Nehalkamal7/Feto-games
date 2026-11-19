@@ -83,5 +83,6 @@ export interface PublicRoomDirectoryItem {
   status: RoomStatus;
   gameMode: GameMode;
   hasPin: boolean;
+  isTeamMode?: boolean;
   createdAt: number;
 }

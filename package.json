@@ -11,7 +11,8 @@
     "dev": "npm run dev --workspaces --if-present",
     "dev:server": "npm run dev --workspace=@feto-games/server",
     "dev:web": "npm run dev --workspace=@feto-games/web",
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build:types && npm run build:web",
+    "build:all": "npm run build --workspaces --if-present",
     "build:types": "npm run build --workspace=@feto-games/shared-types",
     "build:server": "npm run build --workspace=@feto-games/server",
     "build:web": "npm run build --workspace=@feto-games/web",
@@ -22,7 +23,8 @@
     "docker:logs": "docker-compose logs -f",
     "db:migrate": "npm run db:migrate --workspace=@feto-games/server",
     "db:generate": "npm run db:generate --workspace=@feto-games/server",
-    "test:simulation": "tsx scripts/simulate-15-players.ts"
+    "test:simulation": "tsx scripts/simulate-15-players.ts",
+    "postinstall": "node scripts/patch-ably.js"
   },
   "keywords": [
     "multiplayer",

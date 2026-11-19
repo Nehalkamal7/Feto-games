@@ -97,6 +97,9 @@ export interface VoteTally {
 
 export interface ImposterPublicState {
   phase: 'role_reveal' | 'clue_giving' | 'voting' | 'imposter_sudden_death' | 'round_result' | 'game_over';
+  round?: number;
+  totalRounds?: number;
+  phaseEndsAt?: number;
   category: string;
   currentTurnPlayerId?: string;
   currentTurnUsername?: string;
