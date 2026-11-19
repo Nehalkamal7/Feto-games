@@ -11,7 +11,17 @@ let currentClientId: string | null = null;
 export function getAblyRealtime(clientId?: string): Ably.Realtime | null {
   if (typeof window === 'undefined') return null;
 
-  if (clientId && clientId !== currentClientId && ablyInstance) {
+  // Resolve persistent playerId if not explicitly passed
+  let resolvedClientId = clientId;
+  if (!resolvedClientId) {
+    try {
+      resolvedClientId = sessionStorage.getItem('feto_persistent_player_id') || undefined;
+    } catch {
+      // ignore
+    }
+  }
+
+  if (resolvedClientId && resolvedClientId !== currentClientId && ablyInstance) {
     // If clientId changed, disconnect previous and re-init
     try {
       ablyInstance.close();
@@ -23,10 +33,10 @@ export function getAblyRealtime(clientId?: string): Ably.Realtime | null {
 
   if (!ablyInstance) {
     try {
-      currentClientId = clientId || null;
+      currentClientId = resolvedClientId || null;
       ablyInstance = new Ably.Realtime({
-        authUrl: '/api/ably/auth',
-        authParams: clientId ? { clientId } : undefined,
+        authUrl: '/api/ably/token',
+        authParams: resolvedClientId ? { clientId: resolvedClientId } : undefined,
         autoConnect: true
       });
 

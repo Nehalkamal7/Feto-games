@@ -36,7 +36,9 @@ export async function POST(req: NextRequest) {
       attempts++;
     }
 
-    const playerId = `usr_${nanoid(10)}`;
+    const playerId = (body as any).playerId
+      ? String((body as any).playerId).trim()
+      : `usr_${nanoid(10)}`;
     const sessionToken = `ssn_${nanoid(24)}`;
     const maxPlayers = Math.min(Math.max(body.maxPlayers || 15, 2), 15);
     const hasPin = Boolean(body.pin && body.pin.trim().length === 4);

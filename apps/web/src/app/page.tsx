@@ -100,6 +100,12 @@ export default function HomePage() {
       if (savedAvatar && NEON_AVATARS[savedAvatar]) {
         setSelectedAvatar(savedAvatar);
       }
+
+      const kickToast = sessionStorage.getItem('feto_kick_toast');
+      if (kickToast) {
+        setErrorMessage(kickToast);
+        sessionStorage.removeItem('feto_kick_toast');
+      }
     }
     fetchPublicRooms();
     fetchLiveStats();

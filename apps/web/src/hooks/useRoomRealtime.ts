@@ -179,6 +179,7 @@ export function useRoomRealtime({
     };
 
     roomChannel.subscribe('room:state', handleRoomState);
+    roomChannel.subscribe('room_state', handleRoomState);
     roomChannel.subscribe('room:updated', handleRoomState);
     roomChannel.subscribe('room:player-joined', handlePlayerJoined);
     roomChannel.subscribe('room:player-left', handlePlayerLeft);
@@ -187,6 +188,50 @@ export function useRoomRealtime({
     roomChannel.subscribe('game:starting', handleGameStarting);
     roomChannel.subscribe('game:phase-change', handleGamePhaseChange);
     roomChannel.subscribe('game:state_sync', handleGameStateSync);
+
+    // --- Player Kicked Event Listener ---
+    const handlePlayerKicked = (msg: any) => {
+      const targetPlayerId = msg.data?.targetPlayerId;
+      if (targetPlayerId === playerId) {
+        sound.playUnready();
+        if (onKicked) onKicked(msg.data?.reason || 'You were removed from the room by the host');
+      } else {
+        setRoom((prev) => {
+          if (!prev) return prev;
+          const updated = prev.players.filter((p) => p.id !== targetPlayerId);
+          return {
+            ...prev,
+            players: updated,
+            playerCount: updated.length
+          };
+        });
+      }
+    };
+    roomChannel.subscribe('player_kicked', handlePlayerKicked);
+
+    // --- Presence Sync & Leave Cleanup ---
+    try {
+      const myUsername = typeof window !== 'undefined' ? localStorage.getItem('feto_username') || 'Player' : 'Player';
+      const myAvatar = typeof window !== 'undefined' ? localStorage.getItem('feto_avatar') || 'cyber_cat' : 'cyber_cat';
+      roomChannel.presence.enter({ playerId, username: myUsername, avatar: myAvatar }).catch(() => { });
+    } catch {
+      // ignore
+    }
+
+    roomChannel.presence.subscribe('leave', (member: any) => {
+      const leavingId = member.clientId || member.data?.playerId;
+      if (leavingId) {
+        setRoom((prev) => {
+          if (!prev) return prev;
+          const updated = prev.players.filter((p) => p.id !== leavingId);
+          return {
+            ...prev,
+            players: updated,
+            playerCount: updated.length
+          };
+        });
+      }
+    });
 
     // --- Private Player Channel Listeners (Secret roles, Words) ---
     if (playerChannel) {
@@ -282,11 +327,27 @@ export function useRoomRealtime({
   );
 
   const kickPlayer = useCallback(
-    async (targetPlayerId: string) => {
+    async (targetPlayerId: string, reason = 'Removed by room host') => {
       sound.playClick();
-      await dispatchGameAction('KICK_PLAYER', { targetPlayerId });
+      const res = await fetch('/api/rooms/kick', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          roomCode: normalizedCode,
+          playerId,
+          targetPlayerId,
+          reason
+        })
+      });
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error?.message || 'Failed to kick player.');
+      }
+      if (data.data?.room) {
+        setRoom(data.data.room);
+      }
     },
-    [dispatchGameAction]
+    [normalizedCode, playerId]
   );
 
   const rematch = useCallback(

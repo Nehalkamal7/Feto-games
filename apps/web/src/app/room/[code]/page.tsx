@@ -376,14 +376,50 @@ export default function RoomPage() {
       }
     };
 
-    const handleKicked = (data: { reason: string }) => {
+    const handlePlayerKicked = (data: { targetPlayerId?: string; reason?: string }) => {
+      const targetId = data.targetPlayerId;
+      const myPid = currentPlayer?.id || (typeof window !== 'undefined'
+        ? sessionStorage.getItem(`feto_player_id_${roomCode}`) || sessionStorage.getItem('feto_persistent_player_id')
+        : null);
+
+      if (!targetId || targetId === myPid) {
+        // Current user was kicked
+        sound.playUnready();
+        clearReconnectSession(roomCode);
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('feto_kick_toast', 'You were removed from the room by the host');
+        }
+        router.push('/');
+        return;
+      }
+
+      // For all other players (including host):
       sound.playUnready();
-      alert(`You were removed from room ${roomCode}: ${data.reason}`);
-      clearReconnectSession(roomCode);
-      router.push('/');
+      showToast('A player was removed by the room host.');
+      setRoom((prev) => {
+        if (!prev) return prev;
+        const updated = prev.players.filter((p) => p.id !== targetId);
+        return {
+          ...prev,
+          players: updated,
+          playerCount: updated.length
+        };
+      });
+    };
+
+    const handlePresenceLeave = (data: { playerId: string }) => {
+      if (!data?.playerId) return;
+      if (currentPlayer?.isHost || room?.hostId === currentPlayer?.id) {
+        fetch('/api/rooms/leave', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ roomCode, playerId: data.playerId })
+        }).catch(() => {});
+      }
     };
 
     socket.on('room:state', handleRoomState);
+    socket.on('room_state', handleRoomState);
     socket.on('room:player-joined', handlePlayerJoined);
     socket.on('room:player-left', handlePlayerLeft);
     socket.on('room:host-migrated', handleHostMigrated);
@@ -395,13 +431,16 @@ export default function RoomPage() {
     socket.on('game:timer-tick', handleTimerTick);
     socket.on('game:state_sync', handleGameStateSync);
     socket.on('chaos:sabotage', handleChaosSabotage);
-    socket.on('room:kicked', handleKicked);
+    socket.on('room:kicked', handlePlayerKicked);
+    socket.on('player_kicked', handlePlayerKicked);
+    socket.on('presence:leave', handlePresenceLeave);
+    socket.on('presence.leave', handlePresenceLeave);
 
     // Initial Join / Reconnect Flow
     const initConnection = async () => {
       const reconnectToken = getReconnectToken(roomCode);
       const savedPlayerId = typeof window !== 'undefined'
-        ? sessionStorage.getItem(`feto_player_id_${roomCode}`)
+        ? sessionStorage.getItem(`feto_player_id_${roomCode}`) || sessionStorage.getItem('feto_persistent_player_id')
         : null;
 
       if (reconnectToken && savedPlayerId) {
@@ -436,8 +475,9 @@ export default function RoomPage() {
           });
           setRoom(res.room);
           const me =
-            res.room.players.find((p) => p.username === savedUser) ||
-            res.room.spectators.find((s) => s.username === savedUser);
+            (savedPlayerId && res.room.players.find((p) => p.id === savedPlayerId)) ||
+            res.room.players.find((p) => p.username.toLowerCase() === savedUser.toLowerCase()) ||
+            res.room.spectators.find((s) => s.username.toLowerCase() === savedUser.toLowerCase());
           if (me) setCurrentPlayer(me);
           setIsInitializing(false);
           return;
@@ -455,6 +495,7 @@ export default function RoomPage() {
 
     return () => {
       socket.off('room:state', handleRoomState);
+      socket.off('room_state', handleRoomState);
       socket.off('room:player-joined', handlePlayerJoined);
       socket.off('room:player-left', handlePlayerLeft);
       socket.off('room:host-migrated', handleHostMigrated);
@@ -466,7 +507,10 @@ export default function RoomPage() {
       socket.off('game:timer-tick', handleTimerTick);
       socket.off('game:state_sync', handleGameStateSync);
       socket.off('chaos:sabotage', handleChaosSabotage);
-      socket.off('room:kicked', handleKicked);
+      socket.off('room:kicked', handlePlayerKicked);
+      socket.off('player_kicked', handlePlayerKicked);
+      socket.off('presence:leave', handlePresenceLeave);
+      socket.off('presence.leave', handlePresenceLeave);
     };
   }, [roomCode, router, showToast]);
 
@@ -566,8 +610,47 @@ export default function RoomPage() {
     showToast(`Room code ${roomCode} copied!`);
   };
 
-  const isHost = currentPlayer?.isHost ?? false;
-  const activePlayers = room?.players ?? [];
+  // Tab-close / navigate away beacon for instant stale ghost cleanup
+  useEffect(() => {
+    const handleUnload = () => {
+      const pid = currentPlayer?.id || (typeof window !== 'undefined'
+        ? sessionStorage.getItem(`feto_player_id_${roomCode}`) || sessionStorage.getItem('feto_persistent_player_id')
+        : null);
+      if (roomCode && pid) {
+        const payload = JSON.stringify({ roomCode, playerId: pid });
+        const blob = new Blob([payload], { type: 'application/json' });
+        navigator.sendBeacon('/api/rooms/leave', blob);
+      }
+    };
+    window.addEventListener('pagehide', handleUnload);
+    window.addEventListener('beforeunload', handleUnload);
+    return () => {
+      window.removeEventListener('pagehide', handleUnload);
+      window.removeEventListener('beforeunload', handleUnload);
+    };
+  }, [roomCode, currentPlayer?.id]);
+
+  const isHost = (currentPlayer?.isHost || room?.hostId === currentPlayer?.id) ?? false;
+
+  // Deduplicate active players by playerId and username to guarantee no ghost duplicates
+  const activePlayers = React.useMemo(() => {
+    if (!room?.players) return [];
+    const seenIds = new Set<string>();
+    const seenNames = new Set<string>();
+    const deduped: PlayerSummary[] = [];
+
+    for (const p of room.players) {
+      if (!p || !p.id) continue;
+      const lowerName = (p.username || '').toLowerCase();
+      if (!seenIds.has(p.id) && !seenNames.has(lowerName)) {
+        seenIds.add(p.id);
+        seenNames.add(lowerName);
+        deduped.push(p);
+      }
+    }
+    return deduped;
+  }, [room?.players]);
+
   const maxPlayers = 15;
   const allReady = activePlayers.length >= 2 && activePlayers.every((p) => p.isReady);
 
@@ -1123,8 +1206,8 @@ export default function RoomPage() {
                             )}
                           </div>
 
-                          {/* Host Kick Option */}
-                          {isHost && player.id !== currentPlayer?.id ? (
+                          {/* Host Kick Option: never show on host's own card */}
+                          {isHost && player.id !== currentPlayer?.id && player.id !== room.hostId && !player.isHost ? (
                             <button
                               onClick={() => setKickTarget(player)}
                               className="mt-1 text-[9px] text-slate-500 hover:text-red-400 font-bold flex items-center gap-0.5 py-0.5 px-1 touch-manipulation transition-colors"
@@ -1403,7 +1486,7 @@ export default function RoomPage() {
                           >
                             {player.isReady ? '✓ READY' : 'WAITING'}
                           </span>
-                          {isHost && player.id !== currentPlayer?.id && (
+                          {isHost && player.id !== currentPlayer?.id && player.id !== room.hostId && !player.isHost && (
                             <button
                               onClick={() => setKickTarget(player)}
                               className="text-slate-500 hover:text-red-400 p-0.5"

@@ -26,14 +26,37 @@ export const BACKEND_URL = '';
 
 const SESSION_TOKEN_KEY = 'feto_reconnect_token_';
 const SESSION_PLAYER_ID_KEY = 'feto_player_id_';
+const PERSISTENT_PLAYER_ID_KEY = 'feto_persistent_player_id';
 let activeRoomCode: string = '';
 let activePlayerId: string = '';
+
+/**
+ * Returns a single persistent playerId (UUID) stored in sessionStorage per browser tab.
+ * Guarantees that React StrictMode double-mounts, re-renders, or page refreshes
+ * NEVER create a duplicate second player with the same nickname.
+ */
+export const getPersistentPlayerId = (): string => {
+  if (typeof window === 'undefined') return 'usr_server';
+  try {
+    let pid = sessionStorage.getItem(PERSISTENT_PLAYER_ID_KEY);
+    if (!pid) {
+      pid = typeof crypto !== 'undefined' && crypto.randomUUID
+        ? `usr_${crypto.randomUUID().replace(/-/g, '').slice(0, 12)}`
+        : `usr_${Math.random().toString(36).substring(2, 10)}${Date.now().toString(36).slice(-4)}`;
+      sessionStorage.setItem(PERSISTENT_PLAYER_ID_KEY, pid);
+    }
+    return pid;
+  } catch {
+    return `usr_${Math.random().toString(36).substring(2, 10)}`;
+  }
+};
 
 export const saveReconnectSession = (roomCode: string, token: string, playerId: string): void => {
   if (typeof window === 'undefined') return;
   activeRoomCode = roomCode.toUpperCase();
   activePlayerId = playerId;
   try {
+    sessionStorage.setItem(PERSISTENT_PLAYER_ID_KEY, playerId);
     sessionStorage.setItem(`${SESSION_TOKEN_KEY}${roomCode.toUpperCase()}`, token);
     sessionStorage.setItem(`${SESSION_PLAYER_ID_KEY}${roomCode.toUpperCase()}`, playerId);
   } catch (err) {
@@ -50,10 +73,14 @@ export const getReconnectToken = (roomCode: string): string | null => {
   }
 };
 
-export const getSavedPlayerId = (roomCode: string): string | null => {
+export const getSavedPlayerId = (roomCode?: string): string | null => {
   if (typeof window === 'undefined') return activePlayerId || null;
   try {
-    return sessionStorage.getItem(`${SESSION_PLAYER_ID_KEY}${roomCode.toUpperCase()}`) || activePlayerId || null;
+    if (roomCode) {
+      const roomPid = sessionStorage.getItem(`${SESSION_PLAYER_ID_KEY}${roomCode.toUpperCase()}`);
+      if (roomPid) return roomPid;
+    }
+    return sessionStorage.getItem(PERSISTENT_PLAYER_ID_KEY) || activePlayerId || null;
   } catch {
     return activePlayerId || null;
   }
@@ -74,10 +101,11 @@ export const clearReconnectSession = (roomCode: string): void => {
 // ==========================================
 
 export async function socketCreateRoom(dto: CreateRoomDTO): Promise<CreateRoomResponse> {
+  const persistentPid = getPersistentPlayerId();
   const res = await fetch('/api/rooms/create', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(dto)
+    body: JSON.stringify({ ...dto, playerId: persistentPid })
   });
 
   const json = await res.json();
@@ -92,10 +120,11 @@ export async function socketCreateRoom(dto: CreateRoomDTO): Promise<CreateRoomRe
 }
 
 export async function socketJoinRoom(dto: JoinRoomDTO): Promise<JoinRoomResponse> {
+  const persistentPid = getPersistentPlayerId();
   const res = await fetch('/api/rooms/join', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(dto)
+    body: JSON.stringify({ ...dto, playerId: persistentPid })
   });
 
   const json = await res.json();
@@ -113,13 +142,15 @@ export async function socketReconnectRoom(dto: ReconnectDTO): Promise<ReconnectR
   // Extract roomCode from URL if possible or activeRoomCode
   const roomCodeMatch = typeof window !== 'undefined' ? window.location.pathname.match(/\/room\/([a-zA-Z0-9_-]+)/) : null;
   const roomCode = roomCodeMatch ? roomCodeMatch[1].toUpperCase() : activeRoomCode;
-  const playerId = getSavedPlayerId(roomCode);
+  const playerId = getSavedPlayerId(roomCode) || getPersistentPlayerId();
 
   const res = await fetch('/api/rooms/join', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       roomCode,
+      playerId,
+      reconnectToken: dto.reconnectToken,
       username: typeof window !== 'undefined' ? localStorage.getItem('feto_username') || 'Player' : 'Player',
       avatar: typeof window !== 'undefined' ? localStorage.getItem('feto_avatar') || 'cyber_cat' : 'cyber_cat'
     })
@@ -182,17 +213,18 @@ export async function socketUpdateSettings(dto: UpdateRoomSettingsDTO): Promise<
 
 export async function socketKickPlayer(dto: KickPlayerDTO): Promise<void> {
   const roomCode = getActiveRoomCode();
-  const playerId = getSavedPlayerId(roomCode);
-  if (!playerId) return;
+  const playerId = getSavedPlayerId(roomCode) || getPersistentPlayerId();
+  const targetPlayerId = (dto as any).targetPlayerId || (dto as any).playerId;
+  if (!playerId || !targetPlayerId) return;
 
-  const res = await fetch('/api/game/action', {
+  const res = await fetch('/api/rooms/kick', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       roomCode,
       playerId,
-      actionType: 'KICK_PLAYER',
-      payload: { targetPlayerId: (dto as any).targetPlayerId || (dto as any).playerId }
+      targetPlayerId,
+      reason: (dto as any).reason || 'Removed by room host'
     })
   });
 
@@ -311,10 +343,11 @@ export async function socketSendSabotagePowerUp(
 }
 
 export async function socketQuickPlay(dto: { username: string; avatar: any }): Promise<{ roomCode: string }> {
+  const persistentPid = getPersistentPlayerId();
   const res = await fetch('/api/rooms/quick-match', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(dto)
+    body: JSON.stringify({ ...dto, playerId: persistentPid })
   });
   const json = await res.json();
   if (!json.success) throw new Error(json.error?.message || 'Quick match failed.');
@@ -366,14 +399,16 @@ class AblySocketBridge {
 
   public bindRoom(roomCode: string, playerId?: string) {
     const normalized = roomCode.toUpperCase().trim();
-    if (this.boundRoomCode === normalized && this.isSubscribed && playerId === this.boundPlayerId) {
+    const effectivePlayerId = playerId || this.boundPlayerId || getPersistentPlayerId();
+
+    if (this.boundRoomCode === normalized && this.isSubscribed && effectivePlayerId === this.boundPlayerId) {
       return;
     }
 
     this.boundRoomCode = normalized;
-    if (playerId) this.boundPlayerId = playerId;
+    this.boundPlayerId = effectivePlayerId;
 
-    const ably = getAblyRealtime(playerId || this.boundPlayerId || undefined);
+    const ably = getAblyRealtime(effectivePlayerId);
     if (!ably) return;
 
     const roomChannel = ably.channels.get(`feto:room:${normalized}`);
@@ -381,10 +416,34 @@ class AblySocketBridge {
     // Subscribe to all public events
     roomChannel.subscribe((msg: any) => {
       this.dispatch(msg.name, msg.data);
+      if (msg.name === 'room_state') {
+        this.dispatch('room:state', msg.data);
+      }
+      if (msg.name === 'room:state') {
+        this.dispatch('room_state', msg.data);
+      }
     });
 
-    if (playerId || this.boundPlayerId) {
-      const pChannel = ably.channels.get(`feto:player:${playerId || this.boundPlayerId}`);
+    // Enter Ably presence with persistent playerId
+    const username = typeof window !== 'undefined' ? localStorage.getItem('feto_username') || 'Player' : 'Player';
+    const avatar = typeof window !== 'undefined' ? localStorage.getItem('feto_avatar') || 'cyber_cat' : 'cyber_cat';
+    try {
+      roomChannel.presence.enter({ playerId: effectivePlayerId, username, avatar }).catch(() => {});
+    } catch {
+      // ignore
+    }
+
+    // Subscribe to presence leave events for automatic stale ghost cleanup
+    roomChannel.presence.subscribe('leave', (member: any) => {
+      const leavingPid = member.clientId || member.data?.playerId;
+      if (leavingPid) {
+        this.dispatch('presence:leave', { playerId: leavingPid, clientId: member.clientId });
+        this.dispatch('presence.leave', { playerId: leavingPid, clientId: member.clientId });
+      }
+    });
+
+    if (effectivePlayerId) {
+      const pChannel = ably.channels.get(`feto:player:${effectivePlayerId}`);
       pChannel.subscribe((msg: any) => {
         this.dispatch(msg.name, msg.data);
       });

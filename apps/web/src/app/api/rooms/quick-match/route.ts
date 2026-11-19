@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       attempts++;
     }
 
-    const playerId = `usr_${nanoid(10)}`;
+    const playerId = body.playerId ? String(body.playerId).trim() : `usr_${nanoid(10)}`;
     const sessionToken = `ssn_${nanoid(24)}`;
     const randomGameMode = PARTY_GAME_MODES[Math.floor(Math.random() * PARTY_GAME_MODES.length)];
 

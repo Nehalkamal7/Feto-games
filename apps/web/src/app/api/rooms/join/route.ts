@@ -54,12 +54,29 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check capacity (Strictly max 15 active players)
+    const incomingPlayerId = (body as any).playerId
+      ? String((body as any).playerId).trim()
+      : null;
+
+    // Check if player is already in room by persistent playerId or matching username
+    const existingById = incomingPlayerId
+      ? room.players[incomingPlayerId] || room.spectators[incomingPlayerId]
+      : null;
+
+    const existingByUsername = Object.values(room.players).find(
+      (p) => p.username.toLowerCase() === username.toLowerCase()
+    ) || Object.values(room.spectators).find(
+      (s) => s.username.toLowerCase() === username.toLowerCase()
+    );
+
+    const existingPlayer = existingById || existingByUsername;
+
+    // Check capacity (Strictly max 15 active players) - only if this is a brand new player
     const activePlayerCount = Object.keys(room.players).length;
     const maxCapacity = Math.min(room.config.maxPlayers || 15, 15);
 
     let isSpectator = asSpectator;
-    if (!isSpectator && activePlayerCount >= maxCapacity) {
+    if (!existingPlayer && !isSpectator && activePlayerCount >= maxCapacity) {
       if (room.config.allowSpectators) {
         isSpectator = true;
       } else {
@@ -70,26 +87,28 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Check for duplicate username in active players
-    const existingPlayer = Object.values(room.players).find(
-      (p) => p.username.toLowerCase() === username.toLowerCase()
-    );
-
     let playerId: string;
-    let sessionToken: string;
+    let sessionToken: string = `ssn_${nanoid(24)}`;
     let playerObj: Player;
 
-    if (existingPlayer && existingPlayer.connectionStatus !== 'connected') {
-      // Re-connecting existing player
+    if (existingPlayer) {
+      // Idempotent re-entry: update existing entry rather than duplicating
       playerId = existingPlayer.id;
-      sessionToken = `ssn_${nanoid(24)}`;
+      existingPlayer.username = username; // update in case case changed
+      if (body.avatar) existingPlayer.avatar = body.avatar;
       existingPlayer.connectionStatus = 'connected';
       existingPlayer.disconnectedAt = null;
       existingPlayer.graceExpiresAt = null;
       playerObj = existingPlayer;
+
+      // Ensure keyed by playerId in room.players or spectators
+      if (existingPlayer.isSpectator) {
+        room.spectators[playerId] = existingPlayer;
+      } else {
+        room.players[playerId] = existingPlayer;
+      }
     } else {
-      playerId = `usr_${nanoid(10)}`;
-      sessionToken = `ssn_${nanoid(24)}`;
+      playerId = incomingPlayerId || `usr_${nanoid(10)}`;
 
       playerObj = {
         id: playerId,
@@ -116,6 +135,13 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Purge any stale ghost duplicates with same username
+    for (const [pid, p] of Object.entries(room.players)) {
+      if (pid !== playerId && p.username.toLowerCase() === username.toLowerCase()) {
+        delete room.players[pid];
+      }
+    }
+
     room.updatedAt = Date.now();
     await saveRoomState(room, 7200);
 
@@ -137,6 +163,7 @@ export async function POST(req: NextRequest) {
     // Publish join event and updated room state via Ably Realtime to channel feto:room:${roomCode}
     await publishToRoom(roomCode, 'room:player-joined', playerSummary);
     await publishToRoom(roomCode, 'room:state', publicRoom);
+    await publishToRoom(roomCode, 'room_state', publicRoom);
     await publishToRoom(roomCode, 'room:updated', publicRoom);
 
     return NextResponse.json({
