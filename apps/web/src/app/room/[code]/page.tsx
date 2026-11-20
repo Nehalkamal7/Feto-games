@@ -44,12 +44,15 @@ import {
   SecretRolePayload,
   TimerTickPayload
 } from '@feto-games/shared-types';
+import { BrandLogo } from '@/components/BrandLogo';
 import { NeonLogo } from '@/components/NeonLogo';
 import { NeonAvatarDisplay } from '@/components/NeonAvatarDisplay';
 import { FloatingReactions } from '@/components/FloatingReactions';
 import { GamePodiumView } from '@/components/GamePodiumView';
 import { SoundToggle } from '@/components/SoundToggle';
 import { RoomLobbyQRCode } from '@/components/RoomLobbyQRCode';
+import { RoomSettingsModal } from '@/components/RoomSettingsModal';
+import { GamePlaylistQueue } from '@/components/GamePlaylistQueue';
 import { SabotageDrawer, SabotageType } from '@/components/SabotageDrawer';
 import { ImposterGameView } from '@/components/games/ImposterGameView';
 import { DrawAndGuessGameView } from '@/components/games/DrawAndGuessGameView';
@@ -69,6 +72,7 @@ import {
   socketKickPlayer,
   socketLeaveRoom,
   socketReconnectRoom,
+  socketSelectGames,
   socketSelectTeam,
   socketSetReady,
   socketStartGame,
@@ -290,7 +294,23 @@ export default function RoomPage() {
     const socket = getSocket();
 
     const handleRoomState = (newRoom: PublicRoomState) => {
-      setRoom(newRoom);
+      setRoom((prev) => {
+        if (prev && prev.status === 'lobby') {
+          const oldIds = new Set(prev.players.map((p) => p.id));
+          const joined = newRoom.players.filter((p) => !oldIds.has(p.id));
+          const savedPlayerId = typeof window !== 'undefined'
+            ? sessionStorage.getItem(`feto_player_id_${roomCode}`)
+            : null;
+          joined.forEach((p) => {
+            if (p.id !== savedPlayerId && p.id !== currentPlayer?.id) {
+              sound.playPlayerJoined();
+              showToast(`${p.username} joined the party!`);
+            }
+          });
+        }
+        return newRoom;
+      });
+
       if (newRoom.status === 'lobby') {
         setPrivateRole(null);
         setGameStateSync(null);
@@ -312,7 +332,7 @@ export default function RoomPage() {
 
     const handlePlayerJoined = (player: PlayerSummary) => {
       sound.playPlayerJoined();
-      showToast(`${player.username} joined the room!`);
+      showToast(`${player.username} joined the party!`);
     };
 
     const handlePlayerLeft = (data: { playerId: string; username: string; newHostId?: string }) => {
@@ -426,6 +446,7 @@ export default function RoomPage() {
       }
     };
 
+    socket.on('room:updated', handleRoomState);
     socket.on('room:state', handleRoomState);
     socket.on('room_state', handleRoomState);
     socket.on('room:player-joined', handlePlayerJoined);
@@ -446,6 +467,19 @@ export default function RoomPage() {
 
     // Initial Join / Reconnect Flow
     const initConnection = async () => {
+      // 1. Immediately fetch fresh room snapshot so UI displays instantly
+      try {
+        const initialRes = await fetch(`/api/rooms/${roomCode}`);
+        if (initialRes.ok) {
+          const initialJson = await initialRes.json();
+          if (initialJson.success && initialJson.room) {
+            setRoom((prev) => (!prev || (initialJson.room.updatedAt || 0) >= (prev.updatedAt || 0) ? initialJson.room : prev));
+          }
+        }
+      } catch {
+        // fallback to socket
+      }
+
       const reconnectToken = getReconnectToken(roomCode);
       const savedPlayerId = typeof window !== 'undefined'
         ? sessionStorage.getItem(`feto_player_id_${roomCode}`) || sessionStorage.getItem('feto_persistent_player_id')
@@ -463,7 +497,7 @@ export default function RoomPage() {
           if (me) setCurrentPlayer(me);
           setIsInitializing(false);
           return;
-        } catch (err) {
+        } catch {
           clearReconnectSession(roomCode);
         }
       }
@@ -489,7 +523,7 @@ export default function RoomPage() {
           if (me) setCurrentPlayer(me);
           setIsInitializing(false);
           return;
-        } catch (err: any) {
+        } catch {
           setShowJoinModal(true);
         }
       } else {
@@ -501,7 +535,42 @@ export default function RoomPage() {
 
     initConnection();
 
+    // 2.5-second background state sync fallback active in Lobby phase
+    const syncInterval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/rooms/${roomCode}`);
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && json.room) {
+            setRoom((prev) => {
+              if (!prev || (json.room.updatedAt || 0) > (prev.updatedAt || 0)) {
+                if (prev && prev.status === 'lobby') {
+                  const oldIds = new Set(prev.players.map((p) => p.id));
+                  const joined = json.room.players.filter((p: any) => !oldIds.has(p.id));
+                  const savedPid = typeof window !== 'undefined'
+                    ? sessionStorage.getItem(`feto_player_id_${roomCode}`)
+                    : null;
+                  joined.forEach((p: any) => {
+                    if (p.id !== savedPid && p.id !== currentPlayer?.id) {
+                      sound.playPlayerJoined();
+                      showToast(`${p.username} joined the party!`);
+                    }
+                  });
+                }
+                return json.room;
+              }
+              return prev;
+            });
+          }
+        }
+      } catch {
+        // quiet fallback
+      }
+    }, 2500);
+
     return () => {
+      clearInterval(syncInterval);
+      socket.off('room:updated', handleRoomState);
       socket.off('room:state', handleRoomState);
       socket.off('room_state', handleRoomState);
       socket.off('room:player-joined', handlePlayerJoined);
@@ -568,13 +637,34 @@ export default function RoomPage() {
     }
   };
 
-  // Host Start Game
-  const handleStartGame = async () => {
+  // Host Start Game (with support for normal or Force Start)
+  const handleStartGame = async (force = false) => {
     sound.playClick();
     try {
-      await socketStartGame(isSoloDevMode);
+      await socketStartGame(isSoloDevMode, force);
     } catch (err: any) {
       showToast(`⚠️ ${err.message || 'Could not start game.'}`);
+    }
+  };
+
+  // Host Live In-Room Settings Save
+  const handleSaveSettings = async (newSettings: any) => {
+    try {
+      await handleGameAction('UPDATE_SETTINGS', newSettings);
+      showToast('Host updated room settings');
+    } catch (err: any) {
+      showToast(err.message || 'Failed to update settings.');
+      throw err;
+    }
+  };
+
+  // Host Live Playlist Queue Update
+  const handleUpdatePlaylist = async (newGames: GameMode[]) => {
+    try {
+      await socketSelectGames(newGames);
+      showToast(`Playlist updated with ${newGames.length} game${newGames.length > 1 ? 's' : ''}!`);
+    } catch (err: any) {
+      showToast(err.message || 'Failed to update playlist.');
     }
   };
 
@@ -926,7 +1016,7 @@ export default function RoomPage() {
             {/* 1. TOP HEADER: FETO GAMES | LOBBY (LEFT), WAITING FOR PLAYERS... (X/15) (RIGHT) */}
             <div className="glass-panel rounded-2xl px-3.5 sm:px-6 py-2.5 sm:py-3.5 mb-4 flex items-center justify-between border border-cyan-500/25 shadow-neon-cyan">
               <div className="flex items-center gap-2 sm:gap-3">
-                <NeonLogo size="nav" showSubtitle={false} />
+                <BrandLogo size="nav" showSubtitle={false} />
                 <span className="text-slate-600 font-bold hidden sm:inline">|</span>
                 <div className="px-2.5 py-1 rounded-xl bg-purple-950/60 border border-purple-500/40 text-[10px] sm:text-xs font-black uppercase tracking-widest text-purple-300 shadow-neon-purple">
                   LOBBY
@@ -999,8 +1089,23 @@ export default function RoomPage() {
                 )}
               </div>
 
-              {/* Action Controls: Copy Invite Link, Custom Cards, Sip Button, Sound Toggle, Leave Room */}
+              {/* Action Controls: Room Settings, Custom Cards, Sip Button, Sound Toggle, Leave Room */}
               <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 w-full sm:w-auto justify-end">
+                {/* LIVE IN-ROOM SETTINGS BUTTON */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    sound.playClick();
+                    setShowSettingsModal(true);
+                  }}
+                  className="px-3 py-2 rounded-xl bg-[#131822] hover:bg-[#1A2230] border border-cyan-400/50 text-cyan-300 text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-sm touch-manipulation"
+                  title="Live In-Room Settings Editor"
+                  aria-label="Room Settings"
+                >
+                  <Settings className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>⚙️ Settings</span>
+                </button>
+
                 {room.config.vibeMode === 'sip_edition' && (
                   <button
                     onClick={handleQuickTakeSip}
@@ -1052,6 +1157,16 @@ export default function RoomPage() {
                   <LogOut className="w-3.5 h-3.5" />
                 </button>
               </div>
+            </div>
+
+            {/* MULTI-GAME PLAYLIST SELECTION (QUEUE) */}
+            <div className="mb-5">
+              <GamePlaylistQueue
+                selectedGames={room.selectedGames || (room.config.selectedGames || [room.config.gameMode || 'who_is_imposter'])}
+                currentGameIndex={room.currentGameIndex || 0}
+                isHost={Boolean(isHost)}
+                onUpdatePlaylist={handleUpdatePlaylist}
+              />
             </div>
 
             {/* TEAM SQUAD SELECTOR (IF TEAM MODE ENABLED) */}
@@ -1186,13 +1301,12 @@ export default function RoomPage() {
                     <Users className="w-3.5 h-3.5 text-cyan-400" />
                     <span>Lobby Slots (5 × 3 Grid)</span>
                   </span>
-                  <span className="text-[11px] text-cyan-300/80 font-bold">
-                    {activePlayers.length < 2
-                      ? 'Waiting for at least 2 players...'
-                      : allReady
-                      ? 'All players ready to play!'
-                      : 'Waiting for players to ready up...'}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-emerald-950/80 border border-emerald-500/60 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.3)]">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      {activePlayers.filter((p) => p.isReady).length} / {activePlayers.length} READY
+                    </span>
+                  </div>
                 </div>
 
                 {/* 5x3 STRUCTURED 15-SLOT GRID */}
@@ -1213,7 +1327,7 @@ export default function RoomPage() {
                           animate={{ scale: 1, opacity: 1 }}
                           className={`relative glass-panel rounded-2xl p-2.5 sm:p-3 flex flex-col items-center justify-between text-center transition-all min-h-[145px] sm:min-h-[165px] border ${
                             player.isReady
-                              ? 'border-emerald-500/60 shadow-neon-green bg-emerald-950/20'
+                              ? 'border-emerald-500 bg-emerald-950/40 shadow-[0_0_20px_rgba(16,185,129,0.35)] ring-1 ring-emerald-400'
                               : isDisconnected
                               ? 'border-amber-500/60 bg-amber-950/20 shadow-neon-amber'
                               : 'border-feto-border bg-slate-900/60'
@@ -1227,12 +1341,12 @@ export default function RoomPage() {
                                 <span>{remainingGrace}s</span>
                               </div>
                             ) : player.isReady ? (
-                              <div className="w-full py-0.5 px-1 bg-emerald-950/80 border border-emerald-500/50 rounded-lg text-emerald-300 text-[9px] sm:text-[10px] font-black flex items-center justify-center gap-1 shadow-neon-green">
-                                <CheckCircle2 className="w-3 h-3 text-emerald-400 flex-shrink-0" />
-                                <span>READY</span>
+                              <div className="w-full py-0.5 px-1 bg-emerald-900/90 border border-emerald-400 rounded-lg text-emerald-200 text-[9px] sm:text-[10px] font-black flex items-center justify-center gap-1 shadow-[0_0_10px_rgba(16,185,129,0.5)]">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-300 flex-shrink-0" />
+                                <span>READY ✓</span>
                               </div>
                             ) : (
-                              <div className="w-full py-0.5 px-1 bg-amber-950/40 border border-amber-500/30 rounded-lg text-amber-400 text-[9px] sm:text-[10px] font-extrabold truncate">
+                              <div className="w-full py-0.5 px-1 bg-slate-900/80 border border-slate-700/60 rounded-lg text-slate-400 text-[9px] sm:text-[10px] font-extrabold truncate">
                                 NOT READY
                               </div>
                             )}
@@ -1824,54 +1938,70 @@ export default function RoomPage() {
               </div>
             </div>
 
-            {/* Action Buttons: Ready Toggle + Wide Start Game Play Button */}
+            {/* Action Buttons: Ready Toggle + Host Start / Force Start Buttons */}
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto justify-end">
               {/* Ready Status Toggle */}
               <button
                 onClick={handleToggleReady}
-                className={`w-full sm:w-auto px-5 sm:px-6 py-3.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 touch-target ${
+                className={`w-full sm:w-auto px-6 py-3.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 touch-target ${
                   currentPlayer?.isReady
-                    ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600'
-                    : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-neon-green'
+                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.4)] ring-2 ring-emerald-500/50'
+                    : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600'
                 }`}
               >
                 {currentPlayer?.isReady ? (
                   <>
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span>✓ I'M READY</span>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-200" />
+                    <span>READY ✓ (CLICK TO UNREADY)</span>
                   </>
                 ) : (
                   <>
-                    <Zap className="w-4 h-4 text-emerald-300" />
-                    <span>READY UP!</span>
+                    <Zap className="w-4 h-4 text-cyan-400" />
+                    <span>I'M READY!</span>
                   </>
                 )}
               </button>
 
-              {/* Host Start Game Button: WIDE BRIGHT GRADIENT CYAN-TO-PURPLE GLOWING BUTTON */}
+              {/* Host Controls */}
               {isHost && (
-                <button
-                  onClick={handleStartGame}
-                  disabled={!allReady}
-                  title={
-                    !allReady
-                      ? activePlayers.length < minRequired
-                        ? isSoloDevMode
-                          ? 'At least 1 player required'
-                          : 'At least 2 players required (or toggle Solo Test Mode in Game Settings)'
-                        : 'All players must click READY before starting'
-                      : 'Launch Match'
-                  }
-                  className={`w-full sm:w-auto min-w-[240px] px-8 py-3.5 rounded-2xl font-black text-xs sm:text-sm md:text-base uppercase tracking-wider transition-all flex items-center justify-center gap-2 touch-target ${
-                    allReady
-                      ? 'btn-glow-start cursor-pointer'
-                      : 'bg-slate-800/80 border border-slate-700 text-slate-500 cursor-not-allowed opacity-60'
-                  }`}
-                  id="btn-start-game"
-                >
-                  <Play className="w-5 h-5 fill-current" />
-                  <span>START GAME ▶ PLAY</span>
-                </button>
+                <>
+                  {/* Force Start Button: Active whenever 2+ players are present, even if some aren't ready */}
+                  {activePlayers.length >= 2 && !allReady && (
+                    <button
+                      type="button"
+                      onClick={() => handleStartGame(true)}
+                      className="w-full sm:w-auto px-5 sm:px-6 py-3.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 touch-target bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-[0_0_20px_rgba(245,158,11,0.4)] hover:scale-[1.02] active:scale-[0.98]"
+                      title="Force start match with currently connected players"
+                    >
+                      <Zap className="w-4 h-4 fill-slate-950" />
+                      <span>⚡ FORCE START</span>
+                    </button>
+                  )}
+
+                  {/* Primary Start Game Button */}
+                  <button
+                    onClick={() => handleStartGame(false)}
+                    disabled={!allReady}
+                    title={
+                      !allReady
+                        ? activePlayers.length < minRequired
+                          ? isSoloDevMode
+                            ? 'At least 1 player required'
+                            : 'At least 2 players required'
+                          : 'All players must click READY (or use Force Start)'
+                        : 'Launch Match'
+                    }
+                    className={`w-full sm:w-auto min-w-[220px] px-8 py-3.5 rounded-2xl font-black text-xs sm:text-sm md:text-base uppercase tracking-wider transition-all flex items-center justify-center gap-2 touch-target ${
+                      allReady
+                        ? 'btn-glow-start cursor-pointer'
+                        : 'bg-slate-800/80 border border-slate-700 text-slate-500 cursor-not-allowed opacity-60'
+                    }`}
+                    id="btn-start-game"
+                  >
+                    <Play className="w-5 h-5 fill-current" />
+                    <span>START GAME ▶ PLAY</span>
+                  </button>
+                </>
               )}
             </div>
           </div>
@@ -1953,13 +2083,16 @@ export default function RoomPage() {
                           sound.playClick();
                           setJoinAvatar(key);
                         }}
-                        className={`p-2 rounded-xl border flex items-center justify-center text-2xl transition-all ${
+                        aria-label={`Select avatar ${NEON_AVATARS[key].label || key}`}
+                        className={`min-w-[44px] min-h-[44px] p-2 rounded-xl border flex items-center justify-center text-2xl transition-all select-none touch-manipulation font-emoji ${
                           joinAvatar === key
-                            ? 'border-cyan-400 bg-cyan-950/40 scale-105 shadow-neon-cyan'
-                            : 'border-feto-border bg-feto-card'
+                            ? 'border-cyan-400 bg-cyan-950/40 scale-105 shadow-neon-cyan ring-1 ring-cyan-400'
+                            : 'border-feto-border bg-feto-card hover:border-slate-600'
                         }`}
                       >
-                        {NEON_AVATARS[key].emoji}
+                        <span role="img" aria-label={NEON_AVATARS[key].label || key} className="font-emoji">
+                          {NEON_AVATARS[key].emoji}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -2124,6 +2257,15 @@ export default function RoomPage() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* LIVE IN-ROOM SETTINGS MODAL */}
+      <RoomSettingsModal
+        isOpen={showSettingsModal}
+        onClose={() => setShowSettingsModal(false)}
+        room={room}
+        isHost={Boolean(isHost)}
+        onSave={handleSaveSettings}
+      />
 
       {/* TACTICAL SABOTAGE POWER-UP DRAWER (DURING ACTIVE MATCHES) */}
       {room.status === 'in_game' && currentPlayer && (

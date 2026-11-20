@@ -6,7 +6,7 @@ import { getSocket, socketSendReaction } from '@/lib/socket';
 import { sound } from '@/lib/sound';
 import { Sparkles } from 'lucide-react';
 
-const REACTION_EMOJIS = ['🍅', '😂', '🔥', '💀', '🥤'];
+const REACTION_EMOJIS = ['🍅', '😂', '🔥', '💀', '🥤', '👏'];
 
 interface FloatingParticle {
   id: string;
@@ -95,8 +95,11 @@ export function FloatingReactions() {
 
   return (
     <>
-      {/* 1. TOMATO SPLAT SCREEN IMPACT OVERLAY */}
-      <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+      {/* 1. TOMATO SPLAT SCREEN IMPACT OVERLAY (GPU-Accelerated) */}
+      <div
+        className="fixed inset-0 pointer-events-none z-50 overflow-hidden"
+        style={{ transform: 'translate3d(0, 0, 0)', willChange: 'transform, opacity' }}
+      >
         <AnimatePresence>
           {splats.map((splat) => (
             <motion.div
@@ -111,9 +114,9 @@ export function FloatingReactions() {
               style={{
                 left: `${splat.x}%`,
                 top: `${splat.y}%`,
-                transform: `translate(-50%, -50%) rotate(${splat.rotation}deg)`
+                transform: `translate3d(-50%, -50%, 0) rotate(${splat.rotation}deg)`
               }}
-              className="absolute select-none pointer-events-none"
+              className="absolute select-none pointer-events-none font-emoji"
             >
               <div className="relative flex items-center justify-center">
                 {/* Wet Splatter SVG */}
@@ -145,7 +148,7 @@ export function FloatingReactions() {
                 </svg>
 
                 {/* Crushed Center Tomato with juicy splatter */}
-                <span className="absolute text-3xl filter drop-shadow-[0_0_8px_rgba(0,0,0,0.8)]">
+                <span className="absolute text-3xl filter drop-shadow-[0_0_8px_rgba(0,0,0,0.8)] font-emoji">
                   🍅
                 </span>
               </div>
@@ -154,8 +157,11 @@ export function FloatingReactions() {
         </AnimatePresence>
       </div>
 
-      {/* 2. FLOATING RISING EMOJI PARTICLES OVERLAY */}
-      <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+      {/* 2. FLOATING RISING EMOJI PARTICLES OVERLAY (GPU-Accelerated translate3d) */}
+      <div
+        className="fixed inset-0 pointer-events-none z-50 overflow-hidden"
+        style={{ transform: 'translate3d(0, 0, 0)', willChange: 'transform, opacity' }}
+      >
         <AnimatePresence>
           {particles.map((p) => (
             <motion.div
@@ -170,12 +176,12 @@ export function FloatingReactions() {
               exit={{ opacity: 0 }}
               transition={{ duration: 2.8, ease: 'easeOut' }}
               style={{ left: `${p.leftPercent}%` }}
-              className="absolute flex flex-col items-center select-none"
+              className="absolute flex flex-col items-center select-none font-emoji"
             >
-              <span className="text-4xl md:text-5xl filter drop-shadow-[0_0_12px_rgba(255,255,255,0.7)] animate-bounce">
+              <span className="text-4xl md:text-5xl filter drop-shadow-[0_0_12px_rgba(255,255,255,0.7)] animate-bounce font-emoji">
                 {p.emoji}
               </span>
-              <span className="text-[10px] font-bold text-white/80 bg-black/60 px-2 py-0.5 rounded-full mt-1 border border-white/20 backdrop-blur-sm shadow-sm truncate max-w-[90px]">
+              <span className="text-[10px] font-bold text-white/90 bg-slate-900/90 px-2 py-0.5 rounded-full mt-1 border border-white/20 backdrop-blur-sm shadow-sm truncate max-w-[90px]">
                 {p.username}
               </span>
             </motion.div>
@@ -183,7 +189,7 @@ export function FloatingReactions() {
         </AnimatePresence>
       </div>
 
-      {/* 3. REACTION BAR ON SCREEN (MOBILE & DESKTOP FRIENDLY) */}
+      {/* 3. REACTION BAR ON SCREEN (ACCESSIBLE 44px+ MOBILE TOUCH TARGETS) */}
       <div className="fixed bottom-3 sm:bottom-4 right-3 sm:right-4 z-40 flex items-center gap-1.5 safe-bottom safe-right">
         <AnimatePresence>
           {isExpanded && (
@@ -191,14 +197,14 @@ export function FloatingReactions() {
               initial={{ opacity: 0, scale: 0.8, x: 20 }}
               animate={{ opacity: 1, scale: 1, x: 0 }}
               exit={{ opacity: 0, scale: 0.8, x: 20 }}
-              className="flex items-center gap-1 sm:gap-1.5 p-1 sm:p-1.5 bg-slate-950/85 backdrop-blur-md border border-cyan-500/30 rounded-2xl shadow-neon-cyan"
+              className="flex items-center gap-1 sm:gap-1.5 p-1 sm:p-1.5 bg-[#131822]/95 backdrop-blur-md border border-[rgba(255,255,255,0.12)] rounded-2xl shadow-2xl"
             >
               {REACTION_EMOJIS.map((emoji) => (
                 <button
                   key={emoji}
                   onClick={() => handleSendReaction(emoji)}
                   disabled={cooldown}
-                  className={`w-10 h-10 md:w-11 md:h-11 flex items-center justify-center text-xl md:text-2xl rounded-xl transition-all touch-target ${
+                  className={`min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center text-2xl rounded-xl transition-all select-none font-emoji touch-manipulation ${
                     cooldown
                       ? 'opacity-40 cursor-not-allowed scale-90'
                       : 'hover:scale-125 hover:bg-white/10 active:scale-95'
@@ -206,7 +212,7 @@ export function FloatingReactions() {
                   title={cooldown ? '1s Cooldown' : `Send ${emoji}`}
                   aria-label={`Send reaction ${emoji}`}
                 >
-                  {emoji}
+                  <span className="font-emoji">{emoji}</span>
                 </button>
               ))}
             </motion.div>
@@ -215,7 +221,7 @@ export function FloatingReactions() {
 
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className={`min-h-[44px] min-w-[44px] p-2.5 rounded-2xl bg-slate-900/90 border border-cyan-500/40 text-cyan-400 hover:text-white hover:border-cyan-400 transition-all shadow-neon-cyan flex items-center justify-center touch-target ${
+          className={`min-h-[44px] min-w-[44px] w-11 h-11 p-2.5 rounded-2xl bg-[#131822] border border-cyan-400/40 text-cyan-400 hover:text-white hover:border-cyan-400 transition-all shadow-lg flex items-center justify-center select-none touch-manipulation ${
             cooldown ? 'animate-pulse' : ''
           }`}
           title={isExpanded ? 'Hide Reactions' : 'Show Reactions'}

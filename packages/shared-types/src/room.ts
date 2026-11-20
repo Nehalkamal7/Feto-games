@@ -26,7 +26,7 @@ export type GameMode =
   | 'secret_imposter'
   | 'speed_draw';
 
-export type VibeMode = 'chill' | 'chaotic' | 'sip_edition';
+export type VibeMode = 'chill' | 'chaotic' | 'silly' | 'sip_edition';
 
 export interface CustomCardItem {
   id: string;
@@ -37,13 +37,16 @@ export interface CustomCardItem {
 }
 
 export interface RoomConfig {
+  roomName?: string;
   maxPlayers: number; // 2 - 15
   isPrivate: boolean;
   hasPin: boolean;
   pinHash?: string; // Stored securely on server
   roundDurationSeconds: number; // 15 - 90 seconds
-  totalRounds: number; // 3 - 10
+  totalRounds: number; // 1 - 10
   gameMode: GameMode;
+  selectedGames?: GameMode[]; // Multi-game party playlist queue
+  currentGameIndex?: number; // Current index in selectedGames
   vibeMode?: VibeMode;
   customDeckId?: string | null;
   allowSpectators: boolean;
@@ -57,9 +60,12 @@ export type PublicRoomConfig = Omit<RoomConfig, 'pinHash'>;
  */
 export interface RoomState {
   code: string; // e.g. "FG-8492"
+  roomName?: string; // Optional custom room title
   hostId: string; // ID of current host player
   status: RoomStatus;
   config: RoomConfig;
+  selectedGames?: GameMode[]; // Live game playlist
+  currentGameIndex?: number;
   players: Record<string, Player>; // Map of playerId -> Player
   spectators: Record<string, Player>; // Map of spectatorId -> Player
   createdAt: number;
@@ -76,9 +82,12 @@ export interface RoomState {
  */
 export interface PublicRoomState {
   code: string;
+  roomName?: string;
   hostId: string;
   status: RoomStatus;
   config: PublicRoomConfig;
+  selectedGames?: GameMode[];
+  currentGameIndex?: number;
   players: PlayerSummary[];
   spectators: PlayerSummary[];
   playerCount: number;

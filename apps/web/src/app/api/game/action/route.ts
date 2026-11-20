@@ -46,11 +46,41 @@ export async function POST(req: NextRequest) {
 
       player.isReady = payload.isReady !== undefined ? Boolean(payload.isReady) : !player.isReady;
       room.updatedAt = Date.now();
-      await saveRoomState(room);
+      await saveRoomState(room, 7200);
 
       const publicRoom = sanitizeRoomState(room);
-      await publishToRoom(roomCode, 'room:state', publicRoom);
       await publishToRoom(roomCode, 'room:updated', publicRoom);
+      await publishToRoom(roomCode, 'room:state', publicRoom);
+      await publishToRoom(roomCode, 'room_state', publicRoom);
+
+      return NextResponse.json({ success: true, room: publicRoom });
+    }
+
+    if (actionType === 'SELECT_GAMES') {
+      if (room.hostId !== playerId) {
+        return NextResponse.json({ success: false, error: { message: 'Only host can select game playlist.' } }, { status: 403 });
+      }
+
+      if (room.status !== 'lobby') {
+        return NextResponse.json({ success: false, error: { message: 'Cannot change games while match is active.' } }, { status: 400 });
+      }
+
+      const selectedGames = Array.isArray(payload.selectedGames) ? payload.selectedGames : [payload.gameMode || 'who_is_imposter'];
+      if (selectedGames.length === 0) {
+        return NextResponse.json({ success: false, error: { message: 'At least one game must be selected.' } }, { status: 400 });
+      }
+
+      room.selectedGames = selectedGames;
+      room.currentGameIndex = 0;
+      room.config.selectedGames = selectedGames;
+      room.config.gameMode = selectedGames[0];
+      room.updatedAt = Date.now();
+      await saveRoomState(room, 7200);
+
+      const publicRoom = sanitizeRoomState(room);
+      await publishToRoom(roomCode, 'room:updated', publicRoom);
+      await publishToRoom(roomCode, 'room:state', publicRoom);
+      await publishToRoom(roomCode, 'room_state', publicRoom);
 
       return NextResponse.json({ success: true, room: publicRoom });
     }
@@ -65,21 +95,44 @@ export async function POST(req: NextRequest) {
       }
 
       const settings = payload;
+      if (settings.roomName !== undefined) {
+        room.roomName = String(settings.roomName).trim().slice(0, 30);
+        room.config.roomName = room.roomName;
+      }
       if (settings.gameMode) room.config.gameMode = settings.gameMode;
+      if (settings.selectedGames && Array.isArray(settings.selectedGames)) {
+        room.selectedGames = settings.selectedGames;
+        room.config.selectedGames = settings.selectedGames;
+        if (settings.selectedGames[0]) room.config.gameMode = settings.selectedGames[0];
+      }
       if (settings.vibeMode) room.config.vibeMode = settings.vibeMode;
-      if (settings.roundDurationSeconds) room.config.roundDurationSeconds = Math.max(10, Math.min(120, settings.roundDurationSeconds));
-      if (settings.totalRounds) room.config.totalRounds = Math.max(1, Math.min(10, settings.totalRounds));
+      if (settings.roundDurationSeconds) room.config.roundDurationSeconds = Math.max(10, Math.min(180, settings.roundDurationSeconds));
+      if (settings.totalRounds) room.config.totalRounds = Math.max(1, Math.min(15, settings.totalRounds));
+      if (settings.maxPlayers) room.config.maxPlayers = Math.max(2, Math.min(15, settings.maxPlayers));
       if (settings.isTeamMode !== undefined) room.config.isTeamMode = Boolean(settings.isTeamMode);
       if (settings.allowSpectators !== undefined) room.config.allowSpectators = Boolean(settings.allowSpectators);
+      if (settings.isPrivate !== undefined) room.config.isPrivate = Boolean(settings.isPrivate);
+      if (settings.pin !== undefined) {
+        const pinStr = String(settings.pin).trim();
+        if (pinStr) {
+          room.config.hasPin = true;
+          room.config.pinHash = pinStr;
+        } else {
+          room.config.hasPin = false;
+          room.config.pinHash = undefined;
+        }
+      }
       if (settings.customDeckId !== undefined) room.config.customDeckId = settings.customDeckId;
+      if (settings.isSoloDevMode !== undefined) (room.config as any).isSoloDevMode = Boolean(settings.isSoloDevMode);
 
       room.updatedAt = Date.now();
-      await saveRoomState(room);
+      await saveRoomState(room, 7200);
 
       const publicRoom = sanitizeRoomState(room);
       await publishToRoom(roomCode, 'lobby:settings-updated', publicRoom.config);
-      await publishToRoom(roomCode, 'room:state', publicRoom);
       await publishToRoom(roomCode, 'room:updated', publicRoom);
+      await publishToRoom(roomCode, 'room:state', publicRoom);
+      await publishToRoom(roomCode, 'room_state', publicRoom);
 
       return NextResponse.json({ success: true, room: publicRoom });
     }
@@ -94,10 +147,12 @@ export async function POST(req: NextRequest) {
       if (team === 'red' || team === 'blue') {
         player.team = team;
         room.updatedAt = Date.now();
-        await saveRoomState(room);
+        await saveRoomState(room, 7200);
 
         const publicRoom = sanitizeRoomState(room);
+        await publishToRoom(roomCode, 'room:updated', publicRoom);
         await publishToRoom(roomCode, 'room:state', publicRoom);
+        await publishToRoom(roomCode, 'room_state', publicRoom);
         return NextResponse.json({ success: true, room: publicRoom });
       }
 
@@ -119,7 +174,7 @@ export async function POST(req: NextRequest) {
       delete room.spectators[targetPlayerId];
 
       room.updatedAt = Date.now();
-      await saveRoomState(room);
+      await saveRoomState(room, 7200);
 
       // Notify kicked player privately
       await publishToPlayer(targetPlayerId, 'room:kicked', {
@@ -131,7 +186,9 @@ export async function POST(req: NextRequest) {
         playerId: targetPlayerId,
         username: target?.username || 'Player'
       });
+      await publishToRoom(roomCode, 'room:updated', publicRoom);
       await publishToRoom(roomCode, 'room:state', publicRoom);
+      await publishToRoom(roomCode, 'room_state', publicRoom);
 
       return NextResponse.json({ success: true, room: publicRoom });
     }
@@ -145,18 +202,37 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: false, error: { message: 'Game already in progress.' } }, { status: 400 });
       }
 
+      // Check for multi-game playlist initialization
+      if (room.selectedGames && room.selectedGames.length > 0) {
+        room.currentGameIndex = 0;
+        room.config.gameMode = room.selectedGames[0];
+      }
+
+      // Check player count (allow solo if force or solo test mode enabled)
+      const allowSolo = Boolean(payload.force) || Boolean((room.config as any).isSoloDevMode);
+      const activePlayers = Object.values(room.players || {}).filter(
+        (p) => p.connectionStatus === 'connected'
+      );
+
+      if (activePlayers.length < (allowSolo ? 1 : 2)) {
+        return NextResponse.json(
+          { success: false, error: { message: 'At least 2 players are required to start.' } },
+          { status: 400 }
+        );
+      }
+
       // Initialize game session
-      const result = initGameSession(room);
+      const result = initGameSession(room, allowSolo);
       if (result.error) {
         return NextResponse.json({ success: false, error: { message: result.error } }, { status: 400 });
       }
 
-      await saveRoomState(result.updatedRoom);
+      await saveRoomState(result.updatedRoom, 7200);
 
       // Broadcast countdown fanfare
       await publishToRoom(roomCode, 'game:starting', { countdownSeconds: 3 });
 
-      // Send private roles to individual player channels (so imposters/civilians cannot cheat via network inspect)
+      // Send private roles to individual player channels
       if (result.privateRoles) {
         for (const [pId, roleData] of Object.entries(result.privateRoles)) {
           await publishToPlayer(pId, 'game:private_role', roleData);
@@ -166,7 +242,9 @@ export async function POST(req: NextRequest) {
 
       // Sync public state to entire room
       const publicRoom = sanitizeRoomState(result.updatedRoom);
+      await publishToRoom(roomCode, 'room:updated', publicRoom);
       await publishToRoom(roomCode, 'room:state', publicRoom);
+      await publishToRoom(roomCode, 'room_state', publicRoom);
       await publishToRoom(roomCode, 'game:state_sync', {
         gameMode: room.config.gameMode,
         state: result.publicState
@@ -196,10 +274,12 @@ export async function POST(req: NextRequest) {
       }
 
       room.updatedAt = Date.now();
-      await saveRoomState(room);
+      await saveRoomState(room, 7200);
 
       const publicRoom = sanitizeRoomState(room);
+      await publishToRoom(roomCode, 'room:updated', publicRoom);
       await publishToRoom(roomCode, 'room:state', publicRoom);
+      await publishToRoom(roomCode, 'room_state', publicRoom);
 
       return NextResponse.json({ success: true, room: publicRoom });
     }
@@ -238,7 +318,7 @@ export async function POST(req: NextRequest) {
       }
 
       const result = resolveGamePhase(room);
-      await saveRoomState(result.updatedRoom);
+      await saveRoomState(result.updatedRoom, 7200);
 
       // Publish private roles if new round generated private roles
       if (result.privateRoles) {
@@ -249,7 +329,9 @@ export async function POST(req: NextRequest) {
       }
 
       const publicRoom = sanitizeRoomState(result.updatedRoom);
+      await publishToRoom(roomCode, 'room:updated', publicRoom);
       await publishToRoom(roomCode, 'room:state', publicRoom);
+      await publishToRoom(roomCode, 'room_state', publicRoom);
       await publishToRoom(roomCode, 'game:phase-change', {
         phase: result.updatedRoom.gameData?.phase || 'round_results',
         round: result.updatedRoom.currentRound,
@@ -284,7 +366,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: { message: actionResult.error } }, { status: 400 });
     }
 
-    await saveRoomState(actionResult.updatedRoom);
+    await saveRoomState(actionResult.updatedRoom, 7200);
 
     // If action triggered an explicit broadcast event (e.g. chat guess, word claim)
     if (actionResult.broadcastEvent) {
@@ -300,7 +382,9 @@ export async function POST(req: NextRequest) {
 
     // Sync public state to entire room
     const publicRoom = sanitizeRoomState(actionResult.updatedRoom);
+    await publishToRoom(roomCode, 'room:updated', publicRoom);
     await publishToRoom(roomCode, 'room:state', publicRoom);
+    await publishToRoom(roomCode, 'room_state', publicRoom);
     await publishToRoom(roomCode, 'game:state_sync', {
       gameMode: room.config.gameMode,
       state: actionResult.publicState

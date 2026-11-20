@@ -1,12 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --font-outfit: 'Outfit', sans-serif;
-  --font-inter: 'Inter', sans-serif;
+  --font-heading: 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  
+  /* Authentic Studio Palette */
+  --canvas-bg: #0B0E14;
+  --surface-card: #131822;
+  --surface-card-hover: #19202E;
+  --surface-border: rgba(255, 255, 255, 0.08);
+  --cyan-primary: #22D3EE;
+  --cyan-primary-hover: #06B6D4;
+  --emerald-ready: #10B981;
+  --emerald-ready-bg: rgba(16, 185, 129, 0.12);
+  --amber-timer: #F59E0B;
+  --coral-alert: #FB7185;
+  
   --sat: env(safe-area-inset-top, 0px);
   --sab: env(safe-area-inset-bottom, 0px);
   --sal: env(safe-area-inset-left, 0px);
@@ -21,15 +36,14 @@ html {
 }
 
 body {
-  font-family: var(--font-inter);
-  background-color: #090B16;
-  color: #f1f5f9;
+  font-family: var(--font-body);
+  background-color: var(--canvas-bg);
+  color: #F8FAFC;
   overflow-x: hidden;
   background-image: 
-    radial-gradient(circle at 20% 15%, rgba(168, 85, 247, 0.18) 0%, transparent 45%),
-    radial-gradient(circle at 80% 25%, rgba(0, 240, 255, 0.16) 0%, transparent 45%),
-    radial-gradient(circle at 50% 75%, rgba(255, 0, 122, 0.10) 0%, transparent 55%),
-    radial-gradient(circle at 85% 85%, rgba(251, 191, 36, 0.08) 0%, transparent 40%);
+    radial-gradient(circle at 15% 10%, rgba(34, 211, 238, 0.07) 0%, transparent 45%),
+    radial-gradient(circle at 85% 15%, rgba(139, 92, 246, 0.06) 0%, transparent 45%),
+    radial-gradient(circle at 50% 85%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
   background-attachment: fixed;
   min-height: 100dvh;
   height: 100%;
@@ -37,8 +51,17 @@ body {
   padding-bottom: var(--sab);
 }
 
+/* Explicit cross-platform emoji font stack */
+.font-emoji, [data-emoji], .emoji-target {
+  font-family: var(--font-emoji) !important;
+}
+
+.font-mono-code {
+  font-family: var(--font-mono);
+}
+
 h1, h2, h3, h4, h5, h6, .font-heading {
-  font-family: var(--font-outfit);
+  font-family: var(--font-heading);
 }
 
 /* Safe Area Inset Utility Classes */

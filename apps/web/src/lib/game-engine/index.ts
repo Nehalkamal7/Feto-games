@@ -54,6 +54,16 @@ export function initGameSession(room: RoomState, allowSolo = false): GameEngineR
     };
   }
 
+  // Multi-game playlist synchronization
+  if (Array.isArray(room.selectedGames) && room.selectedGames.length > 0) {
+    if (typeof room.currentGameIndex !== 'number' || room.currentGameIndex < 0) {
+      room.currentGameIndex = 0;
+    }
+    if (room.selectedGames[room.currentGameIndex]) {
+      room.config.gameMode = room.selectedGames[room.currentGameIndex];
+    }
+  }
+
   const mode = room.config.gameMode;
   room.status = 'in_game';
   if (!room.currentRound) room.currentRound = 1;
@@ -1107,15 +1117,33 @@ export function handleGameAction(
     case 'NEXT_ROUND': {
       if (!player?.isHost) return { updatedRoom: room, publicState: getPublicGameState(room), error: 'Only host can advance round.' };
       if (room.currentRound >= room.config.totalRounds) {
-        room.status = 'game_over';
-        room.gameData = { ...room.gameData, awards: generatePartyAwards(room) };
-        return { updatedRoom: room, publicState: getPublicGameState(room) };
+        return advanceOrGameOver(room);
       }
       room.currentRound += 1;
       return initGameSession(room);
     }
   }
 
+  return { updatedRoom: room, publicState: getPublicGameState(room) };
+}
+
+// --- Multi-Game Playlist Progression or Match Finale ---
+function advanceOrGameOver(room: RoomState): GameEngineResult {
+  if (
+    Array.isArray(room.selectedGames) &&
+    room.selectedGames.length > 1 &&
+    typeof room.currentGameIndex === 'number' &&
+    room.currentGameIndex + 1 < room.selectedGames.length
+  ) {
+    room.currentGameIndex += 1;
+    const nextGameMode = room.selectedGames[room.currentGameIndex];
+    room.config.gameMode = nextGameMode;
+    room.currentRound = 1;
+    return initGameSession(room, Boolean((room.config as any).isSoloDevMode));
+  }
+
+  room.status = 'game_over';
+  room.gameData = { ...(room.gameData || {}), awards: generatePartyAwards(room) };
   return { updatedRoom: room, publicState: getPublicGameState(room) };
 }
 
@@ -1141,8 +1169,7 @@ export function resolveGamePhase(room: RoomState): GameEngineResult {
         g.revealedWord = g.secretWord;
       } else if (g.phase === 'round_result') {
         if (room.currentRound >= room.config.totalRounds) {
-          room.status = 'game_over';
-          room.gameData.awards = generatePartyAwards(room);
+          return advanceOrGameOver(room);
         } else {
           room.currentRound += 1;
           return initImposterGame(room, Object.values(room.players));
@@ -1157,8 +1184,7 @@ export function resolveGamePhase(room: RoomState): GameEngineResult {
         g.phaseEndsAt = Date.now() + 6000;
       } else if (g.phase === 'round_result') {
         if (room.currentRound >= room.config.totalRounds) {
-          room.status = 'game_over';
-          room.gameData.awards = generatePartyAwards(room);
+          return advanceOrGameOver(room);
         } else {
           room.currentRound += 1;
           return initDrawAndGuessGame(room, Object.values(room.players));
@@ -1174,8 +1200,7 @@ export function resolveGamePhase(room: RoomState): GameEngineResult {
       } else if (g.phase === 'reveal') {
         const qIdx = (g.questionIndex || 0) + 1;
         if (qIdx >= (g.questions?.length || room.config.totalRounds || 5)) {
-          room.status = 'game_over';
-          room.gameData.awards = generatePartyAwards(room);
+          return advanceOrGameOver(room);
         } else {
           g.questionIndex = qIdx;
           g.currentQuestion = g.questions[qIdx];
@@ -1194,8 +1219,7 @@ export function resolveGamePhase(room: RoomState): GameEngineResult {
         g.phaseEndsAt = Date.now() + 6000;
       } else if (g.phase === 'round_results') {
         if (room.currentRound >= room.config.totalRounds) {
-          room.status = 'game_over';
-          room.gameData.awards = generatePartyAwards(room);
+          return advanceOrGameOver(room);
         } else {
           room.currentRound += 1;
           return initWordBattleGame(room, Object.values(room.players));
@@ -1216,8 +1240,7 @@ export function resolveGamePhase(room: RoomState): GameEngineResult {
         g.phaseEndsAt = Date.now() + 6000;
       } else if (g.phase === 'round_results') {
         if (room.currentRound >= room.config.totalRounds) {
-          room.status = 'game_over';
-          room.gameData.awards = generatePartyAwards(room);
+          return advanceOrGameOver(room);
         } else {
           room.currentRound += 1;
           return initTruthOrDareGame(room, Object.values(room.players));
@@ -1232,8 +1255,7 @@ export function resolveGamePhase(room: RoomState): GameEngineResult {
         g.phaseEndsAt = Date.now() + 7000;
       } else if (g.phase === 'reveal') {
         if (room.currentRound >= room.config.totalRounds) {
-          room.status = 'game_over';
-          room.gameData.awards = generatePartyAwards(room);
+          return advanceOrGameOver(room);
         } else {
           room.currentRound += 1;
           return initNeverHaveIEverGame(room, Object.values(room.players));
@@ -1253,8 +1275,7 @@ export function resolveGamePhase(room: RoomState): GameEngineResult {
         g.phaseEndsAt = Date.now() + 6000;
       } else if (g.phase === 'round_results') {
         if (room.currentRound >= room.config.totalRounds) {
-          room.status = 'game_over';
-          room.gameData.awards = generatePartyAwards(room);
+          return advanceOrGameOver(room);
         } else {
           room.currentRound += 1;
           return initMostLikelyToGame(room, Object.values(room.players));
@@ -1277,8 +1298,7 @@ export function resolveGamePhase(room: RoomState): GameEngineResult {
         g.phaseEndsAt = Date.now() + 6000;
       } else if (g.phase === 'round_results') {
         if (room.currentRound >= room.config.totalRounds) {
-          room.status = 'game_over';
-          room.gameData.awards = generatePartyAwards(room);
+          return advanceOrGameOver(room);
         } else {
           room.currentRound += 1;
           return initSipOrSpillGame(room, Object.values(room.players));
@@ -1300,8 +1320,7 @@ export function resolveGamePhase(room: RoomState): GameEngineResult {
         g.phaseEndsAt = Date.now() + 6000;
       } else if (g.phase === 'round_results') {
         if (room.currentRound >= room.config.totalRounds) {
-          room.status = 'game_over';
-          room.gameData.awards = generatePartyAwards(room);
+          return advanceOrGameOver(room);
         } else {
           room.currentRound += 1;
           return initSillyRouletteGame(room, Object.values(room.players));
@@ -1339,8 +1358,7 @@ export function resolveGamePhase(room: RoomState): GameEngineResult {
         g.phaseEndsAt = Date.now() + 6000;
       } else if (g.phase === 'round_results') {
         if (room.currentRound >= room.config.totalRounds) {
-          room.status = 'game_over';
-          room.gameData.awards = generatePartyAwards(room);
+          return advanceOrGameOver(room);
         } else {
           room.currentRound += 1;
           return initHotPotatoGame(room, Object.values(room.players));

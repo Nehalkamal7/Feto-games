@@ -49,7 +49,43 @@ export function useRoomRealtime({
   const isResolvingRef = useRef(false);
   const lastResolvedPhaseKeyRef = useRef<string>('');
 
-  // 1. Refresh current player reference when room updates
+  // 1. Immediate fetch on mount & helper for refreshing state
+  const fetchLatestRoom = useCallback(async () => {
+    if (!normalizedCode) return;
+    try {
+      const res = await fetch(`/api/rooms/${normalizedCode}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.room) {
+          setRoom((prev) => {
+            if (!prev || (json.room.updatedAt || 0) >= (prev.updatedAt || 0)) {
+              return json.room;
+            }
+            return prev;
+          });
+        }
+      }
+    } catch {
+      // quiet fallback
+    }
+  }, [normalizedCode]);
+
+  useEffect(() => {
+    fetchLatestRoom();
+  }, [fetchLatestRoom]);
+
+  // 2. Lightweight 2.5-second background state sync fallback active while in Lobby phase
+  useEffect(() => {
+    if (!normalizedCode || room?.status !== 'lobby') return;
+
+    const interval = setInterval(() => {
+      fetchLatestRoom();
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, [normalizedCode, room?.status, fetchLatestRoom]);
+
+  // 3. Refresh current player reference when room updates
   useEffect(() => {
     if (!room || !playerId) return;
 
@@ -65,7 +101,7 @@ export function useRoomRealtime({
     }
   }, [room, playerId]);
 
-  // 2. Synced Countdown Timer with server phaseEndsAt
+  // 4. Synced Countdown Timer with server phaseEndsAt
   useEffect(() => {
     const phaseEndsAt = gameState?.phaseEndsAt;
     if (!phaseEndsAt || room?.status !== 'in_game') {
@@ -110,7 +146,7 @@ export function useRoomRealtime({
     return () => clearInterval(timerInterval);
   }, [gameState?.phaseEndsAt, gameState?.phase, room?.status, room?.currentRound, room?.code, normalizedCode, playerId]);
 
-  // 3. Connect to Ably Realtime Channels (Public Room + Private Player)
+  // 5. Connect to Ably Realtime Channels (Public Room + Private Player)
   useEffect(() => {
     if (!normalizedCode) return;
 
@@ -130,6 +166,21 @@ export function useRoomRealtime({
     }
 
     setIsConnected(true);
+
+    // Connection state listeners: re-fetch room on connect/reconnect
+    const handleConnStateChange = (stateChange: any) => {
+      if (stateChange.current === 'connected' || stateChange.current === 'reconnected') {
+        setIsConnected(true);
+        fetchLatestRoom();
+      } else if (stateChange.current === 'disconnected' || stateChange.current === 'suspended') {
+        setIsConnected(false);
+      }
+    };
+    try {
+      ably.connection.on(handleConnStateChange);
+    } catch {
+      // ignore
+    }
 
     // --- Public Room Event Listeners ---
     const handleRoomState = (msg: any) => {
@@ -322,7 +373,7 @@ export function useRoomRealtime({
   );
 
   const startGame = useCallback(
-    async (isSoloDevMode = false) => {
+    async (isSoloDevMode = false, force = false) => {
       sound.playClick();
       const res = await fetch('/api/rooms/start', {
         method: 'POST',
@@ -330,7 +381,8 @@ export function useRoomRealtime({
         body: JSON.stringify({
           roomCode: normalizedCode,
           playerId,
-          isSoloDevMode
+          isSoloDevMode,
+          force
         })
       });
       const data = await res.json();
@@ -342,6 +394,21 @@ export function useRoomRealtime({
       return data;
     },
     [normalizedCode, playerId]
+  );
+
+  const forceStartGame = useCallback(
+    async () => {
+      return startGame(false, true);
+    },
+    [startGame]
+  );
+
+  const selectGames = useCallback(
+    async (selectedGames: GameMode[]) => {
+      sound.playClick();
+      await dispatchGameAction('SELECT_GAMES', { selectedGames });
+    },
+    [dispatchGameAction]
   );
 
   const leaveRoom = useCallback(async () => {
@@ -429,6 +496,7 @@ export function useRoomRealtime({
   return {
     room,
     setRoom,
+    fetchLatestRoom,
     currentPlayer,
     gameState,
     setGameState,
@@ -443,7 +511,9 @@ export function useRoomRealtime({
     dispatchGameAction,
     setReady,
     updateSettings,
+    selectGames,
     startGame,
+    forceStartGame,
     leaveRoom,
     selectTeam,
     kickPlayer,

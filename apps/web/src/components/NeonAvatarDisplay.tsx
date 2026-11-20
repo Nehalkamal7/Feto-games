@@ -42,7 +42,7 @@ export const NeonAvatarDisplay: React.FC<NeonAvatarDisplayProps> = ({
       }}
     >
       {/* Avatar Emoji / Graphic */}
-      <span className="select-none transform hover:scale-110 transition-transform">
+      <span className="select-none transform hover:scale-110 transition-transform font-emoji" role="img" aria-label={meta.label || 'Avatar'}>
         {meta.emoji}
       </span>
 

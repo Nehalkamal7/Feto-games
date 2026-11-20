@@ -231,7 +231,7 @@ export async function socketKickPlayer(dto: KickPlayerDTO): Promise<void> {
   if (!json.success) throw new Error(json.error?.message || 'Failed to kick player');
 }
 
-export async function socketStartGame(isSoloDevMode = false): Promise<void> {
+export async function socketStartGame(isSoloDevMode = false, force = false): Promise<void> {
   const roomCode = getActiveRoomCode();
   const playerId = getSavedPlayerId(roomCode) || getPersistentPlayerId();
   if (!playerId) return;
@@ -242,12 +242,33 @@ export async function socketStartGame(isSoloDevMode = false): Promise<void> {
     body: JSON.stringify({
       roomCode,
       playerId,
-      isSoloDevMode
+      isSoloDevMode,
+      force
     })
   });
 
   const json = await res.json();
   if (!json.success) throw new Error(json.error?.message || 'Failed to start game');
+}
+
+export async function socketSelectGames(selectedGames: GameMode[]): Promise<void> {
+  const roomCode = getActiveRoomCode();
+  const playerId = getSavedPlayerId(roomCode) || getPersistentPlayerId();
+  if (!playerId) return;
+
+  const res = await fetch('/api/game/action', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      roomCode,
+      playerId,
+      actionType: 'SELECT_GAMES',
+      payload: { selectedGames }
+    })
+  });
+
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error?.message || 'Failed to update playlist');
 }
 
 export async function socketLeaveRoom(): Promise<void> {
@@ -414,10 +435,14 @@ class AblySocketBridge {
     // Subscribe to all public events
     roomChannel.subscribe((msg: any) => {
       this.dispatch(msg.name, msg.data);
-      if (msg.name === 'room_state') {
+      if (
+        msg.name === 'room:updated' ||
+        msg.name === 'room_state' ||
+        msg.name === 'room:state' ||
+        msg.name === 'room_state_updated'
+      ) {
+        this.dispatch('room:updated', msg.data);
         this.dispatch('room:state', msg.data);
-      }
-      if (msg.name === 'room:state') {
         this.dispatch('room_state', msg.data);
       }
     });

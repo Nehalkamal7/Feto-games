@@ -16,6 +16,7 @@ export type NeonAvatarId =
 export interface NeonAvatarMetadata {
   id: NeonAvatarId;
   name: string;
+  label?: string;
   primaryColor: string;
   glowColor: string;
   emoji: string;
