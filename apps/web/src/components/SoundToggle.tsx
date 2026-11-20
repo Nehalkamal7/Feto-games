@@ -23,8 +23,8 @@ export function SoundToggle({ className = '' }: SoundToggleProps) {
   return (
     <button
       onClick={handleToggle}
-      className={`p-2 rounded-xl glass-panel border border-cyan-500/30 text-slate-300 hover:text-cyan-400 hover:border-cyan-400 transition-all shadow-sm ${
-        isMuted ? 'opacity-60 text-slate-500' : 'text-cyan-400 shadow-neon-cyan'
+      className={`p-2 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] hover:bg-[#FEC90E] transition-all active:translate-x-[1px] active:translate-y-[1px] ${
+        isMuted ? 'opacity-60 text-[#737373]' : 'text-[#010101]'
       } ${className}`}
       title={isMuted ? 'Unmute Sound Effects' : 'Mute Sound Effects'}
       aria-label="Toggle sound effects"

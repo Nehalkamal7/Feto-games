@@ -134,12 +134,12 @@ export function LeaderboardProfileModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#010101]/80 backdrop-blur-sm">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="w-full max-w-2xl glass-panel-neon rounded-3xl p-6 md:p-8 max-h-[90vh] overflow-y-auto relative"
+          className="w-full max-w-2xl bg-[#FFFFFF] border-3 border-[#010101] shadow-[8px_8px_0px_#010101] rounded-3xl p-6 md:p-8 max-h-[90vh] overflow-y-auto relative text-[#010101]"
         >
           {/* CLOSE BUTTON */}
           <button
@@ -147,26 +147,26 @@ export function LeaderboardProfileModal({
               sound.playClick();
               onClose();
             }}
-            className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+            className="absolute top-5 right-5 p-2 rounded-xl text-[#010101] bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101] transition-all font-black"
             aria-label="Close"
           >
             <X className="w-5 h-5" />
           </button>
 
           {/* TAB BUTTONS */}
-          <div className="flex gap-2 mb-6 border-b border-slate-800 pb-4">
+          <div className="flex gap-2 mb-6 border-b-2 border-[#010101]/10 pb-4">
             <button
               onClick={() => {
                 sound.playClick();
                 setActiveTab('leaderboard');
               }}
-              className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all ${
+              className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 border-2 border-[#010101] transition-all ${
                 activeTab === 'leaderboard'
-                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400 shadow-neon-cyan'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[#0B89FD] text-white shadow-[2px_2px_0px_#010101]'
+                  : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
               }`}
             >
-              <Trophy className="w-4 h-4" />
+              <Trophy className="w-4 h-4 text-[#FEC90E] fill-current" />
               <span>Global Leaderboard</span>
             </button>
 
@@ -175,60 +175,60 @@ export function LeaderboardProfileModal({
                 sound.playClick();
                 setActiveTab('profile');
               }}
-              className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all ${
+              className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 border-2 border-[#010101] transition-all ${
                 activeTab === 'profile'
-                  ? 'bg-feto-magenta/20 text-feto-magenta border border-feto-magenta shadow-neon-magenta'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[#FEC90E] text-[#010101] shadow-[2px_2px_0px_#010101]'
+                  : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
               }`}
             >
               <User className="w-4 h-4" />
-              <span>Player Profile & Badges</span>
+              <span>Player Profile &amp; Badges</span>
             </button>
           </div>
 
           {/* TAB 1: GLOBAL LEADERBOARD */}
           {activeTab === 'leaderboard' && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between text-xs text-slate-400 px-3 font-semibold">
-                <span>RANK & PLAYER</span>
+              <div className="flex items-center justify-between text-xs text-[#010101]/60 px-3 font-black">
+                <span>RANK &amp; PLAYER</span>
                 <div className="flex gap-6">
                   <span>WIN RATE</span>
                   <span>TOTAL SCORE</span>
                 </div>
               </div>
 
-              <div className="divide-y divide-slate-800 glass-panel rounded-2xl overflow-hidden">
+              <div className="space-y-2">
                 {leaderboard.map((entry) => (
                   <div
                     key={entry.id}
-                    className="p-3 flex items-center justify-between hover:bg-slate-800/40 transition-all"
+                    className="p-3 bg-[#F8F8F8] border-2 border-[#010101] rounded-2xl shadow-[2px_2px_0px_#010101] flex items-center justify-between"
                   >
                     <div className="flex items-center gap-3">
                       <span
                         className={`w-6 text-center font-black text-sm ${
                           entry.rank === 1
-                            ? 'text-yellow-400'
+                            ? 'text-[#FEC90E]'
                             : entry.rank === 2
-                            ? 'text-slate-300'
+                            ? 'text-[#0B89FD]'
                             : entry.rank === 3
-                            ? 'text-amber-500'
-                            : 'text-slate-500'
+                            ? 'text-[#FD3F01]'
+                            : 'text-[#010101]'
                         }`}
                       >
                         #{entry.rank}
                       </span>
-                      <NeonAvatarDisplay avatarId={entry.avatar} size="sm" />
+                      <NeonAvatarDisplay avatarId={entry.avatar} size="sm" showGlow={false} />
                       <div>
-                        <div className="font-bold text-sm text-white">{entry.username}</div>
-                        <div className="text-[10px] text-slate-400">
+                        <div className="font-black text-sm text-[#010101]">{entry.username}</div>
+                        <div className="text-[10px] text-[#010101]/60 font-bold">
                           {entry.gamesWon} wins / {entry.gamesPlayed} games
                         </div>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-6">
-                      <span className="text-xs font-bold text-cyan-300">{entry.winRate}%</span>
-                      <span className="font-mono font-black text-sm text-yellow-400 w-20 text-right">
+                      <span className="text-xs font-black text-[#0B89FD]">{entry.winRate}%</span>
+                      <span className="font-mono font-black text-sm text-[#010101] w-20 text-right">
                         {entry.points.toLocaleString()} pts
                       </span>
                     </div>
@@ -242,25 +242,25 @@ export function LeaderboardProfileModal({
           {activeTab === 'profile' && (
             <div className="space-y-6">
               {/* Profile Card */}
-              <div className="glass-panel p-6 rounded-2xl flex flex-col sm:flex-row items-center gap-6">
-                <NeonAvatarDisplay avatarId={currentAvatar} size="lg" showGlow />
+              <div className="bg-[#F8F8F8] border-2 border-[#010101] shadow-[4px_4px_0px_#010101] p-6 rounded-2xl flex flex-col sm:flex-row items-center gap-6">
+                <NeonAvatarDisplay avatarId={currentAvatar} size="lg" showGlow={false} />
                 <div className="flex-1 text-center sm:text-left">
-                  <h3 className="text-2xl font-black text-white">{currentUsername}</h3>
-                  <p className="text-xs text-cyan-300 uppercase tracking-wider font-semibold mb-3">
+                  <h3 className="text-2xl font-black text-[#010101]">{currentUsername}</h3>
+                  <p className="text-xs text-[#0B89FD] uppercase tracking-wider font-black mb-3">
                     Arcade Party Veteran
                   </p>
                   <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
-                      <div className="text-xs text-slate-400">Win Rate</div>
-                      <div className="text-base font-extrabold text-cyan-400">68%</div>
+                    <div className="bg-[#FFFFFF] p-2.5 rounded-xl border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
+                      <div className="text-xs text-[#010101]/60 font-black">Win Rate</div>
+                      <div className="text-base font-black text-[#0B89FD]">68%</div>
                     </div>
-                    <div className="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
-                      <div className="text-xs text-slate-400">Games</div>
-                      <div className="text-base font-extrabold text-white">24</div>
+                    <div className="bg-[#FFFFFF] p-2.5 rounded-xl border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
+                      <div className="text-xs text-[#010101]/60 font-black">Games</div>
+                      <div className="text-base font-black text-[#010101]">24</div>
                     </div>
-                    <div className="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
-                      <div className="text-xs text-slate-400">Total Score</div>
-                      <div className="text-base font-extrabold text-yellow-400">4,820</div>
+                    <div className="bg-[#FFFFFF] p-2.5 rounded-xl border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
+                      <div className="text-xs text-[#010101]/60 font-black">Total Score</div>
+                      <div className="text-base font-black text-[#FD3F01]">4,820</div>
                     </div>
                   </div>
                 </div>
@@ -268,8 +268,8 @@ export function LeaderboardProfileModal({
 
               {/* Unlockable Badges */}
               <div>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-3 flex items-center gap-2">
-                  <Award className="w-4 h-4 text-yellow-400" />
+                <h4 className="text-xs font-black uppercase tracking-wider text-[#010101] mb-3 flex items-center gap-2">
+                  <Award className="w-4 h-4 text-[#FEC90E]" />
                   <span>Unlockable Achievement Badges (3 / 6 Unlocked)</span>
                 </h4>
 
@@ -277,26 +277,26 @@ export function LeaderboardProfileModal({
                   {achievements.map((badge) => (
                     <div
                       key={badge.id}
-                      className={`p-3 rounded-2xl border flex items-center gap-3 transition-all ${
+                      className={`p-3 rounded-2xl border-2 border-[#010101] flex items-center gap-3 transition-all ${
                         badge.unlocked
-                          ? 'bg-slate-900/80 border-cyan-500/40 shadow-neon-cyan'
-                          : 'bg-slate-950/40 border-slate-800 opacity-60'
+                          ? 'bg-[#FFFFFF] shadow-[3px_3px_0px_#010101]'
+                          : 'bg-[#F8F8F8] opacity-60 shadow-[1px_1px_0px_#010101]'
                       }`}
                     >
-                      <div className="text-3xl p-2 rounded-xl bg-slate-800/80 border border-slate-700 flex-shrink-0">
+                      <div className="text-3xl p-2 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] flex-shrink-0 font-emoji">
                         {badge.icon}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <span className="font-bold text-xs text-white truncate">{badge.title}</span>
+                          <span className="font-black text-xs text-[#010101] truncate">{badge.title}</span>
                           {badge.unlocked ? (
-                            <CheckCircle2 className="w-3.5 h-3.5 text-green-400 flex-shrink-0" />
+                            <CheckCircle2 className="w-3.5 h-3.5 text-[#0B89FD] flex-shrink-0" />
                           ) : (
-                            <Lock className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
+                            <Lock className="w-3.5 h-3.5 text-[#010101]/40 flex-shrink-0" />
                           )}
                         </div>
-                        <p className="text-[11px] text-slate-400 truncate">{badge.description}</p>
-                        <div className="text-[10px] text-cyan-300 font-semibold mt-1">
+                        <p className="text-[11px] text-[#010101]/70 truncate font-medium">{badge.description}</p>
+                        <div className="text-[10px] text-[#0B89FD] font-black mt-1">
                           {badge.progress}
                         </div>
                       </div>

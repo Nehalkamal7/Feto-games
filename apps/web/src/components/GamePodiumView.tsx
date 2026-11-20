@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import {
   Trophy,
   Crown,
@@ -13,10 +13,7 @@ import {
   Shield,
   Share2,
   Check,
-  Wine,
-  Flame,
   Award,
-  Zap,
   Copy
 } from 'lucide-react';
 import { GameMode, PartyAward, PlayerSummary, PublicRoomState } from '@feto-games/shared-types';
@@ -115,14 +112,14 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
         angle: 60,
         spread: 55,
         origin: { x: 0, y: 0.7 },
-        colors: ['#00F0FF', '#A855F7', '#FFE600', '#FF007A']
+        colors: ['#0B89FD', '#FEC90E', '#FD3F01', '#010101']
       });
       confetti({
         particleCount: 4,
         angle: 120,
         spread: 55,
         origin: { x: 1, y: 0.7 },
-        colors: ['#00F0FF', '#A855F7', '#FFE600', '#FF007A']
+        colors: ['#0B89FD', '#FEC90E', '#FD3F01', '#010101']
       });
 
       if (Date.now() < end) {
@@ -149,12 +146,12 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
   // Viral Share Handler (Instagram / TikTok / WhatsApp / Direct Link)
   const handleShareVictory = async () => {
     sound.playClick();
-    const shareText = `🎮 FETO GAMES VICTORY!\n🏆 ${firstPlace?.username} won 1st Place with ${firstPlace?.score || 0} pts!\n✨ Join our 15-player party room: ${window.location.origin}/room/${room.code}\n#FETOGAMES #PartyGames #EsportsArcade`;
+    const shareText = `🏆 FETO GAMES CHAMPIONSHIP 🏆\n🎮 Game: ${room.config.gameMode.replace(/_/g, ' ').toUpperCase()}\n🥇 1st Place: ${firstPlace?.username || 'Champ'} (${firstPlace?.score || 0} PTS)\n🔥 Room: ${room.code}\nPlay now at ${window.location.origin}`;
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'FETO GAMES Match Victory',
+          title: 'FETO GAMES Match Recap',
           text: shareText,
           url: `${window.location.origin}/room/${room.code}`
         });
@@ -180,31 +177,27 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
   // Team score aggregates if in Team Mode
   const teamScores = room.teamScores || {};
   const teamsRanked = [
-    { team: 'red', name: 'Red Team', score: teamScores.red || 0, color: 'text-red-400', bg: 'bg-red-950/40 border-red-500/40' },
-    { team: 'blue', name: 'Blue Team', score: teamScores.blue || 0, color: 'text-blue-400', bg: 'bg-blue-950/40 border-blue-500/40' },
-    { team: 'green', name: 'Green Team', score: teamScores.green || 0, color: 'text-green-400', bg: 'bg-green-950/40 border-green-500/40' }
+    { team: 'red', name: 'Red Team', score: teamScores.red || 0, color: 'text-[#FD3F01]', bg: 'bg-[#FD3F01]/10 border-2 border-[#010101]' },
+    { team: 'blue', name: 'Blue Team', score: teamScores.blue || 0, color: 'text-[#0B89FD]', bg: 'bg-[#0B89FD]/10 border-2 border-[#010101]' },
+    { team: 'green', name: 'Green Team', score: teamScores.green || 0, color: 'text-[#010101]', bg: 'bg-[#FEC90E]/20 border-2 border-[#010101]' }
   ].sort((a, b) => b.score - a.score);
 
   return (
     <div className="w-full max-w-4xl mx-auto flex flex-col items-center justify-start py-6 px-3 relative z-10">
-      {/* Background Celebration Glows */}
-      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-1/4 left-10 w-72 h-72 bg-feto-magenta/10 rounded-full blur-3xl pointer-events-none" />
-
       {/* HEADER BANNER */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-8"
       >
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel border border-yellow-500/30 text-xs font-bold uppercase tracking-wider text-yellow-300 mb-3 shadow-neon-amber">
-          <Sparkles className="w-4 h-4 text-yellow-400 animate-spin" />
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFFFFF] border-2 border-[#010101] text-xs font-black uppercase tracking-wider text-[#010101] mb-3 shadow-[2px_2px_0px_#010101]">
+          <Sparkles className="w-4 h-4 text-[#FEC90E]" />
           <span>Match Concluded • Victory Ceremony</span>
         </div>
-        <h1 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-500 drop-shadow-[0_0_25px_rgba(255,230,0,0.5)]">
-          FINAL PODIUM
+        <h1 className="text-4xl md:text-6xl font-black text-[#010101] tracking-tight">
+          FINAL <span className="text-[#0B89FD]">PODIUM</span>
         </h1>
-        <p className="text-slate-400 text-sm mt-1">
+        <p className="text-[#010101]/70 text-sm mt-1 font-medium">
           {room.config.isTeamMode ? 'Team & Individual Standings' : 'All players ranked by arcade party glory'}
         </p>
       </motion.div>
@@ -214,26 +207,26 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-full mb-8 glass-panel-neon rounded-2xl p-4 md:p-6"
+          className="w-full mb-8 bg-[#FFFFFF] border-2 border-[#010101] shadow-[4px_4px_0px_#010101] rounded-2xl p-4 md:p-6"
         >
-          <div className="flex items-center gap-2 mb-4 text-xs font-bold uppercase tracking-wider text-cyan-300">
-            <Shield className="w-4 h-4" />
+          <div className="flex items-center gap-2 mb-4 text-xs font-black uppercase tracking-wider text-[#010101]">
+            <Shield className="w-4 h-4 text-[#0B89FD]" />
             <span>Team Championship Leaderboard</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {teamsRanked.map((t, idx) => (
               <div
                 key={t.team}
-                className={`p-4 rounded-xl border flex flex-col items-center justify-between ${t.bg} ${
-                  idx === 0 ? 'ring-2 ring-yellow-400 shadow-neon-gold' : ''
+                className={`p-4 rounded-xl flex flex-col items-center justify-between ${t.bg} ${
+                  idx === 0 ? 'shadow-[4px_4px_0px_#010101]' : 'shadow-[2px_2px_0px_#010101]'
                 }`}
               >
                 <div className="flex items-center gap-2 font-black text-sm">
-                  {idx === 0 && <Crown className="w-4 h-4 text-yellow-400 fill-yellow-400" />}
+                  {idx === 0 && <Crown className="w-4 h-4 text-[#FEC90E] fill-[#FEC90E]" />}
                   <span className={t.color}>{t.name}</span>
                 </div>
-                <div className="text-3xl font-extrabold text-white my-2">{t.score} pts</div>
-                <div className="text-[11px] text-slate-400">
+                <div className="text-3xl font-black text-[#010101] my-2">{t.score} pts</div>
+                <div className="text-[11px] text-[#010101]/70 font-bold">
                   {room.players.filter((p) => p.team === t.team).length} players
                 </div>
               </div>
@@ -243,32 +236,32 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
       )}
 
       {/* 3D ANIMATED PODIUM PEDESTALS */}
-      <div className="w-full flex items-end justify-center gap-1.5 sm:gap-4 md:gap-6 mb-8 pt-8 min-h-[280px] sm:min-h-[320px]">
-        {/* 2ND PLACE (SILVER - LEFT) */}
+      <div className="w-full flex items-end justify-center gap-2 sm:gap-4 md:gap-6 mb-8 pt-8 min-h-[280px] sm:min-h-[320px]">
+        {/* 2ND PLACE (SILVER / BLUE - LEFT) */}
         {secondPlace && (
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex-1 min-w-0 max-w-[95px] sm:max-w-[170px] flex flex-col items-center"
+            className="flex-1 min-w-0 max-w-[100px] sm:max-w-[170px] flex flex-col items-center"
           >
             <div className="relative mb-2">
-              <NeonAvatarDisplay avatarId={secondPlace.avatar} size="sm" showGlow />
-              <div className="absolute -top-2.5 -left-2 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-300 border-2 border-white flex items-center justify-center font-black text-xs text-black shadow-lg">
+              <NeonAvatarDisplay avatarId={secondPlace.avatar} size="sm" showGlow={false} />
+              <div className="absolute -top-2.5 -left-2 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#0B89FD] border-2 border-[#010101] flex items-center justify-center font-black text-xs text-white shadow-[2px_2px_0px_#010101]">
                 2
               </div>
             </div>
-            <div className="font-bold text-xs sm:text-sm text-slate-200 truncate max-w-full mb-0.5 sm:mb-1">
+            <div className="font-black text-xs sm:text-sm text-[#010101] truncate max-w-full mb-0.5 sm:mb-1">
               {secondPlace.username}
             </div>
-            <div className="text-[11px] sm:text-xs font-semibold text-cyan-300 mb-1 sm:mb-2">
+            <div className="text-[11px] sm:text-xs font-black text-[#0B89FD] mb-1 sm:mb-2">
               {secondPlace.score || 0} pts
             </div>
 
             {/* Silver Pedestal */}
-            <div className="w-full h-28 sm:h-36 md:h-44 rounded-t-xl sm:rounded-t-2xl bg-gradient-to-t from-slate-900 to-slate-700/80 border-t-2 border-l border-r border-slate-400 flex flex-col items-center justify-start pt-2 sm:pt-3 shadow-[0_0_20px_rgba(148,163,184,0.3)]">
-              <Medal className="w-5 h-5 sm:w-6 sm:h-6 text-slate-300 mb-0.5 sm:mb-1" />
-              <span className="text-[10px] sm:text-xs font-extrabold text-slate-300 tracking-wider">SILVER</span>
+            <div className="w-full h-28 sm:h-36 md:h-44 rounded-t-2xl bg-[#FFFFFF] border-2 border-[#010101] flex flex-col items-center justify-start pt-2 sm:pt-3 shadow-[4px_4px_0px_#010101]">
+              <Medal className="w-5 h-5 sm:w-6 sm:h-6 text-[#010101] mb-0.5 sm:mb-1" />
+              <span className="text-[10px] sm:text-xs font-black text-[#010101] tracking-wider">SILVER</span>
             </div>
           </motion.div>
         )}
@@ -279,57 +272,57 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
             initial={{ opacity: 0, y: 70 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
-            className="flex-1 min-w-0 max-w-[120px] sm:max-w-[200px] flex flex-col items-center z-10"
+            className="flex-1 min-w-0 max-w-[130px] sm:max-w-[200px] flex flex-col items-center z-10"
           >
             <div className="relative mb-2 sm:mb-3">
-              <div className="absolute -top-5 sm:-top-6 left-1/2 -translate-x-1/2">
-                <Crown className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400 fill-yellow-400 animate-bounce" />
+              <div className="absolute -top-6 sm:-top-7 left-1/2 -translate-x-1/2">
+                <Crown className="w-7 h-7 sm:w-9 sm:h-9 text-[#FEC90E] fill-[#FEC90E] drop-shadow-[2px_2px_0px_#010101]" />
               </div>
-              <NeonAvatarDisplay avatarId={firstPlace.avatar} size="md" showGlow />
-              <div className="absolute -bottom-1 sm:-bottom-2 right-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 border-2 border-white flex items-center justify-center font-black text-xs sm:text-sm text-black shadow-neon-gold">
+              <NeonAvatarDisplay avatarId={firstPlace.avatar} size="md" showGlow={false} />
+              <div className="absolute -bottom-1 sm:-bottom-2 right-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#FEC90E] border-2 border-[#010101] flex items-center justify-center font-black text-xs sm:text-sm text-[#010101] shadow-[2px_2px_0px_#010101]">
                 1
               </div>
             </div>
-            <div className="font-black text-xs sm:text-base text-yellow-300 truncate max-w-full mb-0.5 sm:mb-1 drop-shadow-sm">
+            <div className="font-black text-xs sm:text-base text-[#010101] truncate max-w-full mb-0.5 sm:mb-1">
               {firstPlace.username}
             </div>
-            <div className="text-xs sm:text-sm font-extrabold text-white mb-1 sm:mb-2">
+            <div className="text-xs sm:text-sm font-black text-[#010101] mb-1 sm:mb-2">
               {firstPlace.score || 0} pts
             </div>
 
             {/* Gold Pedestal */}
-            <div className="w-full h-36 sm:h-48 md:h-60 rounded-t-xl sm:rounded-t-2xl bg-gradient-to-t from-amber-950/80 to-yellow-600/90 border-t-4 border-l-2 border-r-2 border-yellow-300 flex flex-col items-center justify-start pt-2 sm:pt-4 shadow-neon-gold">
-              <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-200 fill-yellow-200 mb-0.5 sm:mb-1" />
-              <span className="text-[11px] sm:text-sm font-black text-yellow-100 tracking-widest">CHAMP</span>
+            <div className="w-full h-36 sm:h-48 md:h-60 rounded-t-2xl bg-[#FEC90E] border-4 border-[#010101] flex flex-col items-center justify-start pt-2 sm:pt-4 shadow-[6px_6px_0px_#010101]">
+              <Trophy className="w-7 h-7 sm:w-9 sm:h-9 text-[#010101] fill-[#010101] mb-0.5 sm:mb-1" />
+              <span className="text-[11px] sm:text-sm font-black text-[#010101] tracking-widest">CHAMP</span>
             </div>
           </motion.div>
         )}
 
-        {/* 3RD PLACE (BRONZE - RIGHT) */}
+        {/* 3RD PLACE (BRONZE / RED - RIGHT) */}
         {thirdPlace && (
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex-1 min-w-0 max-w-[95px] sm:max-w-[170px] flex flex-col items-center"
+            className="flex-1 min-w-0 max-w-[100px] sm:max-w-[170px] flex flex-col items-center"
           >
             <div className="relative mb-2">
-              <NeonAvatarDisplay avatarId={thirdPlace.avatar} size="sm" showGlow />
-              <div className="absolute -top-2.5 -right-2 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-amber-700 border-2 border-amber-400 flex items-center justify-center font-black text-xs text-white shadow-lg">
+              <NeonAvatarDisplay avatarId={thirdPlace.avatar} size="sm" showGlow={false} />
+              <div className="absolute -top-2.5 -right-2 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#FD3F01] border-2 border-[#010101] flex items-center justify-center font-black text-xs text-white shadow-[2px_2px_0px_#010101]">
                 3
               </div>
             </div>
-            <div className="font-bold text-xs sm:text-sm text-slate-300 truncate max-w-full mb-0.5 sm:mb-1">
+            <div className="font-black text-xs sm:text-sm text-[#010101] truncate max-w-full mb-0.5 sm:mb-1">
               {thirdPlace.username}
             </div>
-            <div className="text-[11px] sm:text-xs font-semibold text-amber-400 mb-1 sm:mb-2">
+            <div className="text-[11px] sm:text-xs font-black text-[#FD3F01] mb-1 sm:mb-2">
               {thirdPlace.score || 0} pts
             </div>
 
             {/* Bronze Pedestal */}
-            <div className="w-full h-24 sm:h-28 md:h-36 rounded-t-xl sm:rounded-t-2xl bg-gradient-to-t from-slate-950 to-amber-900/60 border-t-2 border-l border-r border-amber-600 flex flex-col items-center justify-start pt-2 sm:pt-3 shadow-[0_0_20px_rgba(217,119,6,0.2)]">
-              <Medal className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500 mb-0.5 sm:mb-1" />
-              <span className="text-[10px] sm:text-xs font-extrabold text-amber-400 tracking-wider">BRONZE</span>
+            <div className="w-full h-24 sm:h-28 md:h-36 rounded-t-2xl bg-[#F8F8F8] border-2 border-[#010101] flex flex-col items-center justify-start pt-2 sm:pt-3 shadow-[4px_4px_0px_#010101]">
+              <Medal className="w-5 h-5 sm:w-6 sm:h-6 text-[#FD3F01] mb-0.5 sm:mb-1" />
+              <span className="text-[10px] sm:text-xs font-black text-[#FD3F01] tracking-wider">BRONZE</span>
             </div>
           </motion.div>
         )}
@@ -342,48 +335,48 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="w-full glass-panel-neon rounded-3xl p-4 sm:p-6 mb-8 border border-purple-500/30"
+        className="w-full bg-[#FFFFFF] rounded-3xl p-4 sm:p-6 mb-8 border-2 border-[#010101] shadow-[6px_6px_0px_#010101]"
       >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Award className="w-5 h-5 text-purple-400" />
-            <h3 className="text-sm sm:text-base font-black text-white uppercase tracking-wider">
+            <Award className="w-5 h-5 text-[#FEC90E]" />
+            <h3 className="text-sm sm:text-base font-black text-[#010101] uppercase tracking-wider">
               Party Awards & MVP Ceremony
             </h3>
           </div>
-          <span className="text-[11px] text-purple-300 font-bold">Hall of Fame</span>
+          <span className="text-[11px] text-[#010101]/70 font-black">Hall of Fame</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {partyAwards.map((award) => (
             <div
               key={award.id}
-              className="bg-slate-900/80 border border-purple-500/30 hover:border-purple-400/60 rounded-2xl p-4 flex flex-col justify-between transition-all group shadow-neon-purple"
+              className="bg-[#F8F8F8] border-2 border-[#010101] rounded-2xl p-4 flex flex-col justify-between shadow-[2px_2px_0px_#010101]"
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-2xl">{award.badgeIcon}</span>
-                  <span className="px-2 py-0.5 rounded-full bg-purple-950 border border-purple-500/40 text-[10px] font-black text-purple-300 font-mono">
+                  <span className="text-2xl font-emoji">{award.badgeIcon}</span>
+                  <span className="px-2 py-0.5 rounded-full bg-[#FEC90E] border border-[#010101] text-[10px] font-black text-[#010101] font-mono">
                     {award.scoreOrStat}
                   </span>
                 </div>
-                <h4 className="text-xs sm:text-sm font-black text-white group-hover:text-cyan-300 transition-colors">
+                <h4 className="text-xs sm:text-sm font-black text-[#010101]">
                   {award.title}
                 </h4>
-                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                <p className="text-[11px] text-[#010101]/70 mt-1 leading-relaxed font-medium">
                   {award.description}
                 </p>
                 {award.thumbnail && (
-                  <div className="mt-2.5 p-1.5 rounded-xl border border-purple-500/50 bg-black/60 flex flex-col items-center">
+                  <div className="mt-2.5 p-1.5 rounded-xl border-2 border-[#010101] bg-[#FFFFFF] flex flex-col items-center">
                     <img src={award.thumbnail} alt="Masterpiece" className="w-full h-24 object-contain rounded" />
-                    <span className="text-[9px] text-purple-300 font-mono mt-1 font-bold">Hall of Shame Snapshot 🎨</span>
+                    <span className="text-[9px] text-[#010101] font-mono mt-1 font-bold">Hall of Shame Snapshot 🎨</span>
                   </div>
                 )}
               </div>
 
-              <div className="mt-3 pt-2 border-t border-slate-800 flex items-center gap-2">
+              <div className="mt-3 pt-2 border-t-2 border-[#010101]/10 flex items-center gap-2">
                 <NeonAvatarDisplay avatarId={award.recipientAvatar} size="sm" showGlow={false} />
-                <span className="text-xs font-black text-amber-300 truncate">
+                <span className="text-xs font-black text-[#010101] truncate">
                   {award.recipientUsername}
                 </span>
               </div>
@@ -399,17 +392,14 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.4 }}
-        className="w-full glass-panel-neon rounded-3xl p-5 sm:p-7 mb-8 border border-cyan-500/40 shadow-neon-cyan relative overflow-hidden"
+        className="w-full bg-[#FFFFFF] rounded-3xl p-5 sm:p-7 mb-8 border-2 border-[#010101] shadow-[6px_6px_0px_#010101] relative overflow-hidden"
       >
-        {/* Glow backdrop */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Left: The Card Blueprint */}
-          <div className="w-full md:w-3/5 bg-gradient-to-br from-[#060a14] via-[#091224] to-[#140b26] border-2 border-cyan-400/50 rounded-2xl p-5 shadow-[0_0_30px_rgba(0,240,255,0.25)] relative">
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-cyan-500/20">
+          <div className="w-full md:w-3/5 bg-[#F8F8F8] border-2 border-[#010101] rounded-2xl p-5 shadow-[4px_4px_0px_#010101] relative">
+            <div className="flex items-center justify-between mb-4 pb-3 border-b-2 border-[#010101]/10">
               <BrandLogo size="nav" showSubtitle={false} />
-              <div className="px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-[10px] font-black uppercase text-cyan-300 tracking-wider">
+              <div className="px-2.5 py-0.5 rounded-full bg-[#FEC90E] border-2 border-[#010101] text-[10px] font-black uppercase text-[#010101] tracking-wider">
                 Official Match Card
               </div>
             </div>
@@ -419,37 +409,37 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
                 <NeonAvatarDisplay
                   avatarId={currentPlayer?.avatar || firstPlace?.avatar || 'cyber_cat'}
                   size="md"
-                  showGlow
+                  showGlow={false}
                 />
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-yellow-400 text-black font-black text-xs flex items-center justify-center">
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#FEC90E] border-2 border-[#010101] text-[#010101] font-black text-xs flex items-center justify-center">
                   #{myRank}
                 </div>
               </div>
               <div className="min-w-0 flex-1">
-                <div className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">
+                <div className="text-[11px] uppercase tracking-wider text-[#010101]/60 font-black">
                   Party Contestant
                 </div>
-                <div className="text-lg font-black text-white truncate">
+                <div className="text-lg font-black text-[#010101] truncate">
                   {currentPlayer?.username || firstPlace?.username}
                 </div>
-                <div className="text-xs font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 font-mono">
+                <div className="text-xs font-black text-[#0B89FD] font-mono">
                   Score: {currentPlayer?.score || firstPlace?.score || 0} PTS
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-slate-800 text-center">
-              <div className="bg-slate-900/60 p-2 rounded-xl">
-                <div className="text-[9px] uppercase font-bold text-slate-400">Room</div>
-                <div className="text-xs font-black text-cyan-300 font-mono">{room.code}</div>
+            <div className="grid grid-cols-3 gap-2 mt-4 pt-3 border-t-2 border-[#010101]/10 text-center">
+              <div className="bg-[#FFFFFF] border-2 border-[#010101] p-2 rounded-xl">
+                <div className="text-[9px] uppercase font-black text-[#010101]/60">Room</div>
+                <div className="text-xs font-black text-[#0B89FD] font-mono">{room.code}</div>
               </div>
-              <div className="bg-slate-900/60 p-2 rounded-xl">
-                <div className="text-[9px] uppercase font-bold text-slate-400">Players</div>
-                <div className="text-xs font-black text-white font-mono">{room.players.length}</div>
+              <div className="bg-[#FFFFFF] border-2 border-[#010101] p-2 rounded-xl">
+                <div className="text-[9px] uppercase font-black text-[#010101]/60">Players</div>
+                <div className="text-xs font-black text-[#010101] font-mono">{room.players.length}</div>
               </div>
-              <div className="bg-slate-900/60 p-2 rounded-xl">
-                <div className="text-[9px] uppercase font-bold text-slate-400">Total Sips</div>
-                <div className="text-xs font-black text-pink-400 font-mono">
+              <div className="bg-[#FFFFFF] border-2 border-[#010101] p-2 rounded-xl">
+                <div className="text-[9px] uppercase font-black text-[#010101]/60">Total Sips</div>
+                <div className="text-xs font-black text-[#FD3F01] font-mono">
                   {Object.values(room.sipsCount || {}).reduce((a, b) => a + b, 0)} 🥤
                 </div>
               </div>
@@ -459,8 +449,8 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
           {/* Right: Quick Viral Share Buttons */}
           <div className="w-full md:w-2/5 flex flex-col gap-3">
             <div>
-              <h4 className="text-base font-black text-white">Share Your Victory</h4>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <h4 className="text-base font-black text-[#010101]">Share Your Victory</h4>
+              <p className="text-xs text-[#010101]/70 font-medium mt-0.5">
                 Post your match stats directly to Instagram, TikTok or WhatsApp and challenge your crew!
               </p>
             </div>
@@ -470,15 +460,15 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
                 sound.playClick();
                 setShowStoryModal(true);
               }}
-              className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-400 hover:brightness-110 text-white font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-neon-purple transition-all active:scale-95"
+              className="w-full py-3.5 px-4 rounded-xl bg-[#0B89FD] hover:bg-[#0977db] text-white font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all"
             >
-              <Sparkles className="w-4 h-4 text-yellow-300" />
+              <Sparkles className="w-4 h-4 text-[#FEC90E]" />
               <span>Export 9:16 Story Card (PNG)</span>
             </button>
 
             <button
               onClick={handleShareVictory}
-              className="w-full py-3 px-4 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-cyan-500/40 text-cyan-300 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-neon-cyan transition-all active:scale-95"
+              className="w-full py-3 px-4 rounded-xl bg-[#FEC90E] hover:bg-[#fed338] text-[#010101] font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all"
             >
               {copiedStats ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
               <span>{copiedStats ? 'Victory Copied!' : 'Share Match Recap'}</span>
@@ -486,9 +476,9 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
 
             <button
               onClick={handleCopyInviteLink}
-              className="w-full py-2.5 px-4 rounded-xl bg-slate-900/60 hover:bg-slate-800 border border-slate-700 text-slate-300 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all"
+              className="w-full py-2.5 px-4 rounded-xl bg-[#FFFFFF] hover:bg-[#F8F8F8] text-[#010101] font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 border-2 border-[#010101] shadow-[2px_2px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#010101] transition-all"
             >
-              {copiedShareLink ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+              {copiedShareLink ? <Check className="w-4 h-4 text-[#0B89FD]" /> : <Copy className="w-4 h-4" />}
               <span>{copiedShareLink ? 'Invite Link Copied!' : 'Copy Room Invite Link'}</span>
             </button>
           </div>
@@ -496,38 +486,38 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
       </motion.div>
 
       {/* FULL 15-PLAYER SCOREBOARD LIST */}
-      <div className="w-full glass-panel rounded-2xl p-3 sm:p-6 mb-6 sm:mb-8">
-        <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-300 mb-3 sm:mb-4 flex items-center gap-2">
-          <Users className="w-4 h-4 text-cyan-400" />
+      <div className="w-full bg-[#FFFFFF] border-2 border-[#010101] shadow-[6px_6px_0px_#010101] rounded-2xl p-3 sm:p-6 mb-6 sm:mb-8">
+        <h3 className="text-xs sm:text-sm font-black uppercase tracking-wider text-[#010101] mb-3 sm:mb-4 flex items-center gap-2">
+          <Users className="w-4 h-4 text-[#0B89FD]" />
           <span>Complete Room Scoreboard ({sortedPlayers.length} Players)</span>
         </h3>
 
-        <div className="divide-y divide-slate-800">
+        <div className="space-y-1.5">
           {sortedPlayers.map((player, idx) => (
             <div
               key={player.id}
-              className={`py-2 px-2.5 sm:py-2.5 sm:px-3 flex items-center justify-between rounded-xl transition-all ${
-                player.id === currentPlayer?.id ? 'bg-cyan-500/10 border border-cyan-500/30' : 'hover:bg-slate-800/40'
+              className={`py-2 px-2.5 sm:py-2.5 sm:px-3 flex items-center justify-between rounded-xl border-2 border-[#010101] shadow-[2px_2px_0px_#010101] transition-all ${
+                player.id === currentPlayer?.id ? 'bg-[#0B89FD]/10' : 'bg-[#F8F8F8]'
               }`}
             >
               <div className="flex items-center gap-2 sm:gap-3 truncate">
-                <span className="w-5 text-center font-bold text-xs text-slate-400">#{idx + 1}</span>
-                <NeonAvatarDisplay avatarId={player.avatar} size="sm" />
+                <span className="w-5 text-center font-black text-xs text-[#010101]">#{idx + 1}</span>
+                <NeonAvatarDisplay avatarId={player.avatar} size="sm" showGlow={false} />
                 <div className="flex items-center gap-1.5 truncate">
-                  <span className="font-bold text-xs sm:text-sm text-white truncate max-w-[110px] sm:max-w-none">{player.username}</span>
+                  <span className="font-black text-xs sm:text-sm text-[#010101] truncate max-w-[110px] sm:max-w-none">{player.username}</span>
                   {player.id === currentPlayer?.id && (
-                    <span className="text-[9px] sm:text-[10px] bg-cyan-500/20 text-cyan-300 px-1 py-0.5 rounded font-semibold">
+                    <span className="text-[9px] sm:text-[10px] bg-[#0B89FD] text-white px-1.5 py-0.5 rounded font-black border border-[#010101]">
                       You
                     </span>
                   )}
                   {room.config.isTeamMode && player.team && (
                     <span
-                      className={`text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${
+                      className={`text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded font-black uppercase border border-[#010101] ${
                         player.team === 'red'
-                          ? 'bg-red-950 text-red-300 border border-red-500/30'
+                          ? 'bg-[#FD3F01] text-white'
                           : player.team === 'blue'
-                          ? 'bg-blue-950 text-blue-300 border border-blue-500/30'
-                          : 'bg-green-950 text-green-300 border border-green-500/30'
+                          ? 'bg-[#0B89FD] text-white'
+                          : 'bg-[#FEC90E] text-[#010101]'
                       }`}
                     >
                       {player.team}
@@ -537,11 +527,11 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
               </div>
               <div className="flex items-center gap-3">
                 {room.sipsCount?.[player.id] !== undefined && (
-                  <span className="text-[10px] font-bold text-pink-300 bg-pink-950/40 px-2 py-0.5 rounded-full border border-pink-500/30">
+                  <span className="text-[10px] font-black text-[#FD3F01] bg-[#FD3F01]/10 px-2 py-0.5 rounded-full border border-[#FD3F01]">
                     {room.sipsCount[player.id]} Sips 🥤
                   </span>
                 )}
-                <div className="font-mono font-black text-xs sm:text-sm text-yellow-400 flex-shrink-0">
+                <div className="font-mono font-black text-xs sm:text-sm text-[#010101] flex-shrink-0">
                   {player.score || 0} pts
                 </div>
               </div>
@@ -551,20 +541,20 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
       </div>
 
       {/* REMATCH / PLAY AGAIN CONTROLS */}
-      <div className="w-full glass-panel-neon rounded-2xl p-4 sm:p-6 text-center">
+      <div className="w-full bg-[#FFFFFF] border-2 border-[#010101] shadow-[6px_6px_0px_#010101] rounded-2xl p-4 sm:p-6 text-center">
         {errorMessage && (
-          <div className="mb-4 p-3 bg-red-950/80 border border-red-500/40 rounded-xl text-red-300 text-xs">
+          <div className="mb-4 p-3 bg-[#FD3F01]/10 border-2 border-[#FD3F01] rounded-xl text-[#FD3F01] text-xs font-bold">
             {errorMessage}
           </div>
         )}
 
         {isHost ? (
           <div className="space-y-4 max-w-md mx-auto">
-            <h4 className="text-sm sm:text-base font-extrabold text-white flex items-center justify-center gap-2">
-              <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
+            <h4 className="text-sm sm:text-base font-black text-[#010101] flex items-center justify-center gap-2">
+              <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5 text-[#0B89FD]" />
               <span>1-Click Rematch (Keep All Players in Room)</span>
             </h4>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-[#010101]/70 font-medium">
               Pick the next game mode and launch instantly without anyone having to rejoin:
             </p>
 
@@ -576,10 +566,10 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
                     sound.playClick();
                     setSelectedNextGame(g.id);
                   }}
-                  className={`min-h-[48px] p-2.5 rounded-xl border text-xs font-bold transition-all touch-target flex items-center justify-start ${
+                  className={`min-h-[48px] p-2.5 rounded-xl border-2 border-[#010101] text-xs font-black transition-all touch-target flex items-center justify-start ${
                     selectedNextGame === g.id
-                      ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300 shadow-neon-cyan'
-                      : 'bg-slate-900/50 border-slate-700 text-slate-400 hover:text-white hover:border-slate-500'
+                      ? 'bg-[#0B89FD] text-white shadow-[2px_2px_0px_#010101]'
+                      : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
                   }`}
                 >
                   {g.name}
@@ -590,7 +580,7 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
             <button
               onClick={handleRematch}
               disabled={isRematching}
-              className="w-full min-h-[52px] py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-cyan-400 via-feto-magenta to-yellow-400 hover:brightness-110 text-black font-black text-sm sm:text-base uppercase tracking-wider flex items-center justify-center gap-2 shadow-neon-magenta transition-all active:scale-95 disabled:opacity-50 touch-target"
+              className="w-full min-h-[52px] py-3.5 sm:py-4 rounded-2xl bg-[#0B89FD] hover:bg-[#0977db] text-white font-black text-sm sm:text-base uppercase tracking-wider flex items-center justify-center gap-2 border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all disabled:opacity-50 touch-target"
             >
               {isRematching ? (
                 <span>Starting Rematch...</span>
@@ -604,16 +594,17 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
           </div>
         ) : (
           <div className="space-y-3 py-2">
-            <div className="flex items-center justify-center gap-2 text-cyan-400 font-bold text-sm">
+            <div className="flex items-center justify-center gap-2 text-[#0B89FD] font-black text-sm">
               <RotateCcw className="w-4 h-4 animate-spin" />
               <span>Waiting for Room Host to Pick the Next Game...</span>
             </div>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-[#010101]/70 font-medium">
               Stay in this room! All players will automatically transition to the next match together.
             </p>
           </div>
         )}
       </div>
+
       {/* 9:16 Story Recap Modal */}
       <ShareRecapCard
         room={room}

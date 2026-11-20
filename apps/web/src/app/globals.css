@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -10,17 +10,16 @@
   --font-mono: 'JetBrains Mono', monospace;
   --font-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
   
-  /* Authentic Studio Palette */
-  --canvas-bg: #0B0E14;
-  --surface-card: #131822;
-  --surface-card-hover: #19202E;
-  --surface-border: rgba(255, 255, 255, 0.08);
-  --cyan-primary: #22D3EE;
-  --cyan-primary-hover: #06B6D4;
-  --emerald-ready: #10B981;
-  --emerald-ready-bg: rgba(16, 185, 129, 0.12);
-  --amber-timer: #F59E0B;
-  --coral-alert: #FB7185;
+  /* Bold Bauhaus / Neo-Brutalist Primary Colors Palette */
+  --canvas-bg: #F8F8F8;
+  --surface-card: #FFFFFF;
+  --surface-card-hover: #F2F2F2;
+  --ink-primary: #010101;
+  --ink-border: #010101;
+  --blue-primary: #0B89FD;
+  --yellow-accent: #FEC90E;
+  --red-alert: #FD3F01;
+  --green-ready: #10B981;
   
   --sat: env(safe-area-inset-top, 0px);
   --sab: env(safe-area-inset-bottom, 0px);
@@ -33,17 +32,17 @@ html {
   min-height: 100dvh;
   -webkit-text-size-adjust: 100%;
   touch-action: manipulation;
+  background-color: var(--canvas-bg);
 }
 
 body {
   font-family: var(--font-body);
   background-color: var(--canvas-bg);
-  color: #F8FAFC;
+  color: var(--ink-primary);
   overflow-x: hidden;
-  background-image: 
-    radial-gradient(circle at 15% 10%, rgba(34, 211, 238, 0.07) 0%, transparent 45%),
-    radial-gradient(circle at 85% 15%, rgba(139, 92, 246, 0.06) 0%, transparent 45%),
-    radial-gradient(circle at 50% 85%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+  /* Bauhaus Geometric Architectural Dot Grid Pattern */
+  background-image: radial-gradient(rgba(1, 1, 1, 0.08) 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
   background-attachment: fixed;
   min-height: 100dvh;
   height: 100%;
@@ -62,6 +61,8 @@ body {
 
 h1, h2, h3, h4, h5, h6, .font-heading {
   font-family: var(--font-heading);
+  color: var(--ink-primary);
+  letter-spacing: -0.02em;
 }
 
 /* Safe Area Inset Utility Classes */
@@ -119,169 +120,226 @@ canvas.canvas-touch-safe {
   -webkit-touch-callout: none;
 }
 
-/* Glassmorphism Panel */
-.glass-panel {
-  background: rgba(13, 16, 32, 0.78);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+/* ============================================================== */
+/* BAUHAUS NEO-BRUTALIST SURFACES & HARD OFFSET SHADOWS           */
+/* ============================================================== */
+
+.glass-panel,
+.glass-panel-neon,
+.neo-card {
+  background: #FFFFFF !important;
+  border: 2px solid #010101 !important;
+  box-shadow: 4px 4px 0px #010101 !important;
+  border-radius: 18px;
+  color: #010101;
 }
 
-.glass-panel-neon {
-  background: rgba(13, 16, 32, 0.88);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 240, 255, 0.35);
-  box-shadow: 0 0 25px rgba(0, 240, 255, 0.15), inset 0 0 15px rgba(0, 240, 255, 0.05);
+.neo-card-lg {
+  background: #FFFFFF !important;
+  border: 3px solid #010101 !important;
+  box-shadow: 6px 6px 0px #010101 !important;
+  border-radius: 22px;
+  color: #010101;
 }
 
-/* Glowing Neon Text */
+.neo-card-sm {
+  background: #FFFFFF !important;
+  border: 2px solid #010101 !important;
+  box-shadow: 2px 2px 0px #010101 !important;
+  border-radius: 12px;
+  color: #010101;
+}
+
+/* Corner Bauhaus Geometric Decors */
+.bauhaus-badge-blue {
+  background: #0B89FD;
+  color: #FFFFFF;
+  border: 2px solid #010101;
+  box-shadow: 2px 2px 0px #010101;
+  font-weight: 800;
+}
+
+.bauhaus-badge-yellow {
+  background: #FEC90E;
+  color: #010101;
+  border: 2px solid #010101;
+  box-shadow: 2px 2px 0px #010101;
+  font-weight: 800;
+}
+
+.bauhaus-badge-red {
+  background: #FD3F01;
+  color: #FFFFFF;
+  border: 2px solid #010101;
+  box-shadow: 2px 2px 0px #010101;
+  font-weight: 800;
+}
+
+/* ============================================================== */
+/* TACTILE HARD-SHADOW BUTTONS & TAP TRANSLATION                  */
+/* ============================================================== */
+
+/* Primary Action: Electric Blue (#0B89FD) */
+.btn-glow-cyan,
+.btn-glow-start,
+.btn-neo-blue,
+.btn-neon-cyan {
+  background: #0B89FD !important;
+  color: #FFFFFF !important;
+  border: 2px solid #010101 !important;
+  box-shadow: 4px 4px 0px #010101 !important;
+  font-weight: 800;
+  border-radius: 14px;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
+  min-height: 48px;
+  touch-action: manipulation;
+}
+
+.btn-glow-cyan:hover:not(:disabled),
+.btn-glow-start:hover:not(:disabled),
+.btn-neo-blue:hover:not(:disabled),
+.btn-neon-cyan:hover:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #010101 !important;
+  background: #0875da !important;
+}
+
+.btn-glow-cyan:active:not(:disabled),
+.btn-glow-start:active:not(:disabled),
+.btn-neo-blue:active:not(:disabled),
+.btn-neon-cyan:active:not(:disabled) {
+  transform: translate(4px, 4px);
+  box-shadow: 0px 0px 0px #010101 !important;
+}
+
+/* Secondary / Highlight Action: Vibrant Gold/Yellow (#FEC90E) */
+.btn-glow-amber,
+.btn-neo-yellow {
+  background: #FEC90E !important;
+  color: #010101 !important;
+  border: 2px solid #010101 !important;
+  box-shadow: 4px 4px 0px #010101 !important;
+  font-weight: 800;
+  border-radius: 14px;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
+  min-height: 48px;
+  touch-action: manipulation;
+}
+
+.btn-glow-amber:hover:not(:disabled),
+.btn-neo-yellow:hover:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #010101 !important;
+  background: #e6b40a !important;
+}
+
+.btn-glow-amber:active:not(:disabled),
+.btn-neo-yellow:active:not(:disabled) {
+  transform: translate(4px, 4px);
+  box-shadow: 0px 0px 0px #010101 !important;
+}
+
+/* Alert / Chaos / Destructive Action: Punchy Red-Orange (#FD3F01) */
+.btn-glow-purple,
+.btn-neon-magenta,
+.btn-neo-red {
+  background: #FD3F01 !important;
+  color: #FFFFFF !important;
+  border: 2px solid #010101 !important;
+  box-shadow: 4px 4px 0px #010101 !important;
+  font-weight: 800;
+  border-radius: 14px;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
+  min-height: 48px;
+  touch-action: manipulation;
+}
+
+.btn-glow-purple:hover:not(:disabled),
+.btn-neon-magenta:hover:not(:disabled),
+.btn-neo-red:hover:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #010101 !important;
+  background: #dc3700 !important;
+}
+
+.btn-glow-purple:active:not(:disabled),
+.btn-neon-magenta:active:not(:disabled),
+.btn-neo-red:active:not(:disabled) {
+  transform: translate(4px, 4px);
+  box-shadow: 0px 0px 0px #010101 !important;
+}
+
+/* Crisp Clean Neutral White Button */
+.btn-neo-white {
+  background: #FFFFFF !important;
+  color: #010101 !important;
+  border: 2px solid #010101 !important;
+  box-shadow: 4px 4px 0px #010101 !important;
+  font-weight: 800;
+  border-radius: 14px;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
+  min-height: 48px;
+  touch-action: manipulation;
+}
+
+.btn-neo-white:hover:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #010101 !important;
+  background: #F4F4F5 !important;
+}
+
+.btn-neo-white:active:not(:disabled) {
+  transform: translate(4px, 4px);
+  box-shadow: 0px 0px 0px #010101 !important;
+}
+
+/* ============================================================== */
+/* HIGH-CONTRAST TYPOGRAPHY PALETTE                               */
+/* ============================================================== */
+
 .text-neon-cyan {
-  color: #00f0ff;
-  text-shadow: 0 0 10px rgba(0, 240, 255, 0.8), 0 0 22px rgba(0, 240, 255, 0.45);
+  color: #0B89FD !important;
+  text-shadow: none !important;
 }
 
 .text-neon-purple {
-  color: #c084fc;
-  text-shadow: 0 0 10px rgba(192, 132, 252, 0.8), 0 0 22px rgba(168, 85, 247, 0.45);
+  color: #010101 !important;
+  text-shadow: none !important;
 }
 
 .text-neon-magenta {
-  color: #ff007a;
-  text-shadow: 0 0 10px rgba(255, 0, 122, 0.8), 0 0 22px rgba(255, 0, 122, 0.45);
+  color: #FD3F01 !important;
+  text-shadow: none !important;
 }
 
 .text-neon-yellow {
-  color: #ffe600;
-  text-shadow: 0 0 10px rgba(255, 230, 0, 0.8), 0 0 22px rgba(255, 230, 0, 0.45);
+  color: #FEC90E !important;
+  text-shadow: none !important;
 }
 
 .text-neon-green {
-  color: #39ff14;
-  text-shadow: 0 0 10px rgba(57, 255, 20, 0.8), 0 0 22px rgba(57, 255, 20, 0.45);
+  color: #10B981 !important;
+  text-shadow: none !important;
 }
 
-/* ESPORTS GLOWING OUTLINE ACTION BUTTONS */
-.btn-glow-purple {
-  background: rgba(18, 14, 38, 0.82);
-  backdrop-filter: blur(16px);
-  border: 2px solid #a855f7;
-  box-shadow: 0 0 20px rgba(168, 85, 247, 0.45), inset 0 0 14px rgba(168, 85, 247, 0.22);
-  color: #e9d5ff;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  min-height: 48px;
-  touch-action: manipulation;
-}
-
-.btn-glow-purple:hover {
-  background: rgba(28, 18, 60, 0.95);
-  border-color: #c084fc;
-  box-shadow: 0 0 35px rgba(168, 85, 247, 0.75), inset 0 0 22px rgba(168, 85, 247, 0.4);
-  color: #ffffff;
-  transform: translateY(-2px);
-}
-
-.btn-glow-cyan {
-  background: rgba(10, 24, 38, 0.82);
-  backdrop-filter: blur(16px);
-  border: 2px solid #00f0ff;
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.45), inset 0 0 14px rgba(0, 240, 255, 0.22);
-  color: #a5f3fc;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  min-height: 48px;
-  touch-action: manipulation;
-}
-
-.btn-glow-cyan:hover {
-  background: rgba(14, 38, 60, 0.95);
-  border-color: #67e8f9;
-  box-shadow: 0 0 35px rgba(0, 240, 255, 0.75), inset 0 0 22px rgba(0, 240, 255, 0.4);
-  color: #ffffff;
-  transform: translateY(-2px);
-}
-
-.btn-glow-amber {
-  background: rgba(36, 24, 10, 0.82);
-  backdrop-filter: blur(16px);
-  border: 2px solid #fbbf24;
-  box-shadow: 0 0 20px rgba(251, 191, 36, 0.45), inset 0 0 14px rgba(251, 191, 36, 0.22);
-  color: #fef08a;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  min-height: 48px;
-  touch-action: manipulation;
-}
-
-.btn-glow-amber:hover {
-  background: rgba(56, 36, 12, 0.95);
-  border-color: #fde047;
-  box-shadow: 0 0 35px rgba(251, 191, 36, 0.75), inset 0 0 22px rgba(251, 191, 36, 0.4);
-  color: #ffffff;
-  transform: translateY(-2px);
-}
-
-/* WIDE CYAN-TO-PURPLE GLOWING START BUTTON */
-.btn-glow-start {
-  background: linear-gradient(135deg, #00f0ff 0%, #7928ca 50%, #ff007a 100%);
-  color: #ffffff;
-  font-weight: 900;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 0 30px rgba(0, 240, 255, 0.55), 0 0 50px rgba(168, 85, 247, 0.4);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  min-height: 52px;
-  touch-action: manipulation;
-}
-
-.btn-glow-start:hover:not(:disabled) {
-  box-shadow: 0 0 45px rgba(0, 240, 255, 0.85), 0 0 70px rgba(255, 0, 122, 0.6);
-  transform: translateY(-2px) scale(1.01);
-  filter: brightness(1.1);
-}
-
-/* Button Neon Styles (Classic) */
-.btn-neon-cyan {
-  background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
-  box-shadow: 0 0 20px rgba(0, 198, 255, 0.4);
-  transition: all 0.2s ease;
-  min-height: 48px;
-  touch-action: manipulation;
-}
-
-.btn-neon-cyan:hover {
-  box-shadow: 0 0 30px rgba(0, 198, 255, 0.7);
-  transform: translateY(-2px);
-}
-
-.btn-neon-magenta {
-  background: linear-gradient(135deg, #ff007a 0%, #7928ca 100%);
-  box-shadow: 0 0 20px rgba(255, 0, 122, 0.4);
-  transition: all 0.2s ease;
-  min-height: 48px;
-  touch-action: manipulation;
-}
-
-.btn-neon-magenta:hover {
-  box-shadow: 0 0 30px rgba(255, 0, 122, 0.7);
-  transform: translateY(-2px);
-}
-
-/* Custom Scrollbar */
+/* Custom Bauhaus Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #090B16;
+  background: #F8F8F8;
+  border-left: 2px solid #010101;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #202742;
-  border-radius: 4px;
+  background: #010101;
+  border-radius: 0px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #00f0ff;
+  background: #0B89FD;
 }
 
 /* Screen Shake Arcade Effect */
@@ -302,31 +360,16 @@ canvas.canvas-touch-safe {
   animation: screenShake 0.65s cubic-bezier(0.36, 0.07, 0.19, 0.97) both !important;
 }
 
-/* Viral Sip Edition Glowing Modal Pulse */
-@keyframes sipPulse {
-  0%, 100% {
-    box-shadow: 0 0 25px rgba(56, 242, 255, 0.6), inset 0 0 20px rgba(168, 85, 247, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 50px rgba(56, 242, 255, 0.95), inset 0 0 35px rgba(255, 0, 122, 0.5);
-  }
-}
-
-.sip-modal-glow {
-  animation: sipPulse 1.8s infinite ease-in-out;
-}
-
-/* Tension Pulse Screen Border Vignette (Final 5 Seconds) */
+/* Tension Pulse Screen Border (Final 5 Seconds) */
 @keyframes tensionVignette {
   0%, 100% {
-    box-shadow: inset 0 0 30px rgba(239, 68, 68, 0.4), inset 0 0 60px rgba(220, 38, 38, 0.2);
+    box-shadow: inset 0 0 0px 4px #FD3F01;
   }
   50% {
-    box-shadow: inset 0 0 80px rgba(239, 68, 68, 0.85), inset 0 0 140px rgba(220, 38, 38, 0.5);
+    box-shadow: inset 0 0 0px 12px #FD3F01;
   }
 }
 
 .tension-pulse {
   animation: tensionVignette 0.8s infinite ease-in-out !important;
 }
-

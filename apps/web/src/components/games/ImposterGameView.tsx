@@ -11,9 +11,7 @@ import { NeonAvatarDisplay } from '../NeonAvatarDisplay';
 import {
   Eye,
   EyeOff,
-  UserCheck,
   Send,
-  HelpCircle,
   Vote,
   Sparkles,
   Flame,
@@ -62,7 +60,6 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
     gameState.suddenDeathActive &&
     gameState.suddenDeathPlayerId === currentPlayer.id;
 
-  const hasVoted = Boolean(gameState.votes[currentPlayer.id]);
   const votedForId = gameState.votes[currentPlayer.id];
 
   // Submit Clue
@@ -126,17 +123,17 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
       {/* ======================================================== */}
       {/* TOP PRIVATE ROLE & CATEGORY BANNER                       */}
       {/* ======================================================== */}
-      <div className="glass-panel-neon rounded-3xl p-5 md:p-6 border border-cyan-500/40 relative overflow-hidden">
+      <div className="bg-[#FFFFFF] rounded-3xl p-5 md:p-6 border-2 border-[#010101] shadow-[4px_4px_0px_#010101] relative overflow-hidden">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-cyan-950/60 rounded-2xl border border-cyan-500/30">
-              <Shield className="w-6 h-6 text-cyan-400" />
+            <div className="p-3 bg-[#0B89FD] rounded-2xl border-2 border-[#010101] text-white shadow-[2px_2px_0px_#010101]">
+              <Shield className="w-6 h-6 text-white" />
             </div>
             <div>
-              <div className="text-xs uppercase tracking-widest text-slate-400 font-bold">
+              <div className="text-xs uppercase tracking-widest text-[#010101]/60 font-black">
                 Category
               </div>
-              <div className="text-xl md:text-2xl font-black text-white">
+              <div className="text-xl md:text-2xl font-black text-[#010101]">
                 {gameState.category || privateRole?.category || 'Classified'}
               </div>
             </div>
@@ -146,9 +143,9 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
           <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
             <button
               onClick={() => setShowRoleSecret(!showRoleSecret)}
-              className="px-4 py-2 bg-feto-card hover:bg-feto-cardHover border border-feto-border hover:border-cyan-400 rounded-xl text-xs font-bold text-cyan-300 flex items-center gap-1.5 transition-all"
+              className="px-4 py-2.5 bg-[#FFFFFF] hover:bg-[#F8F8F8] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] rounded-xl text-xs font-black text-[#010101] flex items-center gap-1.5 transition-all"
             >
-              {showRoleSecret ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              {showRoleSecret ? <EyeOff className="w-4 h-4 text-[#FD3F01]" /> : <Eye className="w-4 h-4 text-[#0B89FD]" />}
               <span>{showRoleSecret ? 'Hide Role' : 'Tap to View Secret'}</span>
             </button>
           </div>
@@ -161,31 +158,31 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="mt-4 pt-4 border-t border-feto-border"
+              className="mt-4 pt-4 border-t-2 border-[#010101]/10"
             >
               {privateRole.role === 'imposter' ? (
-                <div className="p-4 bg-red-950/60 border border-red-500/60 rounded-2xl text-center space-y-1 shadow-neon-magenta">
-                  <div className="text-xs font-black uppercase tracking-widest text-red-400 flex items-center justify-center gap-1">
-                    <Flame className="w-4 h-4" /> YOU ARE THE IMPOSTER!
+                <div className="p-4 bg-[#FD3F01] border-2 border-[#010101] rounded-2xl text-center space-y-1 shadow-[4px_4px_0px_#010101] text-white">
+                  <div className="text-xs font-black uppercase tracking-widest flex items-center justify-center gap-1">
+                    <Flame className="w-4 h-4 text-[#FEC90E]" /> YOU ARE THE IMPOSTER!
                   </div>
-                  <p className="text-sm font-medium text-slate-200">
+                  <p className="text-sm font-bold text-white/95">
                     You do NOT know the secret word! Listen carefully to other players&apos; clues, blend in, and don&apos;t get voted out.
                   </p>
                   {privateRole.teammateNames && privateRole.teammateNames.length > 0 && (
-                    <div className="text-xs text-yellow-300 pt-1">
-                      Fellow Imposters: <span className="font-bold">{privateRole.teammateNames.join(', ')}</span>
+                    <div className="text-xs text-[#FEC90E] pt-1 font-black">
+                      Fellow Imposters: <span className="underline">{privateRole.teammateNames.join(', ')}</span>
                     </div>
                   )}
                 </div>
               ) : (
-                <div className="p-4 bg-cyan-950/60 border border-cyan-400/60 rounded-2xl text-center space-y-1 shadow-neon-cyan">
-                  <div className="text-xs font-black uppercase tracking-widest text-cyan-400 flex items-center justify-center gap-1">
-                    <Sparkles className="w-4 h-4" /> CIVILIAN • SECRET WORD
+                <div className="p-4 bg-[#0B89FD] border-2 border-[#010101] rounded-2xl text-center space-y-1 shadow-[4px_4px_0px_#010101] text-white">
+                  <div className="text-xs font-black uppercase tracking-widest flex items-center justify-center gap-1">
+                    <Sparkles className="w-4 h-4 text-[#FEC90E]" /> CIVILIAN • SECRET WORD
                   </div>
-                  <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-white tracking-wider">
+                  <div className="text-3xl font-black text-white tracking-wider my-1">
                     {privateRole.secretWord}
                   </div>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-white/90 font-medium">
                     Give a subtle 1-word or short clue related to this word without making it too obvious for the imposter!
                   </p>
                 </div>
@@ -202,21 +199,21 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
         <div className="space-y-4">
           {/* Turn Banner */}
           <div
-            className={`p-4 rounded-2xl border text-center transition-all ${
+            className={`p-4 rounded-2xl border-2 border-[#010101] text-center transition-all ${
               isMyTurn
-                ? 'bg-cyan-950/80 border-cyan-400 shadow-neon-cyan animate-pulse'
-                : 'bg-feto-card border-feto-border'
+                ? 'bg-[#FEC90E] text-[#010101] shadow-[4px_4px_0px_#010101]'
+                : 'bg-[#FFFFFF] text-[#010101] shadow-[2px_2px_0px_#010101]'
             }`}
           >
             {isMyTurn ? (
-              <div className="text-base font-black text-cyan-300 flex items-center justify-center gap-2">
-                <Zap className="w-5 h-5 text-yellow-400" />
+              <div className="text-base font-black flex items-center justify-center gap-2">
+                <Zap className="w-5 h-5 text-[#010101]" />
                 <span>IT IS YOUR TURN! SUBMIT YOUR CLUE NOW</span>
               </div>
             ) : (
-              <div className="text-sm font-semibold text-slate-300">
+              <div className="text-sm font-bold text-[#010101]">
                 Waiting for{' '}
-                <span className="text-cyan-400 font-bold">
+                <span className="text-[#0B89FD] font-black">
                   {gameState.currentTurnUsername || 'Next Player'}
                 </span>{' '}
                 to submit their clue...
@@ -239,12 +236,12 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
                 onChange={(e) => setClueInput(e.target.value)}
                 placeholder="Type your 1-word or short clue..."
                 autoFocus
-                className="flex-1 min-h-[48px] bg-feto-dark border border-cyan-400 focus:ring-2 focus:ring-cyan-500/40 rounded-2xl px-5 py-3 text-white text-base font-bold outline-none"
+                className="flex-1 min-h-[48px] bg-[#FFFFFF] border-2 border-[#010101] focus:border-[#0B89FD] rounded-2xl px-5 py-3 text-[#010101] text-base font-bold outline-none shadow-[4px_4px_0px_#010101]"
               />
               <button
                 type="submit"
                 disabled={isSubmittingClue || !clueInput.trim()}
-                className="btn-neon-cyan min-h-[48px] px-6 py-3 rounded-2xl text-white font-black text-base flex items-center justify-center gap-1.5 touch-target"
+                className="min-h-[48px] px-6 py-3 rounded-2xl bg-[#0B89FD] hover:bg-[#0977db] text-white font-black text-base flex items-center justify-center gap-1.5 border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all touch-target disabled:opacity-50"
               >
                 <Send className="w-4 h-4" />
                 <span>Submit</span>
@@ -254,7 +251,7 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
 
           {/* Submitted Clues Timeline */}
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
+            <h3 className="text-xs font-black uppercase tracking-wider text-[#010101] mb-3">
               Submitted Clues ({Object.keys(gameState.clues).length} / {gameState.turnOrder.length})
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -266,32 +263,32 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
                 return (
                   <div
                     key={pid}
-                    className={`p-3.5 rounded-2xl border flex items-center gap-3 transition-all ${
+                    className={`p-3.5 rounded-2xl border-2 border-[#010101] flex items-center gap-3 transition-all ${
                       clueObj
-                        ? 'bg-feto-card border-feto-border'
+                        ? 'bg-[#FFFFFF] shadow-[3px_3px_0px_#010101]'
                         : isCurrent
-                        ? 'bg-cyan-950/40 border-cyan-500/50 shadow-neon-cyan'
-                        : 'bg-feto-dark/50 border-slate-800/80 opacity-60'
+                        ? 'bg-[#FEC90E]/30 shadow-[3px_3px_0px_#010101]'
+                        : 'bg-[#F8F8F8] opacity-60 shadow-[1px_1px_0px_#010101]'
                     }`}
                   >
-                    <span className="text-xs font-black text-slate-500">#{idx + 1}</span>
+                    <span className="text-xs font-black text-[#010101]/60">#{idx + 1}</span>
                     {player && (
                       <NeonAvatarDisplay avatarId={player.avatar} size="sm" showGlow={false} />
                     )}
                     <div className="flex-1 truncate">
-                      <div className="text-xs font-bold text-white truncate">
+                      <div className="text-xs font-black text-[#010101] truncate">
                         {player?.username || 'Player'}
                       </div>
                       {clueObj ? (
-                        <div className="text-sm font-black text-cyan-300 truncate">
+                        <div className="text-sm font-black text-[#0B89FD] truncate">
                           &ldquo;{clueObj.clue}&rdquo;
                         </div>
                       ) : isCurrent ? (
-                        <div className="text-xs text-yellow-400 animate-pulse font-medium">
+                        <div className="text-xs text-[#FD3F01] animate-pulse font-black">
                           Thinking...
                         </div>
                       ) : (
-                        <div className="text-xs text-slate-600">Waiting</div>
+                        <div className="text-xs text-[#010101]/40 font-medium">Waiting</div>
                       )}
                     </div>
                   </div>
@@ -307,12 +304,12 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
       {/* ======================================================== */}
       {gameState.phase === 'voting' && (
         <div className="space-y-4">
-          <div className="p-4 bg-feto-card rounded-2xl border border-yellow-500/40 text-center">
-            <h3 className="text-xl font-black text-white flex items-center justify-center gap-2">
-              <Vote className="w-5 h-5 text-yellow-400" />
+          <div className="p-4 bg-[#FFFFFF] rounded-2xl border-2 border-[#010101] shadow-[4px_4px_0px_#010101] text-center">
+            <h3 className="text-xl font-black text-[#010101] flex items-center justify-center gap-2">
+              <Vote className="w-5 h-5 text-[#FD3F01]" />
               <span>VOTE FOR THE IMPOSTER!</span>
             </h3>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-[#010101]/70 mt-1 font-medium">
               Who gave a suspicious or out-of-place clue? Cast your vote before the timer expires!
             </p>
           </div>
@@ -328,25 +325,25 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
               return (
                 <div
                   key={p.id}
-                  className={`p-4 rounded-2xl border flex flex-col items-center justify-between text-center transition-all ${
+                  className={`p-4 rounded-2xl border-2 border-[#010101] flex flex-col items-center justify-between text-center transition-all ${
                     isMyVote
-                      ? 'bg-yellow-950/40 border-yellow-400 shadow-neon-yellow scale-102'
-                      : 'bg-feto-card border-feto-border hover:border-slate-500'
+                      ? 'bg-[#FEC90E]/30 shadow-[4px_4px_0px_#010101]'
+                      : 'bg-[#FFFFFF] shadow-[3px_3px_0px_#010101] hover:bg-[#F8F8F8]'
                   }`}
                 >
                   <div className="relative mb-2">
-                    <NeonAvatarDisplay avatarId={p.avatar} size="md" showGlow={isMyVote} />
+                    <NeonAvatarDisplay avatarId={p.avatar} size="md" showGlow={false} />
                     {votesReceived > 0 && (
-                      <div className="absolute -top-2 -right-2 px-2 py-0.5 bg-red-600 text-white font-black text-xs rounded-full shadow-md">
+                      <div className="absolute -top-2 -right-2 px-2 py-0.5 bg-[#FD3F01] text-white font-black text-xs rounded-full border border-[#010101] shadow-[1px_1px_0px_#010101]">
                         {votesReceived} {votesReceived === 1 ? 'vote' : 'votes'}
                       </div>
                     )}
                   </div>
 
                   <div className="w-full truncate mb-2">
-                    <div className="font-bold text-sm text-white truncate">{p.username}</div>
+                    <div className="font-black text-sm text-[#010101] truncate">{p.username}</div>
                     {clueObj && (
-                      <div className="text-xs text-cyan-300 font-semibold truncate mt-0.5">
+                      <div className="text-xs text-[#0B89FD] font-black truncate mt-0.5">
                         Clue: &ldquo;{clueObj.clue}&rdquo;
                       </div>
                     )}
@@ -355,17 +352,17 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
                   {!isSelf && (
                     <button
                       onClick={() => handleCastVote(p.id)}
-                      className={`w-full min-h-[48px] py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all touch-target flex items-center justify-center ${
+                      className={`w-full min-h-[48px] py-2.5 rounded-xl text-xs sm:text-sm font-black border-2 border-[#010101] transition-all touch-target flex items-center justify-center ${
                         isMyVote
-                          ? 'bg-yellow-400 text-black shadow-neon-yellow'
-                          : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
+                          ? 'bg-[#FEC90E] text-[#010101] shadow-[2px_2px_0px_#010101]'
+                          : 'bg-[#0B89FD] hover:bg-[#0977db] text-white shadow-[2px_2px_0px_#010101]'
                       }`}
                     >
-                      {isMyVote ? 'VOTED' : 'VOTE'}
+                      {isMyVote ? 'VOTED ✓' : 'VOTE'}
                     </button>
                   )}
                   {isSelf && (
-                    <span className="text-[10px] text-slate-500 uppercase font-bold py-3">
+                    <span className="text-[10px] text-[#010101]/60 uppercase font-black py-3">
                       (You)
                     </span>
                   )}
@@ -381,25 +378,25 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
       {/* ======================================================== */}
       <AnimatePresence>
         {gameState.suddenDeathActive && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md safe-top safe-bottom">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#010101]/80 backdrop-blur-sm safe-top safe-bottom">
             <motion.div
               initial={{ scale: 0.85, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.85, opacity: 0 }}
-              className="w-full max-w-lg glass-panel-neon p-5 sm:p-8 rounded-3xl border-2 border-red-500 text-center space-y-4 shadow-neon-magenta"
+              className="w-full max-w-lg bg-[#FFFFFF] p-5 sm:p-8 rounded-3xl border-3 border-[#010101] text-center space-y-4 shadow-[8px_8px_0px_#010101]"
             >
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-red-950/80 border border-red-500/60 flex items-center justify-center mx-auto text-red-400 animate-bounce">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#FD3F01] border-2 border-[#010101] flex items-center justify-center mx-auto text-white shadow-[3px_3px_0px_#010101] animate-bounce">
                 <Flame className="w-7 h-7 sm:w-8 sm:h-8" />
               </div>
 
               <div>
-                <span className="text-xs uppercase font-black tracking-widest text-red-400">
+                <span className="text-xs uppercase font-black tracking-widest text-[#FD3F01]">
                   IMPOSTER CAUGHT!
                 </span>
-                <h3 className="text-xl sm:text-3xl font-black text-white">
+                <h3 className="text-xl sm:text-3xl font-black text-[#010101]">
                   10-Second Sudden Death
                 </h3>
-                <p className="text-xs text-slate-300 mt-1">
+                <p className="text-xs text-[#010101]/70 mt-1 font-medium">
                   {isCaughtImposter
                     ? 'You have 10 seconds to guess the secret word and steal +500 points for the imposters!'
                     : `${gameState.suddenDeathPlayerUsername} was voted out and is attempting a final guess!`}
@@ -415,18 +412,18 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
                     placeholder="Guess the secret word..."
                     autoFocus
                     required
-                    className="w-full min-h-[48px] bg-feto-dark border-2 border-yellow-400 focus:ring-4 focus:ring-yellow-500/30 rounded-2xl px-4 py-3 sm:py-4 text-center text-lg sm:text-xl font-black text-white outline-none uppercase"
+                    className="w-full min-h-[48px] bg-[#F8F8F8] border-2 border-[#010101] focus:border-[#0B89FD] rounded-2xl px-4 py-3 sm:py-4 text-center text-lg sm:text-xl font-black text-[#010101] outline-none uppercase shadow-[4px_4px_0px_#010101]"
                   />
                   <button
                     type="submit"
                     disabled={isSubmittingGuess || !suddenDeathInput.trim()}
-                    className="w-full min-h-[52px] py-3.5 sm:py-4 bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-black font-black text-base sm:text-lg rounded-2xl shadow-neon-yellow tracking-wider touch-target"
+                    className="w-full min-h-[52px] py-3.5 sm:py-4 bg-[#FEC90E] hover:bg-[#fed338] text-[#010101] font-black text-base sm:text-lg rounded-2xl border-2 border-[#010101] shadow-[4px_4px_0px_#010101] tracking-wider touch-target active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101]"
                   >
                     STEAL THE ROUND WIN!
                   </button>
                 </form>
               ) : (
-                <div className="p-4 bg-feto-card rounded-2xl border border-feto-border text-slate-400 text-xs animate-pulse">
+                <div className="p-4 bg-[#F8F8F8] rounded-2xl border-2 border-[#010101] text-[#010101]/70 text-xs font-bold animate-pulse">
                   Waiting for imposter to submit their final guess...
                 </div>
               )}
@@ -442,34 +439,34 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="glass-panel p-6 md:p-8 rounded-3xl border border-cyan-500/40 text-center space-y-6"
+          className="bg-[#FFFFFF] p-6 md:p-8 rounded-3xl border-3 border-[#010101] shadow-[8px_8px_0px_#010101] text-center space-y-6"
         >
           <div>
-            <div className="text-xs uppercase font-black tracking-widest text-cyan-400 mb-1">
+            <div className="text-xs uppercase font-black tracking-widest text-[#0B89FD] mb-1">
               Round Complete
             </div>
-            <h2 className="text-3xl md:text-4xl font-black text-white">
+            <h2 className="text-3xl md:text-4xl font-black text-[#010101]">
               {gameState.impostersWon ? '😈 THE IMPOSTERS WON!' : '🎉 CIVILIANS WIN!'}
             </h2>
           </div>
 
           {gameState.revealedWord && (
-            <div className="p-4 bg-cyan-950/40 border border-cyan-500/30 rounded-2xl inline-block px-8">
-              <span className="text-xs uppercase text-slate-400 font-bold block">Secret Word Was</span>
-              <span className="text-3xl font-black text-cyan-300">{gameState.revealedWord}</span>
+            <div className="p-4 bg-[#F8F8F8] border-2 border-[#010101] rounded-2xl inline-block px-8 shadow-[3px_3px_0px_#010101]">
+              <span className="text-xs uppercase text-[#010101]/60 font-black block">Secret Word Was</span>
+              <span className="text-3xl font-black text-[#0B89FD]">{gameState.revealedWord}</span>
             </div>
           )}
 
           {gameState.imposterList && (
             <div>
-              <h4 className="text-xs uppercase font-bold text-slate-400 mb-2">Imposter Identities</h4>
+              <h4 className="text-xs uppercase font-black text-[#010101]/70 mb-2">Imposter Identities</h4>
               <div className="flex flex-wrap justify-center gap-2">
                 {gameState.imposterList
                   .filter((p) => p.role === 'imposter')
                   .map((imp) => (
                     <span
                       key={imp.id}
-                      className="px-3 py-1.5 bg-red-950/80 border border-red-500/60 rounded-xl text-red-300 font-bold text-xs"
+                      className="px-3 py-1.5 bg-[#FD3F01] border-2 border-[#010101] rounded-xl text-white font-black text-xs shadow-[2px_2px_0px_#010101]"
                     >
                       {imp.username} (Imposter)
                     </span>

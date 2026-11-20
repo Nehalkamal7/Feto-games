@@ -262,12 +262,12 @@ export function GameRulesModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#010101]/80 backdrop-blur-sm">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
-          className="w-full max-w-2xl glass-panel-neon rounded-3xl p-6 md:p-8 max-h-[90vh] overflow-y-auto relative"
+          className="w-full max-w-2xl bg-[#FFFFFF] rounded-3xl p-6 md:p-8 max-h-[90vh] overflow-y-auto relative border-3 border-[#010101] shadow-[8px_8px_0px_#010101]"
         >
           {/* CLOSE BUTTON */}
           <button
@@ -275,15 +275,15 @@ export function GameRulesModal({
               sound.playClick();
               onClose();
             }}
-            className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+            className="absolute top-5 right-5 p-2 rounded-xl text-[#010101] bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101] transition-all font-black"
             aria-label="Close"
           >
             <X className="w-5 h-5" />
           </button>
 
           {/* TITLE */}
-          <div className="flex items-center gap-2 mb-6 text-cyan-400 text-xs font-bold uppercase tracking-wider">
-            <BookOpen className="w-4 h-4" />
+          <div className="flex items-center gap-2 mb-6 text-[#0B89FD] text-xs font-black uppercase tracking-wider">
+            <BookOpen className="w-4 h-4 text-[#0B89FD]" />
             <span>Party Game Rulebooks</span>
           </div>
 
@@ -299,14 +299,16 @@ export function GameRulesModal({
                     sound.playClick();
                     setActiveMode(mode);
                   }}
-                  className={`p-2.5 rounded-xl border text-xs font-bold text-left transition-all ${
+                  className={`p-2.5 rounded-xl border-2 border-[#010101] text-xs font-black text-left transition-all ${
                     isSelected
-                      ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300 shadow-neon-cyan'
-                      : 'bg-slate-900/60 border-slate-700 text-slate-400 hover:text-white hover:border-slate-500'
+                      ? 'bg-[#0B89FD] text-white shadow-[2px_2px_0px_#010101]'
+                      : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
                   }`}
                 >
                   <div className="truncate">{item.name}</div>
-                  <div className="text-[10px] text-slate-400 font-normal">{item.playerRange}</div>
+                  <div className={`text-[10px] font-medium ${isSelected ? 'text-white/80' : 'text-[#010101]/60'}`}>
+                    {item.playerRange}
+                  </div>
                 </button>
               );
             })}
@@ -316,27 +318,27 @@ export function GameRulesModal({
           <div className="space-y-6">
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-2">
-                <h2 className="text-2xl font-black text-white">{rule.name}</h2>
-                <span className={`px-2.5 py-0.5 rounded-full text-xs font-extrabold border ${rule.badgeColor}`}>
+                <h2 className="text-2xl font-black text-[#010101]">{rule.name}</h2>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-black border-2 border-[#010101] bg-[#FEC90E] text-[#010101]">
                   {rule.playerRange}
                 </span>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700">
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-[#F8F8F8] text-[#010101] border-2 border-[#010101]">
                   {rule.difficulty}
                 </span>
               </div>
-              <p className="text-slate-300 text-sm">{rule.overview}</p>
+              <p className="text-[#010101]/80 text-sm font-medium">{rule.overview}</p>
             </div>
 
             {/* HOW TO PLAY */}
-            <div className="glass-panel p-4 rounded-2xl">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-cyan-300 mb-3 flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+            <div className="bg-[#F8F8F8] p-4 rounded-2xl border-2 border-[#010101] shadow-[3px_3px_0px_#010101]">
+              <h3 className="text-xs font-black uppercase tracking-wider text-[#010101] mb-3 flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5 text-[#0B89FD]" />
                 <span>How to Play</span>
               </h3>
               <ul className="space-y-2">
                 {rule.howToPlay.map((step, idx) => (
-                  <li key={idx} className="text-xs text-slate-300 flex items-start gap-2.5 leading-relaxed">
-                    <span className="w-5 h-5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-bold flex items-center justify-center flex-shrink-0 text-[10px]">
+                  <li key={idx} className="text-xs text-[#010101]/90 flex items-start gap-2.5 leading-relaxed font-medium">
+                    <span className="w-5 h-5 rounded-full bg-[#0B89FD] text-white border border-[#010101] font-black flex items-center justify-center flex-shrink-0 text-[10px]">
                       {idx + 1}
                     </span>
                     <span>{step}</span>
@@ -346,15 +348,15 @@ export function GameRulesModal({
             </div>
 
             {/* SCORING & STRATEGY */}
-            <div className="glass-panel p-4 rounded-2xl border-feto-magenta/30">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-feto-magenta mb-3 flex items-center gap-2">
-                <Flame className="w-3.5 h-3.5 text-feto-magenta" />
-                <span>Scoring & Strategy</span>
+            <div className="bg-[#F8F8F8] p-4 rounded-2xl border-2 border-[#010101] shadow-[3px_3px_0px_#010101]">
+              <h3 className="text-xs font-black uppercase tracking-wider text-[#FD3F01] mb-3 flex items-center gap-2">
+                <Flame className="w-3.5 h-3.5 text-[#FD3F01]" />
+                <span>Scoring &amp; Strategy</span>
               </h3>
               <ul className="space-y-1.5">
                 {rule.scoringTips.map((tip, idx) => (
-                  <li key={idx} className="text-xs text-slate-300 flex items-start gap-2">
-                    <span className="text-feto-magenta font-black">•</span>
+                  <li key={idx} className="text-xs text-[#010101]/90 flex items-start gap-2 font-medium">
+                    <span className="text-[#FD3F01] font-black">•</span>
                     <span>{tip}</span>
                   </li>
                 ))}

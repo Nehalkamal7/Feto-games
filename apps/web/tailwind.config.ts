@@ -10,25 +10,45 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        bauhaus: {
+          canvas: '#F8F8F8',
+          white: '#FFFFFF',
+          black: '#010101',
+          blue: '#0B89FD',
+          yellow: '#FEC90E',
+          red: '#FD3F01',
+          muted: '#E5E5E5',
+          darkMuted: '#525252'
+        },
         feto: {
-          dark: '#0a0b14',
-          card: '#121424',
-          cardHover: '#181c32',
-          border: '#242a4a',
-          cyan: '#00F0FF',
-          magenta: '#FF007A',
-          purple: '#8B00FF',
-          yellow: '#FFE600',
-          green: '#39FF14',
-          orange: '#FF5E00'
+          dark: '#F8F8F8', // Crisp Off-White canvas
+          card: '#FFFFFF', // Pure White elevated card surfaces
+          cardHover: '#F4F4F5',
+          border: '#010101', // Jet Black borders
+          blue: '#0B89FD', // Electric Blue primary action
+          yellow: '#FEC90E', // Vibrant Gold/Yellow accent
+          red: '#FD3F01', // Punchy Red-Orange alert/timer
+          cyan: '#0B89FD',
+          magenta: '#FD3F01',
+          purple: '#0B89FD',
+          green: '#10B981',
+          orange: '#FD3F01'
         }
       },
       boxShadow: {
-        'neon-cyan': '0 0 15px rgba(0, 240, 255, 0.5), 0 0 30px rgba(0, 240, 255, 0.2)',
-        'neon-magenta': '0 0 15px rgba(255, 0, 122, 0.5), 0 0 30px rgba(255, 0, 122, 0.2)',
-        'neon-yellow': '0 0 15px rgba(255, 230, 0, 0.5), 0 0 30px rgba(255, 230, 0, 0.2)',
-        'neon-green': '0 0 15px rgba(57, 255, 20, 0.5), 0 0 30px rgba(57, 255, 20, 0.2)',
-        'neon-gold': '0 0 20px rgba(255, 215, 0, 0.6), 0 0 40px rgba(255, 215, 0, 0.3)'
+        'neo': '4px 4px 0px #010101',
+        'neo-sm': '2px 2px 0px #010101',
+        'neo-lg': '6px 6px 0px #010101',
+        'neo-xl': '8px 8px 0px #010101',
+        'neo-blue': '4px 4px 0px #0B89FD',
+        'neo-yellow': '4px 4px 0px #FEC90E',
+        'neo-red': '4px 4px 0px #FD3F01',
+        'neon-cyan': '4px 4px 0px #010101',
+        'neon-magenta': '4px 4px 0px #FD3F01',
+        'neon-yellow': '4px 4px 0px #FEC90E',
+        'neon-green': '4px 4px 0px #010101',
+        'neon-purple': '4px 4px 0px #010101',
+        'neon-gold': '4px 4px 0px #FEC90E'
       },
       animation: {
         'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',

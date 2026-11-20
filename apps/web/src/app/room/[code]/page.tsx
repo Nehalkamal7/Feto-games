@@ -849,10 +849,10 @@ export default function RoomPage() {
 
   if (isInitializing || !room) {
     return (
-      <div className="min-h-[100dvh] flex items-center justify-center bg-feto-dark">
+      <div className="min-h-[100dvh] flex items-center justify-center bg-[#F8F8F8]">
         <div className="text-center space-y-4">
-          <div className="w-16 h-16 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto shadow-neon-cyan" />
-          <p className="text-cyan-300 font-black uppercase tracking-wider text-sm">
+          <div className="w-16 h-16 border-4 border-[#010101] border-t-[#0B89FD] rounded-full animate-spin mx-auto shadow-[4px_4px_0px_#010101]" />
+          <p className="text-[#010101] font-black uppercase tracking-wider text-sm">
             Connecting to FETO Room {roomCode}...
           </p>
         </div>
@@ -862,16 +862,12 @@ export default function RoomPage() {
 
   return (
     <div
-      className={`min-h-[100dvh] bg-feto-dark text-slate-100 flex flex-col justify-between max-w-7xl mx-auto px-3 sm:px-6 py-3 sm:py-5 relative safe-top safe-bottom transition-all ${
+      className={`min-h-[100dvh] bg-[#F8F8F8] text-[#010101] flex flex-col justify-between max-w-7xl mx-auto px-3 sm:px-6 py-3 sm:py-5 relative safe-top safe-bottom transition-all ${
         timerState && timerState.remainingSeconds <= 5 && timerState.remainingSeconds > 0 && (room.status === 'in_game' || room.status === 'playing')
           ? 'tension-pulse'
           : ''
       }`}
     >
-      {/* Background Neon Glows */}
-      <div className="fixed top-0 left-1/4 w-[450px] h-[450px] bg-cyan-600/10 rounded-full blur-[140px] pointer-events-none -z-10" />
-      <div className="fixed bottom-10 right-1/4 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[150px] pointer-events-none -z-10" />
-
       {/* Toast Notification Banner */}
       <AnimatePresence>
         {toastMessage && (
@@ -879,9 +875,9 @@ export default function RoomPage() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 bg-feto-card border border-cyan-400 rounded-full text-white text-xs md:text-sm font-semibold shadow-neon-cyan flex items-center gap-2"
+            className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 bg-[#FFFFFF] border-2 border-[#010101] rounded-full text-[#010101] text-xs md:text-sm font-black shadow-[4px_4px_0px_#010101] flex items-center gap-2"
           >
-            <Sparkles className="w-4 h-4 text-cyan-400" />
+            <Sparkles className="w-4 h-4 text-[#0B89FD]" />
             <span>{toastMessage}</span>
           </motion.div>
         )}
@@ -937,14 +933,14 @@ export default function RoomPage() {
         /* IN-GAME ACTIVE SCREEN */
         <div className="flex-1 flex flex-col items-center justify-start py-2 relative z-10 w-full min-h-[600px]">
           {/* IN-GAME HUD BAR */}
-          <div className="w-full glass-panel rounded-2xl px-3 sm:px-5 py-2 mb-3 flex items-center justify-between border border-cyan-500/25 shadow-neon-cyan">
+          <div className="w-full bg-[#FFFFFF] rounded-2xl px-3 sm:px-5 py-2 mb-3 flex items-center justify-between border-2 border-[#010101] shadow-[4px_4px_0px_#010101]">
             <div className="flex items-center gap-2 sm:gap-3">
-              <NeonLogo size="nav" showSubtitle={false} />
-              <span className="text-slate-600 font-bold hidden sm:inline">|</span>
-              <div className="px-2.5 py-0.5 rounded-lg bg-cyan-950/80 border border-cyan-500/30 text-[10px] sm:text-xs font-black text-cyan-300 font-mono">
+              <BrandLogo size="nav" showSubtitle={false} />
+              <span className="text-[#010101]/40 font-bold hidden sm:inline">|</span>
+              <div className="px-2.5 py-0.5 rounded-lg bg-[#FEC90E] border-2 border-[#010101] text-[10px] sm:text-xs font-black text-[#010101] font-mono shadow-[1px_1px_0px_#010101]">
                 ROOM: {roomCode}
               </div>
-              <div className="px-2.5 py-0.5 rounded-lg bg-purple-950/80 border border-purple-500/40 text-[10px] sm:text-xs font-black text-purple-300 uppercase">
+              <div className="px-2.5 py-0.5 rounded-lg bg-[#0B89FD] border-2 border-[#010101] text-[10px] sm:text-xs font-black text-white uppercase shadow-[1px_1px_0px_#010101]">
                 Round {room.currentRound} / {room.config.totalRounds}
               </div>
             </div>
@@ -953,12 +949,12 @@ export default function RoomPage() {
               {room.config.vibeMode === 'sip_edition' && (
                 <button
                   onClick={handleQuickTakeSip}
-                  className="px-2.5 py-1 rounded-xl bg-pink-950/80 hover:bg-pink-900 border border-pink-500/50 text-pink-300 text-[11px] font-black flex items-center gap-1 shadow-neon-magenta animate-pulse touch-target"
+                  className="px-2.5 py-1 rounded-xl bg-[#FD3F01] hover:bg-[#e03800] border-2 border-[#010101] text-white text-[11px] font-black flex items-center gap-1 shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] touch-target"
                   title="Take a drink & log on leaderboard"
                 >
-                  <Wine className="w-3 h-3 text-pink-400" />
+                  <Wine className="w-3.5 h-3.5 text-white" />
                   <span className="hidden sm:inline">Take Sip! 🥤</span>
-                  <span className="font-mono text-[10px] text-white">
+                  <span className="font-mono text-[10px] text-white font-black">
                     ({room.sipsCount?.[currentPlayer?.id || ''] || 0})
                   </span>
                 </button>
@@ -969,10 +965,10 @@ export default function RoomPage() {
                   sound.playClick();
                   setShowCustomCardModal(true);
                 }}
-                className="p-1.5 sm:px-2.5 sm:py-1 rounded-xl bg-purple-950/60 hover:bg-purple-900/60 border border-purple-500/40 text-purple-300 text-[11px] font-bold flex items-center gap-1"
+                className="p-1.5 sm:px-2.5 sm:py-1 rounded-xl bg-[#FFFFFF] hover:bg-[#F8F8F8] border-2 border-[#010101] text-[#010101] text-[11px] font-black flex items-center gap-1 shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px]"
                 title="Submit Custom Card"
               >
-                <PlusCircle className="w-3.5 h-3.5 text-purple-400" />
+                <PlusCircle className="w-3.5 h-3.5 text-[#0B89FD]" />
                 <span className="hidden sm:inline">Custom Card</span>
               </button>
 
@@ -980,7 +976,7 @@ export default function RoomPage() {
 
               <button
                 onClick={handleLeaveRoom}
-                className="p-1.5 rounded-xl bg-red-950/40 hover:bg-red-900/50 border border-red-500/40 text-red-400"
+                className="p-1.5 rounded-xl bg-[#FFFFFF] hover:bg-[#FD3F01]/20 border-2 border-[#010101] text-[#010101] shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px]"
                 title="Leave Room"
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -994,26 +990,26 @@ export default function RoomPage() {
               exit={{ scale: 1.5, opacity: 0 }}
               className="my-auto text-center py-20 flex flex-col items-center justify-center"
             >
-              <div className="text-sm uppercase tracking-widest text-cyan-400 font-bold mb-4 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 animate-spin text-cyan-400" />
+              <div className="text-sm uppercase tracking-widest text-[#010101] font-black mb-4 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 animate-spin text-[#0B89FD]" />
                 <span>Match Starting In</span>
               </div>
-              <div className="text-9xl md:text-[12rem] font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-feto-magenta to-yellow-400 animate-pulse font-display drop-shadow-[0_0_50px_rgba(0,240,255,0.6)]">
+              <div className="text-9xl md:text-[12rem] font-black text-[#FD3F01] filter drop-shadow-[6px_6px_0px_#010101] font-display">
                 {countdown}
               </div>
             </motion.div>
           ) : !currentPlayer ? (
             <div className="flex flex-col items-center justify-center my-auto py-20 space-y-4">
-              <div className="w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin" />
-              <p className="text-slate-400 font-medium">Connecting to game room...</p>
+              <div className="w-12 h-12 border-4 border-[#010101] border-t-[#0B89FD] rounded-full animate-spin" />
+              <p className="text-[#525252] font-black">Connecting to game room...</p>
             </div>
           ) : !gameStateSync || gameStateSync.gameMode !== room.config.gameMode ? (
             <div className="flex flex-col items-center justify-center my-auto py-20 space-y-4 max-w-md mx-auto text-center px-4">
-              <div className="w-12 h-12 border-4 border-feto-magenta border-t-transparent rounded-full animate-spin" />
-              <p className="text-cyan-300 font-bold tracking-wide animate-pulse">
+              <div className="w-12 h-12 border-4 border-[#010101] border-t-[#FD3F01] rounded-full animate-spin" />
+              <p className="text-[#010101] font-black tracking-wide">
                 Syncing match...
               </p>
-              <p className="text-slate-400 text-xs">
+              <p className="text-[#525252] text-xs font-semibold">
                 Connecting to live game round data
               </p>
               {syncSeconds >= 4 && (
@@ -1023,7 +1019,7 @@ export default function RoomPage() {
                     syncMatchState();
                   }}
                   disabled={isManualSyncing}
-                  className="mt-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold text-xs uppercase tracking-wider shadow-neon-cyan transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50"
+                  className="mt-2 px-5 py-2.5 rounded-xl bg-[#0B89FD] hover:bg-[#0977db] text-white font-black text-xs uppercase tracking-wider border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all disabled:opacity-50"
                 >
                   {isManualSyncing ? 'Syncing...' : '🔄 Retry Sync'}
                 </button>
@@ -1123,11 +1119,11 @@ export default function RoomPage() {
         <div className="flex-1 flex flex-col justify-between py-1 sm:py-2 relative z-10 w-full">
           <div>
             {/* 1. TOP HEADER: FETO GAMES | LOBBY (LEFT), WAITING FOR PLAYERS... (X/15) (RIGHT) */}
-            <div className="glass-panel rounded-2xl px-3.5 sm:px-6 py-2.5 sm:py-3.5 mb-4 flex items-center justify-between border border-cyan-500/25 shadow-neon-cyan">
+            <div className="bg-[#FFFFFF] rounded-2xl px-3.5 sm:px-6 py-2.5 sm:py-3.5 mb-4 flex items-center justify-between border-2 border-[#010101] shadow-[4px_4px_0px_#010101]">
               <div className="flex items-center gap-2 sm:gap-3">
                 <BrandLogo size="nav" showSubtitle={false} />
-                <span className="text-slate-600 font-bold hidden sm:inline">|</span>
-                <div className="px-2.5 py-1 rounded-xl bg-purple-950/60 border border-purple-500/40 text-[10px] sm:text-xs font-black uppercase tracking-widest text-purple-300 shadow-neon-purple">
+                <span className="text-[#010101]/30 font-bold hidden sm:inline">|</span>
+                <div className="px-2.5 py-1 rounded-xl bg-[#FEC90E] border-2 border-[#010101] text-[10px] sm:text-xs font-black uppercase tracking-widest text-[#010101] shadow-[2px_2px_0px_#010101]">
                   LOBBY
                 </div>
               </div>
@@ -1140,59 +1136,59 @@ export default function RoomPage() {
                     setIsStreamerMode(!isStreamerMode);
                     showToast(isStreamerMode ? 'Streamer Mode Disabled (Code Visible)' : 'Streamer Mode Active (Code Hidden for Streaming)');
                   }}
-                  className={`px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition-all ${
+                  className={`px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition-all border-2 border-[#010101] shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] ${
                     isStreamerMode
-                      ? 'bg-amber-950/80 border border-amber-500/50 text-amber-300 shadow-neon-amber'
-                      : 'bg-slate-900/90 border border-slate-700/80 text-slate-400 hover:text-white'
+                      ? 'bg-[#FEC90E] text-[#010101]'
+                      : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
                   }`}
                   title="Toggle Streamer Mode to hide room code & invite links for Twitch / YouTube / TikTok streaming"
                 >
-                  {isStreamerMode ? <EyeOff className="w-3.5 h-3.5 text-amber-400" /> : <Eye className="w-3.5 h-3.5" />}
+                  {isStreamerMode ? <EyeOff className="w-3.5 h-3.5 text-[#010101]" /> : <Eye className="w-3.5 h-3.5 text-[#010101]" />}
                   <span className="hidden sm:inline">Streamer Mode</span>
                 </button>
 
-                <div className="flex items-center gap-1.5 sm:gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-[11px] sm:text-xs font-black uppercase tracking-wider">
-                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                <div className="flex items-center gap-1.5 sm:gap-2 px-3 py-1 rounded-full bg-[#0B89FD] border-2 border-[#010101] text-white text-[11px] sm:text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_#010101]">
+                  <div className="w-2 h-2 rounded-full bg-white animate-ping" />
                   <span className="hidden sm:inline">WAITING FOR PLAYERS...</span>
-                  <span className="font-mono text-cyan-300">({activePlayers.length}/15)</span>
+                  <span className="font-mono text-white font-black">({activePlayers.length}/15)</span>
                 </div>
               </div>
             </div>
 
             {/* 2. LARGE BOLD ROOM CODE DISPLAY + COPY INVITE LINK + PLAYERS COUNTER */}
-            <div className="glass-panel-neon rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 mb-5 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 border border-cyan-500/30 shadow-neon-cyan">
+            <div className="bg-[#FFFFFF] rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 mb-5 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 border-2 border-[#010101] shadow-[4px_4px_0px_#010101]">
               <div className="flex flex-wrap items-center gap-3 sm:gap-5 w-full sm:w-auto">
                 {/* Large Room Code Display */}
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] sm:text-xs uppercase font-black tracking-widest text-slate-400">
+                  <span className="text-[10px] sm:text-xs uppercase font-black tracking-widest text-[#525252]">
                     ROOM:
                   </span>
                   <button
                     onClick={handleCopyCode}
-                    className="group flex items-center gap-2 px-3.5 py-1.5 bg-feto-dark border border-cyan-500/50 hover:border-cyan-400 rounded-xl transition-all shadow-neon-cyan"
+                    className="group flex items-center gap-2 px-3.5 py-1.5 bg-[#F8F8F8] border-2 border-[#010101] hover:bg-[#FFFFFF] rounded-xl transition-all shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px]"
                     title="Click to copy Room Code"
                   >
-                    <span className="text-xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-white to-purple-400 tracking-widest font-mono">
+                    <span className="text-xl sm:text-3xl font-black text-[#010101] tracking-widest font-mono">
                       {isStreamerMode ? 'FG-••••' : roomCode}
                     </span>
                     {copiedCode ? (
-                      <Check className="w-4 h-4 text-emerald-400" />
+                      <Check className="w-4 h-4 text-[#0B89FD]" />
                     ) : (
-                      <Copy className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform" />
+                      <Copy className="w-4 h-4 text-[#010101] group-hover:scale-110 transition-transform" />
                     )}
                   </button>
                 </div>
 
                 {/* Players Counter Pill */}
-                <div className="px-3 py-1.5 rounded-xl bg-purple-950/50 border border-purple-500/30 text-purple-300 font-black text-xs sm:text-sm flex items-center gap-1.5">
-                  <Users className="w-4 h-4 text-purple-400" />
-                  <span>Players: <strong className="text-white font-mono">{activePlayers.length}</strong> / 15</span>
+                <div className="px-3 py-1.5 rounded-xl bg-[#F8F8F8] border-2 border-[#010101] text-[#010101] font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-[2px_2px_0px_#010101]">
+                  <Users className="w-4 h-4 text-[#0B89FD]" />
+                  <span>Players: <strong className="text-[#010101] font-mono font-black">{activePlayers.length}</strong> / 15</span>
                 </div>
 
                 {/* PIN Protected indicator */}
                 {room.config.hasPin && (
-                  <div className="px-2.5 py-1 rounded-xl bg-amber-950/50 border border-amber-500/40 text-amber-300 text-[10px] sm:text-xs font-bold flex items-center gap-1">
-                    <Lock className="w-3.5 h-3.5 text-amber-400" />
+                  <div className="px-2.5 py-1 rounded-xl bg-[#FD3F01]/10 border-2 border-[#FD3F01] text-[#FD3F01] text-[10px] sm:text-xs font-black flex items-center gap-1">
+                    <Lock className="w-3.5 h-3.5 text-[#FD3F01]" />
                     <span>PIN Protected</span>
                   </div>
                 )}
@@ -1207,23 +1203,23 @@ export default function RoomPage() {
                     sound.playClick();
                     setShowSettingsModal(true);
                   }}
-                  className="px-3 py-2 rounded-xl bg-[#131822] hover:bg-[#1A2230] border border-cyan-400/50 text-cyan-300 text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-sm touch-manipulation"
+                  className="px-3 py-2 rounded-xl bg-[#FFFFFF] hover:bg-[#F8F8F8] border-2 border-[#010101] text-[#010101] text-xs font-black flex items-center gap-1.5 transition-all shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] touch-manipulation"
                   title="Live In-Room Settings Editor"
                   aria-label="Room Settings"
                 >
-                  <Settings className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>⚙️ Settings</span>
+                  <Settings className="w-3.5 h-3.5 text-[#010101]" />
+                  <span>Settings</span>
                 </button>
 
                 {room.config.vibeMode === 'sip_edition' && (
                   <button
                     onClick={handleQuickTakeSip}
-                    className="px-3 py-2 rounded-xl bg-pink-950/70 hover:bg-pink-900/80 border border-pink-500/50 text-pink-300 text-xs font-black flex items-center gap-1.5 transition-all shadow-neon-magenta touch-target animate-pulse"
+                    className="px-3 py-2 rounded-xl bg-[#FD3F01] hover:bg-[#e03800] border-2 border-[#010101] text-white text-xs font-black flex items-center gap-1.5 transition-all shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] touch-target"
                     title="Take a drink & log it on the leaderboard!"
                   >
-                    <Wine className="w-3.5 h-3.5 text-pink-400" />
+                    <Wine className="w-3.5 h-3.5 text-white" />
                     <span>Take Sip! 🥤</span>
-                    <span className="font-mono text-[10px] px-1.5 py-0.2 bg-pink-900/90 rounded-full border border-pink-500/40 text-white font-bold">
+                    <span className="font-mono text-[10px] px-1.5 py-0.2 bg-white text-[#FD3F01] rounded-full border border-[#010101] font-black">
                       {room.sipsCount?.[currentPlayer?.id || ''] || 0}
                     </span>
                   </button>
@@ -1234,13 +1230,13 @@ export default function RoomPage() {
                     sound.playClick();
                     setShowCustomCardModal(true);
                   }}
-                  className="px-3 py-2 rounded-xl bg-purple-950/60 hover:bg-purple-900/60 border border-purple-500/40 text-purple-300 text-xs font-bold flex items-center gap-1.5 transition-all shadow-neon-purple touch-target"
+                  className="px-3 py-2 rounded-xl bg-[#FFFFFF] hover:bg-[#F8F8F8] border-2 border-[#010101] text-[#010101] text-xs font-black flex items-center gap-1.5 transition-all shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] touch-target"
                   title="Submit your own question or dare"
                 >
-                  <PlusCircle className="w-3.5 h-3.5 text-purple-400" />
+                  <PlusCircle className="w-3.5 h-3.5 text-[#0B89FD]" />
                   <span className="hidden sm:inline">Custom Card</span>
                   {room.customCardsCount ? (
-                    <span className="font-mono text-[10px] px-1 py-0.2 bg-purple-900 rounded-full text-purple-200">
+                    <span className="font-mono text-[10px] px-1 py-0.2 bg-[#FEC90E] border border-[#010101] rounded-full text-[#010101] font-black">
                       +{room.customCardsCount}
                     </span>
                   ) : null}
@@ -1252,15 +1248,15 @@ export default function RoomPage() {
 
                 <button
                   onClick={handleCopyInviteLink}
-                  className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-500/20 to-purple-500/20 hover:from-cyan-500/30 hover:to-purple-500/30 border border-cyan-400/50 text-cyan-300 text-xs font-extrabold flex items-center gap-1.5 shadow-neon-cyan transition-all touch-target"
+                  className="px-3.5 py-2 rounded-xl bg-[#0B89FD] hover:bg-[#0977db] text-white border-2 border-[#010101] text-xs font-black flex items-center gap-1.5 shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] transition-all touch-target"
                 >
-                  {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
+                  {copiedLink ? <Check className="w-3.5 h-3.5 text-white" /> : <Share2 className="w-3.5 h-3.5 text-white" />}
                   <span>{copiedLink ? 'Copied!' : 'Invite'}</span>
                 </button>
 
                 <button
                   onClick={handleLeaveRoom}
-                  className="p-2 rounded-xl bg-red-950/40 hover:bg-red-900/50 border border-red-500/40 text-red-400 transition-all touch-target"
+                  className="p-2 rounded-xl bg-[#FFFFFF] hover:bg-[#FD3F01]/20 border-2 border-[#010101] text-[#010101] shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] transition-all touch-target"
                   title="Leave Room"
                 >
                   <LogOut className="w-3.5 h-3.5" />
@@ -1406,13 +1402,13 @@ export default function RoomPage() {
               {/* LEFT/CENTER AREA: 5x3 STRUCTURED GRID OF 15 GLOWING PLAYER SLOTS */}
               <div className="lg:col-span-8 flex flex-col">
                 <div className="flex items-center justify-between mb-3 px-1">
-                  <span className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                    <Users className="w-3.5 h-3.5 text-cyan-400" />
+                  <span className="text-xs font-black uppercase tracking-wider text-[#010101] flex items-center gap-1.5">
+                    <Users className="w-3.5 h-3.5 text-[#0B89FD]" />
                     <span>Lobby Slots (5 × 3 Grid)</span>
                   </span>
                   <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-emerald-950/80 border border-emerald-500/60 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.3)]">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-[#0B89FD] border-2 border-[#010101] text-white shadow-[2px_2px_0px_#010101]">
+                      <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
                       {activePlayers.filter((p) => p.isReady).length} / {activePlayers.length} READY
                     </span>
                   </div>
@@ -1434,71 +1430,71 @@ export default function RoomPage() {
                           layout
                           initial={{ scale: 0.85, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
-                          className={`relative glass-panel rounded-2xl p-2.5 sm:p-3 flex flex-col items-center justify-between text-center transition-all min-h-[145px] sm:min-h-[165px] border ${
+                          className={`relative bg-[#FFFFFF] rounded-2xl p-2.5 sm:p-3 flex flex-col items-center justify-between text-center transition-all min-h-[145px] sm:min-h-[165px] border-2 border-[#010101] ${
                             player.isReady
-                              ? 'border-emerald-500 bg-emerald-950/40 shadow-[0_0_20px_rgba(16,185,129,0.35)] ring-1 ring-emerald-400'
+                              ? 'shadow-[4px_4px_0px_#010101]'
                               : isDisconnected
-                              ? 'border-amber-500/60 bg-amber-950/20 shadow-neon-amber'
-                              : 'border-feto-border bg-slate-900/60'
+                              ? 'border-[#FD3F01] bg-[#FD3F01]/10 shadow-[2px_2px_0px_#010101]'
+                              : 'shadow-[2px_2px_0px_#010101]'
                           }`}
                         >
-                          {/* TOP PILL BADGE: GREEN READY OR AMBER NOT READY */}
+                          {/* TOP PILL BADGE: BLUE READY OR MUTED NOT READY */}
                           <div className="w-full mb-1">
                             {isDisconnected ? (
-                              <div className="w-full py-0.5 px-1 bg-amber-950/80 border border-amber-500/50 rounded-lg text-amber-300 text-[9px] font-black flex items-center justify-center gap-1 animate-pulse">
-                                <Clock className="w-2.5 h-2.5" />
+                              <div className="w-full py-0.5 px-1 bg-[#FD3F01] border-2 border-[#010101] rounded-lg text-white text-[9px] font-black flex items-center justify-center gap-1 animate-pulse">
+                                <Clock className="w-2.5 h-2.5 text-white" />
                                 <span>{remainingGrace}s</span>
                               </div>
                             ) : player.isReady ? (
-                              <div className="w-full py-0.5 px-1 bg-emerald-900/90 border border-emerald-400 rounded-lg text-emerald-200 text-[9px] sm:text-[10px] font-black flex items-center justify-center gap-1 shadow-[0_0_10px_rgba(16,185,129,0.5)]">
-                                <CheckCircle2 className="w-3 h-3 text-emerald-300 flex-shrink-0" />
+                              <div className="w-full py-0.5 px-1 bg-[#0B89FD] border-2 border-[#010101] rounded-lg text-white text-[9px] sm:text-[10px] font-black flex items-center justify-center gap-1 shadow-[1px_1px_0px_#010101]">
+                                <CheckCircle2 className="w-3 h-3 text-white flex-shrink-0" />
                                 <span>READY ✓</span>
                               </div>
                             ) : (
-                              <div className="w-full py-0.5 px-1 bg-slate-900/80 border border-slate-700/60 rounded-lg text-slate-400 text-[9px] sm:text-[10px] font-extrabold truncate">
+                              <div className="w-full py-0.5 px-1 bg-[#F8F8F8] border border-[#010101] rounded-lg text-[#525252] text-[9px] sm:text-[10px] font-black truncate">
                                 NOT READY
                               </div>
                             )}
                           </div>
 
-                          {/* AVATAR FRAME WITH GLOW */}
+                          {/* AVATAR FRAME */}
                           <div className="relative my-1">
                             {/* Golden Host Crown Badge */}
                             {player.isHost && (
                               <div
-                                className="absolute -top-2 -right-2 z-10 p-1 bg-yellow-400 rounded-full shadow-neon-gold transform rotate-12"
+                                className="absolute -top-2.5 -right-2.5 z-10 p-1 bg-[#FEC90E] border-2 border-[#010101] rounded-full shadow-[2px_2px_0px_#010101] transform rotate-12"
                                 title="Room Host"
                               >
-                                <Crown className="w-3 h-3 text-black fill-black" />
+                                <Crown className="w-3 h-3 text-[#010101] fill-[#010101]" />
                               </div>
                             )}
 
                             <NeonAvatarDisplay
                               avatarId={player.avatar}
                               size="sm"
-                              showGlow={player.isReady}
+                              showGlow={false}
                               isReady={player.isReady}
                             />
                           </div>
 
                           {/* BOLD USERNAME UNDERNEATH */}
                           <div className="w-full truncate mt-1">
-                            <div className="font-black text-xs text-white truncate px-0.5">
+                            <div className="font-black text-xs text-[#010101] truncate px-0.5">
                               {player.username}
                               {player.id === currentPlayer?.id && (
-                                <span className="ml-1 text-[9px] text-cyan-300 font-semibold">(You)</span>
+                                <span className="ml-1 text-[9px] text-[#0B89FD] font-black">(You)</span>
                               )}
                             </div>
 
                             {/* Squad Badge if Team Mode */}
                             {room.config.isTeamMode && player.team && (
                               <div
-                                className={`mt-0.5 text-[8px] font-black px-1.5 py-0.2 rounded-full uppercase inline-block ${
+                                className={`mt-0.5 text-[8px] font-black px-1.5 py-0.2 rounded-full uppercase inline-block border border-[#010101] ${
                                   player.team === 'red'
-                                    ? 'bg-red-950/80 text-red-300 border border-red-500/40'
+                                    ? 'bg-[#FD3F01] text-white'
                                     : player.team === 'blue'
-                                    ? 'bg-blue-950/80 text-blue-300 border border-blue-500/40'
-                                    : 'bg-green-950/80 text-green-300 border border-green-500/40'
+                                    ? 'bg-[#0B89FD] text-white'
+                                    : 'bg-[#FEC90E] text-[#010101]'
                                 }`}
                               >
                                 {player.team}
@@ -1506,7 +1502,7 @@ export default function RoomPage() {
                             )}
                           </div>
 
-                          {/* Host Kick Option: never show on host's own card */}
+                          {/* Host Kick Option */}
                           {isHost && player.id !== currentPlayer?.id && player.id !== room.hostId && !player.isHost ? (
                             <button
                               type="button"
@@ -1514,10 +1510,10 @@ export default function RoomPage() {
                                 e.stopPropagation();
                                 setKickTarget(player);
                               }}
-                              className="mt-1 text-[10px] text-red-400 hover:text-white bg-red-950/40 hover:bg-red-900/60 font-bold flex items-center gap-1 py-0.5 px-2 rounded-md border border-red-500/30 hover:border-red-400 transition-all relative z-20 pointer-events-auto touch-manipulation"
+                              className="mt-1 text-[10px] text-[#FD3F01] hover:bg-[#FD3F01]/10 bg-[#FFFFFF] font-black flex items-center gap-1 py-0.5 px-2 rounded-md border border-[#010101] shadow-[1px_1px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] transition-all relative z-20 pointer-events-auto touch-manipulation"
                               title={`Kick ${player.username}`}
                             >
-                              <UserX className="w-2.5 h-2.5" /> Kick
+                              <UserX className="w-2.5 h-2.5 text-[#FD3F01]" /> Kick
                             </button>
                           ) : (
                             <div className="h-3" />
@@ -1530,35 +1526,35 @@ export default function RoomPage() {
                     return (
                       <div
                         key={`slot-${index}`}
-                        className="rounded-2xl border-2 border-dashed border-slate-800/80 bg-slate-900/20 flex flex-col items-center justify-center p-2.5 text-center text-slate-600 select-none min-h-[145px] sm:min-h-[165px]"
+                        className="rounded-2xl border-2 border-dashed border-[#010101]/30 bg-[#FFFFFF]/60 flex flex-col items-center justify-center p-2.5 text-center text-[#737373] select-none min-h-[145px] sm:min-h-[165px]"
                       >
-                        <div className="w-10 h-10 rounded-full border border-dashed border-slate-800 flex items-center justify-center mb-1 text-slate-600 text-xs font-bold">
+                        <div className="w-10 h-10 rounded-full border-2 border-dashed border-[#010101]/30 flex items-center justify-center mb-1 text-[#010101]/50 text-xs font-black">
                           ...
                         </div>
-                        <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">
+                        <span className="text-[10px] font-black text-[#525252] uppercase tracking-wider">
                           Slot #{slotNum}
                         </span>
-                        <span className="text-[9px] text-slate-700">Open</span>
+                        <span className="text-[9px] text-[#737373] font-semibold">Open</span>
                       </div>
                     );
                   })}
                 </div>
               </div>
 
-              {/* RIGHT SIDEBAR: GLOWING AMBER/PURPLE GAME SETTINGS PANEL */}
-              <div className="lg:col-span-4 glass-panel-neon rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-amber-500/30 shadow-neon-amber flex flex-col justify-between">
+              {/* RIGHT SIDEBAR: BOLD BAUHAUS GAME SETTINGS PANEL */}
+              <div className="lg:col-span-4 bg-[#FFFFFF] rounded-2xl sm:rounded-3xl p-4 sm:p-5 border-2 border-[#010101] shadow-[4px_4px_0px_#010101] flex flex-col justify-between">
                 <div>
                   {/* Panel Header */}
-                  <div className="flex items-center justify-between pb-3 mb-4 border-b border-amber-500/20">
+                  <div className="flex items-center justify-between pb-3 mb-4 border-b-2 border-[#010101]">
                     <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                        <Sliders className="w-4 h-4 text-amber-400" />
+                      <div className="p-1.5 rounded-xl bg-[#FEC90E] text-[#010101] border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
+                        <Sliders className="w-4 h-4 text-[#010101]" />
                       </div>
                       <div>
-                        <h3 className="text-xs sm:text-sm font-black text-white uppercase tracking-wider">
+                        <h3 className="text-xs sm:text-sm font-black text-[#010101] uppercase tracking-wider">
                           Game Settings
                         </h3>
-                        <p className="text-[10px] text-amber-300/80">
+                        <p className="text-[10px] text-[#525252] font-semibold">
                           {isHost ? 'Host controls & match configuration' : 'Match settings locked by host'}
                         </p>
                       </div>
@@ -1570,10 +1566,10 @@ export default function RoomPage() {
                     {/* 1. 10-GAME SELECTOR */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <label className="text-[11px] font-black uppercase tracking-wider text-slate-300">
+                        <label className="text-[11px] font-black uppercase tracking-wider text-[#010101]">
                           Selected Game (10 Modes)
                         </label>
-                        <span className="text-[10px] text-cyan-300 font-bold uppercase">
+                        <span className="text-[10px] text-[#0B89FD] font-black uppercase">
                           {room.config.gameMode?.replace(/_/g, ' ')}
                         </span>
                       </div>
@@ -1602,15 +1598,15 @@ export default function RoomPage() {
                                 sound.playClick();
                                 socketUpdateSettings({ gameMode: g.id as GameMode });
                               }}
-                              className={`p-2 rounded-xl border text-left flex flex-col justify-between transition-all ${
+                              className={`p-2 rounded-xl border-2 text-left flex flex-col justify-between transition-all ${
                                 isSelected
-                                  ? 'border-cyan-400 bg-cyan-950/70 text-white shadow-neon-cyan scale-[1.02]'
-                                  : 'border-slate-800 bg-slate-900/80 text-slate-300 hover:border-slate-700 hover:text-white'
-                              } ${!isHost ? 'cursor-default' : 'cursor-pointer'}`}
+                                  ? 'border-[#010101] bg-[#FEC90E] text-[#010101] shadow-[2px_2px_0px_#010101]'
+                                  : 'border-[#010101] bg-[#F8F8F8] text-[#010101] hover:bg-[#FFFFFF]'
+                              } ${!isHost ? 'cursor-default' : 'cursor-pointer active:translate-x-[1px] active:translate-y-[1px]'}`}
                             >
                               <div className="flex items-center justify-between">
                                 <span className="text-base">{g.emoji}</span>
-                                <span className="text-[9px] font-mono text-slate-400 font-bold">{g.players}</span>
+                                <span className="text-[9px] font-mono text-[#525252] font-black">{g.players}</span>
                               </div>
                               <span className="text-[11px] font-black truncate mt-1">{g.title}</span>
                             </button>
@@ -1627,7 +1623,7 @@ export default function RoomPage() {
                               sound.playClick();
                               socketUpdateSettings({ gameMode: e.target.value as GameMode });
                             }}
-                            className="w-full bg-slate-900 border border-amber-500/40 rounded-xl px-3 py-1.5 text-xs font-bold text-white outline-none cursor-pointer appearance-none hover:border-amber-400 transition-all"
+                            className="w-full bg-[#F8F8F8] border-2 border-[#010101] rounded-xl px-3 py-1.5 text-xs font-black text-[#010101] outline-none cursor-pointer appearance-none hover:bg-[#FFFFFF] transition-all"
                           >
                             <option value="who_is_imposter">🎭 Who Is The Imposter? (3-15p)</option>
                             <option value="draw_and_guess">🎨 Draw & Guess (2-15p)</option>
@@ -1640,30 +1636,30 @@ export default function RoomPage() {
                             <option value="silly_roulette">🎯 Silly Roulette (2-15p)</option>
                             <option value="hot_potato">🥔 Hot Potato (2-15p)</option>
                           </select>
-                          <ChevronDown className="w-4 h-4 text-amber-400 absolute right-3 top-2 pointer-events-none" />
+                          <ChevronDown className="w-4 h-4 text-[#010101] absolute right-3 top-2 pointer-events-none" />
                         </div>
                       )}
                     </div>
 
                     {/* 2. MATCH MODE: SOLO VS TEAMS */}
-                    <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-700/80">
+                    <div className="p-3 rounded-2xl bg-[#F8F8F8] border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
                       <div className="flex items-center justify-between mb-1.5">
                         <div className="flex items-center gap-1.5">
-                          <Shield className="w-4 h-4 text-cyan-400" />
-                          <span className="text-xs font-bold text-white">Match Mode</span>
+                          <Shield className="w-4 h-4 text-[#010101]" />
+                          <span className="text-xs font-black text-[#010101]">Match Mode</span>
                         </div>
                         {isHost ? (
-                          <div className="flex items-center bg-slate-950 p-0.5 rounded-lg border border-slate-800">
+                          <div className="flex items-center bg-[#FFFFFF] p-0.5 rounded-xl border-2 border-[#010101]">
                             <button
                               type="button"
                               onClick={() => {
                                 sound.playClick();
                                 socketUpdateSettings({ isTeamMode: false, mode: 'solo' });
                               }}
-                              className={`px-3 py-1 rounded-md text-[10px] font-black uppercase transition-all ${
+                              className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase transition-all ${
                                 !room.config.isTeamMode
-                                  ? 'bg-cyan-500 text-black shadow-neon-cyan'
-                                  : 'text-slate-400 hover:text-white'
+                                  ? 'bg-[#0B89FD] text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101]'
+                                  : 'text-[#010101] hover:bg-[#F8F8F8]'
                               }`}
                             >
                               Solo
@@ -1674,22 +1670,22 @@ export default function RoomPage() {
                                 sound.playClick();
                                 socketUpdateSettings({ isTeamMode: true, mode: 'teams' });
                               }}
-                              className={`px-3 py-1 rounded-md text-[10px] font-black uppercase transition-all ${
+                              className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase transition-all ${
                                 room.config.isTeamMode
-                                  ? 'bg-purple-500 text-white shadow-neon-purple'
-                                  : 'text-slate-400 hover:text-white'
+                                  ? 'bg-[#FEC90E] text-[#010101] border-2 border-[#010101] shadow-[2px_2px_0px_#010101]'
+                                  : 'text-[#010101] hover:bg-[#F8F8F8]'
                               }`}
                             >
                               Teams
                             </button>
                           </div>
                         ) : (
-                          <span className="text-xs font-black uppercase text-cyan-300">
+                          <span className="text-xs font-black uppercase text-[#0B89FD]">
                             {room.config.isTeamMode ? 'Teams Mode' : 'Solo FFA'}
                           </span>
                         )}
                       </div>
-                      <p className="text-[10px] text-slate-400">
+                      <p className="text-[10px] text-[#010101]/70 font-medium">
                         {room.config.isTeamMode
                           ? 'Blue Squad vs Red Squad (Team victory)'
                           : 'Free-For-All (Individual points & leaderboard)'}
@@ -1698,12 +1694,12 @@ export default function RoomPage() {
 
                     {/* 3. SOLO TEST / DEV MODE TOGGLE (HOST ONLY) */}
                     {isHost && (
-                      <div className="p-2.5 rounded-xl bg-cyan-950/40 border border-cyan-500/40 flex items-center justify-between">
+                      <div className="p-3 rounded-2xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <Sparkles className="w-4 h-4 text-cyan-400" />
+                          <Sparkles className="w-4 h-4 text-[#FEC90E]" />
                           <div>
-                            <div className="text-xs font-bold text-white">Solo Test / Dev Mode</div>
-                            <div className="text-[9px] text-cyan-300/80">Allow 1 player to launch & test any mode</div>
+                            <div className="text-xs font-black text-[#010101]">Solo Test / Dev Mode</div>
+                            <div className="text-[9px] text-[#010101]/70 font-medium">Allow 1 player to launch & test any mode</div>
                           </div>
                         </div>
                         <input
@@ -1715,7 +1711,7 @@ export default function RoomPage() {
                             setIsSoloDevMode(next);
                             socketUpdateSettings({ isSoloDevMode: next });
                           }}
-                          className="w-4 h-4 accent-cyan-400 rounded cursor-pointer"
+                          className="w-4 h-4 accent-[#0B89FD] rounded cursor-pointer border-2 border-[#010101]"
                         />
                       </div>
                     )}
@@ -1723,10 +1719,10 @@ export default function RoomPage() {
                     {/* 4. PARTY VIBE MODE */}
                     <div>
                       <div className="flex justify-between items-center mb-1">
-                        <label className="text-[11px] font-black uppercase tracking-wider text-slate-300">
+                        <label className="text-[11px] font-black uppercase tracking-wider text-[#010101]">
                           Party Vibe Mode
                         </label>
-                        <span className="text-cyan-300 font-extrabold text-[10px] uppercase">
+                        <span className="text-[#0B89FD] font-black text-[10px] uppercase">
                           {room.config.vibeMode?.replace('_', ' ') || 'chill'}
                         </span>
                       </div>
@@ -1744,10 +1740,10 @@ export default function RoomPage() {
                                 sound.playClick();
                                 socketUpdateSettings({ vibeMode: vibe.id as any });
                               }}
-                              className={`py-1.5 rounded-lg border text-[11px] font-bold transition-all ${
+                              className={`py-1.5 rounded-xl border-2 border-[#010101] text-[11px] font-black transition-all ${
                                 (room.config.vibeMode || 'chill') === vibe.id
-                                  ? 'border-cyan-400 bg-cyan-950/60 text-cyan-300 shadow-neon-cyan'
-                                  : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
+                                  ? 'bg-[#0B89FD] text-white shadow-[2px_2px_0px_#010101]'
+                                  : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
                               }`}
                             >
                               {vibe.label}
@@ -1755,7 +1751,7 @@ export default function RoomPage() {
                           ))}
                         </div>
                       ) : (
-                        <div className="px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-700 text-xs font-bold text-cyan-300 capitalize">
+                        <div className="px-3 py-1.5 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] text-xs font-black text-[#010101] capitalize">
                           {room.config.vibeMode?.replace('_', ' ') || 'Chill & Funny'}
                         </div>
                       )}
@@ -1764,10 +1760,10 @@ export default function RoomPage() {
                     {/* 5. ROUNDS SELECTOR */}
                     <div>
                       <div className="flex justify-between items-center mb-1">
-                        <label className="text-[11px] font-black uppercase tracking-wider text-slate-300">
+                        <label className="text-[11px] font-black uppercase tracking-wider text-[#010101]">
                           Rounds
                         </label>
-                        <span className="text-amber-300 font-extrabold text-xs">{room.config.totalRounds || 5} Rounds</span>
+                        <span className="text-[#010101] font-black text-xs">{room.config.totalRounds || 5} Rounds</span>
                       </div>
                       <div className="flex items-center gap-1.5 mb-1.5">
                         <button
@@ -1778,11 +1774,11 @@ export default function RoomPage() {
                             const next = Math.max(1, (room.config.totalRounds || 5) - 1);
                             socketUpdateSettings({ totalRounds: next });
                           }}
-                          className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700 hover:border-amber-400 text-amber-300 font-black flex items-center justify-center disabled:opacity-40"
+                          className="w-8 h-8 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] hover:bg-[#FEC90E] text-[#010101] font-black flex items-center justify-center disabled:opacity-40"
                         >
                           -
                         </button>
-                        <div className="flex-1 py-1 rounded-lg bg-slate-900 border border-slate-700 text-center font-black text-amber-300 text-xs">
+                        <div className="flex-1 py-1 rounded-xl bg-[#F8F8F8] border-2 border-[#010101] text-center font-black text-[#010101] text-xs">
                           {room.config.totalRounds || 5} Rounds
                         </div>
                         <button
@@ -1793,7 +1789,7 @@ export default function RoomPage() {
                             const next = Math.min(15, (room.config.totalRounds || 5) + 1);
                             socketUpdateSettings({ totalRounds: next });
                           }}
-                          className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700 hover:border-amber-400 text-amber-300 font-black flex items-center justify-center disabled:opacity-40"
+                          className="w-8 h-8 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] hover:bg-[#FEC90E] text-[#010101] font-black flex items-center justify-center disabled:opacity-40"
                         >
                           +
                         </button>
@@ -1808,10 +1804,10 @@ export default function RoomPage() {
                               sound.playClick();
                               socketUpdateSettings({ totalRounds: rounds });
                             }}
-                            className={`py-1 rounded-lg border text-[11px] font-bold transition-all ${
+                            className={`py-1 rounded-xl border-2 border-[#010101] text-[11px] font-black transition-all ${
                               (room.config.totalRounds || 5) === rounds
-                                ? 'border-amber-400 bg-amber-950/50 text-amber-300 shadow-neon-amber'
-                                : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
+                                ? 'bg-[#FEC90E] text-[#010101] shadow-[2px_2px_0px_#010101]'
+                                : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
                             }`}
                           >
                             {rounds}
@@ -1823,10 +1819,10 @@ export default function RoomPage() {
                     {/* 6. TIMER SELECTOR */}
                     <div>
                       <div className="flex justify-between items-center mb-1">
-                        <label className="text-[11px] font-black uppercase tracking-wider text-slate-300">
+                        <label className="text-[11px] font-black uppercase tracking-wider text-[#010101]">
                           Timer (Sec / Turn)
                         </label>
-                        <span className="text-cyan-300 font-extrabold text-xs">{room.config.roundDurationSeconds || 30}s</span>
+                        <span className="text-[#0B89FD] font-black text-xs">{room.config.roundDurationSeconds || 30}s</span>
                       </div>
                       <div className="flex items-center gap-1.5 mb-1.5">
                         <button
@@ -1837,11 +1833,11 @@ export default function RoomPage() {
                             const next = Math.max(10, (room.config.roundDurationSeconds || 30) - 5);
                             socketUpdateSettings({ roundDurationSeconds: next });
                           }}
-                          className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700 hover:border-cyan-400 text-cyan-300 font-black flex items-center justify-center disabled:opacity-40"
+                          className="w-8 h-8 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] hover:bg-[#0B89FD] hover:text-white text-[#010101] font-black flex items-center justify-center disabled:opacity-40"
                         >
                           -
                         </button>
-                        <div className="flex-1 py-1 rounded-lg bg-slate-900 border border-slate-700 text-center font-black text-cyan-300 text-xs">
+                        <div className="flex-1 py-1 rounded-xl bg-[#F8F8F8] border-2 border-[#010101] text-center font-black text-[#010101] text-xs">
                           {room.config.roundDurationSeconds || 30} Seconds
                         </div>
                         <button
@@ -1852,7 +1848,7 @@ export default function RoomPage() {
                             const next = Math.min(180, (room.config.roundDurationSeconds || 30) + 5);
                             socketUpdateSettings({ roundDurationSeconds: next });
                           }}
-                          className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700 hover:border-cyan-400 text-cyan-300 font-black flex items-center justify-center disabled:opacity-40"
+                          className="w-8 h-8 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] hover:bg-[#0B89FD] hover:text-white text-[#010101] font-black flex items-center justify-center disabled:opacity-40"
                         >
                           +
                         </button>
@@ -1867,10 +1863,10 @@ export default function RoomPage() {
                               sound.playClick();
                               socketUpdateSettings({ roundDurationSeconds: sec });
                             }}
-                            className={`py-1 rounded-lg border text-[11px] font-bold transition-all ${
+                            className={`py-1 rounded-xl border-2 border-[#010101] text-[11px] font-black transition-all ${
                               (room.config.roundDurationSeconds || 30) === sec
-                                ? 'border-cyan-400 bg-cyan-950/50 text-cyan-300 shadow-neon-cyan'
-                                : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
+                                ? 'bg-[#0B89FD] text-white shadow-[2px_2px_0px_#010101]'
+                                : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
                             }`}
                           >
                             {sec}s
@@ -1882,10 +1878,10 @@ export default function RoomPage() {
                     {/* 7. MAX PLAYERS SELECTOR */}
                     <div>
                       <div className="flex justify-between items-center mb-1">
-                        <label className="text-[11px] font-black uppercase tracking-wider text-slate-300">
+                        <label className="text-[11px] font-black uppercase tracking-wider text-[#010101]">
                           Max Players
                         </label>
-                        <span className="text-purple-300 font-extrabold text-xs">{room.config.maxPlayers || 15} Players</span>
+                        <span className="text-[#010101] font-black text-xs">{room.config.maxPlayers || 15} Players</span>
                       </div>
                       <div className="flex items-center gap-1.5 mb-1.5">
                         <button
@@ -1896,11 +1892,11 @@ export default function RoomPage() {
                             const next = Math.max(2, (room.config.maxPlayers || 15) - 1);
                             socketUpdateSettings({ maxPlayers: next });
                           }}
-                          className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700 hover:border-purple-400 text-purple-300 font-black flex items-center justify-center disabled:opacity-40"
+                          className="w-8 h-8 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] hover:bg-[#FEC90E] text-[#010101] font-black flex items-center justify-center disabled:opacity-40"
                         >
                           -
                         </button>
-                        <div className="flex-1 py-1 rounded-lg bg-slate-900 border border-slate-700 text-center font-black text-purple-300 text-xs">
+                        <div className="flex-1 py-1 rounded-xl bg-[#F8F8F8] border-2 border-[#010101] text-center font-black text-[#010101] text-xs">
                           {room.config.maxPlayers || 15} Capacity
                         </div>
                         <button
@@ -1911,7 +1907,7 @@ export default function RoomPage() {
                             const next = Math.min(15, (room.config.maxPlayers || 15) + 1);
                             socketUpdateSettings({ maxPlayers: next });
                           }}
-                          className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700 hover:border-purple-400 text-purple-300 font-black flex items-center justify-center disabled:opacity-40"
+                          className="w-8 h-8 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] hover:bg-[#FEC90E] text-[#010101] font-black flex items-center justify-center disabled:opacity-40"
                         >
                           +
                         </button>
@@ -1926,10 +1922,10 @@ export default function RoomPage() {
                               sound.playClick();
                               socketUpdateSettings({ maxPlayers: count });
                             }}
-                            className={`py-1 rounded-lg border text-[11px] font-bold transition-all ${
+                            className={`py-1 rounded-xl border-2 border-[#010101] text-[11px] font-black transition-all ${
                               (room.config.maxPlayers || 15) === count
-                                ? 'border-purple-400 bg-purple-950/50 text-purple-300 shadow-neon-purple'
-                                : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
+                                ? 'bg-[#FEC90E] text-[#010101] shadow-[2px_2px_0px_#010101]'
+                                : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
                             }`}
                           >
                             {count}p
@@ -1940,7 +1936,7 @@ export default function RoomPage() {
 
                     {/* 8. DIFFICULTY SELECTOR */}
                     <div>
-                      <label className="block text-[11px] font-black uppercase tracking-wider text-slate-300 mb-1">
+                      <label className="block text-[11px] font-black uppercase tracking-wider text-[#010101] mb-1">
                         Match Intensity
                       </label>
                       <div className="grid grid-cols-3 gap-1.5">
@@ -1956,10 +1952,10 @@ export default function RoomPage() {
                               sound.playClick();
                               setDifficultySetting(diff.id as any);
                             }}
-                            className={`py-1.5 rounded-lg border text-[11px] font-bold transition-all ${
+                            className={`py-1.5 rounded-xl border-2 border-[#010101] text-[11px] font-black transition-all ${
                               difficultySetting === diff.id
-                                ? 'border-purple-400 bg-purple-950/50 text-purple-300 shadow-neon-purple'
-                                : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
+                                ? 'bg-[#FD3F01] text-white shadow-[2px_2px_0px_#010101]'
+                                : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
                             }`}
                           >
                             {diff.label}
@@ -1971,12 +1967,12 @@ export default function RoomPage() {
                 </div>
 
                 {/* Compact Live Player Management List */}
-                <div className="mt-5 pt-3 border-t border-slate-800">
+                <div className="mt-5 pt-3 border-t-2 border-[#010101]/10">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] uppercase font-black tracking-wider text-slate-400">
+                    <span className="text-[10px] uppercase font-black tracking-wider text-[#010101]">
                       Connected ({activePlayers.length}/15)
                     </span>
-                    <span className="text-[10px] text-cyan-400 font-bold">
+                    <span className="text-[10px] text-[#0B89FD] font-black">
                       {activePlayers.filter((p) => p.isReady).length} Ready
                     </span>
                   </div>
@@ -1985,13 +1981,13 @@ export default function RoomPage() {
                     {activePlayers.map((player) => (
                       <div
                         key={player.id}
-                        className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-slate-900/60 border border-slate-800 text-xs"
+                        className="flex items-center justify-between px-2.5 py-1.5 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] text-xs"
                       >
                         <div className="flex items-center gap-2 truncate">
                           <span className="text-sm">{NEON_AVATARS[player.avatar]?.emoji || '👾'}</span>
-                          <span className="font-bold text-slate-200 truncate">{player.username}</span>
+                          <span className="font-bold text-[#010101] truncate">{player.username}</span>
                           {player.isHost && (
-                            <span className="text-[9px] px-1 py-0.2 rounded bg-yellow-400/20 text-yellow-300 font-extrabold">
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-[#FEC90E] text-[#010101] border border-[#010101] font-black">
                               HOST
                             </span>
                           )}
@@ -2000,7 +1996,7 @@ export default function RoomPage() {
                         <div className="flex items-center gap-2">
                           <span
                             className={`text-[9px] font-black uppercase ${
-                              player.isReady ? 'text-emerald-400' : 'text-amber-400'
+                              player.isReady ? 'text-[#0B89FD]' : 'text-[#FD3F01]'
                             }`}
                           >
                             {player.isReady ? '✓ READY' : 'WAITING'}
@@ -2012,7 +2008,7 @@ export default function RoomPage() {
                                 e.stopPropagation();
                                 setKickTarget(player);
                               }}
-                              className="text-red-400 hover:text-white hover:bg-red-950/80 p-1 rounded-md border border-red-500/20 hover:border-red-400/50 transition-all relative z-20 pointer-events-auto"
+                              className="text-[#FD3F01] hover:bg-[#FD3F01] hover:text-white p-1 rounded-md border-2 border-[#010101] transition-all relative z-20 pointer-events-auto"
                               title={`Kick ${player.username}`}
                             >
                               <UserX className="w-3.5 h-3.5" />
@@ -2028,18 +2024,18 @@ export default function RoomPage() {
           </div>
 
           {/* 5. BOTTOM CENTER: WIDE BRIGHT GRADIENT CYAN-TO-PURPLE GLOWING START GAME ▶ PLAY BUTTON */}
-          <div className="glass-panel-neon rounded-2xl sm:rounded-3xl p-3 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 border border-cyan-500/30 sticky bottom-2 z-20 shadow-2xl safe-bottom">
+          <div className="bg-[#FFFFFF] rounded-2xl sm:rounded-3xl p-3 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 border-2 border-[#010101] sticky bottom-2 z-20 shadow-[6px_6px_0px_#010101] safe-bottom">
             {/* Player Info Preview */}
             <div className="flex items-center gap-3 w-full sm:w-auto">
               {currentPlayer && (
                 <NeonAvatarDisplay avatarId={currentPlayer.avatar} size="sm" showGlow={false} />
               )}
               <div>
-                <div className="text-[11px] text-slate-400">Playing as</div>
-                <div className="text-sm sm:text-base font-black text-white flex items-center gap-2">
+                <div className="text-[11px] text-[#010101]/70 font-bold uppercase tracking-wider">Playing as</div>
+                <div className="text-sm sm:text-base font-black text-[#010101] flex items-center gap-2">
                   <span>{currentPlayer?.username}</span>
                   {isHost && (
-                    <span className="px-2 py-0.5 bg-yellow-400/20 text-yellow-300 border border-yellow-400/40 text-[9px] sm:text-[10px] font-extrabold rounded-full">
+                    <span className="px-2 py-0.5 bg-[#FEC90E] text-[#010101] border-2 border-[#010101] text-[9px] sm:text-[10px] font-black rounded-full shadow-[1px_1px_0px_#010101]">
                       HOST
                     </span>
                   )}
@@ -2052,20 +2048,20 @@ export default function RoomPage() {
               {/* Ready Status Toggle */}
               <button
                 onClick={handleToggleReady}
-                className={`w-full sm:w-auto px-6 py-3.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 touch-target ${
+                className={`w-full sm:w-auto px-6 py-3.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 touch-target border-2 border-[#010101] active:translate-x-[2px] active:translate-y-[2px] ${
                   currentPlayer?.isReady
-                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.4)] ring-2 ring-emerald-500/50'
-                    : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600'
+                    ? 'bg-[#0B89FD] hover:bg-[#0977db] text-white shadow-[4px_4px_0px_#010101] active:shadow-[2px_2px_0px_#010101]'
+                    : 'bg-[#FFFFFF] hover:bg-[#F8F8F8] text-[#010101] shadow-[4px_4px_0px_#010101] active:shadow-[2px_2px_0px_#010101]'
                 }`}
               >
                 {currentPlayer?.isReady ? (
                   <>
-                    <CheckCircle2 className="w-4 h-4 text-emerald-200" />
+                    <CheckCircle2 className="w-4 h-4 text-white" />
                     <span>READY ✓ (CLICK TO UNREADY)</span>
                   </>
                 ) : (
                   <>
-                    <Zap className="w-4 h-4 text-cyan-400" />
+                    <Zap className="w-4 h-4 text-[#FEC90E]" />
                     <span>I'M READY!</span>
                   </>
                 )}
@@ -2079,10 +2075,10 @@ export default function RoomPage() {
                     <button
                       type="button"
                       onClick={() => handleStartGame(true)}
-                      className="w-full sm:w-auto px-5 sm:px-6 py-3.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 touch-target bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-[0_0_20px_rgba(245,158,11,0.4)] hover:scale-[1.02] active:scale-[0.98]"
+                      className="w-full sm:w-auto px-5 sm:px-6 py-3.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 touch-target bg-[#FEC90E] hover:bg-[#fed338] text-[#010101] border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101]"
                       title="Force start match with currently connected players"
                     >
-                      <Zap className="w-4 h-4 fill-slate-950" />
+                      <Zap className="w-4 h-4 fill-current" />
                       <span>⚡ FORCE START</span>
                     </button>
                   )}
@@ -2100,10 +2096,10 @@ export default function RoomPage() {
                           : 'All players must click READY (or use Force Start)'
                         : 'Launch Match'
                     }
-                    className={`w-full sm:w-auto min-w-[220px] px-8 py-3.5 rounded-2xl font-black text-xs sm:text-sm md:text-base uppercase tracking-wider transition-all flex items-center justify-center gap-2 touch-target ${
+                    className={`w-full sm:w-auto min-w-[220px] px-8 py-3.5 rounded-2xl font-black text-xs sm:text-sm md:text-base uppercase tracking-wider transition-all flex items-center justify-center gap-2 touch-target border-2 border-[#010101] active:translate-x-[2px] active:translate-y-[2px] ${
                       allReady
-                        ? 'btn-glow-start cursor-pointer'
-                        : 'bg-slate-800/80 border border-slate-700 text-slate-500 cursor-not-allowed opacity-60'
+                        ? 'bg-[#0B89FD] hover:bg-[#0977db] text-white shadow-[4px_4px_0px_#010101] active:shadow-[2px_2px_0px_#010101] cursor-pointer'
+                        : 'bg-[#E5E5E5] text-[#010101]/40 border-[#010101]/40 cursor-not-allowed opacity-60'
                     }`}
                     id="btn-start-game"
                   >
@@ -2122,7 +2118,7 @@ export default function RoomPage() {
       {/* ======================================================== */}
       <AnimatePresence>
         {countdown !== null && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#010101]/90 backdrop-blur-sm">
             <motion.div
               key={countdown}
               initial={{ scale: 0.5, opacity: 0 }}
@@ -2131,10 +2127,10 @@ export default function RoomPage() {
               transition={{ duration: 0.5 }}
               className="text-center"
             >
-              <div className="text-8xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-feto-magenta to-yellow-400 drop-shadow-2xl">
+              <div className="text-8xl md:text-9xl font-black text-[#FD3F01] drop-shadow-[4px_4px_0px_#010101]">
                 {countdown}
               </div>
-              <p className="text-cyan-300 font-extrabold uppercase tracking-widest text-lg mt-4">
+              <p className="text-[#FFFFFF] font-black uppercase tracking-widest text-lg mt-4">
                 Starting Game...
               </p>
             </motion.div>
@@ -2147,26 +2143,26 @@ export default function RoomPage() {
       {/* ======================================================== */}
       <AnimatePresence>
         {showJoinModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#010101]/80 backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="w-full max-w-md glass-panel-neon rounded-3xl p-6 md:p-8 border border-cyan-500/30"
+              className="w-full max-w-md bg-[#FFFFFF] rounded-3xl p-6 md:p-8 border-3 border-[#010101] shadow-[8px_8px_0px_#010101]"
             >
-              <h3 className="text-2xl font-black text-white mb-1">Join Room {roomCode}</h3>
-              <p className="text-xs text-slate-400 mb-6">Choose your neon avatar and nickname to enter.</p>
+              <h3 className="text-2xl font-black text-[#010101] mb-1">Join Room {roomCode}</h3>
+              <p className="text-xs text-[#010101]/70 mb-6 font-medium">Choose your avatar and nickname to enter.</p>
 
               {errorMessage && (
-                <div className="mb-4 p-3 bg-red-950/60 border border-red-500/50 rounded-xl text-red-200 text-xs flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                <div className="mb-4 p-3 bg-[#FD3F01]/10 border-2 border-[#FD3F01] rounded-xl text-[#FD3F01] text-xs flex items-center gap-2 font-bold">
+                  <AlertTriangle className="w-4 h-4 flex-shrink-0 text-[#FD3F01]" />
                   <span>{errorMessage}</span>
                 </div>
               )}
 
               <form onSubmit={handleModalJoin} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                  <label className="block text-xs font-black uppercase tracking-wider text-[#010101] mb-1.5">
                     Your Nickname
                   </label>
                   <input
@@ -2175,12 +2171,12 @@ export default function RoomPage() {
                     onChange={(e) => setJoinUsername(e.target.value.slice(0, 18))}
                     placeholder="Enter nickname..."
                     required
-                    className="w-full bg-slate-900 border border-slate-700 focus:border-cyan-400 rounded-xl px-4 py-3 text-white outline-none"
+                    className="w-full bg-[#F8F8F8] border-2 border-[#010101] focus:border-[#0B89FD] rounded-xl px-4 py-3 text-[#010101] font-bold outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                  <label className="block text-xs font-black uppercase tracking-wider text-[#010101] mb-1.5">
                     Pick Avatar
                   </label>
                   <div className="grid grid-cols-4 gap-2">
@@ -2193,10 +2189,10 @@ export default function RoomPage() {
                           setJoinAvatar(key);
                         }}
                         aria-label={`Select avatar ${NEON_AVATARS[key].label || key}`}
-                        className={`min-w-[44px] min-h-[44px] p-2 rounded-xl border flex items-center justify-center text-2xl transition-all select-none touch-manipulation font-emoji ${
+                        className={`min-w-[44px] min-h-[44px] p-2 rounded-xl border-2 border-[#010101] flex items-center justify-center text-2xl transition-all select-none touch-manipulation font-emoji ${
                           joinAvatar === key
-                            ? 'border-cyan-400 bg-cyan-950/40 scale-105 shadow-neon-cyan ring-1 ring-cyan-400'
-                            : 'border-feto-border bg-feto-card hover:border-slate-600'
+                            ? 'bg-[#0B89FD] text-white scale-105 shadow-[2px_2px_0px_#010101]'
+                            : 'bg-[#FFFFFF] hover:bg-[#F8F8F8]'
                         }`}
                       >
                         <span role="img" aria-label={NEON_AVATARS[key].label || key} className="font-emoji">
@@ -2208,7 +2204,7 @@ export default function RoomPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                  <label className="block text-xs font-black uppercase tracking-wider text-[#010101] mb-1.5">
                     Room PIN (If private)
                   </label>
                   <input
@@ -2217,13 +2213,13 @@ export default function RoomPage() {
                     value={joinPin}
                     onChange={(e) => setJoinPin(e.target.value.replace(/\D/g, ''))}
                     placeholder="••••"
-                    className="w-full bg-slate-900 border border-slate-700 focus:border-yellow-400 rounded-xl px-4 py-2.5 text-center text-lg tracking-widest text-white outline-none"
+                    className="w-full bg-[#F8F8F8] border-2 border-[#010101] focus:border-[#FEC90E] rounded-xl px-4 py-2.5 text-center text-lg tracking-widest text-[#010101] font-black outline-none"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full btn-neon-cyan py-3.5 rounded-2xl text-white font-black text-base mt-2"
+                  className="w-full bg-[#0B89FD] hover:bg-[#0977db] text-white border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] py-3.5 rounded-2xl font-black text-base mt-2"
                 >
                   Enter Waiting Lobby
                 </button>
@@ -2238,30 +2234,30 @@ export default function RoomPage() {
       {/* ======================================================== */}
       <AnimatePresence>
         {kickTarget && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#010101]/80 backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="w-full max-w-sm glass-panel p-6 rounded-3xl text-center space-y-4 border border-red-500/40"
+              className="w-full max-w-sm bg-[#FFFFFF] p-6 rounded-3xl text-center space-y-4 border-3 border-[#010101] shadow-[8px_8px_0px_#010101]"
             >
-              <div className="w-12 h-12 rounded-full bg-red-950/80 border border-red-500/50 flex items-center justify-center mx-auto text-red-400">
+              <div className="w-12 h-12 rounded-2xl bg-[#FD3F01]/10 border-2 border-[#FD3F01] flex items-center justify-center mx-auto text-[#FD3F01]">
                 <UserX className="w-6 h-6" />
               </div>
-              <h4 className="text-xl font-bold text-white">Kick {kickTarget.username}?</h4>
-              <p className="text-xs text-slate-400">
+              <h4 className="text-xl font-black text-[#010101]">Kick {kickTarget.username}?</h4>
+              <p className="text-xs text-[#010101]/70 font-medium">
                 Are you sure you want to remove this player from the room?
               </p>
               <div className="flex gap-2 pt-2">
                 <button
                   onClick={() => setKickTarget(null)}
-                  className="flex-1 py-2.5 bg-feto-card border border-feto-border rounded-xl text-slate-300 font-semibold text-xs"
+                  className="flex-1 py-2.5 bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] rounded-xl text-[#010101] font-bold text-xs hover:bg-[#F8F8F8]"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleConfirmKick}
-                  className="flex-1 py-2.5 bg-red-600 hover:bg-red-500 rounded-xl text-white font-bold text-xs"
+                  className="flex-1 py-2.5 bg-[#FD3F01] hover:bg-[#e03700] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] rounded-xl text-white font-black text-xs"
                 >
                   Yes, Kick
                 </button>
@@ -2276,30 +2272,30 @@ export default function RoomPage() {
       {/* ======================================================== */}
       <AnimatePresence>
         {showCustomCardModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#010101]/80 backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, scale: 0.92 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.92 }}
-              className="w-full max-w-md glass-panel-neon rounded-3xl p-6 border border-purple-500/40 shadow-neon-purple"
+              className="w-full max-w-md bg-[#FFFFFF] rounded-3xl p-6 border-3 border-[#010101] shadow-[8px_8px_0px_#010101]"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/40">
-                    <PlusCircle className="w-5 h-5 text-purple-400" />
+                  <div className="p-2 rounded-xl bg-[#0B89FD] text-white border-2 border-[#010101]">
+                    <PlusCircle className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-white uppercase tracking-wider">
+                    <h3 className="text-lg font-black text-[#010101] uppercase tracking-wider">
                       Submit Custom Card
                     </h3>
-                    <p className="text-[11px] text-purple-300/80">
+                    <p className="text-[11px] text-[#010101]/70 font-medium">
                       Inject your question or dare live into this room
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setShowCustomCardModal(false)}
-                  className="text-slate-400 hover:text-white text-2xl font-bold leading-none p-1"
+                  className="text-[#010101] hover:text-[#FD3F01] text-2xl font-black leading-none p-1"
                 >
                   &times;
                 </button>
@@ -2307,7 +2303,7 @@ export default function RoomPage() {
 
               <form onSubmit={handleSubmitCustomCard} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-black uppercase tracking-wider text-slate-300 mb-1.5">
+                  <label className="block text-xs font-black uppercase tracking-wider text-[#010101] mb-1.5">
                     Card Category
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -2323,10 +2319,10 @@ export default function RoomPage() {
                           sound.playClick();
                           setCustomCardType(cat.id);
                         }}
-                        className={`py-2 rounded-xl border text-xs font-bold transition-all ${
+                        className={`py-2 rounded-xl border-2 border-[#010101] text-xs font-black transition-all ${
                           customCardType === cat.id
-                            ? 'border-purple-400 bg-purple-950/50 text-purple-300 shadow-neon-purple'
-                            : 'border-slate-800 bg-slate-900 text-slate-400'
+                            ? 'bg-[#FEC90E] text-[#010101] shadow-[2px_2px_0px_#010101]'
+                            : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
                         }`}
                       >
                         {cat.label}
@@ -2336,7 +2332,7 @@ export default function RoomPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-black uppercase tracking-wider text-slate-300 mb-1.5">
+                  <label className="block text-xs font-black uppercase tracking-wider text-[#010101] mb-1.5">
                     Your Party Prompt / Challenge (English)
                   </label>
                   <textarea
@@ -2346,9 +2342,9 @@ export default function RoomPage() {
                     onChange={(e) => setCustomCardPrompt(e.target.value)}
                     placeholder="e.g., Who is most likely to win a reality TV show? or Do an impression of your favorite movie villain..."
                     required
-                    className="w-full bg-slate-900 border border-slate-700 focus:border-purple-400 rounded-xl p-3 text-white text-xs outline-none resize-none leading-relaxed"
+                    className="w-full bg-[#F8F8F8] border-2 border-[#010101] focus:border-[#0B89FD] rounded-xl p-3 text-[#010101] text-xs font-bold outline-none resize-none leading-relaxed"
                   />
-                  <div className="text-right text-[10px] text-slate-500 mt-1">
+                  <div className="text-right text-[10px] text-[#010101]/50 mt-1 font-bold">
                     {customCardPrompt.length}/160
                   </div>
                 </div>
@@ -2356,7 +2352,7 @@ export default function RoomPage() {
                 <button
                   type="submit"
                   disabled={isSubmittingCard || !customCardPrompt.trim()}
-                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-purple-500 to-cyan-500 hover:brightness-110 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-neon-purple transition-all disabled:opacity-50"
+                  className="w-full py-3.5 rounded-2xl bg-[#0B89FD] hover:bg-[#0977db] text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all disabled:opacity-50"
                 >
                   <Sparkles className="w-4 h-4" />
                   <span>{isSubmittingCard ? 'Injecting Card...' : 'Add to Match Rotation'}</span>

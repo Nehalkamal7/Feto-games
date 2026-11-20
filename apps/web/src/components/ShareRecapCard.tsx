@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Download, Share2, Check, Sparkles, X, Eye, Trophy, Wine, Flame, EyeOff, Award } from 'lucide-react';
+import { Download, Share2, Check, X, Trophy } from 'lucide-react';
 import { PartyAward, PlayerSummary, PublicRoomState } from '@feto-games/shared-types';
 import { BrandLogo } from '@/components/BrandLogo';
 import { NeonAvatarDisplay } from '@/components/NeonAvatarDisplay';
@@ -59,7 +59,7 @@ export function ShareRecapCard({
   const sipAward = awards.find((a) => a.title.includes('Sip'));
   const chaosAward = awards.find((a) => a.title.includes('Chaos'));
 
-  // High-Resolution 1080x1920 Canvas Exporter
+  // High-Resolution 1080x1920 Bauhaus Canvas Exporter
   const handleDownloadPNG = async () => {
     sound.playClick();
     setIsExporting(true);
@@ -71,204 +71,295 @@ export function ShareRecapCard({
       const ctx = canvas.getContext('2d');
       if (!ctx) throw new Error('Canvas context unavailable');
 
-      // 1. Background: Dark Navy Esports Theme
-      ctx.fillStyle = '#090D16';
+      // 1. Canvas Background: Crisp Off-White (#F8F8F8)
+      ctx.fillStyle = '#F8F8F8';
       ctx.fillRect(0, 0, 1080, 1920);
 
-      // Radial neon glows
-      const glowCyan = ctx.createRadialGradient(250, 350, 10, 250, 350, 600);
-      glowCyan.addColorStop(0, 'rgba(56, 242, 255, 0.22)');
-      glowCyan.addColorStop(1, 'rgba(9, 13, 22, 0)');
-      ctx.fillStyle = glowCyan;
-      ctx.fillRect(0, 0, 1080, 1920);
+      // Subtle Bauhaus Dot Matrix Pattern
+      ctx.fillStyle = '#010101';
+      for (let x = 60; x < 1020; x += 36) {
+        for (let y = 60; y < 1860; y += 36) {
+          ctx.beginPath();
+          ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
 
-      const glowPurple = ctx.createRadialGradient(850, 1100, 10, 850, 1100, 700);
-      glowPurple.addColorStop(0, 'rgba(168, 85, 247, 0.22)');
-      glowPurple.addColorStop(1, 'rgba(9, 13, 22, 0)');
-      ctx.fillStyle = glowPurple;
-      ctx.fillRect(0, 0, 1080, 1920);
+      // ========================================================
+      // 2. GEOMETRIC BAUHAUS CORNER ACCENTS
+      // ========================================================
+      // Top-Left: Large Quarter-Circle in Electric Blue (#0B89FD)
+      ctx.fillStyle = '#0B89FD';
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.arc(0, 0, 240, 0, Math.PI / 2, false);
+      ctx.closePath();
+      ctx.fill();
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = '#010101';
+      ctx.stroke();
 
-      // Outer Neon Cyber Border
+      // Top-Right: Diagonal Stripes & Yellow Accent (#FEC90E)
+      ctx.fillStyle = '#FEC90E';
+      ctx.beginPath();
+      ctx.moveTo(1080, 0);
+      ctx.arc(1080, 0, 220, Math.PI / 2, Math.PI, false);
+      ctx.closePath();
+      ctx.fill();
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = '#010101';
+      ctx.stroke();
+
+      // Bottom-Left: Clean Bauhaus Circle in Red-Orange (#FD3F01)
+      ctx.fillStyle = '#FD3F01';
+      ctx.beginPath();
+      ctx.arc(80, 1840, 160, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = '#010101';
+      ctx.stroke();
+
+      // Outer Jet Black Frame
       ctx.lineWidth = 14;
-      ctx.strokeStyle = '#38F2FF';
-      ctx.shadowColor = '#38F2FF';
-      ctx.shadowBlur = 35;
+      ctx.strokeStyle = '#010101';
       ctx.strokeRect(40, 40, 1000, 1840);
-      ctx.shadowBlur = 0; // reset
 
-      // Secondary Accent Border
+      // Inset Accent Border
       ctx.lineWidth = 3;
-      ctx.strokeStyle = 'rgba(168, 85, 247, 0.6)';
+      ctx.strokeStyle = '#010101';
       ctx.strokeRect(55, 55, 970, 1810);
 
-      // 2. Header Brand Logo Text
+      // ========================================================
+      // 3. HEADER BRAND LOGO & TITLE
+      // ========================================================
       ctx.textAlign = 'center';
-      ctx.font = '900 68px "Arial Black", Montserrat, sans-serif';
-      ctx.fillStyle = '#38F2FF';
-      ctx.shadowColor = '#38F2FF';
-      ctx.shadowBlur = 25;
-      ctx.fillText('FETO GAMES', 540, 180);
-      ctx.shadowBlur = 0;
+      ctx.font = '900 72px "Arial Black", Impact, sans-serif';
+      ctx.fillStyle = '#010101';
+      ctx.fillText('FETO ', 480, 175);
+      ctx.fillStyle = '#0B89FD';
+      ctx.fillText('GAMES', 650, 175);
 
-      ctx.font = '700 28px Arial, sans-serif';
-      ctx.fillStyle = '#A855F7';
-      ctx.letterSpacing = '6px';
-      ctx.fillText('OFFICIAL MATCH RECAP • 9:16 STORY', 540, 230);
+      ctx.font = '900 26px Arial, sans-serif';
+      ctx.fillStyle = '#525252';
+      ctx.letterSpacing = '5px';
+      ctx.fillText('OFFICIAL MATCH RECAP • 9:16 STORY', 540, 225);
 
-      // Room & Stats pill
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+      // Room & Player Count Banner (Hard Shadow + Pure White Card)
+      // Hard black offset shadow
+      ctx.fillStyle = '#010101';
       ctx.beginPath();
-      drawRoundedRect(ctx, 300, 260, 480, 60, 30);
+      drawRoundedRect(ctx, 308, 268, 480, 56, 16);
       ctx.fill();
-      ctx.strokeStyle = 'rgba(56, 242, 255, 0.4)';
-      ctx.lineWidth = 2;
+      // Foreground card
+      ctx.fillStyle = '#FEC90E';
+      ctx.beginPath();
+      drawRoundedRect(ctx, 300, 260, 480, 56, 16);
+      ctx.fill();
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#010101';
       ctx.stroke();
 
-      ctx.font = '800 24px monospace';
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillText(`ROOM: ${room.code}  •  ${room.players.length} PLAYERS`, 540, 300);
+      ctx.font = '900 24px monospace';
+      ctx.fillStyle = '#010101';
+      ctx.fillText(`ROOM: ${room.code}  •  ${room.players.length} PLAYERS`, 540, 297);
 
-      // 3. MVP Crown Card
-      ctx.fillStyle = 'rgba(234, 179, 8, 0.1)';
+      // ========================================================
+      // 4. MVP CROWN CARD
+      // ========================================================
+      const mvpY = 350;
+      // Hard offset shadow
+      ctx.fillStyle = '#010101';
       ctx.beginPath();
-      drawRoundedRect(ctx, 100, 360, 880, 340, 28);
+      drawRoundedRect(ctx, 110, mvpY + 10, 880, 330, 24);
       ctx.fill();
-      ctx.strokeStyle = '#EAB308';
+      // Elevated Pure White Surface
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      drawRoundedRect(ctx, 100, mvpY, 880, 330, 24);
+      ctx.fill();
       ctx.lineWidth = 6;
-      ctx.shadowColor = '#EAB308';
-      ctx.shadowBlur = 30;
+      ctx.strokeStyle = '#010101';
       ctx.stroke();
-      ctx.shadowBlur = 0;
 
-      ctx.font = '900 38px Arial, sans-serif';
-      ctx.fillStyle = '#FDE047';
-      ctx.fillText('👑  MVP OF THE NIGHT  👑', 540, 440);
+      // Top MVP Yellow Banner
+      ctx.fillStyle = '#FEC90E';
+      ctx.beginPath();
+      drawRoundedRect(ctx, 240, mvpY + 28, 600, 56, 14);
+      ctx.fill();
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#010101';
+      ctx.stroke();
 
-      ctx.font = '900 64px Arial, sans-serif';
+      ctx.font = '900 32px Arial, sans-serif';
+      ctx.fillStyle = '#010101';
+      ctx.fillText('👑  MVP OF THE NIGHT  👑', 540, mvpY + 67);
+
+      // MVP Username
+      ctx.font = '900 68px Arial, sans-serif';
+      ctx.fillStyle = '#010101';
+      ctx.fillText(mvp?.username || 'Champion', 540, mvpY + 185);
+
+      // MVP Points Badge
+      ctx.fillStyle = '#0B89FD';
+      ctx.beginPath();
+      drawRoundedRect(ctx, 320, mvpY + 225, 440, 54, 12);
+      ctx.fill();
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#010101';
+      ctx.stroke();
+
+      ctx.font = '900 30px monospace';
       ctx.fillStyle = '#FFFFFF';
-      ctx.fillText(mvp?.username || 'Champion', 540, 530);
+      ctx.fillText(`${mvp?.score || 0} POINTS  •  1ST PLACE`, 540, mvpY + 262);
 
-      ctx.font = '800 36px monospace';
-      ctx.fillStyle = '#38F2FF';
-      ctx.fillText(`${mvp?.score || 0} POINTS  •  1ST PLACE`, 540, 610);
-
-      // 4. Awards Grid (Certified Liar, Sip Champion, Chaos Menace)
+      // ========================================================
+      // 5. SUPERLATIVE AWARDS (HARD OFFSET WHITE CARDS)
+      // ========================================================
       const awardsToDraw = [
         {
           title: liarAward?.title || 'The Certified Liar 🕵️',
           name: liarAward?.recipientUsername || sortedPlayers[1]?.username || 'Deceiver',
           stat: liarAward?.scoreOrStat || 'Undetected',
-          color: '#38F2FF',
-          y: 740
+          accent: '#0B89FD',
+          y: 720
         },
         {
           title: sipAward?.title || 'Sip Champion 🥤',
           name: sipAward?.recipientUsername || 'Hydrated Legend',
           stat: sipAward?.scoreOrStat || 'Top Chugger',
-          color: '#EC4899',
-          y: 910
+          accent: '#FD3F01',
+          y: 880
         },
         {
           title: chaosAward?.title || 'Chaos Menace 🔥',
           name: chaosAward?.recipientUsername || 'Wild Agent',
           stat: chaosAward?.scoreOrStat || '100% Chaos',
-          color: '#F97316',
-          y: 1080
+          accent: '#FEC90E',
+          y: 1040
         }
       ];
 
       for (const a of awardsToDraw) {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+        // Hard black offset shadow
+        ctx.fillStyle = '#010101';
         ctx.beginPath();
-        drawRoundedRect(ctx, 100, a.y, 880, 140, 20);
+        drawRoundedRect(ctx, 108, a.y + 8, 880, 130, 18);
         ctx.fill();
-        ctx.strokeStyle = a.color;
-        ctx.lineWidth = 3;
+        // Foreground Card
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        drawRoundedRect(ctx, 100, a.y, 880, 130, 18);
+        ctx.fill();
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = '#010101';
+        ctx.stroke();
+
+        // Accent Left Strip
+        ctx.fillStyle = a.accent;
+        ctx.beginPath();
+        drawRoundedRect(ctx, 100, a.y, 22, 130, 4);
+        ctx.fill();
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = '#010101';
         ctx.stroke();
 
         ctx.textAlign = 'left';
-        ctx.font = '800 30px Arial, sans-serif';
-        ctx.fillStyle = a.color;
-        ctx.fillText(a.title, 140, a.y + 55);
+        ctx.font = '900 26px Arial, sans-serif';
+        ctx.fillStyle = '#525252';
+        ctx.fillText(a.title, 145, a.y + 50);
 
         ctx.font = '900 42px Arial, sans-serif';
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillText(a.name, 140, a.y + 110);
+        ctx.fillStyle = '#010101';
+        ctx.fillText(a.name, 145, a.y + 102);
 
         ctx.textAlign = 'right';
-        ctx.font = '700 24px monospace';
-        ctx.fillStyle = '#94A3B8';
-        ctx.fillText(a.stat, 940, a.y + 85);
+        ctx.font = '800 24px monospace';
+        ctx.fillStyle = '#0B89FD';
+        ctx.fillText(a.stat, 940, a.y + 78);
       }
 
-      // 5. Drawing Snapshot (Picasso From Wish 🎨) or Hall of Fame Highlight
-      const picassoY = 1260;
-      ctx.fillStyle = 'rgba(168, 85, 247, 0.08)';
+      // ========================================================
+      // 6. DRAWING SNAPSHOT (PICASSO FROM WISH)
+      // ========================================================
+      const picassoY = 1210;
+      // Hard offset shadow
+      ctx.fillStyle = '#010101';
       ctx.beginPath();
-      drawRoundedRect(ctx, 100, picassoY, 880, 420, 24);
+      drawRoundedRect(ctx, 110, picassoY + 10, 880, 440, 24);
       ctx.fill();
-      ctx.strokeStyle = '#A855F7';
-      ctx.lineWidth = 4;
+      // Foreground Card
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      drawRoundedRect(ctx, 100, picassoY, 880, 440, 24);
+      ctx.fill();
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = '#010101';
       ctx.stroke();
 
       ctx.textAlign = 'center';
-      ctx.font = '800 32px Arial, sans-serif';
-      ctx.fillStyle = '#C084FC';
-      ctx.fillText(picassoAward?.title || 'Picasso From Wish 🎨', 540, picassoY + 60);
+      ctx.font = '900 32px Arial, sans-serif';
+      ctx.fillStyle = '#010101';
+      ctx.fillText(picassoAward?.title || 'Picasso From Wish 🎨', 540, picassoY + 56);
 
-      // If a drawing thumbnail image is available, render it!
       if (picassoAward?.thumbnail) {
         try {
           const img = new Image();
-          await new Promise((resolve, reject) => {
+          await new Promise((resolve) => {
             img.onload = resolve;
-            img.onerror = resolve; // don't crash if image format fails
+            img.onerror = resolve;
             img.src = picassoAward.thumbnail!;
           });
-          // Draw inside rounded rectangle
           ctx.save();
           ctx.beginPath();
-          drawRoundedRect(ctx, 360, picassoY + 90, 360, 240, 16);
+          drawRoundedRect(ctx, 360, picassoY + 80, 360, 260, 14);
           ctx.clip();
-          ctx.drawImage(img, 360, picassoY + 90, 360, 240);
+          ctx.drawImage(img, 360, picassoY + 80, 360, 260);
           ctx.restore();
 
-          ctx.strokeStyle = '#C084FC';
-          ctx.lineWidth = 3;
-          ctx.strokeRect(360, picassoY + 90, 360, 240);
+          ctx.strokeStyle = '#010101';
+          ctx.lineWidth = 5;
+          ctx.strokeRect(360, picassoY + 80, 360, 260);
 
-          ctx.font = '700 26px Arial, sans-serif';
-          ctx.fillStyle = '#FFFFFF';
-          ctx.fillText(`By ${picassoAward.recipientUsername} • Masterpiece`, 540, picassoY + 375);
+          ctx.font = '900 26px Arial, sans-serif';
+          ctx.fillStyle = '#010101';
+          ctx.fillText(`By ${picassoAward.recipientUsername} • Masterpiece`, 540, picassoY + 395);
         } catch {
-          // Fallback text
           ctx.font = '700 28px Arial, sans-serif';
-          ctx.fillStyle = '#E2E8F0';
-          ctx.fillText(`By: ${picassoAward.recipientUsername}`, 540, picassoY + 160);
-          ctx.font = '600 24px Arial, sans-serif';
-          ctx.fillStyle = '#94A3B8';
-          ctx.fillText('A true party mystery that baffled the audience!', 540, picassoY + 220);
+          ctx.fillStyle = '#525252';
+          ctx.fillText(`By: ${picassoAward.recipientUsername}`, 540, picassoY + 180);
         }
       } else {
-        ctx.font = '700 28px Arial, sans-serif';
-        ctx.fillStyle = '#E2E8F0';
-        ctx.fillText(`By: ${picassoAward?.recipientUsername || sortedPlayers[1]?.username || 'The Squad'}`, 540, picassoY + 160);
-        ctx.font = '600 24px Arial, sans-serif';
-        ctx.fillStyle = '#94A3B8';
-        ctx.fillText('Pure comedy, chaos, and viral glory!', 540, picassoY + 220);
+        ctx.font = '800 28px Arial, sans-serif';
+        ctx.fillStyle = '#0B89FD';
+        ctx.fillText(`By: ${picassoAward?.recipientUsername || sortedPlayers[1]?.username || 'The Squad'}`, 540, picassoY + 180);
+        ctx.font = '700 24px Arial, sans-serif';
+        ctx.fillStyle = '#525252';
+        ctx.fillText('Pure comedy, chaos, and viral party glory!', 540, picassoY + 240);
       }
 
-      // 6. Footer Call to Action
+      // ========================================================
+      // 7. FOOTER CALL TO ACTION (VIBRANT GOLD BAR)
+      // ========================================================
+      // Hard offset shadow
+      ctx.fillStyle = '#010101';
+      ctx.beginPath();
+      drawRoundedRect(ctx, 108, 1698, 880, 96, 20);
+      ctx.fill();
+      // Foreground Card
+      ctx.fillStyle = '#FEC90E';
+      ctx.beginPath();
+      drawRoundedRect(ctx, 100, 1690, 880, 96, 20);
+      ctx.fill();
+      ctx.lineWidth = 5;
+      ctx.strokeStyle = '#010101';
+      ctx.stroke();
+
       ctx.textAlign = 'center';
-      ctx.font = '900 32px Arial, sans-serif';
-      ctx.fillStyle = '#38F2FF';
-      ctx.fillText('PLAY UP TO 15 PLAYERS FREE AT FETO GAMES', 540, 1750);
+      ctx.font = '900 30px Arial, sans-serif';
+      ctx.fillStyle = '#010101';
+      ctx.fillText('PLAY UP TO 15 PLAYERS FREE AT FETO GAMES', 540, 1748);
 
-      ctx.font = '600 24px Arial, sans-serif';
-      ctx.fillStyle = '#64748B';
-      ctx.fillText(`${typeof window !== 'undefined' ? window.location.origin : 'fetogames.com'}`, 540, 1800);
-
-      // 7. Trigger Direct Download
+      // Trigger Direct Download
       const dataUrl = canvas.toDataURL('image/png');
       const a = document.createElement('a');
       a.href = dataUrl;
@@ -316,7 +407,7 @@ export function ShareRecapCard({
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="w-full max-w-sm sm:max-w-md bg-[#090D16] border-2 border-cyan-400/60 rounded-3xl p-5 shadow-[0_0_50px_rgba(56,242,255,0.3)] relative text-white flex flex-col items-center my-auto"
+            className="w-full max-w-sm sm:max-w-md bg-[#FFFFFF] border-3 border-[#010101] rounded-3xl p-5 shadow-[8px_8px_0px_#010101] relative text-[#010101] flex flex-col items-center my-auto"
           >
             {/* Close Button */}
             <button
@@ -324,7 +415,7 @@ export function ShareRecapCard({
                 sound.playClick();
                 onClose();
               }}
-              className="absolute top-4 right-4 p-2 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors z-20"
+              className="absolute top-4 right-4 p-2 rounded-full bg-[#FFFFFF] hover:bg-[#F8F8F8] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] text-[#010101] transition-colors z-20 active:translate-x-[1px] active:translate-y-[1px]"
             >
               <X className="w-5 h-5" />
             </button>
@@ -332,36 +423,36 @@ export function ShareRecapCard({
             {/* Visual 9:16 Story Preview Container */}
             <div
               ref={cardRef}
-              className="w-full aspect-[9/16] max-h-[65vh] bg-gradient-to-b from-[#060a14] via-[#091224] to-[#140b26] border border-cyan-500/40 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden shadow-neon-cyan mb-4"
+              className="w-full aspect-[9/16] max-h-[65vh] bg-[#F8F8F8] border-2 border-[#010101] rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden shadow-[4px_4px_0px_#010101] mb-4"
             >
-              {/* Neon Ambient Background */}
-              <div className="absolute top-0 right-0 w-40 h-40 bg-cyan-500/15 rounded-full blur-2xl pointer-events-none" />
-              <div className="absolute bottom-0 left-0 w-40 h-40 bg-purple-500/15 rounded-full blur-2xl pointer-events-none" />
+              {/* Subtle Geometric Corner Accent in Preview */}
+              <div className="absolute -top-8 -left-8 w-20 h-20 rounded-full bg-[#0B89FD] border-2 border-[#010101] pointer-events-none" />
+              <div className="absolute -bottom-8 -right-8 w-20 h-20 rounded-full bg-[#FEC90E] border-2 border-[#010101] pointer-events-none" />
 
               {/* Story Header */}
               <div className="flex flex-col items-center text-center z-10 pt-1">
                 <BrandLogo size="nav" showSubtitle={false} />
-                <span className="text-[10px] font-black uppercase tracking-widest text-purple-400 mt-1">
+                <span className="text-[10px] font-black uppercase tracking-widest text-[#525252] mt-1">
                   OFFICIAL 9:16 MATCH RECAP
                 </span>
-                <span className="text-[11px] font-mono text-cyan-300 font-bold bg-cyan-950/60 px-2 py-0.5 rounded-full border border-cyan-500/30 mt-1">
+                <span className="text-[11px] font-mono text-[#010101] font-black bg-[#FEC90E] px-2.5 py-0.5 rounded-full border-2 border-[#010101] mt-1 shadow-[1px_1px_0px_#010101]">
                   ROOM {room.code} • {room.players.length} PLAYERS
                 </span>
               </div>
 
-              {/* MVP Hero */}
-              <div className="bg-amber-950/40 border border-yellow-500/50 rounded-xl p-3 flex flex-col items-center text-center z-10 shadow-neon-gold">
-                <div className="flex items-center gap-1.5 text-xs font-black text-yellow-300 uppercase tracking-wider mb-1">
-                  <Trophy className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+              {/* MVP Hero Card */}
+              <div className="bg-[#FFFFFF] border-2 border-[#010101] rounded-xl p-3 flex flex-col items-center text-center z-10 shadow-[3px_3px_0px_#010101]">
+                <div className="flex items-center gap-1.5 text-xs font-black text-[#010101] uppercase tracking-wider mb-1">
+                  <Trophy className="w-4 h-4 text-[#FEC90E] fill-[#FEC90E]" />
                   <span>MVP OF THE NIGHT</span>
                 </div>
                 <div className="flex items-center gap-2 my-1">
-                  {mvp && <NeonAvatarDisplay avatarId={mvp.avatar} size="sm" showGlow />}
-                  <span className="text-base font-black text-white truncate max-w-[150px]">
+                  {mvp && <NeonAvatarDisplay avatarId={mvp.avatar} size="sm" showGlow={false} />}
+                  <span className="text-base font-black text-[#010101] truncate max-w-[150px]">
                     {mvp?.username || 'Champion'}
                   </span>
                 </div>
-                <span className="text-xs font-mono font-black text-cyan-300">
+                <span className="text-xs font-mono font-black text-[#0B89FD]">
                   {mvp?.score || 0} PTS • 1ST PLACE
                 </span>
               </div>
@@ -369,65 +460,65 @@ export function ShareRecapCard({
               {/* Superlative Awards */}
               <div className="space-y-1.5 z-10">
                 {liarAward && (
-                  <div className="bg-slate-900/80 border border-cyan-500/30 rounded-lg px-2.5 py-1.5 flex items-center justify-between">
+                  <div className="bg-[#FFFFFF] border-2 border-[#010101] rounded-lg px-2.5 py-1.5 flex items-center justify-between shadow-[2px_2px_0px_#010101]">
                     <div className="flex items-center gap-1.5">
                       <span className="text-sm">🕵️</span>
-                      <span className="text-xs font-bold text-slate-200">{liarAward.recipientUsername}</span>
+                      <span className="text-xs font-black text-[#010101]">{liarAward.recipientUsername}</span>
                     </div>
-                    <span className="text-[10px] font-black text-cyan-300 font-mono">{liarAward.scoreOrStat}</span>
+                    <span className="text-[10px] font-black text-[#0B89FD] font-mono">{liarAward.scoreOrStat}</span>
                   </div>
                 )}
 
                 {sipAward && (
-                  <div className="bg-slate-900/80 border border-pink-500/30 rounded-lg px-2.5 py-1.5 flex items-center justify-between">
+                  <div className="bg-[#FFFFFF] border-2 border-[#010101] rounded-lg px-2.5 py-1.5 flex items-center justify-between shadow-[2px_2px_0px_#010101]">
                     <div className="flex items-center gap-1.5">
                       <span className="text-sm">🥤</span>
-                      <span className="text-xs font-bold text-slate-200">{sipAward.recipientUsername}</span>
+                      <span className="text-xs font-black text-[#010101]">{sipAward.recipientUsername}</span>
                     </div>
-                    <span className="text-[10px] font-black text-pink-400 font-mono">{sipAward.scoreOrStat}</span>
+                    <span className="text-[10px] font-black text-[#FD3F01] font-mono">{sipAward.scoreOrStat}</span>
                   </div>
                 )}
 
                 {chaosAward && (
-                  <div className="bg-slate-900/80 border border-amber-500/30 rounded-lg px-2.5 py-1.5 flex items-center justify-between">
+                  <div className="bg-[#FFFFFF] border-2 border-[#010101] rounded-lg px-2.5 py-1.5 flex items-center justify-between shadow-[2px_2px_0px_#010101]">
                     <div className="flex items-center gap-1.5">
                       <span className="text-sm">🔥</span>
-                      <span className="text-xs font-bold text-slate-200">{chaosAward.recipientUsername}</span>
+                      <span className="text-xs font-black text-[#010101]">{chaosAward.recipientUsername}</span>
                     </div>
-                    <span className="text-[10px] font-black text-amber-400 font-mono">{chaosAward.scoreOrStat}</span>
+                    <span className="text-[10px] font-black text-[#FEC90E] font-mono">{chaosAward.scoreOrStat}</span>
                   </div>
                 )}
               </div>
 
               {/* Picasso From Wish or Snapshot */}
               {picassoAward?.thumbnail ? (
-                <div className="bg-purple-950/40 border border-purple-500/40 rounded-xl p-2 flex flex-col items-center text-center z-10">
-                  <span className="text-[10px] font-black uppercase text-purple-300 mb-1">
-                    🎨 Picasso From Wish (Hall of Shame)
+                <div className="bg-[#FFFFFF] border-2 border-[#010101] rounded-xl p-2 flex flex-col items-center text-center z-10 shadow-[2px_2px_0px_#010101]">
+                  <span className="text-[10px] font-black uppercase text-[#010101] mb-1">
+                    🎨 Picasso From Wish (Hall of Fame)
                   </span>
                   <img
                     src={picassoAward.thumbnail}
                     alt="Drawing Masterpiece"
-                    className="w-24 h-16 object-contain rounded border border-purple-400/50 bg-black/50"
+                    className="w-24 h-16 object-contain rounded border-2 border-[#010101] bg-[#F8F8F8]"
                   />
-                  <span className="text-[9px] text-slate-300 mt-1">
+                  <span className="text-[9px] font-bold text-[#525252] mt-1">
                     By {picassoAward.recipientUsername} ({picassoAward.scoreOrStat})
                   </span>
                 </div>
               ) : (
                 <div className="text-center z-10 py-1">
-                  <span className="text-[10px] font-black text-purple-300 uppercase tracking-widest">
+                  <span className="text-[10px] font-black text-[#010101] uppercase tracking-widest">
                     ✨ Pure Party Mayhem & Glory ✨
                   </span>
                 </div>
               )}
 
               {/* Story Footer */}
-              <div className="text-center z-10 border-t border-cyan-500/20 pt-1.5">
-                <span className="text-[10px] font-black text-cyan-300 uppercase tracking-wider block">
+              <div className="text-center z-10 border-t-2 border-[#010101] pt-1.5">
+                <span className="text-[10px] font-black text-[#010101] uppercase tracking-wider block">
                   PLAY UP TO 15 PLAYERS FREE
                 </span>
-                <span className="text-[9px] text-slate-400">Join instant party rooms at FETO GAMES</span>
+                <span className="text-[9px] font-bold text-[#525252]">Join instant party rooms at FETO GAMES</span>
               </div>
             </div>
 
@@ -436,17 +527,17 @@ export function ShareRecapCard({
               <button
                 onClick={handleDownloadPNG}
                 disabled={isExporting}
-                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-400 via-feto-magenta to-yellow-400 hover:brightness-110 text-black font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-neon-cyan transition-all active:scale-95 disabled:opacity-50"
+                className="w-full py-3.5 px-4 rounded-xl bg-[#0B89FD] hover:bg-[#0977db] text-white font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all disabled:opacity-50 touch-target"
               >
-                <Download className="w-4 h-4" />
+                <Download className="w-4 h-4 text-white" />
                 <span>{isExporting ? 'Generating PNG...' : 'Download 9:16 Story (PNG)'}</span>
               </button>
 
               <button
                 onClick={handleShareDirect}
-                className="w-full py-2.5 px-4 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-cyan-500/40 text-cyan-300 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all"
+                className="w-full py-3 px-4 rounded-xl bg-[#FEC90E] hover:bg-[#fed338] border-2 border-[#010101] text-[#010101] font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-[3px_3px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#010101] transition-all touch-target"
               >
-                {copiedLink ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4" />}
+                {copiedLink ? <Check className="w-4 h-4 text-[#010101]" /> : <Share2 className="w-4 h-4 text-[#010101]" />}
                 <span>{copiedLink ? 'Story Copied!' : 'Share to Instagram / TikTok / WhatsApp'}</span>
               </button>
             </div>

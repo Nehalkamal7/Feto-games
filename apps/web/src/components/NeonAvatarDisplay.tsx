@@ -22,23 +22,18 @@ const sizeClasses = {
 export const NeonAvatarDisplay: React.FC<NeonAvatarDisplayProps> = ({
   avatarId,
   size = 'md',
-  showGlow = true,
-  isGlowing,
   className = '',
   isReady
 }) => {
   const meta = NEON_AVATARS[avatarId] || NEON_AVATARS.cyber_cat;
-  const shouldGlow = isGlowing !== undefined ? isGlowing : showGlow;
 
   return (
     <div
-      className={`relative inline-flex items-center justify-center rounded-2xl transition-all duration-300 ${sizeClasses[size]} ${className}`}
+      className={`relative inline-flex items-center justify-center rounded-2xl transition-all duration-150 ${sizeClasses[size]} ${className}`}
       style={{
-        backgroundColor: '#0c0e1a',
-        border: `2px solid ${isReady ? '#39FF14' : meta.primaryColor}`,
-        boxShadow: shouldGlow
-          ? `0 0 ${size === 'xl' ? '30px' : '18px'} ${isReady ? 'rgba(57, 255, 20, 0.6)' : meta.glowColor}`
-          : 'none'
+        backgroundColor: isReady ? '#0B89FD' : '#FFFFFF',
+        border: '2px solid #010101',
+        boxShadow: isReady ? '3px 3px 0px #010101' : '3px 3px 0px #010101'
       }}
     >
       {/* Avatar Emoji / Graphic */}
@@ -46,14 +41,13 @@ export const NeonAvatarDisplay: React.FC<NeonAvatarDisplayProps> = ({
         {meta.emoji}
       </span>
 
-      {/* Futuristic cyber corner brackets */}
+      {/* Bauhaus Geometric Corner Triangle Accent */}
       <div
-        className="absolute top-1 left-1 w-2 h-2 border-t-2 border-l-2 pointer-events-none rounded-tl-sm opacity-80"
-        style={{ borderColor: meta.primaryColor }}
-      />
-      <div
-        className="absolute bottom-1 right-1 w-2 h-2 border-b-2 border-r-2 pointer-events-none rounded-br-sm opacity-80"
-        style={{ borderColor: meta.primaryColor }}
+        className="absolute top-0 right-0 w-3 h-3 pointer-events-none rounded-tr-xl"
+        style={{
+          background: isReady ? '#FEC90E' : '#0B89FD',
+          clipPath: 'polygon(100% 0, 0 0, 100% 100%)'
+        }}
       />
     </div>
   );

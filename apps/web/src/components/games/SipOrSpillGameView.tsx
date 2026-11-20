@@ -5,12 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Wine,
   MessageSquare,
-  Sparkles,
-  Flame,
   Clock,
-  Heart,
-  Laugh,
-  Skull,
   Send
 } from 'lucide-react';
 import {
@@ -99,21 +94,21 @@ export function SipOrSpillGameView({
       {/* 1. TOP HEADER */}
       <div className="flex items-center justify-between mb-3 px-1">
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-rose-500/20 text-rose-300 border border-rose-500/40 flex items-center gap-1.5 shadow-[0_0_12px_rgba(244,63,94,0.3)]">
-            <Wine className="w-3.5 h-3.5 text-rose-400" />
+          <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-[#FFFFFF] text-[#010101] border-2 border-[#010101] flex items-center gap-1.5 shadow-[2px_2px_0px_#010101]">
+            <Wine className="w-3.5 h-3.5 text-[#FD3F01]" />
             Round {state.round} / {state.totalRounds}
           </span>
-          <span className="hidden sm:inline-block px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/30">
+          <span className="hidden sm:inline-block px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-[#FEC90E] text-[#010101] border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
             Spicy Level {state.spicyLevel} 🔥
           </span>
         </div>
 
         {/* TIMER */}
         <div
-          className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-black tracking-wider transition-all ${
+          className={`flex items-center gap-1.5 px-3 py-1 rounded-full border-2 border-[#010101] text-xs font-black tracking-wider shadow-[2px_2px_0px_#010101] transition-all ${
             state.remainingSeconds <= 5
-              ? 'bg-rose-500/20 border-rose-500/60 text-rose-400 animate-pulse shadow-[0_0_15px_rgba(244,63,94,0.5)]'
-              : 'bg-slate-900/80 border-cyan-500/30 text-cyan-300'
+              ? 'bg-[#FD3F01] text-white animate-bounce'
+              : 'bg-[#FFFFFF] text-[#0B89FD]'
           }`}
         >
           <Clock className="w-3.5 h-3.5" />
@@ -125,15 +120,15 @@ export function SipOrSpillGameView({
       <motion.div
         initial={{ opacity: 0, y: -6 }}
         animate={{ opacity: 1, y: 0 }}
-        className="glass-panel p-3 sm:p-4 rounded-2xl border border-cyan-500/20 flex items-center justify-between mb-3"
+        className="bg-[#FFFFFF] p-3 sm:p-4 rounded-2xl border-2 border-[#010101] shadow-[3px_3px_0px_#010101] flex items-center justify-between mb-3"
       >
         <div className="flex items-center gap-3">
-          <NeonAvatarDisplay avatarId={state.targetAvatar} size="sm" isGlowing />
+          <NeonAvatarDisplay avatarId={state.targetAvatar} size="sm" showGlow={false} />
           <div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400 block">
+            <span className="text-[10px] font-black uppercase tracking-widest text-[#0B89FD] block">
               In The Hot Seat:
             </span>
-            <span className="text-sm sm:text-base font-black text-white">
+            <span className="text-sm sm:text-base font-black text-[#010101]">
               {state.targetUsername} {isMyTurn && '(You!)'}
             </span>
           </div>
@@ -148,7 +143,7 @@ export function SipOrSpillGameView({
                 onClick={() => handleSendReaction(emoji)}
                 whileHover={{ scale: 1.25 }}
                 whileTap={{ scale: 0.85 }}
-                className="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-purple-900/40 border border-slate-700/60 flex items-center justify-center text-sm"
+                className="w-8 h-8 rounded-full bg-[#FFFFFF] hover:bg-[#FEC90E] border-2 border-[#010101] shadow-[1px_1px_0px_#010101] flex items-center justify-center text-sm font-emoji"
               >
                 {emoji}
               </motion.button>
@@ -161,16 +156,15 @@ export function SipOrSpillGameView({
       <motion.div
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="glass-panel-neon p-5 sm:p-7 rounded-3xl border-2 border-rose-500/30 text-center relative overflow-hidden mb-4 shadow-[0_0_30px_rgba(244,63,94,0.18)]"
+        className="bg-[#FFFFFF] p-5 sm:p-7 rounded-3xl border-2 border-[#010101] text-center relative overflow-hidden mb-4 shadow-[4px_4px_0px_#010101]"
       >
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 via-purple-500 to-cyan-400" />
-        <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.25em] text-rose-400 block mb-2">
+        <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.25em] text-[#FD3F01] block mb-2">
           Sip Or Spill Dilemma
         </span>
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-snug mb-3">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-[#010101] tracking-tight leading-snug mb-3">
           {state.dilemma}
         </h2>
-        <p className="text-xs sm:text-sm text-cyan-300 font-bold max-w-lg mx-auto">
+        <p className="text-xs sm:text-sm text-[#0B89FD] font-black max-w-lg mx-auto">
           Deep Dive: {state.question}
         </p>
       </motion.div>
@@ -181,43 +175,39 @@ export function SipOrSpillGameView({
           {isMyTurn ? (
             <div className="w-full max-w-lg grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               {/* BUTTON 1: SPILL THE TRUTH */}
-              <motion.button
+              <button
                 onClick={() => setShowConfessionModal(true)}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                className="btn-glow-cyan p-5 rounded-2xl flex flex-col items-center justify-center text-center gap-2"
+                className="p-5 rounded-2xl flex flex-col items-center justify-center text-center gap-2 bg-[#0B89FD] hover:bg-[#0977db] text-white border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all"
               >
-                <MessageSquare className="w-8 h-8 text-cyan-400 animate-bounce" />
+                <MessageSquare className="w-8 h-8 text-white" />
                 <span className="text-base sm:text-lg font-black uppercase tracking-wider text-white">
                   Spill The Truth!
                 </span>
-                <span className="text-[11px] font-bold text-cyan-300/80">
+                <span className="text-[11px] font-bold text-white/90">
                   +150 PTS • Confess to the room
                 </span>
-              </motion.button>
+              </button>
 
               {/* BUTTON 2: TAKE A SIP */}
-              <motion.button
+              <button
                 onClick={handleTakeSip}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                className="btn-glow-purple p-5 rounded-2xl flex flex-col items-center justify-center text-center gap-2"
+                className="p-5 rounded-2xl flex flex-col items-center justify-center text-center gap-2 bg-[#FD3F01] hover:bg-[#e03700] text-white border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all"
               >
-                <Wine className="w-8 h-8 text-purple-400" />
+                <Wine className="w-8 h-8 text-white" />
                 <span className="text-base sm:text-lg font-black uppercase tracking-wider text-white">
                   Take A Sip! 🥤
                 </span>
-                <span className="text-[11px] font-bold text-purple-300/80">
+                <span className="text-[11px] font-bold text-white/90">
                   Take {state.spicyLevel || 2} sips to skip question
                 </span>
-              </motion.button>
+              </button>
             </div>
           ) : (
-            <div className="text-center py-6 px-4 rounded-2xl glass-panel border border-slate-700/60 max-w-md">
-              <span className="text-xs font-black uppercase tracking-widest text-cyan-400 block mb-1">
+            <div className="text-center py-6 px-4 rounded-2xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[3px_3px_0px_#010101] max-w-md">
+              <span className="text-xs font-black uppercase tracking-widest text-[#0B89FD] block mb-1">
                 Awaiting Decision
               </span>
-              <p className="text-sm font-bold text-slate-300">
+              <p className="text-sm font-bold text-[#010101]">
                 Watching {state.targetUsername} sweat! Will they confess or drink?
               </p>
             </div>
@@ -230,30 +220,30 @@ export function SipOrSpillGameView({
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="flex-1 flex flex-col items-center justify-center text-center p-6 rounded-3xl glass-panel-neon border border-purple-500/40"
+          className="flex-1 flex flex-col items-center justify-center text-center p-6 rounded-3xl bg-[#FFFFFF] border-3 border-[#010101] shadow-[6px_6px_0px_#010101]"
         >
           {state.chosenAction === 'sip' ? (
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-rose-500/20 border-2 border-rose-400 flex items-center justify-center text-3xl mb-3 shadow-[0_0_25px_rgba(244,63,94,0.6)] animate-bounce">
+              <div className="w-16 h-16 rounded-full bg-[#FD3F01] border-2 border-[#010101] flex items-center justify-center text-3xl mb-3 shadow-[3px_3px_0px_#010101] animate-bounce">
                 🥤
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black text-rose-400 mb-1">
+              <h3 className="text-2xl sm:text-3xl font-black text-[#FD3F01] mb-1">
                 {state.targetUsername} Chose To Sip!
               </h3>
-              <p className="text-sm font-bold text-slate-300 mb-4">
+              <p className="text-sm font-bold text-[#010101] mb-4">
                 Poured {state.spicyLevel || 2} sips into the session tally!
               </p>
             </div>
           ) : (
             <div className="flex flex-col items-center max-w-lg">
-              <div className="w-16 h-16 rounded-full bg-cyan-500/20 border-2 border-cyan-400 flex items-center justify-center text-3xl mb-3 shadow-[0_0_25px_rgba(0,240,255,0.6)]">
+              <div className="w-16 h-16 rounded-full bg-[#0B89FD] border-2 border-[#010101] flex items-center justify-center text-3xl mb-3 shadow-[3px_3px_0px_#010101]">
                 💬
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black text-cyan-300 mb-2">
+              <h3 className="text-2xl sm:text-3xl font-black text-[#0B89FD] mb-2">
                 {state.targetUsername} Spilled The Truth!
               </h3>
               {state.confessionText && (
-                <div className="p-4 rounded-2xl bg-slate-900/80 border border-cyan-400/40 text-sm font-bold text-white mb-4 italic">
+                <div className="p-4 rounded-2xl bg-[#F8F8F8] border-2 border-[#010101] text-sm font-bold text-[#010101] mb-4 italic shadow-[2px_2px_0px_#010101]">
                   &ldquo;{state.confessionText}&rdquo;
                 </div>
               )}
@@ -261,14 +251,12 @@ export function SipOrSpillGameView({
           )}
 
           {isHost && (
-            <motion.button
+            <button
               onClick={handleNextRound}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              className="btn-glow-start px-8 py-3 rounded-2xl text-sm font-black uppercase tracking-wider mt-2"
+              className="px-8 py-3 rounded-2xl bg-[#0B89FD] hover:bg-[#0977db] text-white font-black text-sm uppercase tracking-wider border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all mt-2"
             >
               Next Round →
-            </motion.button>
+            </button>
           )}
         </motion.div>
       )}
@@ -276,17 +264,17 @@ export function SipOrSpillGameView({
       {/* CONFESSION INPUT MODAL */}
       <AnimatePresence>
         {showConfessionModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#010101]/80 backdrop-blur-sm p-4">
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="w-full max-w-md p-6 rounded-3xl glass-panel-neon border-2 border-cyan-400 text-center"
+              className="w-full max-w-md p-6 rounded-3xl bg-[#FFFFFF] border-3 border-[#010101] shadow-[8px_8px_0px_#010101] text-center"
             >
-              <h3 className="text-xl font-black text-cyan-300 uppercase tracking-wide mb-2">
+              <h3 className="text-xl font-black text-[#010101] uppercase tracking-wide mb-2">
                 Spill Your Confession
               </h3>
-              <p className="text-xs text-slate-300 font-semibold mb-4">
+              <p className="text-xs text-[#010101]/70 font-semibold mb-4">
                 Type your answer or confess out loud to the crew:
               </p>
 
@@ -295,19 +283,19 @@ export function SipOrSpillGameView({
                 onChange={(e) => setConfessionInput(e.target.value)}
                 placeholder="Type your spicy confession here..."
                 rows={3}
-                className="w-full p-3 rounded-xl bg-slate-950/80 border border-cyan-500/40 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-cyan-400 mb-4"
+                className="w-full p-3 rounded-xl bg-[#F8F8F8] border-2 border-[#010101] text-[#010101] placeholder-[#010101]/40 text-sm font-bold focus:outline-none focus:border-[#0B89FD] mb-4"
               />
 
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowConfessionModal(false)}
-                  className="flex-1 py-2.5 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs uppercase"
+                  className="flex-1 py-2.5 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] text-[#010101] font-bold text-xs uppercase shadow-[2px_2px_0px_#010101]"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSpillTruth}
-                  className="flex-1 py-2.5 rounded-xl btn-glow-start text-white font-black text-xs uppercase flex items-center justify-center gap-1.5"
+                  className="flex-1 py-2.5 rounded-xl bg-[#0B89FD] hover:bg-[#0977db] text-white border-2 border-[#010101] font-black text-xs uppercase flex items-center justify-center gap-1.5 shadow-[2px_2px_0px_#010101]"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>Submit</span>

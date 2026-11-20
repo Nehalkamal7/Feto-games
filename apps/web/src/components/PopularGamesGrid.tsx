@@ -303,85 +303,97 @@ export function PopularGamesGrid({ onSelectGame, onOpenRules }: PopularGamesGrid
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-6">
         <div>
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(0,240,255,0.8)]" />
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-wider uppercase font-heading">
+            <span className="w-3 h-3 rounded-full bg-[#0B89FD] border-2 border-[#010101] shadow-[1px_1px_0px_#010101]" />
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-[#010101] tracking-wider uppercase font-heading">
               POPULAR PARTY GAMES
             </h2>
           </div>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+          <p className="text-xs sm:text-sm text-[#525252] font-semibold mt-1">
             Pick a game to instantly launch a custom 15-player room with your crew
           </p>
         </div>
 
-        <div className="text-xs font-bold text-cyan-300/80 px-3 py-1 rounded-full bg-cyan-950/40 border border-cyan-500/30">
+        <div className="text-xs font-black text-[#010101] px-3.5 py-1 rounded-full bg-[#FEC90E] border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
           10 Live Party Modes
         </div>
       </div>
 
       {/* 10-CARD RESPONSIVE GRID (2 cols mobile, 3 cols tablet, 5 cols desktop) */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-        {games.map((g, idx) => (
-          <motion.div
-            key={g.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: idx * 0.06 }}
-            whileHover={{ y: -6, scale: 1.02 }}
-            onClick={() => {
-              sound.playClick();
-              onSelectGame(g.id);
-            }}
-            className={`cursor-pointer glass-panel rounded-2xl p-3 flex flex-col justify-between border-2 border-slate-800 transition-all duration-300 relative group ${g.glowBorderColor}`}
-          >
-            {/* TOP BADGE: PLAYER COUNT */}
-            <div className="flex items-center justify-between gap-1 mb-2">
-              <span className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider truncate">
-                {g.category}
-              </span>
-              <span className={`text-[10px] font-black px-2 py-0.5 rounded-full border flex-shrink-0 ${g.badgeColor}`}>
-                {g.players}
-              </span>
-            </div>
+        {games.map((g, idx) => {
+          const cornerColor =
+            g.id === 'who_is_imposter' || g.id === 'hot_potato' || g.id === 'silly_roulette'
+              ? '#FD3F01'
+              : g.id === 'draw_and_guess' || g.id === 'word_battle' || g.id === 'quiz_battle'
+              ? '#0B89FD'
+              : '#FEC90E';
 
-            {/* CUSTOM NEON ARTWORK */}
-            <div className="my-1 transition-transform duration-300 group-hover:scale-105">
-              {g.renderArtwork()}
-            </div>
+          return (
+            <motion.div
+              key={g.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: idx * 0.05 }}
+              whileHover={{ y: -4, x: -2 }}
+              onClick={() => {
+                sound.playClick();
+                onSelectGame(g.id);
+              }}
+              className="cursor-pointer bg-[#FFFFFF] rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between border-2 border-[#010101] shadow-[4px_4px_0px_#010101] hover:shadow-[6px_6px_0px_#010101] transition-all relative group overflow-hidden"
+            >
+              {/* SUBTLE GEOMETRIC BAUHAUS CORNER ACCENT (QUARTER-CIRCLE) */}
+              <div className="absolute -top-6 -right-6 w-14 h-14 rounded-full border-2 border-[#010101] pointer-events-none z-0" style={{ backgroundColor: cornerColor }} />
 
-            {/* TITLE & DESCRIPTION */}
-            <div className="mt-2.5 flex-1 flex flex-col justify-between">
-              <div>
-                <h3 className="font-extrabold text-xs sm:text-sm text-white group-hover:text-cyan-300 transition-colors line-clamp-1">
-                  {g.title}
-                </h3>
-                <p className="text-[11px] text-slate-400 mt-1 leading-snug line-clamp-2">
-                  {g.tagline}
-                </p>
+              {/* TOP BADGE: PLAYER COUNT */}
+              <div className="flex items-center justify-between gap-1 mb-2 relative z-10">
+                <span className="text-[10px] font-black uppercase text-[#525252] tracking-wider truncate">
+                  {g.category}
+                </span>
+                <span className="text-[10px] font-black px-2 py-0.5 rounded-full border-2 border-[#010101] bg-[#FEC90E] text-[#010101] flex-shrink-0 shadow-[1px_1px_0px_#010101]">
+                  {g.players}
+                </span>
               </div>
 
-              {/* CARD ACTION BUTTON */}
-              <div className="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    sound.playClick();
-                    onOpenRules(g.id);
-                  }}
-                  className="text-[10px] font-bold text-slate-400 hover:text-white flex items-center gap-1 py-1 px-1 touch-target"
-                >
-                  <HelpCircle className="w-3 h-3 text-cyan-400" />
-                  <span>Rules</span>
-                </button>
+              {/* CUSTOM ARTWORK IN CRISP FRAME */}
+              <div className="my-1 rounded-xl bg-[#F8F8F8] border-2 border-[#010101] p-1 overflow-hidden transition-transform duration-300 group-hover:scale-[1.02] relative z-10">
+                {g.renderArtwork()}
+              </div>
 
-                <div className="flex items-center gap-1 text-[11px] font-black text-cyan-400 group-hover:translate-x-0.5 transition-transform">
-                  <span>PLAY</span>
-                  <ArrowRight className="w-3 h-3" />
+              {/* TITLE & DESCRIPTION */}
+              <div className="mt-2.5 flex-1 flex flex-col justify-between relative z-10">
+                <div>
+                  <h3 className="font-black text-xs sm:text-sm text-[#010101] group-hover:text-[#0B89FD] transition-colors line-clamp-1">
+                    {g.title}
+                  </h3>
+                  <p className="text-[11px] text-[#525252] font-medium mt-1 leading-snug line-clamp-2">
+                    {g.tagline}
+                  </p>
+                </div>
+
+                {/* CARD ACTION BUTTON */}
+                <div className="mt-3 pt-2.5 border-t-2 border-[#010101] flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      sound.playClick();
+                      onOpenRules(g.id);
+                    }}
+                    className="text-[10px] font-black text-[#525252] hover:text-[#010101] flex items-center gap-1 py-1 px-1 touch-target transition-colors"
+                  >
+                    <HelpCircle className="w-3.5 h-3.5 text-[#0B89FD]" />
+                    <span>Rules</span>
+                  </button>
+
+                  <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#0B89FD] text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101] text-[10px] font-black group-hover:bg-[#0977db] transition-colors">
+                    <span>PLAY</span>
+                    <ArrowRight className="w-3 h-3 text-white" />
+                  </div>
                 </div>
               </div>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          );
+        })}
       </div>
     </section>
   );

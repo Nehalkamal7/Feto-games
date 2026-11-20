@@ -121,12 +121,12 @@ export function CustomDeckModal({ isOpen, onClose, gameMode, onDeckCreated }: Cu
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#010101]/80 backdrop-blur-sm">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="w-full max-w-2xl glass-panel-neon rounded-3xl p-6 md:p-8 max-h-[90vh] overflow-y-auto relative"
+          className="w-full max-w-2xl bg-[#FFFFFF] rounded-3xl p-6 md:p-8 max-h-[90vh] overflow-y-auto relative border-3 border-[#010101] shadow-[8px_8px_0px_#010101] text-[#010101]"
         >
           {/* CLOSE BUTTON */}
           <button
@@ -134,39 +134,39 @@ export function CustomDeckModal({ isOpen, onClose, gameMode, onDeckCreated }: Cu
               sound.playClick();
               onClose();
             }}
-            className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+            className="absolute top-5 right-5 p-2 rounded-xl text-[#010101] bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101] transition-all font-black"
             aria-label="Close"
           >
             <X className="w-5 h-5" />
           </button>
 
           {/* TITLE */}
-          <div className="flex items-center gap-2 mb-6 text-feto-magenta text-xs font-bold uppercase tracking-wider">
-            <Layers className="w-4 h-4" />
+          <div className="flex items-center gap-2 mb-4 text-[#0B89FD] text-xs font-black uppercase tracking-wider">
+            <Layers className="w-4 h-4 text-[#0B89FD]" />
             <span>Custom Game Deck Creator</span>
           </div>
 
-          <h2 className="text-2xl font-black text-white mb-2">Build Your Custom Deck</h2>
-          <p className="text-xs text-slate-300 mb-6">
+          <h2 className="text-2xl font-black text-[#010101] mb-2">Build Your Custom Deck</h2>
+          <p className="text-xs text-[#010101]/70 mb-6 font-medium">
             Create custom question packs, secret words, or crazy dares tailored for your group of 15 friends.
           </p>
 
           {statusMessage && (
-            <div className="mb-4 p-3 bg-green-950/80 border border-green-500/40 rounded-xl text-green-300 text-xs flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-green-400" />
+            <div className="mb-4 p-3 bg-[#0B89FD]/10 border-2 border-[#0B89FD] rounded-xl text-[#0B89FD] text-xs flex items-center gap-2 font-black">
+              <CheckCircle className="w-4 h-4 text-[#0B89FD]" />
               <span>{statusMessage}</span>
             </div>
           )}
 
           {errorMessage && (
-            <div className="mb-4 p-3 bg-red-950/80 border border-red-500/40 rounded-xl text-red-300 text-xs">
+            <div className="mb-4 p-3 bg-[#FD3F01]/10 border-2 border-[#FD3F01] rounded-xl text-[#FD3F01] text-xs font-black">
               {errorMessage}
             </div>
           )}
 
           <div className="space-y-4 mb-6">
             <div>
-              <label className="block text-xs font-semibold uppercase text-slate-300 mb-1.5">
+              <label className="block text-xs font-black uppercase text-[#010101] mb-1.5">
                 Deck Name
               </label>
               <input
@@ -174,31 +174,31 @@ export function CustomDeckModal({ isOpen, onClose, gameMode, onDeckCreated }: Cu
                 value={deckName}
                 onChange={(e) => setDeckName(e.target.value)}
                 placeholder="e.g., College Friends Inside Jokes, Tech Trivia"
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:border-feto-magenta focus:outline-none"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#F8F8F8] border-2 border-[#010101] text-[#010101] font-bold text-sm focus:border-[#0B89FD] focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase text-slate-300 mb-1.5">
+              <label className="block text-xs font-black uppercase text-[#010101] mb-1.5">
                 Target Game Mode
               </label>
               <select
                 value={targetMode}
                 onChange={(e) => setTargetMode(e.target.value as GameMode)}
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:border-feto-magenta focus:outline-none"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#F8F8F8] border-2 border-[#010101] text-[#010101] font-bold text-sm focus:border-[#0B89FD] focus:outline-none"
               >
                 <option value="who_is_imposter">Who Is The Imposter? (Secret Words)</option>
-                <option value="draw_and_guess">Draw & Guess (Drawing Prompts)</option>
+                <option value="draw_and_guess">Draw &amp; Guess (Drawing Prompts)</option>
                 <option value="quiz_battle">Quiz Battle (Trivia Prompts)</option>
                 <option value="word_battle">Word Battle (Word Categories)</option>
-                <option value="truth_or_dare">Truth or Dare (Custom Dares & Truths)</option>
+                <option value="truth_or_dare">Truth or Dare (Custom Dares &amp; Truths)</option>
                 <option value="never_have_i_ever">Never Have I Ever (Confession Prompts)</option>
               </select>
             </div>
 
             {/* ADD CARD INPUT */}
             <div>
-              <label className="block text-xs font-semibold uppercase text-slate-300 mb-1.5">
+              <label className="block text-xs font-black uppercase text-[#010101] mb-1.5">
                 Add Items / Prompts ({cards.length} cards)
               </label>
               <form onSubmit={handleAddCard} className="flex gap-2">
@@ -207,11 +207,11 @@ export function CustomDeckModal({ isOpen, onClose, gameMode, onDeckCreated }: Cu
                   value={newCardInput}
                   onChange={(e) => setNewCardInput(e.target.value)}
                   placeholder="Type a word, question, or prompt and hit Add..."
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:border-feto-magenta focus:outline-none"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-[#F8F8F8] border-2 border-[#010101] text-[#010101] font-bold text-sm focus:border-[#0B89FD] focus:outline-none"
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2.5 rounded-xl bg-feto-magenta hover:brightness-110 text-white font-bold text-xs uppercase flex items-center gap-1.5 transition-all shadow-neon-magenta"
+                  className="px-4 py-2.5 rounded-xl bg-[#FEC90E] hover:bg-[#fed338] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] text-[#010101] font-black text-xs uppercase flex items-center gap-1.5 transition-all"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Add</span>
@@ -220,13 +220,13 @@ export function CustomDeckModal({ isOpen, onClose, gameMode, onDeckCreated }: Cu
             </div>
 
             {/* LIST OF CARDS */}
-            <div className="max-h-48 overflow-y-auto divide-y divide-slate-800 glass-panel rounded-2xl p-2">
+            <div className="max-h-48 overflow-y-auto space-y-1.5 bg-[#F8F8F8] border-2 border-[#010101] rounded-2xl p-2.5">
               {cards.map((card, idx) => (
-                <div key={idx} className="flex items-center justify-between p-2 hover:bg-slate-800/40 rounded-lg">
-                  <span className="text-xs text-white font-medium truncate flex-1 mr-2">{card}</span>
+                <div key={idx} className="flex items-center justify-between p-2 bg-[#FFFFFF] border border-[#010101] rounded-xl shadow-[1px_1px_0px_#010101]">
+                  <span className="text-xs text-[#010101] font-bold truncate flex-1 mr-2">{card}</span>
                   <button
                     onClick={() => handleRemoveCard(idx)}
-                    className="text-slate-500 hover:text-red-400 p-1"
+                    className="text-[#010101]/60 hover:text-[#FD3F01] p-1 font-black"
                     title="Remove item"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -240,7 +240,7 @@ export function CustomDeckModal({ isOpen, onClose, gameMode, onDeckCreated }: Cu
           <button
             onClick={handleSaveDeck}
             disabled={isSaving}
-            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-feto-magenta to-cyan-400 hover:brightness-110 text-black font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-neon-magenta transition-all disabled:opacity-50 mb-6"
+            className="w-full py-3.5 rounded-2xl bg-[#0B89FD] hover:bg-[#0977db] text-white font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all disabled:opacity-50 mb-6"
           >
             <Save className="w-4 h-4" />
             <span>{isSaving ? 'Saving Deck to Cloud...' : 'Save Deck to PostgreSQL'}</span>
@@ -248,16 +248,16 @@ export function CustomDeckModal({ isOpen, onClose, gameMode, onDeckCreated }: Cu
 
           {/* SAVED DECKS ACCORDION */}
           {savedDecks.length > 0 && (
-            <div className="border-t border-slate-800 pt-4">
-              <h3 className="text-xs font-bold uppercase text-slate-400 mb-3 flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+            <div className="border-t-2 border-[#010101]/10 pt-4">
+              <h3 className="text-xs font-black uppercase text-[#010101] mb-3 flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5 text-[#FEC90E]" />
                 <span>Existing Community Decks ({savedDecks.length})</span>
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {savedDecks.map((d) => (
-                  <div key={d.id} className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-xs">
-                    <div className="font-bold text-white truncate">{d.name}</div>
-                    <div className="text-[10px] text-slate-400 flex items-center justify-between mt-1">
+                  <div key={d.id} className="p-3 rounded-xl bg-[#F8F8F8] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] text-xs">
+                    <div className="font-black text-[#010101] truncate">{d.name}</div>
+                    <div className="text-[10px] text-[#010101]/70 flex items-center justify-between mt-1 font-bold">
                       <span className="capitalize">{d.gameMode.replace(/_/g, ' ')}</span>
                       <span>{d.itemCount} items</span>
                     </div>

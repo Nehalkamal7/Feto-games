@@ -277,12 +277,7 @@ export default function HomePage() {
   };
 
   return (
-    <main className="min-h-[100dvh] bg-feto-dark text-slate-100 px-3 sm:px-6 py-3 sm:py-5 flex flex-col items-center justify-start relative max-w-7xl mx-auto safe-top safe-bottom">
-      {/* Background Neon Ambient Glows */}
-      <div className="fixed top-0 left-1/4 w-[500px] h-[500px] bg-cyan-600/10 rounded-full blur-[140px] pointer-events-none -z-10" />
-      <div className="fixed top-1/3 right-10 w-[550px] h-[550px] bg-purple-600/10 rounded-full blur-[160px] pointer-events-none -z-10" />
-      <div className="fixed bottom-10 left-1/3 w-[450px] h-[450px] bg-feto-magenta/10 rounded-full blur-[130px] pointer-events-none -z-10" />
-
+    <main className="min-h-[100dvh] bg-[#F8F8F8] text-[#010101] px-3 sm:px-6 py-3 sm:py-5 flex flex-col items-center justify-start relative max-w-7xl mx-auto safe-top safe-bottom">
       {/* 1. TOP NAVIGATION BAR */}
       <TopNavbar
         onlinePlayersCount={liveStats.onlinePlayers}
@@ -294,50 +289,50 @@ export default function HomePage() {
 
       {/* ERROR BANNER */}
       {errorMessage && (
-        <div className="w-full max-w-3xl mb-4 p-3 bg-red-950/80 border border-red-500/50 rounded-2xl text-red-300 text-xs flex items-center justify-between gap-2 shadow-neon-magenta">
+        <div className="w-full max-w-3xl mb-4 p-3.5 bg-[#FD3F01]/10 border-2 border-[#FD3F01] rounded-2xl text-[#FD3F01] font-black text-xs flex items-center justify-between gap-2 shadow-[3px_3px_0px_#010101]">
           <div className="flex items-center gap-2">
-            <ShieldAlert className="w-4 h-4 flex-shrink-0 text-red-400" />
+            <ShieldAlert className="w-4 h-4 flex-shrink-0 text-[#FD3F01]" />
             <span>{errorMessage}</span>
           </div>
           <button
             onClick={() => setErrorMessage(null)}
-            className="text-slate-400 hover:text-white text-base font-bold leading-none px-2"
+            className="text-[#010101] hover:text-[#FD3F01] text-base font-black leading-none px-2"
           >
             &times;
           </button>
         </div>
       )}
 
-      {/* 2. HERO SECTION & GLOWING OUTLINE ACTION BUTTONS */}
+      {/* 2. HERO SECTION & BOLD BAUHAUS PRIMARY ACTION BUTTONS */}
       <section className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center my-2 sm:my-6 md:my-8 relative z-10">
         {/* Left Column: Esports Branding, Headline, Profile Bar, Action Buttons */}
         <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
           {/* Eyebrow Pill */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/40 text-[11px] font-black uppercase tracking-widest text-cyan-300 mb-4 shadow-neon-cyan">
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-spin" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#FFFFFF] border-2 border-[#010101] text-[11px] font-black uppercase tracking-widest text-[#010101] mb-4 shadow-[2px_2px_0px_#010101]">
+            <Sparkles className="w-3.5 h-3.5 text-[#0B89FD] animate-spin" />
             <span>Esports-Grade Party Gaming Platform</span>
           </div>
 
-          {/* Futuristic Headline */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-[1.08] font-display text-white mb-3">
+          {/* Bold Futuristic Headline */}
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-[1.08] font-display text-[#010101] mb-3">
             The Ultimate{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-cyan-300 to-feto-purple text-glow-cyan">
+            <span className="text-[#0B89FD] underline decoration-4 sm:decoration-6 decoration-[#FEC90E]">
               Party Game Hub
             </span>
           </h1>
 
           {/* Subtitle */}
-          <p className="text-cyan-300/90 text-sm sm:text-lg font-extrabold uppercase tracking-widest mb-2">
+          <p className="text-[#010101] text-sm sm:text-lg font-black uppercase tracking-widest mb-2">
             PLAY WITH FRIENDS, ANYTIME, ANYWHERE
           </p>
 
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-purple-950/60 border border-purple-500/40 text-xs font-black text-purple-200 mb-4 shadow-neon-purple">
-            <Flame className="w-4 h-4 text-pink-400 animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#FEC90E] border-2 border-[#010101] text-xs font-black text-[#010101] mb-4 shadow-[2px_2px_0px_#010101]">
+            <Flame className="w-4 h-4 text-[#FD3F01]" />
             <span>Invite your crew for 15-player madness!</span>
-            <span className="text-cyan-300 ml-1 font-mono font-bold">• 10 Party Modes</span>
+            <span className="text-[#010101] ml-1 font-mono font-bold">• 10 Party Modes</span>
           </div>
 
-          <p className="text-slate-400 text-xs sm:text-sm md:text-base max-w-xl mb-6 leading-relaxed">
+          <p className="text-[#525252] font-medium text-xs sm:text-sm md:text-base max-w-xl mb-6 leading-relaxed">
             Instant real-time browser party gaming supporting up to 15 concurrent players.
             Social deduction, drawing, speed trivia, word battles, and hilarious party challenges with zero downloads.
           </p>
@@ -352,76 +347,76 @@ export default function HomePage() {
             />
           </div>
 
-          {/* 3 SLEEK DARK GLASSMORPHIC BUTTONS WITH THICK GLOWING NEON BORDERS */}
+          {/* 3 BOLD TACTILE NEO-BRUTALIST ACTION BUTTONS */}
           <div className="w-full max-w-xl grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5">
-            {/* 1. CREATE ROOM (+) -> NEON PURPLE GLOW */}
+            {/* 1. CREATE ROOM (+) -> VIBRANT ELECTRIC BLUE #0B89FD */}
             <motion.button
               whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileTap={{ scale: 0.96 }}
               onClick={() => {
                 sound.playClick();
                 setShowCreateModal(true);
               }}
-              className="btn-glow-purple px-4 py-3.5 rounded-2xl flex items-center justify-center gap-2 touch-target group"
+              className="px-4 py-3.5 rounded-2xl flex items-center justify-center gap-2 bg-[#0B89FD] hover:bg-[#0977db] text-white border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all touch-target group"
               id="btn-create-room"
             >
-              <div className="p-1 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-400/40 group-hover:bg-purple-500/30">
-                <Plus className="w-4 h-4" />
+              <div className="p-1 rounded-lg bg-white/20 text-white border border-white/40">
+                <Plus className="w-4 h-4 text-white" />
               </div>
-              <span className="font-black text-xs sm:text-sm tracking-wider uppercase text-purple-200 group-hover:text-white">
+              <span className="font-black text-xs sm:text-sm tracking-wider uppercase text-white">
                 Create Room
               </span>
             </motion.button>
 
-            {/* 2. JOIN VIA CODE -> NEON CYAN GLOW */}
+            {/* 2. JOIN VIA CODE -> CRISP WHITE SURFACE #FFFFFF */}
             <motion.button
               whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileTap={{ scale: 0.96 }}
               onClick={() => {
                 sound.playClick();
                 setShowJoinModal(true);
               }}
-              className="btn-glow-cyan px-4 py-3.5 rounded-2xl flex items-center justify-center gap-2 touch-target group"
+              className="px-4 py-3.5 rounded-2xl flex items-center justify-center gap-2 bg-[#FFFFFF] hover:bg-[#F8F8F8] text-[#010101] border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all touch-target group"
               id="btn-join-code"
             >
-              <div className="p-1 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 group-hover:bg-cyan-500/30">
-                <Hash className="w-4 h-4" />
+              <div className="p-1 rounded-lg bg-[#010101]/10 text-[#010101] border border-[#010101]/30">
+                <Hash className="w-4 h-4 text-[#010101]" />
               </div>
-              <span className="font-black text-xs sm:text-sm tracking-wider uppercase text-cyan-200 group-hover:text-white">
+              <span className="font-black text-xs sm:text-sm tracking-wider uppercase text-[#010101]">
                 Join Via Code
               </span>
             </motion.button>
 
-            {/* 3. QUICK PLAY (▶) -> NEON AMBER/ORANGE GLOW */}
+            {/* 3. QUICK PLAY (▶) -> VIBRANT GOLD/YELLOW #FEC90E */}
             <motion.button
               whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileTap={{ scale: 0.96 }}
               onClick={handleQuickPlay}
               disabled={isQuickPlaying}
-              className="btn-glow-amber px-4 py-3.5 rounded-2xl flex items-center justify-center gap-2 touch-target group disabled:opacity-60"
+              className="px-4 py-3.5 rounded-2xl flex items-center justify-center gap-2 bg-[#FEC90E] hover:bg-[#fed338] text-[#010101] border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all touch-target group disabled:opacity-60"
               id="btn-quick-play"
             >
-              <div className="p-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-400/40 group-hover:bg-amber-500/30">
+              <div className="p-1 rounded-lg bg-[#010101]/10 text-[#010101] border border-[#010101]/30">
                 {isQuickPlaying ? (
-                  <div className="w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-[#010101] border-t-transparent rounded-full animate-spin" />
                 ) : (
-                  <Play className="w-4 h-4 fill-amber-300" />
+                  <Play className="w-4 h-4 fill-[#010101] text-[#010101]" />
                 )}
               </div>
-              <span className="font-black text-xs sm:text-sm tracking-wider uppercase text-amber-200 group-hover:text-white">
-                {isQuickPlaying ? 'Finding Party...' : 'Play With Strangers (Public Match)'}
+              <span className="font-black text-xs sm:text-sm tracking-wider uppercase text-[#010101]">
+                {isQuickPlaying ? 'Finding Party...' : 'Quick Match'}
               </span>
             </motion.button>
           </div>
         </div>
 
-        {/* Right Column: 3D-Style Neon Gaming Illustration (Desktop / Stacks on Mobile) */}
+        {/* Right Column: Bauhaus Geometric Gaming Illustration */}
         <div className="lg:col-span-5 flex justify-center lg:justify-end w-full">
           <HeroIllustration />
         </div>
       </section>
 
-      {/* 3. "POPULAR PARTY GAMES" INTERACTIVE 6-CARD GRID */}
+      {/* 3. "POPULAR PARTY GAMES" INTERACTIVE GRID */}
       <div ref={gamesGridRef} className="w-full my-6 sm:my-10">
         <PopularGamesGrid
           onSelectGame={(mode) => {
@@ -438,17 +433,17 @@ export default function HomePage() {
       </div>
 
       {/* 4. ACTIVE PUBLIC ROOMS DIRECTORY */}
-      <section className="w-full glass-panel rounded-3xl p-5 sm:p-7 relative z-10 mb-8 border border-cyan-500/20">
+      <section className="w-full bg-[#FFFFFF] rounded-3xl p-5 sm:p-7 relative z-10 mb-8 border-2 border-[#010101] shadow-[4px_4px_0px_#010101]">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+            <div className="p-2 rounded-xl bg-[#0B89FD]/15 border-2 border-[#010101] text-[#0B89FD]">
               <Globe className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-black text-white uppercase tracking-wider">
+              <h2 className="text-base sm:text-lg font-black text-[#010101] uppercase tracking-wider">
                 Live Public Rooms
               </h2>
-              <p className="text-[11px] sm:text-xs text-slate-400">
+              <p className="text-[11px] sm:text-xs text-[#525252] font-medium">
                 Jump straight into open community lobbies
               </p>
             </div>
@@ -460,18 +455,18 @@ export default function HomePage() {
               fetchPublicRooms();
             }}
             disabled={isFetchingRooms}
-            className="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-cyan-300 flex items-center gap-1.5 transition-all"
+            className="px-3.5 py-1.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F8F8F8] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] text-xs font-black text-[#010101] flex items-center gap-1.5 transition-all active:translate-x-[1px] active:translate-y-[1px]"
           >
-            <Radio className={`w-3.5 h-3.5 text-cyan-400 ${isFetchingRooms ? 'animate-spin' : 'animate-pulse'}`} />
+            <Radio className={`w-3.5 h-3.5 text-[#0B89FD] ${isFetchingRooms ? 'animate-spin' : 'animate-pulse'}`} />
             <span>{isFetchingRooms ? 'Refreshing...' : 'Refresh Lobbies'}</span>
           </button>
         </div>
 
         {publicRooms.length === 0 ? (
-          <div className="text-center py-10 text-slate-500 space-y-2">
-            <Gamepad2 className="w-10 h-10 mx-auto text-slate-600 mb-2 opacity-60" />
-            <p className="text-sm font-bold text-slate-300">No public rooms are currently open.</p>
-            <p className="text-xs text-slate-500">
+          <div className="text-center py-10 text-[#525252] space-y-2">
+            <Gamepad2 className="w-10 h-10 mx-auto text-[#010101] mb-2 opacity-50" />
+            <p className="text-sm font-black text-[#010101]">No public rooms are currently open.</p>
+            <p className="text-xs text-[#525252] font-medium">
               Hit "Create Room" above and invite up to 14 friends with your room link!
             </p>
           </div>
@@ -480,32 +475,32 @@ export default function HomePage() {
             {publicRooms.map((room) => (
               <div
                 key={room.code}
-                className="bg-feto-card border border-feto-border hover:border-cyan-500/50 rounded-2xl p-4 flex items-center justify-between transition-all group hover:shadow-neon-cyan"
+                className="bg-[#F8F8F8] border-2 border-[#010101] rounded-2xl p-4 flex items-center justify-between transition-all group shadow-[3px_3px_0px_#010101] hover:shadow-[5px_5px_0px_#010101] hover:-translate-x-0.5 hover:-translate-y-0.5"
               >
                 <div className="flex items-center gap-3">
                   <NeonAvatarDisplay avatarId={room.hostAvatar as NeonAvatarId} size="sm" showGlow={false} />
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-black text-white text-sm sm:text-base tracking-wider">{room.code}</span>
+                      <span className="font-black text-[#010101] text-sm sm:text-base tracking-wider">{room.code}</span>
                       {room.hasPin && (
                         <span title="PIN Protected">
-                          <Lock className="w-3.5 h-3.5 text-amber-400" />
+                          <Lock className="w-3.5 h-3.5 text-[#FD3F01]" />
                         </span>
                       )}
                     </div>
-                    <div className="text-[11px] text-slate-400">
-                      Host: <span className="text-slate-200 font-semibold">{room.hostUsername}</span> •{' '}
-                      <span className="capitalize text-cyan-300">{room.gameMode.replace(/_/g, ' ')}</span>
+                    <div className="text-[11px] text-[#525252] font-semibold">
+                      Host: <span className="text-[#010101] font-black">{room.hostUsername}</span> •{' '}
+                      <span className="capitalize text-[#0B89FD] font-black">{room.gameMode.replace(/_/g, ' ')}</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <div className="text-xs font-black text-cyan-400">
+                    <div className="text-xs font-black text-[#010101]">
                       {room.playerCount}/{room.maxPlayers}
                     </div>
-                    <div className="text-[9px] text-slate-400 uppercase tracking-widest">{room.status}</div>
+                    <div className="text-[9px] text-[#525252] font-black uppercase tracking-widest">{room.status}</div>
                   </div>
                   <button
                     onClick={() => {
@@ -513,7 +508,7 @@ export default function HomePage() {
                       setJoinCode(room.code);
                       setShowJoinModal(true);
                     }}
-                    className="px-3.5 py-1.5 bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 rounded-xl text-cyan-300 text-xs font-extrabold transition-all"
+                    className="px-3.5 py-1.5 bg-[#0B89FD] hover:bg-[#0977db] text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101] rounded-xl text-xs font-black transition-all active:translate-x-[1px] active:translate-y-[1px]"
                   >
                     Join
                   </button>
@@ -529,25 +524,25 @@ export default function HomePage() {
       {/* ======================================================== */}
       <AnimatePresence>
         {showCreateModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md safe-top safe-bottom">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm safe-top safe-bottom">
             <motion.div
               initial={{ opacity: 0, scale: 0.92, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.92, y: 10 }}
-              className="w-full max-w-lg glass-panel-neon rounded-3xl p-5 sm:p-8 relative max-h-[92dvh] overflow-y-auto border border-purple-500/30"
+              className="w-full max-w-lg bg-[#FFFFFF] rounded-3xl p-5 sm:p-8 relative max-h-[92dvh] overflow-y-auto border-3 border-[#010101] shadow-[8px_8px_0px_#010101] text-[#010101]"
             >
               <div className="flex items-center justify-between mb-4 sm:mb-6">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/40">
-                    <Sparkles className="w-5 h-5 text-purple-400" />
+                  <div className="p-2 rounded-xl bg-[#0B89FD] text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
+                    <Sparkles className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="text-lg sm:text-2xl font-black text-white uppercase tracking-wider">
+                  <h3 className="text-lg sm:text-2xl font-black text-[#010101] uppercase tracking-wider">
                     Create New Room
                   </h3>
                 </div>
                 <button
                   onClick={() => setShowCreateModal(false)}
-                  className="min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-400 hover:text-white text-2xl font-bold leading-none touch-manipulation"
+                  className="min-h-[40px] min-w-[40px] flex items-center justify-center text-[#010101] hover:text-[#FD3F01] text-2xl font-black leading-none touch-manipulation"
                 >
                   &times;
                 </button>
@@ -556,7 +551,7 @@ export default function HomePage() {
               <form onSubmit={handleCreateRoom} className="space-y-4 sm:space-y-5">
                 {/* Select Game Mode */}
                 <div>
-                  <label className="block text-xs font-black uppercase tracking-wider text-slate-300 mb-2">
+                  <label className="block text-xs font-black uppercase tracking-wider text-[#010101] mb-2">
                     Select Game Mode
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -579,13 +574,14 @@ export default function HomePage() {
                           sound.playClick();
                           setGameMode(mode.id as GameMode);
                         }}
-                        className={`min-h-[48px] p-2.5 sm:p-3 rounded-xl border text-left transition-all touch-target ${gameMode === mode.id
-                            ? 'border-purple-400 bg-purple-950/40 text-white shadow-neon-purple'
-                            : 'border-feto-border bg-feto-card text-slate-300 hover:border-slate-500'
-                          }`}
+                        className={`min-h-[48px] p-2.5 sm:p-3 rounded-xl border-2 text-left transition-all touch-target ${
+                          gameMode === mode.id
+                            ? 'border-[#010101] bg-[#FEC90E] text-[#010101] shadow-[3px_3px_0px_#010101]'
+                            : 'border-[#010101] bg-[#F8F8F8] text-[#010101] hover:bg-[#FFFFFF]'
+                        }`}
                       >
-                        <div className="font-extrabold text-xs sm:text-sm text-purple-300 truncate">{mode.title}</div>
-                        <div className="text-[10px] text-slate-400 truncate">{mode.desc}</div>
+                        <div className="font-black text-xs sm:text-sm text-[#010101] truncate">{mode.title}</div>
+                        <div className="text-[10px] text-[#525252] font-semibold truncate">{mode.desc}</div>
                       </button>
                     ))}
                   </div>
@@ -594,11 +590,11 @@ export default function HomePage() {
                 {/* Vibe Mode Selector */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                    <label className="text-xs font-black uppercase tracking-wider text-[#010101] flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-[#0B89FD]" />
                       <span>Party Vibe Mode</span>
                     </label>
-                    <span className="text-[10px] text-cyan-300 font-bold uppercase">{vibeMode.replace('_', ' ')}</span>
+                    <span className="text-[10px] text-[#0B89FD] font-black uppercase">{vibeMode.replace('_', ' ')}</span>
                   </div>
                   <div className="grid grid-cols-3 gap-2">
                     {[
@@ -613,43 +609,43 @@ export default function HomePage() {
                           sound.playClick();
                           setVibeMode(v.id as VibeMode);
                         }}
-                        className={`p-2.5 rounded-xl border text-left transition-all ${
+                        className={`p-2.5 rounded-xl border-2 text-left transition-all ${
                           vibeMode === v.id
-                            ? 'border-cyan-400 bg-cyan-950/40 text-white shadow-neon-cyan'
-                            : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
+                            ? 'border-[#010101] bg-[#0B89FD] text-white shadow-[3px_3px_0px_#010101]'
+                            : 'border-[#010101] bg-[#F8F8F8] text-[#010101] hover:bg-[#FFFFFF]'
                         }`}
                       >
-                        <div className="text-xs font-bold text-cyan-300 truncate">{v.label}</div>
-                        <div className="text-[9px] text-slate-400 leading-tight mt-0.5 line-clamp-2">{v.desc}</div>
+                        <div className="text-xs font-black truncate">{v.label}</div>
+                        <div className={`text-[9px] leading-tight mt-0.5 line-clamp-2 ${vibeMode === v.id ? 'text-white/80' : 'text-[#525252]'}`}>{v.desc}</div>
                       </button>
                     ))}
                   </div>
                 </div>
 
                 {/* Team Mode Toggle */}
-                <div className="p-3 sm:p-3.5 rounded-2xl bg-slate-900/80 border border-cyan-500/30 flex items-center justify-between">
+                <div className="p-3 sm:p-3.5 rounded-2xl bg-[#F8F8F8] border-2 border-[#010101] flex items-center justify-between">
                   <div className="flex items-center gap-2.5 sm:gap-3">
-                    <Shield className="w-5 h-5 text-cyan-400" />
+                    <Shield className="w-5 h-5 text-[#0B89FD]" />
                     <div>
-                      <div className="text-xs sm:text-sm font-bold text-white">Team Mode (3 Squads)</div>
-                      <div className="text-[10px] sm:text-xs text-slate-400">Split up to 15 players into Red, Blue, Green</div>
+                      <div className="text-xs sm:text-sm font-black text-[#010101]">Team Mode (3 Squads)</div>
+                      <div className="text-[10px] sm:text-xs text-[#525252]">Split up to 15 players into Red, Blue, Green</div>
                     </div>
                   </div>
                   <input
                     type="checkbox"
                     checked={isTeamMode}
                     onChange={(e) => setIsTeamMode(e.target.checked)}
-                    className="w-5 h-5 accent-cyan-400 rounded cursor-pointer touch-manipulation"
+                    className="w-5 h-5 accent-[#0B89FD] rounded cursor-pointer touch-manipulation"
                   />
                 </div>
 
                 {/* Max Players Slider (2 to 15) */}
                 <div>
                   <div className="flex justify-between items-center mb-1.5">
-                    <label className="text-xs font-black uppercase tracking-wider text-slate-300">
+                    <label className="text-xs font-black uppercase tracking-wider text-[#010101]">
                       Player Capacity (2 - 15)
                     </label>
-                    <span className="text-cyan-400 font-extrabold text-sm">{maxPlayers} Players</span>
+                    <span className="text-[#0B89FD] font-black text-sm">{maxPlayers} Players</span>
                   </div>
                   <input
                     type="range"
@@ -657,13 +653,13 @@ export default function HomePage() {
                     max={15}
                     value={maxPlayers}
                     onChange={(e) => setMaxPlayers(Number(e.target.value))}
-                    className="w-full accent-cyan-400 cursor-pointer h-3"
+                    className="w-full accent-[#0B89FD] cursor-pointer h-3"
                   />
                 </div>
 
                 {/* Round Duration */}
                 <div>
-                  <label className="block text-xs font-black uppercase tracking-wider text-slate-300 mb-1.5">
+                  <label className="block text-xs font-black uppercase tracking-wider text-[#010101] mb-1.5">
                     Round Timer
                   </label>
                   <div className="grid grid-cols-4 gap-2">
@@ -675,10 +671,11 @@ export default function HomePage() {
                           sound.playClick();
                           setRoundDuration(sec);
                         }}
-                        className={`py-2 rounded-xl border text-xs font-bold transition-all ${roundDuration === sec
-                            ? 'border-cyan-400 bg-cyan-950/40 text-cyan-300 shadow-neon-cyan'
-                            : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
-                          }`}
+                        className={`py-2 rounded-xl border-2 text-xs font-black transition-all ${
+                          roundDuration === sec
+                            ? 'border-[#010101] bg-[#0B89FD] text-white shadow-[2px_2px_0px_#010101]'
+                            : 'border-[#010101] bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
+                        }`}
                       >
                         {sec}s
                       </button>
@@ -687,17 +684,17 @@ export default function HomePage() {
                 </div>
 
                 {/* Privacy & PIN */}
-                <div className="space-y-3 pt-2 border-t border-feto-border">
+                <div className="space-y-3 pt-2 border-t-2 border-[#010101]">
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="text-xs sm:text-sm font-semibold text-white">Private Room</div>
-                      <div className="text-[10px] sm:text-xs text-slate-400">Requires 4-digit PIN to join</div>
+                      <div className="text-xs sm:text-sm font-black text-[#010101]">Private Room</div>
+                      <div className="text-[10px] sm:text-xs text-[#525252]">Requires 4-digit PIN to join</div>
                     </div>
                     <input
                       type="checkbox"
                       checked={isPrivate}
                       onChange={(e) => setIsPrivate(e.target.checked)}
-                      className="w-5 h-5 accent-purple-400 rounded cursor-pointer"
+                      className="w-5 h-5 accent-[#0B89FD] rounded cursor-pointer"
                     />
                   </div>
 
@@ -709,7 +706,7 @@ export default function HomePage() {
                         placeholder="Enter 4-digit numeric PIN..."
                         value={pin}
                         onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
-                        className="w-full bg-slate-900 border border-slate-700 focus:border-purple-400 rounded-xl px-4 py-2.5 text-white text-center font-mono tracking-widest text-lg outline-none"
+                        className="w-full bg-[#F8F8F8] border-2 border-[#010101] focus:bg-[#FFFFFF] focus:border-[#0B89FD] rounded-xl px-4 py-2.5 text-[#010101] text-center font-mono font-black tracking-widest text-lg outline-none"
                       />
                     </motion.div>
                   )}
@@ -719,7 +716,7 @@ export default function HomePage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full py-4 rounded-2xl font-black text-sm uppercase tracking-wider text-white bg-gradient-to-r from-purple-600 via-feto-purple to-cyan-500 hover:brightness-110 shadow-neon-purple transition-all flex items-center justify-center gap-2 touch-target"
+                  className="w-full py-4 rounded-2xl font-black text-sm uppercase tracking-wider text-white bg-[#0B89FD] hover:bg-[#0977db] border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all flex items-center justify-center gap-2 touch-target"
                 >
                   {isLoading ? (
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -741,25 +738,25 @@ export default function HomePage() {
       {/* ======================================================== */}
       <AnimatePresence>
         {showJoinModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md safe-top safe-bottom">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm safe-top safe-bottom">
             <motion.div
               initial={{ opacity: 0, scale: 0.92, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.92, y: 10 }}
-              className="w-full max-w-md glass-panel-neon rounded-3xl p-5 sm:p-8 relative border border-cyan-500/30"
+              className="w-full max-w-md bg-[#FFFFFF] rounded-3xl p-5 sm:p-8 relative border-3 border-[#010101] shadow-[8px_8px_0px_#010101] text-[#010101]"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
-                    <Hash className="w-5 h-5 text-cyan-400" />
+                  <div className="p-2 rounded-xl bg-[#0B89FD] text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
+                    <Hash className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="text-lg sm:text-2xl font-black text-white uppercase tracking-wider">
+                  <h3 className="text-lg sm:text-2xl font-black text-[#010101] uppercase tracking-wider">
                     Join Room
                   </h3>
                 </div>
                 <button
                   onClick={() => setShowJoinModal(false)}
-                  className="min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-400 hover:text-white text-2xl font-bold leading-none touch-manipulation"
+                  className="min-h-[40px] min-w-[40px] flex items-center justify-center text-[#010101] hover:text-[#FD3F01] text-2xl font-black leading-none touch-manipulation"
                 >
                   &times;
                 </button>
@@ -767,7 +764,7 @@ export default function HomePage() {
 
               <form onSubmit={handleJoinRoom} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-black uppercase tracking-wider text-slate-300 mb-1.5">
+                  <label className="block text-xs font-black uppercase tracking-wider text-[#010101] mb-1.5">
                     Room Code
                   </label>
                   <input
@@ -776,12 +773,12 @@ export default function HomePage() {
                     placeholder="FG-XXXX"
                     value={joinCode}
                     onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                    className="w-full bg-slate-900 border border-slate-700 focus:border-cyan-400 rounded-xl px-4 py-3 text-white text-center font-mono tracking-widest text-2xl outline-none"
+                    className="w-full bg-[#F8F8F8] border-2 border-[#010101] focus:bg-[#FFFFFF] focus:border-[#0B89FD] rounded-xl px-4 py-3 text-[#010101] text-center font-mono font-black tracking-widest text-2xl outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-black uppercase tracking-wider text-slate-300 mb-1.5">
+                  <label className="block text-xs font-black uppercase tracking-wider text-[#010101] mb-1.5">
                     Room PIN (If Private)
                   </label>
                   <input
@@ -790,20 +787,20 @@ export default function HomePage() {
                     placeholder="Optional 4-digit PIN"
                     value={joinPin}
                     onChange={(e) => setJoinPin(e.target.value.replace(/\D/g, ''))}
-                    className="w-full bg-slate-900 border border-slate-700 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-white text-center font-mono tracking-widest text-base outline-none"
+                    className="w-full bg-[#F8F8F8] border-2 border-[#010101] focus:bg-[#FFFFFF] focus:border-[#0B89FD] rounded-xl px-4 py-2.5 text-[#010101] text-center font-mono font-black tracking-widest text-base outline-none"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full py-4 rounded-2xl font-black text-sm uppercase tracking-wider text-black bg-gradient-to-r from-cyan-400 to-cyan-300 hover:brightness-110 shadow-neon-cyan transition-all flex items-center justify-center gap-2 touch-target"
+                  className="w-full py-4 rounded-2xl font-black text-sm uppercase tracking-wider text-white bg-[#0B89FD] hover:bg-[#0977db] border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all flex items-center justify-center gap-2 touch-target"
                 >
                   {isLoading ? (
-                    <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <>
-                      <ArrowRight className="w-5 h-5" />
+                      <ArrowRight className="w-5 h-5 text-white" />
                       <span>Enter Game Lobby</span>
                     </>
                   )}

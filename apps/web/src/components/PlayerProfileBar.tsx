@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { NeonAvatarId, NEON_AVATARS } from '@feto-games/shared-types';
 import { NeonAvatarDisplay } from './NeonAvatarDisplay';
-import { User, Dices, Edit3, Check, Sparkles, X, Star, Zap } from 'lucide-react';
+import { Dices, Edit3, Check, Sparkles, Star, Zap } from 'lucide-react';
 import { PINNED_NICKNAMES, rollDynamicNicknames } from '@/lib/nicknames';
 import { sound } from '@/lib/sound';
 
@@ -71,7 +71,7 @@ export function PlayerProfileBar({
   return (
     <>
       {/* SLEEK COMPACT PROFILE BAR */}
-      <div className="inline-flex items-center gap-2.5 p-1.5 pr-3.5 rounded-2xl glass-panel border border-cyan-500/30 hover:border-cyan-400 transition-all shadow-[0_0_15px_rgba(0,240,255,0.15)] group">
+      <div className="inline-flex items-center gap-2.5 p-1.5 pr-3.5 rounded-2xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] hover:shadow-[3px_3px_0px_#010101] transition-all group">
         <button
           type="button"
           onClick={handleOpen}
@@ -79,11 +79,11 @@ export function PlayerProfileBar({
         >
           <NeonAvatarDisplay avatarId={avatar} size="sm" showGlow={false} />
           <div>
-            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
+            <div className="text-[10px] font-black text-[#010101]/60 uppercase tracking-widest flex items-center gap-1">
               <span>PLAYER PROFILE</span>
-              <Edit3 className="w-2.5 h-2.5 text-cyan-400 group-hover:scale-110 transition-transform" />
+              <Edit3 className="w-2.5 h-2.5 text-[#0B89FD] group-hover:scale-110 transition-transform" />
             </div>
-            <div className="text-xs sm:text-sm font-black text-white truncate max-w-[130px] sm:max-w-[180px]">
+            <div className="text-xs sm:text-sm font-black text-[#010101] truncate max-w-[130px] sm:max-w-[180px]">
               {username || 'Player'}
             </div>
           </div>
@@ -95,7 +95,7 @@ export function PlayerProfileBar({
             sound.playClick();
             onRandomize();
           }}
-          className="p-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-400 hover:text-cyan-300 transition-all touch-manipulation"
+          className="p-1.5 rounded-xl bg-[#FFFFFF] hover:bg-[#FEC90E] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] text-[#010101] transition-all touch-manipulation"
           title="Randomize Nickname"
           aria-label="Randomize Nickname"
         >
@@ -106,22 +106,22 @@ export function PlayerProfileBar({
       {/* QUICK CUSTOMIZATION MODAL */}
       <AnimatePresence>
         {isOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md safe-top safe-bottom">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#010101]/80 backdrop-blur-sm safe-top safe-bottom">
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="w-full max-w-lg glass-panel-neon rounded-3xl p-5 sm:p-6 border border-cyan-400 shadow-neon-cyan relative max-h-[90dvh] overflow-y-auto"
+              className="w-full max-w-lg bg-[#FFFFFF] rounded-3xl p-5 sm:p-6 border-3 border-[#010101] shadow-[8px_8px_0px_#010101] relative max-h-[90dvh] overflow-y-auto text-[#010101]"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-cyan-400" />
-                  <h3 className="text-xl font-black text-white">Customize Profile</h3>
+                  <Sparkles className="w-5 h-5 text-[#FEC90E]" />
+                  <h3 className="text-xl font-black text-[#010101]">Customize Profile</h3>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="text-slate-400 hover:text-white text-2xl font-bold min-h-[36px] min-w-[36px] flex items-center justify-center"
+                  className="text-[#010101] hover:text-[#FD3F01] text-2xl font-black min-h-[36px] min-w-[36px] flex items-center justify-center"
                 >
                   &times;
                 </button>
@@ -129,7 +129,7 @@ export function PlayerProfileBar({
 
               {/* Username Input & Randomizer */}
               <div className="space-y-2 mb-3">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
+                <label className="text-xs font-black uppercase tracking-wider text-[#010101] block">
                   Player Nickname
                 </label>
                 <div className="flex items-center gap-2">
@@ -139,7 +139,7 @@ export function PlayerProfileBar({
                     value={tempName}
                     onChange={(e) => setTempName(e.target.value)}
                     placeholder="Enter nickname..."
-                    className="flex-1 min-h-[46px] bg-slate-950 border border-slate-700 focus:border-cyan-400 rounded-xl px-4 text-white font-bold text-sm outline-none"
+                    className="flex-1 min-h-[46px] bg-[#F8F8F8] border-2 border-[#010101] focus:border-[#0B89FD] rounded-xl px-4 text-[#010101] font-bold text-sm outline-none"
                   />
                   <motion.button
                     type="button"
@@ -147,13 +147,13 @@ export function PlayerProfileBar({
                     whileTap={{ scale: 0.94 }}
                     onClick={handleRollChips}
                     disabled={isRolling}
-                    className="min-h-[46px] px-3.5 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-xl text-white flex items-center justify-center gap-1.5 text-xs font-bold touch-target shadow-neon-cyan"
+                    className="min-h-[46px] px-3.5 bg-[#FEC90E] hover:bg-[#fed338] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] rounded-xl text-[#010101] flex items-center justify-center gap-1.5 text-xs font-black touch-target"
                   >
                     <motion.div
                       animate={isRolling ? { rotate: [0, 360] } : { rotate: 0 }}
                       transition={{ duration: 0.45 }}
                     >
-                      <Dices className="w-4 h-4 text-cyan-200" />
+                      <Dices className="w-4 h-4 text-[#010101]" />
                     </motion.div>
                     <span>Roll</span>
                   </motion.button>
@@ -161,10 +161,10 @@ export function PlayerProfileBar({
               </div>
 
               {/* 8 Nickname Suggestion Chips */}
-              <div className="mb-4 space-y-2 p-3 bg-slate-950/60 rounded-2xl border border-slate-800">
-                <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <div className="mb-4 space-y-2 p-3 bg-[#F8F8F8] rounded-2xl border-2 border-[#010101]">
+                <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-[#010101]/70">
                   <div className="flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-cyan-400" />
+                    <Sparkles className="w-3 h-3 text-[#0B89FD]" />
                     <span>Suggested Gamer Tags (4 Pinned + 4 Dynamic)</span>
                   </div>
                 </div>
@@ -178,20 +178,20 @@ export function PlayerProfileBar({
                         key={name}
                         type="button"
                         onClick={() => handleSelectChip(name)}
-                        className={`h-8 px-2 rounded-xl text-xs font-black flex items-center justify-between gap-1 border transition-all ${
+                        className={`h-8 px-2 rounded-xl text-xs font-black flex items-center justify-between gap-1 border-2 border-[#010101] transition-all ${
                           sel
-                            ? 'bg-amber-500/25 border-amber-400 text-amber-200 shadow-[0_0_10px_rgba(251,191,36,0.4)]'
-                            : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-400/50'
+                            ? 'bg-[#FEC90E] text-[#010101] shadow-[2px_2px_0px_#010101]'
+                            : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
                         }`}
                       >
                         <span className="truncate flex items-center gap-1">
-                          <span className="text-[10px] text-amber-400">#{i + 1}</span>
+                          <span className="text-[10px] text-[#010101]/60">#{i + 1}</span>
                           <span>{name}</span>
                         </span>
                         {sel ? (
-                          <Check className="w-3 h-3 text-amber-300 flex-shrink-0" />
+                          <Check className="w-3 h-3 text-[#010101] flex-shrink-0" />
                         ) : (
-                          <Star className="w-2.5 h-2.5 text-amber-400/40 fill-amber-400/20 flex-shrink-0" />
+                          <Star className="w-2.5 h-2.5 text-[#FEC90E] fill-[#FEC90E] flex-shrink-0" />
                         )}
                       </button>
                     );
@@ -207,18 +207,18 @@ export function PlayerProfileBar({
                         key={`${name}-${i}`}
                         type="button"
                         onClick={() => handleSelectChip(name)}
-                        className={`h-8 px-2 rounded-xl text-xs font-black flex items-center justify-between gap-1 border transition-all ${
+                        className={`h-8 px-2 rounded-xl text-xs font-black flex items-center justify-between gap-1 border-2 border-[#010101] transition-all ${
                           sel
-                            ? 'bg-cyan-500/25 border-cyan-400 text-cyan-200 shadow-[0_0_10px_rgba(56,242,255,0.4)]'
-                            : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-cyan-400/50'
+                            ? 'bg-[#0B89FD] text-white shadow-[2px_2px_0px_#010101]'
+                            : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
                         }`}
                       >
                         <span className="truncate flex items-center gap-1">
-                          <Zap className="w-2.5 h-2.5 text-cyan-400/60 flex-shrink-0" />
+                          <Zap className="w-2.5 h-2.5 text-[#FEC90E] flex-shrink-0" />
                           <span>{name}</span>
                         </span>
                         {sel && (
-                          <Check className="w-3 h-3 text-cyan-300 flex-shrink-0" />
+                          <Check className="w-3 h-3 text-white flex-shrink-0" />
                         )}
                       </button>
                     );
@@ -228,8 +228,8 @@ export function PlayerProfileBar({
 
               {/* Avatar Picker (10 Neon Avatars) */}
               <div className="mb-5">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-2">
-                  Choose Neon Avatar
+                <label className="text-xs font-black uppercase tracking-wider text-[#010101] block mb-2">
+                  Choose Avatar
                 </label>
                 <div className="grid grid-cols-5 gap-2">
                   {(Object.keys(NEON_AVATARS) as NeonAvatarId[]).map((avId) => (
@@ -240,13 +240,13 @@ export function PlayerProfileBar({
                         sound.playClick();
                         onAvatarChange(avId);
                       }}
-                      className={`p-1.5 rounded-xl border-2 flex items-center justify-center transition-all touch-target ${
+                      className={`p-1.5 rounded-xl border-2 border-[#010101] flex items-center justify-center transition-all touch-target ${
                         avatar === avId
-                          ? 'border-cyan-400 bg-cyan-950/60 scale-105 shadow-neon-cyan'
-                          : 'border-slate-800 bg-slate-950/60 hover:border-slate-600'
+                          ? 'bg-[#0B89FD] scale-105 shadow-[2px_2px_0px_#010101]'
+                          : 'bg-[#FFFFFF] hover:bg-[#F8F8F8]'
                       }`}
                     >
-                      <NeonAvatarDisplay avatarId={avId} size="sm" showGlow={avatar === avId} />
+                      <NeonAvatarDisplay avatarId={avId} size="sm" showGlow={false} />
                     </button>
                   ))}
                 </div>
@@ -256,10 +256,10 @@ export function PlayerProfileBar({
               <button
                 type="button"
                 onClick={handleSave}
-                className="w-full min-h-[48px] btn-neon-cyan py-3 rounded-xl text-white font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg touch-target"
+                className="w-full min-h-[48px] bg-[#0B89FD] hover:bg-[#0977db] text-white border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] py-3 rounded-2xl font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all touch-target"
               >
                 <Check className="w-4 h-4" />
-                <span>Confirm & Save</span>
+                <span>Confirm &amp; Save</span>
               </button>
             </motion.div>
           </div>
