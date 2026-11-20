@@ -112,14 +112,15 @@ export default function HomePage() {
 
     const interval = setInterval(() => {
       fetchLiveStats();
-    }, 15000);
+      fetchPublicRooms();
+    }, 6000);
 
     return () => clearInterval(interval);
   }, []);
 
   const fetchLiveStats = async () => {
     try {
-      const res = await fetch(`${BACKEND_URL}/api/stats/live`);
+      const res = await fetch('/api/stats/live');
       const data = await res.json();
       if (data.success && data.data) {
         setLiveStats({
@@ -157,11 +158,11 @@ export default function HomePage() {
     }
   };
 
-  // Fetch active public rooms
+  // Fetch active public rooms (auto-prunes stale / finished rooms)
   const fetchPublicRooms = async () => {
     setIsFetchingRooms(true);
     try {
-      const res = await fetch(`${BACKEND_URL}/api/rooms/public`);
+      const res = await fetch('/api/rooms/public');
       const data = await res.json();
       if (data.success) {
         setPublicRooms(data.data?.rooms || (Array.isArray(data.data) ? data.data : []));

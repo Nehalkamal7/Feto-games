@@ -55,6 +55,7 @@ export async function POST(req: NextRequest) {
     delete room.spectators[targetPlayerId];
 
     room.updatedAt = Date.now();
+    room.lastActivityAt = Date.now();
     await saveRoomState(room, 7200);
 
     const publicRoom = sanitizeRoomState(room);

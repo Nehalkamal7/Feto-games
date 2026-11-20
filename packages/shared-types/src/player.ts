@@ -81,7 +81,7 @@ export const NEON_AVATARS: Record<NeonAvatarId, NeonAvatarMetadata> = {
   }
 };
 
-export type PlayerConnectionStatus = 'connected' | 'disconnected_grace';
+export type PlayerConnectionStatus = 'connected' | 'disconnected_grace' | 'disconnected';
 export type PlayerTeam = 'red' | 'blue' | 'green' | 'none';
 
 export interface Player {

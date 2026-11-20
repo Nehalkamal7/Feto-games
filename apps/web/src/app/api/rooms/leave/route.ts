@@ -30,8 +30,8 @@ export async function POST(req: NextRequest) {
 
     const remainingPlayers = Object.values(room.players);
 
-    // If room is empty, delete it completely from Redis and public directory
-    if (remainingPlayers.length === 0 && Object.keys(room.spectators).length === 0) {
+    // If room has no active players left, delete it completely from Redis and public directory
+    if (remainingPlayers.length === 0) {
       await deleteRoomState(roomCode);
       return NextResponse.json({ success: true, message: 'Room closed (empty).' });
     }

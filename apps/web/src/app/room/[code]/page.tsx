@@ -132,6 +132,51 @@ export default function RoomPage() {
   // Grace period countdown state map for disconnected players
   const [graceCountdowns, setGraceCountdowns] = useState<Record<string, number>>({});
 
+  // Match data auto-sync safety fallback
+  const [syncSeconds, setSyncSeconds] = useState(0);
+  const [isManualSyncing, setIsManualSyncing] = useState(false);
+
+  const syncMatchState = useCallback(async () => {
+    if (!roomCode) return;
+    setIsManualSyncing(true);
+    try {
+      const res = await fetch(`/api/rooms/${roomCode}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.room) {
+          setRoom(json.room);
+          const stateData = json.room.gameState || json.room.gameData;
+          if (stateData) {
+            setGameStateSync({
+              gameMode: json.room.config?.gameMode || 'who_is_imposter',
+              state: stateData
+            });
+            setCountdown(null);
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Sync match state error:', err);
+    } finally {
+      setIsManualSyncing(false);
+    }
+  }, [roomCode]);
+
+  useEffect(() => {
+    const isPlaying = room?.status === 'playing' || room?.status === 'in_game';
+    const isMissingData = !gameStateSync || gameStateSync.gameMode !== room?.config?.gameMode;
+
+    if (isPlaying && isMissingData) {
+      syncMatchState();
+      const timer = setInterval(() => {
+        setSyncSeconds((s) => s + 1);
+      }, 1000);
+      return () => clearInterval(timer);
+    } else {
+      setSyncSeconds(0);
+    }
+  }, [room?.status, room?.config?.gameMode, gameStateSync, syncMatchState]);
+
   const showToast = useCallback((msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 4000);
@@ -245,7 +290,7 @@ export default function RoomPage() {
 
   useEffect(() => {
     const phaseEndsAt = gameStateSync?.state?.phaseEndsAt;
-    if (!phaseEndsAt || room?.status !== 'in_game') return;
+    if (!phaseEndsAt || (room?.status !== 'in_game' && room?.status !== 'playing')) return;
 
     const interval = setInterval(() => {
       const now = Date.now();
@@ -258,7 +303,7 @@ export default function RoomPage() {
       });
 
       // Tension heartbeat & haptic in final 5 seconds of active round
-      if (diff > 0 && diff <= 5 && room.status === 'in_game') {
+      if (diff > 0 && diff <= 5 && (room.status === 'in_game' || room.status === 'playing')) {
         sound.playHeartbeat(diff);
       }
 
@@ -314,6 +359,19 @@ export default function RoomPage() {
       if (newRoom.status === 'lobby') {
         setPrivateRole(null);
         setGameStateSync(null);
+        setCountdown(null);
+      } else if (newRoom.status === 'playing' || newRoom.status === 'in_game') {
+        if (newRoom.gameState) {
+          setGameStateSync({
+            gameMode: newRoom.config?.gameMode || 'who_is_imposter',
+            state: newRoom.gameState
+          });
+        } else if (newRoom.gameData) {
+          setGameStateSync({
+            gameMode: newRoom.config?.gameMode || 'who_is_imposter',
+            state: newRoom.gameData
+          });
+        }
         setCountdown(null);
       }
 
@@ -373,6 +431,20 @@ export default function RoomPage() {
 
     const handleGameStateSync = (data: { gameMode: GameMode; state: any }) => {
       setGameStateSync(data);
+      setCountdown(null);
+    };
+
+    const handleGameStarted = (data: { room?: PublicRoomState; gameMode?: GameMode; gameState?: any }) => {
+      if (data?.room) {
+        setRoom(data.room);
+      }
+      if (data?.gameMode && data?.gameState) {
+        setGameStateSync({
+          gameMode: data.gameMode,
+          state: data.gameState
+        });
+      }
+      setCountdown(null);
     };
 
     const handleChaosSabotage = (data: {
@@ -449,6 +521,7 @@ export default function RoomPage() {
     socket.on('room:updated', handleRoomState);
     socket.on('room:state', handleRoomState);
     socket.on('room_state', handleRoomState);
+    socket.on('game:started', handleGameStarted);
     socket.on('room:player-joined', handlePlayerJoined);
     socket.on('room:player-left', handlePlayerLeft);
     socket.on('room:host-migrated', handleHostMigrated);
@@ -535,7 +608,7 @@ export default function RoomPage() {
 
     initConnection();
 
-    // 2.5-second background state sync fallback active in Lobby phase
+    // 2-second background state sync fallback active in Lobby phase or loading
     const syncInterval = setInterval(async () => {
       try {
         const res = await fetch(`/api/rooms/${roomCode}`);
@@ -561,18 +634,29 @@ export default function RoomPage() {
               }
               return prev;
             });
+            if (json.room.status === 'playing' || json.room.status === 'in_game') {
+              const stateData = json.room.gameState || json.room.gameData;
+              if (stateData) {
+                setGameStateSync({
+                  gameMode: json.room.config?.gameMode || 'who_is_imposter',
+                  state: stateData
+                });
+                setCountdown(null);
+              }
+            }
           }
         }
       } catch {
         // quiet fallback
       }
-    }, 2500);
+    }, 2000);
 
     return () => {
       clearInterval(syncInterval);
       socket.off('room:updated', handleRoomState);
       socket.off('room:state', handleRoomState);
       socket.off('room_state', handleRoomState);
+      socket.off('game:started', handleGameStarted);
       socket.off('room:player-joined', handlePlayerJoined);
       socket.off('room:player-left', handlePlayerLeft);
       socket.off('room:host-migrated', handleHostMigrated);
@@ -641,7 +725,17 @@ export default function RoomPage() {
   const handleStartGame = async (force = false) => {
     sound.playClick();
     try {
-      await socketStartGame(isSoloDevMode, force);
+      const res = await socketStartGame(isSoloDevMode, force);
+      if (res?.room) {
+        setRoom(res.room);
+      }
+      if (res?.gameState) {
+        setGameStateSync({
+          gameMode: res.room?.config?.gameMode || room?.config?.gameMode || 'who_is_imposter',
+          state: res.gameState
+        });
+      }
+      setCountdown(null);
     } catch (err: any) {
       showToast(`⚠️ ${err.message || 'Could not start game.'}`);
     }
@@ -769,7 +863,7 @@ export default function RoomPage() {
   return (
     <div
       className={`min-h-[100dvh] bg-feto-dark text-slate-100 flex flex-col justify-between max-w-7xl mx-auto px-3 sm:px-6 py-3 sm:py-5 relative safe-top safe-bottom transition-all ${
-        timerState && timerState.remainingSeconds <= 5 && timerState.remainingSeconds > 0 && room.status === 'in_game'
+        timerState && timerState.remainingSeconds <= 5 && timerState.remainingSeconds > 0 && (room.status === 'in_game' || room.status === 'playing')
           ? 'tension-pulse'
           : ''
       }`}
@@ -839,7 +933,7 @@ export default function RoomPage() {
       {/* ======================================================== */}
       {/* 4. 15-PLAYER WAITING LOBBY REDESIGN                      */}
       {/* ======================================================== */}
-      {room.status === 'in_game' || room.status === 'countdown' ? (
+      {room.status === 'in_game' || room.status === 'playing' || room.status === 'countdown' ? (
         /* IN-GAME ACTIVE SCREEN */
         <div className="flex-1 flex flex-col items-center justify-start py-2 relative z-10 w-full min-h-[600px]">
           {/* IN-GAME HUD BAR */}
@@ -914,11 +1008,26 @@ export default function RoomPage() {
               <p className="text-slate-400 font-medium">Connecting to game room...</p>
             </div>
           ) : !gameStateSync || gameStateSync.gameMode !== room.config.gameMode ? (
-            <div className="flex flex-col items-center justify-center my-auto py-20 space-y-4">
+            <div className="flex flex-col items-center justify-center my-auto py-20 space-y-4 max-w-md mx-auto text-center px-4">
               <div className="w-12 h-12 border-4 border-feto-magenta border-t-transparent rounded-full animate-spin" />
               <p className="text-cyan-300 font-bold tracking-wide animate-pulse">
-                Synchronizing live match state...
+                Syncing match...
               </p>
+              <p className="text-slate-400 text-xs">
+                Connecting to live game round data
+              </p>
+              {syncSeconds >= 4 && (
+                <button
+                  onClick={() => {
+                    sound.playClick();
+                    syncMatchState();
+                  }}
+                  disabled={isManualSyncing}
+                  className="mt-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold text-xs uppercase tracking-wider shadow-neon-cyan transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50"
+                >
+                  {isManualSyncing ? 'Syncing...' : '🔄 Retry Sync'}
+                </button>
+              )}
             </div>
           ) : room.config.gameMode === 'who_is_imposter' ? (
             <ImposterGameView
@@ -1006,7 +1115,7 @@ export default function RoomPage() {
             </div>
           )}
         </div>
-      ) : room.status === 'game_over' ? (
+      ) : (room.status === 'game_over' || room.status === 'finished') ? (
         /* ANIMATED PODIUM & REMATCH SCREEN */
         <GamePodiumView room={room} currentPlayer={currentPlayer} />
       ) : (
@@ -2268,7 +2377,7 @@ export default function RoomPage() {
       />
 
       {/* TACTICAL SABOTAGE POWER-UP DRAWER (DURING ACTIVE MATCHES) */}
-      {room.status === 'in_game' && currentPlayer && (
+      {(room.status === 'in_game' || room.status === 'playing') && currentPlayer && (
         <SabotageDrawer
           room={room}
           currentPlayer={currentPlayer}

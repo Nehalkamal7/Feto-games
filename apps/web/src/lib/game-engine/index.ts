@@ -65,7 +65,7 @@ export function initGameSession(room: RoomState, allowSolo = false): GameEngineR
   }
 
   const mode = room.config.gameMode;
-  room.status = 'in_game';
+  room.status = 'playing';
   if (!room.currentRound) room.currentRound = 1;
   if (!room.sipsCount) room.sipsCount = {};
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getRoomState, sanitizeRoomState, saveRoomState } from '@/lib/redis';
+import { getRoomState, removePublicRoomDirectory, sanitizeRoomState, saveRoomState } from '@/lib/redis';
 import { publishToPlayer, publishToRoom } from '@/lib/ably-server';
 import { initGameSession } from '@/lib/game-engine';
 
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (room.status === 'in_game') {
+    if (room.status === 'in_game' || room.status === 'playing') {
       return NextResponse.json(
         { success: false, error: { message: 'Game match is already in progress.' } },
         { status: 400 }
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate player count: allow 1 player if solo test/dev mode is requested or set in config
-    const allowSolo = isSoloDevMode || Boolean((room.config as any).isSoloDevMode);
+    const allowSolo = isSoloDevMode || Boolean((room.config as any).isSoloDevMode) || Boolean(body.force);
     const activePlayers = Object.values(room.players || {}).filter(
       (p) => p.connectionStatus === 'connected'
     );
@@ -71,34 +71,54 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Persist to Upstash Redis
-    await saveRoomState(result.updatedRoom, 7200);
+    const now = Date.now();
+    result.updatedRoom.status = 'playing';
+    result.updatedRoom.currentGameIndex = 0;
+    result.updatedRoom.currentRound = 1;
+    result.updatedRoom.phase = result.publicState?.phase || 'active';
+    result.updatedRoom.lastActivityAt = now;
+    result.updatedRoom.updatedAt = now;
 
-    // 1. Broadcast 3-second countdown fanfare
-    await publishToRoom(roomCode, 'game:starting', { countdownSeconds: 3 });
+    const publicRoom = sanitizeRoomState(result.updatedRoom);
+    publicRoom.status = 'playing';
+    publicRoom.gameState = result.publicState;
+    publicRoom.gameData = result.publicState;
 
-    // 2. Transmit private roles to individual player channels (prevents cheating)
+    // Parallelize Redis operations
+    const redisPromises = [
+      saveRoomState(result.updatedRoom, 7200),
+      removePublicRoomDirectory(roomCode)
+    ];
+
+    // Parallelize Ably broadcasts
+    const publishPromises: Promise<any>[] = [
+      publishToRoom(roomCode, 'room:updated', publicRoom),
+      publishToRoom(roomCode, 'room:state', publicRoom),
+      publishToRoom(roomCode, 'room_state', publicRoom),
+      publishToRoom(roomCode, 'game:started', {
+        room: publicRoom,
+        gameMode: result.updatedRoom.config.gameMode,
+        gameState: result.publicState
+      }),
+      publishToRoom(roomCode, 'game:state_sync', {
+        gameMode: result.updatedRoom.config.gameMode,
+        state: result.publicState
+      })
+    ];
+
     if (result.privateRoles) {
       for (const [pId, roleData] of Object.entries(result.privateRoles)) {
-        await publishToPlayer(pId, 'game:private_role', roleData);
-        await publishToPlayer(pId, 'game:secret-role', roleData);
+        publishPromises.push(publishToPlayer(pId, 'game:private_role', roleData));
+        publishPromises.push(publishToPlayer(pId, 'game:secret-role', roleData));
       }
     }
 
-    const publicRoom = sanitizeRoomState(result.updatedRoom);
-
-    // 3. Broadcast public game state to all players on room channel
-    await publishToRoom(roomCode, 'game:state_sync', {
-      gameMode: room.config.gameMode,
-      state: result.publicState
-    });
-    await publishToRoom(roomCode, 'room_state_updated', publicRoom);
-    await publishToRoom(roomCode, 'room:state', publicRoom);
-    await publishToRoom(roomCode, 'room_state', publicRoom);
-    await publishToRoom(roomCode, 'room:updated', publicRoom);
+    await Promise.all([...redisPromises, ...publishPromises]);
 
     return NextResponse.json({
       success: true,
+      room: publicRoom,
+      gameState: result.publicState,
       data: {
         room: publicRoom,
         gameState: result.publicState

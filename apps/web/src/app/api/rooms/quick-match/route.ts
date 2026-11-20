@@ -37,17 +37,31 @@ export async function POST(req: NextRequest) {
 
     // 1. Check for open public rooms that have room for players (< 15) and no PIN
     const publicRooms = await getPublicRoomDirectory();
-    const candidate = publicRooms.find(
-      (r) => r.playerCount < (r.maxPlayers || 15) && !r.hasPin && r.status === 'lobby'
-    );
+    let matchedRoomCode: string | null = null;
 
-    if (candidate) {
+    for (const candidate of publicRooms) {
+      if (candidate.playerCount < (candidate.maxPlayers || 15) && !candidate.hasPin && candidate.status === 'lobby') {
+        const liveRoom = await getRoomState(candidate.code);
+        if (
+          liveRoom &&
+          liveRoom.status === 'lobby' &&
+          !liveRoom.config.isPrivate &&
+          !liveRoom.config.hasPin &&
+          Object.keys(liveRoom.players).length < (liveRoom.config.maxPlayers || 15)
+        ) {
+          matchedRoomCode = candidate.code;
+          break;
+        }
+      }
+    }
+
+    if (matchedRoomCode) {
       return NextResponse.json({
         success: true,
         data: {
-          roomCode: candidate.code,
+          roomCode: matchedRoomCode,
           isNewRoom: false,
-          message: `Matched to open room ${candidate.code}!`
+          message: `Matched to open room ${matchedRoomCode}!`
         }
       });
     }
@@ -105,6 +119,7 @@ export async function POST(req: NextRequest) {
       spectators: {},
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      lastActivityAt: Date.now(),
       currentRound: 0,
       sipsCount: {},
       customCards: []

@@ -7,8 +7,10 @@ export type RoomStatus =
   | 'lobby'
   | 'countdown'
   | 'in_game'
+  | 'playing'
   | 'round_transition'
-  | 'game_over';
+  | 'game_over'
+  | 'finished';
 
 export type GameMode =
   | 'who_is_imposter'
@@ -63,6 +65,7 @@ export interface RoomState {
   roomName?: string; // Optional custom room title
   hostId: string; // ID of current host player
   status: RoomStatus;
+  phase?: string;
   config: RoomConfig;
   selectedGames?: GameMode[]; // Live game playlist
   currentGameIndex?: number;
@@ -70,6 +73,7 @@ export interface RoomState {
   spectators: Record<string, Player>; // Map of spectatorId -> Player
   createdAt: number;
   updatedAt: number;
+  lastActivityAt?: number;
   currentRound: number;
   gameData?: any; // Dynamic state for the active mini-game
   teamScores?: Record<string, number>;
@@ -85,6 +89,7 @@ export interface PublicRoomState {
   roomName?: string;
   hostId: string;
   status: RoomStatus;
+  phase?: string;
   config: PublicRoomConfig;
   selectedGames?: GameMode[];
   currentGameIndex?: number;
@@ -95,10 +100,13 @@ export interface PublicRoomState {
   currentRound: number;
   createdAt: number;
   updatedAt: number;
+  lastActivityAt?: number;
   teamScores?: Record<string, number>;
   sipsCount?: Record<string, number>;
   customCardsCount?: number;
   awards?: PartyAward[];
+  gameData?: any;
+  gameState?: any;
 }
 
 /**

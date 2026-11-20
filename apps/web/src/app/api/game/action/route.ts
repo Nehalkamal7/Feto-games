@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { acquireLock, getRoomState, sanitizeRoomState, saveRoomState } from '@/lib/redis';
+import {
+  acquireLock,
+  addPublicRoomDirectory,
+  getRoomState,
+  removePublicRoomDirectory,
+  sanitizeRoomState,
+  saveRoomState
+} from '@/lib/redis';
 import { publishToPlayer, publishToRoom } from '@/lib/ably-server';
 import {
   getPublicGameState,
@@ -111,7 +118,14 @@ export async function POST(req: NextRequest) {
       if (settings.maxPlayers) room.config.maxPlayers = Math.max(2, Math.min(15, settings.maxPlayers));
       if (settings.isTeamMode !== undefined) room.config.isTeamMode = Boolean(settings.isTeamMode);
       if (settings.allowSpectators !== undefined) room.config.allowSpectators = Boolean(settings.allowSpectators);
-      if (settings.isPrivate !== undefined) room.config.isPrivate = Boolean(settings.isPrivate);
+      if (settings.isPrivate !== undefined) {
+        room.config.isPrivate = Boolean(settings.isPrivate);
+        if (room.config.isPrivate) {
+          await removePublicRoomDirectory(roomCode);
+        } else if (room.status === 'lobby' && Object.keys(room.players).length < (room.config.maxPlayers || 15)) {
+          await addPublicRoomDirectory(room.code);
+        }
+      }
       if (settings.pin !== undefined) {
         const pinStr = String(settings.pin).trim();
         if (pinStr) {
@@ -126,6 +140,7 @@ export async function POST(req: NextRequest) {
       if (settings.isSoloDevMode !== undefined) (room.config as any).isSoloDevMode = Boolean(settings.isSoloDevMode);
 
       room.updatedAt = Date.now();
+      room.lastActivityAt = Date.now();
       await saveRoomState(room, 7200);
 
       const publicRoom = sanitizeRoomState(room);
@@ -193,12 +208,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, room: publicRoom });
     }
 
-    if (actionType === 'START_GAME') {
+    if (actionType === 'START_GAME' || actionType === 'FORCE_START') {
       if (room.hostId !== playerId) {
         return NextResponse.json({ success: false, error: { message: 'Only host can start the game.' } }, { status: 403 });
       }
 
-      if (room.status === 'in_game') {
+      if (room.status === 'in_game' || room.status === 'playing') {
         return NextResponse.json({ success: false, error: { message: 'Game already in progress.' } }, { status: 400 });
       }
 
@@ -209,7 +224,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Check player count (allow solo if force or solo test mode enabled)
-      const allowSolo = Boolean(payload.force) || Boolean((room.config as any).isSoloDevMode);
+      const allowSolo = Boolean(payload?.force) || Boolean(payload?.isSoloDevMode) || Boolean((room.config as any)?.isSoloDevMode) || actionType === 'FORCE_START';
       const activePlayers = Object.values(room.players || {}).filter(
         (p) => p.connectionStatus === 'connected'
       );
@@ -221,34 +236,57 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Initialize game session
+      // Synchronously initialize game session and round data
       const result = initGameSession(room, allowSolo);
       if (result.error) {
         return NextResponse.json({ success: false, error: { message: result.error } }, { status: 400 });
       }
 
-      await saveRoomState(result.updatedRoom, 7200);
+      // Set playing status, round counters, and activity timestamps
+      const now = Date.now();
+      result.updatedRoom.status = 'playing';
+      result.updatedRoom.currentGameIndex = 0;
+      result.updatedRoom.currentRound = 1;
+      result.updatedRoom.phase = result.publicState?.phase || 'active';
+      result.updatedRoom.lastActivityAt = now;
+      result.updatedRoom.updatedAt = now;
 
-      // Broadcast countdown fanfare
-      await publishToRoom(roomCode, 'game:starting', { countdownSeconds: 3 });
+      const publicRoom = sanitizeRoomState(result.updatedRoom);
+      publicRoom.status = 'playing';
+      publicRoom.gameState = result.publicState;
+      publicRoom.gameData = result.publicState;
 
-      // Send private roles to individual player channels
+      // Parallelize Redis persistence and public room eviction
+      const redisPromises = [
+        saveRoomState(result.updatedRoom, 7200),
+        removePublicRoomDirectory(roomCode)
+      ];
+
+      // Parallelize all Ably channel dispatches
+      const publishPromises: Promise<any>[] = [
+        publishToRoom(roomCode, 'room:updated', publicRoom),
+        publishToRoom(roomCode, 'room:state', publicRoom),
+        publishToRoom(roomCode, 'room_state', publicRoom),
+        publishToRoom(roomCode, 'game:started', {
+          room: publicRoom,
+          gameMode: result.updatedRoom.config.gameMode,
+          gameState: result.publicState
+        }),
+        publishToRoom(roomCode, 'game:state_sync', {
+          gameMode: result.updatedRoom.config.gameMode,
+          state: result.publicState
+        })
+      ];
+
       if (result.privateRoles) {
         for (const [pId, roleData] of Object.entries(result.privateRoles)) {
-          await publishToPlayer(pId, 'game:private_role', roleData);
-          await publishToPlayer(pId, 'game:secret-role', roleData);
+          publishPromises.push(publishToPlayer(pId, 'game:private_role', roleData));
+          publishPromises.push(publishToPlayer(pId, 'game:secret-role', roleData));
         }
       }
 
-      // Sync public state to entire room
-      const publicRoom = sanitizeRoomState(result.updatedRoom);
-      await publishToRoom(roomCode, 'room:updated', publicRoom);
-      await publishToRoom(roomCode, 'room:state', publicRoom);
-      await publishToRoom(roomCode, 'room_state', publicRoom);
-      await publishToRoom(roomCode, 'game:state_sync', {
-        gameMode: room.config.gameMode,
-        state: result.publicState
-      });
+      // Execute all async operations concurrently
+      await Promise.all([...redisPromises, ...publishPromises]);
 
       return NextResponse.json({
         success: true,
@@ -274,7 +312,12 @@ export async function POST(req: NextRequest) {
       }
 
       room.updatedAt = Date.now();
+      room.lastActivityAt = Date.now();
       await saveRoomState(room, 7200);
+
+      if (!room.config.isPrivate && Object.keys(room.players).length < (room.config.maxPlayers || 15)) {
+        await addPublicRoomDirectory(room.code);
+      }
 
       const publicRoom = sanitizeRoomState(room);
       await publishToRoom(roomCode, 'room:updated', publicRoom);
@@ -318,7 +361,13 @@ export async function POST(req: NextRequest) {
       }
 
       const result = resolveGamePhase(room);
-      await saveRoomState(result.updatedRoom, 7200);
+      const isGameOver = result.updatedRoom.status === 'game_over' || (result.updatedRoom.status as string) === 'finished';
+      if (isGameOver) {
+        await removePublicRoomDirectory(roomCode);
+        await saveRoomState(result.updatedRoom, 300);
+      } else {
+        await saveRoomState(result.updatedRoom, 7200);
+      }
 
       // Publish private roles if new round generated private roles
       if (result.privateRoles) {
@@ -354,7 +403,7 @@ export async function POST(req: NextRequest) {
     // 3. IN-GAME PLAYER ACTIONS
     // ========================================================
 
-    if (room.status !== 'in_game') {
+    if (room.status !== 'in_game' && room.status !== 'playing') {
       return NextResponse.json(
         { success: false, error: { message: 'Game is not currently active.' } },
         { status: 400 }
@@ -366,7 +415,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: { message: actionResult.error } }, { status: 400 });
     }
 
-    await saveRoomState(actionResult.updatedRoom, 7200);
+    const isGameOver = actionResult.updatedRoom.status === 'game_over' || (actionResult.updatedRoom.status as string) === 'finished';
+    if (isGameOver) {
+      await removePublicRoomDirectory(roomCode);
+      await saveRoomState(actionResult.updatedRoom, 300);
+    } else {
+      await saveRoomState(actionResult.updatedRoom, 7200);
+    }
 
     // If action triggered an explicit broadcast event (e.g. chat guess, word claim)
     if (actionResult.broadcastEvent) {

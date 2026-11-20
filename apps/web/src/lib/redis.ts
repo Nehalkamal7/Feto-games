@@ -1,5 +1,6 @@
 import { Redis } from '@upstash/redis';
 import { RoomState, PublicRoomDirectoryItem, PublicRoomState } from '@feto-games/shared-types';
+import { getPublicGameState } from './game-engine';
 
 /**
  * In-memory fallback mock for local development when Upstash credentials
@@ -180,6 +181,34 @@ export async function saveRoomState(
   const key = `${ROOM_KEY_PREFIX}${normalized}`;
   const playersHashKey = `room:${normalized}:players`;
 
+  // Always keep activity and update timestamps strictly fresh
+  const now = Date.now();
+  if (!room.updatedAt) room.updatedAt = now;
+  room.lastActivityAt = now;
+
+  const activePlayers = Object.values(room.players || {}).filter(
+    (p) => p.connectionStatus !== 'disconnected'
+  );
+
+  // If room is finished / game_over:
+  // Shorten Redis TTL to 300 seconds (5 minutes) for recap card downloads, and purge from public_rooms
+  if (room.status === 'game_over' || (room.status as string) === 'finished') {
+    ttlSeconds = Math.min(ttlSeconds, 300);
+    await removePublicRoomDirectory(normalized);
+  } else if (room.status === 'in_game' || (room.status as string) === 'playing') {
+    // Game is actively running: purge from matchmaking directory
+    await removePublicRoomDirectory(normalized);
+  } else if (room.config?.isPrivate) {
+    // Private room: purge from public matchmaking
+    await removePublicRoomDirectory(normalized);
+  } else if (activePlayers.length >= (room.config?.maxPlayers || 15)) {
+    // Room is full: purge from public matchmaking
+    await removePublicRoomDirectory(normalized);
+  } else if (activePlayers.length === 0) {
+    // Room is empty: purge from public matchmaking
+    await removePublicRoomDirectory(normalized);
+  }
+
   await redis.set(key, room, { ex: ttlSeconds });
 
   // Sync players in Upstash Redis Hash `room:{roomCode}:players` keyed by playerId
@@ -212,25 +241,38 @@ export async function deleteRoomState(code: string): Promise<void> {
   await removePublicRoomDirectory(normalized);
 }
 
-export async function addPublicRoomDirectory(item: PublicRoomDirectoryItem): Promise<void> {
-  const jsonStr = JSON.stringify(item);
+export async function addPublicRoomDirectory(item: PublicRoomDirectoryItem | string): Promise<void> {
+  const code = (typeof item === 'string' ? item : item.code).toUpperCase().trim();
+  // Clean any old entries for this room code first to prevent duplicates
+  await removePublicRoomDirectory(code);
+  const jsonStr = typeof item === 'string' ? JSON.stringify({ code }) : JSON.stringify(item);
+  await (redis as any).sadd(PUBLIC_ROOMS_SET, code);
   await (redis as any).sadd(PUBLIC_ROOMS_SET, jsonStr);
 }
 
 export async function removePublicRoomDirectory(code: string): Promise<void> {
   const normalized = code.toUpperCase().trim();
-  const members = await (redis as any).smembers(PUBLIC_ROOMS_SET);
-  if (!members || members.length === 0) return;
+  try {
+    await (redis as any).srem(PUBLIC_ROOMS_SET, normalized);
+    const members = await (redis as any).smembers(PUBLIC_ROOMS_SET);
+    if (!members || members.length === 0) return;
 
-  for (const itemStr of members) {
-    try {
-      const parsed = typeof itemStr === 'string' ? JSON.parse(itemStr) : itemStr;
-      if (parsed.code === normalized) {
+    for (const itemStr of members) {
+      if (itemStr === normalized) {
         await (redis as any).srem(PUBLIC_ROOMS_SET, itemStr);
+      } else {
+        try {
+          const parsed = typeof itemStr === 'string' ? JSON.parse(itemStr) : itemStr;
+          if (parsed && (parsed.code === normalized || parsed === normalized)) {
+            await (redis as any).srem(PUBLIC_ROOMS_SET, itemStr);
+          }
+        } catch {
+          // ignore parse err
+        }
       }
-    } catch {
-      // ignore parse err
     }
+  } catch {
+    // quiet
   }
 }
 
@@ -240,24 +282,70 @@ export async function getPublicRoomDirectory(): Promise<PublicRoomDirectoryItem[
 
   const items: PublicRoomDirectoryItem[] = [];
   const now = Date.now();
+  const seenCodes = new Set<string>();
 
   for (const itemStr of members) {
+    let code = '';
     try {
-      const parsed = typeof itemStr === 'string' ? JSON.parse(itemStr) : itemStr;
-      // Check if room still exists in Redis
-      const exists = await getRoomState(parsed.code);
-      if (exists && exists.status === 'lobby') {
-        items.push({
-          ...parsed,
-          playerCount: Object.keys(exists.players).length
-        });
-      } else {
-        // Stale or finished, remove from index
-        await (redis as any).srem(PUBLIC_ROOMS_SET, itemStr);
+      if (typeof itemStr === 'string' && (itemStr.startsWith('{') || itemStr.startsWith('['))) {
+        const parsed = JSON.parse(itemStr);
+        code = (parsed.code || '').toUpperCase().trim();
+      } else if (typeof itemStr === 'string') {
+        code = itemStr.toUpperCase().trim();
+      } else if (itemStr && typeof itemStr === 'object' && itemStr.code) {
+        code = itemStr.code.toUpperCase().trim();
       }
     } catch {
-      // ignore
+      await (redis as any).srem(PUBLIC_ROOMS_SET, itemStr);
+      continue;
     }
+
+    if (!code || seenCodes.has(code)) {
+      if (seenCodes.has(code)) {
+        await (redis as any).srem(PUBLIC_ROOMS_SET, itemStr);
+      }
+      continue;
+    }
+
+    seenCodes.add(code);
+
+    // Self-Healing: Verify against the real-time live room object in Redis
+    const room = await getRoomState(code);
+    const activePlayers = room?.players
+      ? Object.values(room.players).filter((p) => p.connectionStatus !== 'disconnected')
+      : [];
+
+    const lastActivity = room?.lastActivityAt || room?.updatedAt || room?.createdAt || 0;
+    const isInactive = now - lastActivity > 15 * 60 * 1000; // Inactive for > 15 minutes
+
+    if (
+      !room ||
+      room.status !== 'lobby' ||
+      activePlayers.length === 0 ||
+      room.config.isPrivate ||
+      activePlayers.length >= (room.config.maxPlayers || 15) ||
+      isInactive
+    ) {
+      // Stale, finished, full, private, or inactive -> immediately remove from public index
+      await (redis as any).srem(PUBLIC_ROOMS_SET, itemStr);
+      await (redis as any).srem(PUBLIC_ROOMS_SET, code);
+      continue;
+    }
+
+    const host = room.players[room.hostId] || activePlayers.find((p) => p.isHost) || activePlayers[0];
+
+    items.push({
+      code: room.code,
+      hostUsername: host?.username || 'Host',
+      hostAvatar: host?.avatar || 'cyber_cat',
+      playerCount: activePlayers.length,
+      maxPlayers: Math.min(room.config.maxPlayers || 15, 15),
+      status: room.status,
+      gameMode: room.config.gameMode,
+      hasPin: Boolean(room.config.hasPin),
+      isTeamMode: Boolean(room.config.isTeamMode),
+      createdAt: room.createdAt || now
+    });
   }
 
   return items;
@@ -324,10 +412,20 @@ export function sanitizeRoomState(room: RoomState): PublicRoomState {
   }
   const spectatorList = Array.from(uniqueSpectatorMap.values());
 
+  let publicGameState: any = undefined;
+  if (room.gameData) {
+    try {
+      publicGameState = getPublicGameState(room);
+    } catch {
+      publicGameState = room.gameData.publicState || room.gameData;
+    }
+  }
+
   return {
     code: room.code,
     hostId: room.hostId,
     status: room.status,
+    phase: room.phase || room.gameData?.phase,
     config: {
       roomName: room.config.roomName || `Room ${room.code}`,
       maxPlayers: room.config.maxPlayers,
@@ -352,9 +450,12 @@ export function sanitizeRoomState(room: RoomState): PublicRoomState {
     currentRound: room.currentRound,
     createdAt: room.createdAt,
     updatedAt: room.updatedAt,
+    lastActivityAt: room.lastActivityAt || room.updatedAt || Date.now(),
     teamScores: room.teamScores,
     sipsCount: room.sipsCount || {},
     customCardsCount: room.customCards?.length || 0,
-    awards: room.gameData?.awards || []
+    awards: room.gameData?.awards || [],
+    gameState: publicGameState,
+    gameData: publicGameState
   };
 }

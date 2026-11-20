@@ -16,6 +16,31 @@ interface ShareRecapCardProps {
   onClose: () => void;
 }
 
+function drawRoundedRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number
+) {
+  if (typeof (ctx as any).roundRect === 'function') {
+    (ctx as any).roundRect(x, y, w, h, r);
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+}
+
 export function ShareRecapCard({
   room,
   currentPlayer,
@@ -93,7 +118,7 @@ export function ShareRecapCard({
       // Room & Stats pill
       ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
       ctx.beginPath();
-      ctx.roundRect(300, 260, 480, 60, 30);
+      drawRoundedRect(ctx, 300, 260, 480, 60, 30);
       ctx.fill();
       ctx.strokeStyle = 'rgba(56, 242, 255, 0.4)';
       ctx.lineWidth = 2;
@@ -106,7 +131,7 @@ export function ShareRecapCard({
       // 3. MVP Crown Card
       ctx.fillStyle = 'rgba(234, 179, 8, 0.1)';
       ctx.beginPath();
-      ctx.roundRect(100, 360, 880, 340, 28);
+      drawRoundedRect(ctx, 100, 360, 880, 340, 28);
       ctx.fill();
       ctx.strokeStyle = '#EAB308';
       ctx.lineWidth = 6;
@@ -155,7 +180,7 @@ export function ShareRecapCard({
       for (const a of awardsToDraw) {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
         ctx.beginPath();
-        ctx.roundRect(100, a.y, 880, 140, 20);
+        drawRoundedRect(ctx, 100, a.y, 880, 140, 20);
         ctx.fill();
         ctx.strokeStyle = a.color;
         ctx.lineWidth = 3;
@@ -180,7 +205,7 @@ export function ShareRecapCard({
       const picassoY = 1260;
       ctx.fillStyle = 'rgba(168, 85, 247, 0.08)';
       ctx.beginPath();
-      ctx.roundRect(100, picassoY, 880, 420, 24);
+      drawRoundedRect(ctx, 100, picassoY, 880, 420, 24);
       ctx.fill();
       ctx.strokeStyle = '#A855F7';
       ctx.lineWidth = 4;
@@ -203,7 +228,7 @@ export function ShareRecapCard({
           // Draw inside rounded rectangle
           ctx.save();
           ctx.beginPath();
-          ctx.roundRect(360, picassoY + 90, 360, 240, 16);
+          drawRoundedRect(ctx, 360, picassoY + 90, 360, 240, 16);
           ctx.clip();
           ctx.drawImage(img, 360, picassoY + 90, 360, 240);
           ctx.restore();

@@ -231,24 +231,28 @@ export async function socketKickPlayer(dto: KickPlayerDTO): Promise<void> {
   if (!json.success) throw new Error(json.error?.message || 'Failed to kick player');
 }
 
-export async function socketStartGame(isSoloDevMode = false, force = false): Promise<void> {
+export async function socketStartGame(isSoloDevMode = false, force = false): Promise<any> {
   const roomCode = getActiveRoomCode();
   const playerId = getSavedPlayerId(roomCode) || getPersistentPlayerId();
-  if (!playerId) return;
+  if (!playerId) return null;
 
-  const res = await fetch('/api/rooms/start', {
+  const res = await fetch('/api/game/action', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       roomCode,
       playerId,
-      isSoloDevMode,
-      force
+      actionType: force ? 'FORCE_START' : 'START_GAME',
+      payload: {
+        isSoloDevMode,
+        force
+      }
     })
   });
 
   const json = await res.json();
   if (!json.success) throw new Error(json.error?.message || 'Failed to start game');
+  return json;
 }
 
 export async function socketSelectGames(selectedGames: GameMode[]): Promise<void> {

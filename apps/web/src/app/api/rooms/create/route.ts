@@ -84,6 +84,7 @@ export async function POST(req: NextRequest) {
       spectators: {},
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      lastActivityAt: Date.now(),
       currentRound: 0,
       sipsCount: {},
       customCards: []

@@ -74,16 +74,17 @@ export function useRoomRealtime({
     fetchLatestRoom();
   }, [fetchLatestRoom]);
 
-  // 2. Lightweight 2.5-second background state sync fallback active while in Lobby phase
+  // 2. Lightweight 2-second background state sync fallback active while in Lobby phase or loading
   useEffect(() => {
-    if (!normalizedCode || room?.status !== 'lobby') return;
+    if (!normalizedCode) return;
+    if (room && room.status !== 'lobby' && gameState) return;
 
     const interval = setInterval(() => {
       fetchLatestRoom();
-    }, 2500);
+    }, 2000);
 
     return () => clearInterval(interval);
-  }, [normalizedCode, room?.status, fetchLatestRoom]);
+  }, [normalizedCode, room, gameState, fetchLatestRoom]);
 
   // 3. Refresh current player reference when room updates
   useEffect(() => {
@@ -104,7 +105,7 @@ export function useRoomRealtime({
   // 4. Synced Countdown Timer with server phaseEndsAt
   useEffect(() => {
     const phaseEndsAt = gameState?.phaseEndsAt;
-    if (!phaseEndsAt || room?.status !== 'in_game') {
+    if (!phaseEndsAt || (room?.status !== 'in_game' && room?.status !== 'playing')) {
       setRemainingSeconds(0);
       return;
     }
@@ -185,13 +186,33 @@ export function useRoomRealtime({
     // --- Public Room Event Listeners ---
     const handleRoomState = (msg: any) => {
       const newRoom: PublicRoomState = msg.data;
+      if (!newRoom) return;
       setRoom(newRoom);
       if (newRoom.status === 'lobby') {
         setPrivateRole(null);
         setSecretRole(null);
         setGameState(null);
         setCountdown(null);
+      } else if (newRoom.status === 'playing' || newRoom.status === 'in_game') {
+        if (newRoom.config?.gameMode) setGameMode(newRoom.config.gameMode);
+        if (newRoom.gameState) setGameState(newRoom.gameState);
+        else if (newRoom.gameData) setGameState(newRoom.gameData);
+        setCountdown(null);
       }
+    };
+
+    const handleGameStarted = (msg: any) => {
+      const data = msg.data;
+      if (data?.room) {
+        setRoom(data.room);
+      }
+      if (data?.gameMode) {
+        setGameMode(data.gameMode);
+      }
+      if (data?.gameState) {
+        setGameState(data.gameState);
+      }
+      setCountdown(null);
     };
 
     const handlePlayerJoined = (msg: any) => {
@@ -227,12 +248,14 @@ export function useRoomRealtime({
       const data = msg.data;
       if (data?.gameMode) setGameMode(data.gameMode);
       if (data?.state) setGameState(data.state);
+      setCountdown(null);
     };
 
     roomChannel.subscribe('room:state', handleRoomState);
     roomChannel.subscribe('room_state', handleRoomState);
     roomChannel.subscribe('room_state_updated', handleRoomState);
     roomChannel.subscribe('room:updated', handleRoomState);
+    roomChannel.subscribe('game:started', handleGameStarted);
     roomChannel.subscribe('room:player-joined', handlePlayerJoined);
     roomChannel.subscribe('room:player-left', handlePlayerLeft);
     roomChannel.subscribe('room:host-migrated', handleHostMigrated);
