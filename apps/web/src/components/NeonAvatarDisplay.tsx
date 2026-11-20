@@ -2,8 +2,9 @@
 
 import React from 'react';
 import { NeonAvatarId, NEON_AVATARS } from '@feto-games/shared-types';
+import { PlayerAvatar } from './PlayerAvatar';
 
-interface NeonAvatarDisplayProps {
+export interface NeonAvatarDisplayProps {
   avatarId: NeonAvatarId;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   showGlow?: boolean;
@@ -13,10 +14,17 @@ interface NeonAvatarDisplayProps {
 }
 
 const sizeClasses = {
-  sm: 'w-10 h-10 text-xl',
-  md: 'w-16 h-16 text-3xl',
-  lg: 'w-24 h-24 text-5xl',
-  xl: 'w-32 h-32 text-6xl'
+  sm: 'w-10 h-10',
+  md: 'w-14 h-14',
+  lg: 'w-20 h-20',
+  xl: 'w-28 h-28'
+};
+
+const avatarSizeProp: Record<'sm' | 'md' | 'lg' | 'xl', 'sm' | 'md' | 'lg' | 'xl'> = {
+  sm: 'sm',
+  md: 'md',
+  lg: 'lg',
+  xl: 'xl'
 };
 
 export const NeonAvatarDisplay: React.FC<NeonAvatarDisplayProps> = ({
@@ -29,25 +37,19 @@ export const NeonAvatarDisplay: React.FC<NeonAvatarDisplayProps> = ({
 
   return (
     <div
-      className={`relative inline-flex items-center justify-center rounded-2xl transition-all duration-150 ${sizeClasses[size]} ${className}`}
-      style={{
-        backgroundColor: isReady ? '#0B89FD' : '#FFFFFF',
-        border: '2px solid #010101',
-        boxShadow: isReady ? '3px 3px 0px #010101' : '3px 3px 0px #010101'
-      }}
+      className={`relative inline-flex items-center justify-center shrink-0 rounded-2xl transition-all duration-200 ${sizeClasses[size]} ${
+        isReady
+          ? 'bg-emerald-50 border border-emerald-400 ring-2 ring-emerald-500/30 shadow-sm'
+          : 'bg-white border border-gray-200 shadow-sm'
+      } ${className}`}
+      title={meta.name}
     >
-      {/* Avatar Emoji / Graphic */}
-      <span className="select-none transform hover:scale-110 transition-transform font-emoji" role="img" aria-label={meta.label || 'Avatar'}>
-        {meta.emoji}
-      </span>
-
-      {/* Bauhaus Geometric Corner Triangle Accent */}
-      <div
-        className="absolute top-0 right-0 w-3 h-3 pointer-events-none rounded-tr-xl"
-        style={{
-          background: isReady ? '#FEC90E' : '#0B89FD',
-          clipPath: 'polygon(100% 0, 0 0, 100% 100%)'
-        }}
+      <PlayerAvatar
+        avatarId={avatarId}
+        size={avatarSizeProp[size]}
+        isReady={isReady}
+        showBorder={false}
+        className="w-full h-full rounded-2xl p-1"
       />
     </div>
   );

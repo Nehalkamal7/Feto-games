@@ -182,7 +182,12 @@ export function SabotageDrawer({
                       className={`w-full text-left p-4 rounded-2xl ${pu.colorBorder} ${pu.colorBg} ${pu.colorGlow} hover:bg-[#FFFFFF] transition-all flex items-center justify-between group active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101]`}
                     >
                       <div className="flex items-start gap-3">
-                        <span className="text-3xl font-emoji">{pu.icon}</span>
+                        <div
+                          className="min-w-[44px] min-h-[44px] w-11 h-11 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] inline-flex items-center justify-center shrink-0 text-2xl select-none"
+                          style={{ fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif' }}
+                        >
+                          {pu.icon}
+                        </div>
                         <div>
                           <div className="flex items-center gap-2">
                             <span className="font-black text-sm text-[#010101] transition-colors">
@@ -198,7 +203,7 @@ export function SabotageDrawer({
                         </div>
                       </div>
 
-                      <ChevronRight className="w-5 h-5 text-[#010101] group-hover:text-[#FD3F01] flex-shrink-0 ml-2" />
+                      <ChevronRight className="w-5 h-5 text-[#010101] group-hover:text-[#FD3F01] shrink-0 ml-2" strokeWidth={2.5} />
                     </button>
                   ))}
                 </div>
@@ -208,9 +213,14 @@ export function SabotageDrawer({
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-xs text-[#010101]/70 uppercase font-black block">Targeting:</span>
-                      <span className="text-sm font-black text-[#FD3F01]">
-                        {SABOTAGE_POWERUPS.find((p) => p.type === selectedType)?.name}{' '}
-                        {SABOTAGE_POWERUPS.find((p) => p.type === selectedType)?.icon}
+                      <span className="text-sm font-black text-[#FD3F01] flex items-center gap-1.5 mt-0.5">
+                        <span>{SABOTAGE_POWERUPS.find((p) => p.type === selectedType)?.name}</span>
+                        <span
+                          className="min-w-[28px] min-h-[28px] w-7 h-7 rounded-lg bg-[#FFFFFF] border-2 border-[#010101] shadow-[1px_1px_0px_#010101] inline-flex items-center justify-center shrink-0 text-base"
+                          style={{ fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif' }}
+                        >
+                          {SABOTAGE_POWERUPS.find((p) => p.type === selectedType)?.icon}
+                        </span>
                       </span>
                     </div>
 

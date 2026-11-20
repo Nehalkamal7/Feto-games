@@ -9,6 +9,7 @@ import {
   PlayerSummary
 } from '@feto-games/shared-types';
 import { NeonAvatarDisplay } from '../NeonAvatarDisplay';
+import { GameIcon } from '../GameIcon';
 import {
   Brush,
   Eraser,
@@ -372,7 +373,7 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* CANVAS CONTAINER (3 Columns) */}
         <div className="lg:col-span-3 flex flex-col space-y-2 sm:space-y-3">
-          <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border-2 border-feto-border bg-[#0a0b14] shadow-2xl aspect-[4/3] touch-action-none">
+          <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border-2 border-[#010101] bg-[#FFFFFF] shadow-[4px_4px_0px_#010101] aspect-[4/3] touch-action-none">
             <canvas
               ref={canvasRef}
               onMouseDown={handlePointerDown}
@@ -387,7 +388,7 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
 
             {/* Non-drawer Spectating Tag */}
             {!isDrawer && (
-              <div className="absolute top-2 left-2 sm:top-3 sm:left-3 px-2.5 py-1 bg-black/60 backdrop-blur-md rounded-full text-[10px] sm:text-[11px] text-slate-300 border border-slate-700 pointer-events-none">
+              <div className="absolute top-2 left-2 sm:top-3 sm:left-3 px-3 py-1 bg-[#FFFFFF] border-2 border-[#010101] rounded-full text-[10px] sm:text-[11px] text-[#010101] font-black shadow-[2px_2px_0px_#010101] pointer-events-none">
                 Watching Live Stream
               </div>
             )}
@@ -398,11 +399,11 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="glass-panel rounded-2xl p-2.5 sm:p-3 flex flex-wrap items-center justify-between gap-2 border border-feto-border"
+              className="bg-[#FFFFFF] rounded-2xl p-2.5 sm:p-3 flex flex-wrap items-center justify-between gap-2 border-2 border-[#010101] shadow-[3px_3px_0px_#010101]"
             >
               {/* Color Palette (Touch-friendly buttons) */}
               <div className="flex items-center gap-1.5 flex-wrap">
-                <Palette className="w-4 h-4 text-slate-400 mr-0.5 hidden sm:inline" />
+                <Palette className="w-4 h-4 text-[#010101] mr-0.5 hidden sm:inline shrink-0" strokeWidth={2.5} />
                 {PALETTE_COLORS.map((c) => (
                   <button
                     key={c}
@@ -414,10 +415,10 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
                     }}
                     style={{ backgroundColor: c }}
                     aria-label={`Color ${c}`}
-                    className={`w-8 h-8 sm:w-7 sm:h-7 rounded-xl border-2 transition-transform touch-target ${
+                    className={`w-8 h-8 sm:w-7 sm:h-7 rounded-xl border-2 transition-transform touch-target shrink-0 ${
                       selectedColor === c && !isEraser
-                        ? 'scale-110 border-white shadow-md ring-2 ring-cyan-400/50'
-                        : 'border-slate-800 hover:scale-105'
+                        ? 'scale-110 border-[#010101] shadow-[2px_2px_0px_#010101] ring-2 ring-[#0B89FD]'
+                        : 'border-[#010101] hover:scale-105'
                     }`}
                   />
                 ))}
@@ -426,7 +427,7 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
               {/* Brush Sizes & Eraser / Clear */}
               <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                 {/* Brush size buttons */}
-                <div className="flex items-center gap-1 bg-feto-dark p-1 rounded-xl border border-feto-border">
+                <div className="flex items-center gap-1 bg-[#F8F8F8] p-1 rounded-xl border-2 border-[#010101]">
                   {BRUSH_SIZES.map((size) => (
                     <button
                       key={size}
@@ -436,10 +437,10 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
                         setBrushSize(size);
                         setIsEraser(false);
                       }}
-                      className={`w-8 h-8 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center transition-all ${
+                      className={`w-8 h-8 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center transition-all shrink-0 ${
                         brushSize === size && !isEraser
-                          ? 'bg-cyan-500 text-black font-bold'
-                          : 'text-slate-400 hover:text-white'
+                          ? 'bg-[#0B89FD] text-white font-bold'
+                          : 'text-[#010101] hover:bg-[#FFFFFF]'
                       }`}
                       aria-label={`Brush size ${size}`}
                     >
@@ -458,37 +459,37 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
                     sound.playClick();
                     setIsEraser(!isEraser);
                   }}
-                  className={`min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 p-2 sm:p-2 rounded-xl border flex items-center justify-center transition-all ${
+                  className={`w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center shrink-0 rounded-xl border-2 border-[#010101] shadow-[2px_2px_0px_#010101] transition-all active:translate-x-[1px] active:translate-y-[1px] ${
                     isEraser
-                      ? 'bg-yellow-400 text-black border-yellow-400 shadow-neon-yellow'
-                      : 'bg-feto-dark border-feto-border text-slate-300 hover:border-slate-500'
+                      ? 'bg-[#FEC90E] text-[#010101]'
+                      : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
                   }`}
                   title="Eraser"
                   aria-label="Eraser"
                 >
-                  <Eraser className="w-4 h-4" />
+                  <Eraser className="w-4 h-4 shrink-0" strokeWidth={2.5} />
                 </button>
 
                 {/* Undo */}
                 <button
                   type="button"
                   onClick={handleUndoButton}
-                  className="min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 p-2 bg-feto-dark hover:bg-feto-card border border-feto-border rounded-xl text-slate-300 hover:text-white flex items-center justify-center transition-all"
+                  className="w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center shrink-0 rounded-xl border-2 border-[#010101] bg-[#FFFFFF] hover:bg-[#F8F8F8] text-[#010101] shadow-[2px_2px_0px_#010101] transition-all active:translate-x-[1px] active:translate-y-[1px]"
                   title="Undo Stroke"
                   aria-label="Undo"
                 >
-                  <RotateCcw className="w-4 h-4" />
+                  <RotateCcw className="w-4 h-4 shrink-0" strokeWidth={2.5} />
                 </button>
 
                 {/* Clear */}
                 <button
                   type="button"
                   onClick={handleClearButton}
-                  className="min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 p-2 bg-red-950/40 hover:bg-red-900/50 border border-red-500/40 rounded-xl text-red-400 flex items-center justify-center transition-all"
+                  className="w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center shrink-0 rounded-xl border-2 border-[#010101] bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white text-[#FD3F01] shadow-[2px_2px_0px_#010101] transition-all active:translate-x-[1px] active:translate-y-[1px]"
                   title="Clear Canvas"
                   aria-label="Clear Canvas"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-4 h-4 shrink-0" strokeWidth={2.5} />
                 </button>
               </div>
             </motion.div>
@@ -496,12 +497,12 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
         </div>
 
         {/* CHAT & GUESS FEED (1 Column) */}
-        <div className="lg:col-span-1 glass-panel rounded-2xl sm:rounded-3xl p-3 sm:p-4 flex flex-col justify-between border border-feto-border h-[280px] sm:h-[380px] lg:h-[480px]">
-          <div className="flex items-center justify-between pb-2 sm:pb-3 border-b border-feto-border mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+        <div className="lg:col-span-1 bg-[#FFFFFF] rounded-2xl sm:rounded-3xl p-3 sm:p-4 flex flex-col justify-between border-2 border-[#010101] shadow-[4px_4px_0px_#010101] h-[280px] sm:h-[380px] lg:h-[480px]">
+          <div className="flex items-center justify-between pb-2 sm:pb-3 border-b-2 border-[#010101]/10 mb-2">
+            <span className="text-xs font-black uppercase tracking-wider text-[#010101]">
               Live Guesses & Chat
             </span>
-            <span className="text-[10px] text-cyan-400 font-semibold">Auto-checked</span>
+            <span className="text-[10px] text-[#0B89FD] font-black">Auto-checked</span>
           </div>
 
           {/* Scrollable messages container */}
@@ -574,18 +575,18 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="w-full max-w-md glass-panel-neon p-5 sm:p-8 rounded-3xl text-center space-y-4 border border-cyan-400"
+              className="w-full max-w-md bg-[#FFFFFF] border-3 border-[#010101] shadow-[8px_8px_0px_#010101] p-5 sm:p-8 rounded-3xl text-center space-y-4 text-[#010101]"
             >
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-cyan-950/80 border border-cyan-400/60 flex items-center justify-center mx-auto text-cyan-300">
-                <Brush className="w-6 h-6 sm:w-7 sm:h-7" />
+              <div className="flex items-center justify-center mx-auto">
+                <GameIcon gameMode="draw_and_guess" size="lg" showContainer />
               </div>
 
               <div>
-                <span className="text-xs font-black uppercase tracking-widest text-cyan-400">
+                <span className="text-xs font-black uppercase tracking-widest text-[#0B89FD]">
                   YOUR TURN TO DRAW!
                 </span>
-                <h3 className="text-xl sm:text-2xl font-black text-white mt-1">Choose a Word</h3>
-                <p className="text-xs text-slate-400">
+                <h3 className="text-xl sm:text-2xl font-black text-[#010101] mt-1">Choose a Word</h3>
+                <p className="text-xs text-[#525252] font-medium">
                   Pick one of the 3 words below to draw for everyone:
                 </p>
               </div>
@@ -595,10 +596,10 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
                   <button
                     key={w}
                     onClick={() => handleSelectWord(w)}
-                    className="min-h-[52px] p-4 bg-feto-card hover:bg-cyan-950/50 border border-feto-border hover:border-cyan-400 rounded-2xl text-white font-black text-base sm:text-lg transition-all text-left flex items-center justify-between group touch-target"
+                    className="min-h-[52px] p-4 bg-[#F8F8F8] hover:bg-[#0B89FD] hover:text-white border-2 border-[#010101] shadow-[3px_3px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#010101] rounded-2xl text-[#010101] font-black text-base sm:text-lg transition-all text-left flex items-center justify-between group touch-target"
                   >
                     <span>{w}</span>
-                    <span className="text-xs text-slate-500 group-hover:text-cyan-300 uppercase font-bold">
+                    <span className="text-xs text-[#525252] group-hover:text-white uppercase font-bold">
                       {idx === 0 ? 'Easy' : idx === 1 ? 'Medium' : 'Hard'}
                     </span>
                   </button>

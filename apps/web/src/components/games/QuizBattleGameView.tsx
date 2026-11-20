@@ -7,6 +7,7 @@ import {
   QuizPublicState
 } from '@feto-games/shared-types';
 import { NeonAvatarDisplay } from '../NeonAvatarDisplay';
+import { GameIcon } from '../GameIcon';
 import {
   Trophy,
   CheckCircle2,
@@ -91,14 +92,15 @@ export const QuizBattleGameView: React.FC<QuizBattleGameViewProps> = ({
       {/* ======================================================== */}
       {/* TOP HEADER: QUESTION PROGRESS & TIMER                    */}
       {/* ======================================================== */}
-      <div className="glass-panel-neon rounded-3xl p-5 md:p-6 border border-cyan-500/30">
+      <div className="bg-[#FFFFFF] rounded-3xl p-5 md:p-6 border-2 border-[#010101] shadow-[4px_4px_0px_#010101] text-[#010101]">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-3">
-            <span className="px-3 py-1 bg-cyan-950/60 border border-cyan-500/40 rounded-full text-xs font-black text-cyan-300 uppercase tracking-widest">
+            <GameIcon gameMode="quiz_battle" size="md" showContainer />
+            <span className="px-3 py-1 bg-[#FEC90E] border-2 border-[#010101] rounded-full text-xs font-black text-[#010101] uppercase tracking-widest shadow-[1px_1px_0px_#010101]">
               Question {gameState.questionNumber} / {gameState.totalQuestions}
             </span>
             {currentQ && (
-              <span className="px-3 py-1 bg-feto-card border border-feto-border rounded-full text-xs font-bold text-slate-300">
+              <span className="px-3 py-1 bg-[#F8F8F8] border-2 border-[#010101] rounded-full text-xs font-black text-[#010101]">
                 {currentQ.category} • <span className="capitalize">{currentQ.difficulty}</span>
               </span>
             )}
@@ -106,10 +108,10 @@ export const QuizBattleGameView: React.FC<QuizBattleGameViewProps> = ({
 
           <div className="flex items-center gap-3">
             <div className="text-right">
-              <span className="text-xs text-slate-400 font-bold block uppercase">Speed Timer</span>
-              <span className="text-xl font-black text-cyan-300">{remainingSeconds}s</span>
+              <span className="text-[10px] text-[#525252] font-black block uppercase tracking-wider">Speed Timer</span>
+              <span className="text-xl font-black text-[#FD3F01] font-mono">{remainingSeconds}s</span>
             </div>
-            <div className="text-xs px-3 py-1.5 rounded-full bg-feto-card border border-feto-border text-slate-300 font-bold">
+            <div className="text-xs px-3 py-1.5 rounded-full bg-[#F8F8F8] border-2 border-[#010101] text-[#010101] font-black shadow-[1px_1px_0px_#010101]">
               {gameState.answeredPlayerIds.length} / {gameState.totalActivePlayers} Answered
             </div>
           </div>
@@ -117,12 +119,12 @@ export const QuizBattleGameView: React.FC<QuizBattleGameViewProps> = ({
 
         {/* Animated Timer Bar */}
         {gameState.phase === 'question' && (
-          <div className="w-full h-3 bg-feto-dark rounded-full overflow-hidden border border-cyan-500/30">
+          <div className="w-full h-3 bg-[#F8F8F8] rounded-full overflow-hidden border-2 border-[#010101]">
             <div
               className={`h-full transition-all duration-300 ease-linear ${
                 remainingSeconds <= 3
-                  ? 'bg-red-500 animate-pulse'
-                  : 'bg-gradient-to-r from-cyan-400 via-feto-magenta to-yellow-400'
+                  ? 'bg-[#FD3F01] animate-pulse'
+                  : 'bg-[#0B89FD]'
               }`}
               style={{ width: `${timerPercentage}%` }}
             />
@@ -138,43 +140,42 @@ export const QuizBattleGameView: React.FC<QuizBattleGameViewProps> = ({
           key={currentQ.id}
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-panel rounded-3xl p-6 md:p-8 border border-feto-border text-center space-y-3"
+          className="bg-[#FFFFFF] rounded-3xl p-6 md:p-8 border-2 border-[#010101] shadow-[4px_4px_0px_#010101] text-center space-y-3 text-[#010101]"
         >
-          <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-yellow-400">
-            <Zap className="w-4 h-4 fill-yellow-400" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FEC90E] border-2 border-[#010101] text-xs font-black uppercase tracking-wider text-[#010101] shadow-[2px_2px_0px_#010101]">
+            <Zap className="w-3.5 h-3.5 fill-[#010101] text-[#010101] shrink-0" strokeWidth={2.5} />
             <span>Answer Faster For Higher Speed Bonus!</span>
           </div>
-          <h2 className="text-2xl md:text-3xl font-black text-white leading-snug">
+          <h2 className="text-2xl md:text-3xl font-black text-[#010101] leading-snug">
             {currentQ.question}
           </h2>
         </motion.div>
       )}
 
       {/* ======================================================== */}
-      {/* 4 INTERACTIVE NEON OPTIONS                                */}
+      {/* 4 INTERACTIVE NEON/BAUHAUS OPTIONS                        */}
       {/* ======================================================== */}
       {currentQ && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {currentQ.options.map((optText, idx) => {
             const letter = OPTION_LETTERS[idx];
-            const colorMeta = OPTION_COLORS[idx] || OPTION_COLORS[0];
             const isSelected = selectedOption === idx;
             const isCorrect = gameState.correctAnswerIndex === idx;
             const isWrongSelection =
               gameState.phase === 'reveal' && isSelected && !isCorrect;
 
-            let cardStyle = `${colorMeta.border} ${colorMeta.bg} bg-feto-card`;
+            let cardStyle = 'bg-[#FFFFFF] text-[#010101] border-2 border-[#010101] shadow-[3px_3px_0px_#010101] hover:bg-[#F8F8F8]';
 
             if (gameState.phase === 'reveal') {
               if (isCorrect) {
-                cardStyle = 'border-green-400 bg-green-950/80 shadow-neon-green scale-102';
+                cardStyle = 'bg-[#10B981] text-white border-2 border-[#010101] shadow-[4px_4px_0px_#010101] scale-[1.02]';
               } else if (isWrongSelection) {
-                cardStyle = 'border-red-500 bg-red-950/80 opacity-70';
+                cardStyle = 'bg-[#FD3F01] text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101] opacity-80';
               } else {
-                cardStyle = 'border-slate-800 bg-feto-dark/50 opacity-50';
+                cardStyle = 'bg-[#F8F8F8] text-[#010101]/60 border-2 border-[#010101]/40 opacity-50';
               }
             } else if (isSelected) {
-              cardStyle = `${colorMeta.border} ${colorMeta.active} scale-102`;
+              cardStyle = 'bg-[#0B89FD] text-white border-2 border-[#010101] shadow-[4px_4px_0px_#010101] scale-[1.02]';
             }
 
             return (
@@ -188,15 +189,15 @@ export const QuizBattleGameView: React.FC<QuizBattleGameViewProps> = ({
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-base border ${
-                      isSelected
-                        ? 'bg-white text-black border-white'
-                        : 'bg-feto-dark text-slate-300 border-slate-700'
+                    className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-black text-base border-2 border-[#010101] shrink-0 ${
+                      isSelected || isCorrect || isWrongSelection
+                        ? 'bg-[#FFFFFF] text-[#010101]'
+                        : 'bg-[#FEC90E] text-[#010101]'
                     }`}
                   >
                     {letter}
                   </div>
-                  <span className="text-base font-bold text-white leading-tight">
+                  <span className="text-base font-black leading-tight">
                     {optText}
                   </span>
                 </div>
@@ -204,12 +205,12 @@ export const QuizBattleGameView: React.FC<QuizBattleGameViewProps> = ({
                 {/* Status Indicator */}
                 {gameState.phase === 'reveal' ? (
                   isCorrect ? (
-                    <CheckCircle2 className="w-6 h-6 text-green-400 flex-shrink-0" />
+                    <CheckCircle2 className="w-6 h-6 text-white shrink-0" strokeWidth={2.5} />
                   ) : isWrongSelection ? (
-                    <XCircle className="w-6 h-6 text-red-500 flex-shrink-0" />
+                    <XCircle className="w-6 h-6 text-white shrink-0" strokeWidth={2.5} />
                   ) : null
                 ) : isSelected ? (
-                  <span className="text-[11px] font-black uppercase tracking-wider text-cyan-300 px-2 py-1 bg-cyan-950/60 rounded-lg">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-[#010101] px-2.5 py-1 bg-[#FEC90E] border-2 border-[#010101] rounded-lg shrink-0">
                     LOCKED IN
                   </span>
                 ) : null}
@@ -226,12 +227,12 @@ export const QuizBattleGameView: React.FC<QuizBattleGameViewProps> = ({
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="glass-panel-neon p-6 md:p-8 rounded-3xl border border-cyan-400/50 space-y-4"
+          className="bg-[#FFFFFF] p-6 md:p-8 rounded-3xl border-3 border-[#010101] shadow-[8px_8px_0px_#010101] space-y-4 text-[#010101]"
         >
           <div className="text-center mb-6">
-            <Trophy className="w-10 h-10 text-yellow-400 mx-auto mb-2 animate-bounce" />
-            <h3 className="text-2xl font-black text-white">Live Leaderboard</h3>
-            <p className="text-xs text-slate-400">Scores after Question {gameState.questionNumber}</p>
+            <Trophy className="w-10 h-10 text-[#FEC90E] mx-auto mb-2 animate-bounce shrink-0" strokeWidth={2.5} />
+            <h3 className="text-2xl font-black text-[#010101]">Live Leaderboard</h3>
+            <p className="text-xs text-[#525252] font-medium">Scores after Question {gameState.questionNumber}</p>
           </div>
 
           <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">

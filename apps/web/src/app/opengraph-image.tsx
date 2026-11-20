@@ -17,36 +17,12 @@ export default function OpenGraphImage() {
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '48px 56px',
-          background: '#090D16',
+          background: '#F8F8F8',
           position: 'relative',
           fontFamily: 'sans-serif'
         }}
       >
-        {/* Background Radial Glows */}
-        <div
-          style={{
-            position: 'absolute',
-            top: -100,
-            left: 100,
-            width: 500,
-            height: 500,
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(56, 242, 255, 0.18) 0%, rgba(9, 13, 22, 0) 70%)'
-          }}
-        />
-        <div
-          style={{
-            position: 'absolute',
-            bottom: -100,
-            right: 100,
-            width: 550,
-            height: 550,
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(168, 85, 247, 0.22) 0%, rgba(9, 13, 22, 0) 70%)'
-          }}
-        />
-
-        {/* Outer Cyber Border Frame */}
+        {/* Outer Neo-Brutalist Hard Border Frame */}
         <div
           style={{
             position: 'absolute',
@@ -54,8 +30,9 @@ export default function OpenGraphImage() {
             left: 20,
             right: 20,
             bottom: 20,
-            border: '2px solid rgba(56, 242, 255, 0.4)',
+            border: '4px solid #010101',
             borderRadius: 24,
+            boxShadow: '8px 8px 0px #010101',
             pointerEvents: 'none'
           }}
         />
@@ -68,24 +45,25 @@ export default function OpenGraphImage() {
             gap: 12,
             padding: '8px 24px',
             borderRadius: 9999,
-            background: 'rgba(56, 242, 255, 0.08)',
-            border: '1.5px solid rgba(56, 242, 255, 0.35)'
+            background: '#FEC90E',
+            border: '3px solid #010101',
+            boxShadow: '3px 3px 0px #010101'
           }}
         >
           <div
             style={{
-              width: 10,
-              height: 10,
+              width: 12,
+              height: 12,
               borderRadius: '50%',
-              background: '#38F2FF',
-              boxShadow: '0 0 10px #38F2FF'
+              background: '#FD3F01',
+              border: '2px solid #010101'
             }}
           />
           <span
             style={{
-              color: '#38F2FF',
+              color: '#010101',
               fontSize: 16,
-              fontWeight: 800,
+              fontWeight: 900,
               letterSpacing: '3px',
               textTransform: 'uppercase'
             }}
@@ -105,61 +83,103 @@ export default function OpenGraphImage() {
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-            {/* High-Precision SVG Shield Emblem */}
-            <svg width="110" height="110" viewBox="0 0 100 100" fill="none">
-              <defs>
-                <linearGradient id="ogShieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#38F2FF" />
-                  <stop offset="100%" stopColor="#A855F7" />
-                </linearGradient>
-                <linearGradient id="ogCoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#00F0FF" />
-                  <stop offset="100%" stopColor="#38F2FF" />
-                </linearGradient>
-              </defs>
-
+            {/* High-Precision SVG Bauhaus Shield Emblem */}
+            <svg width="120" height="120" viewBox="0 0 160 160" fill="none">
+              {/* Offset Hard Shadow */}
               <path
-                d="M50 10 L90 26 L80 70 L50 96 L20 70 L10 26 Z"
-                fill="none"
-                stroke="url(#ogShieldGrad)"
-                strokeWidth="5"
+                d="M80 14 L142 42 C146 72 138 112 104 142 L80 156 L56 142 C22 112 14 72 18 42 Z"
+                fill="#010101"
+                transform="translate(6, 6)"
+              />
+              {/* Main White Shield Body */}
+              <path
+                d="M80 14 L142 42 C146 72 138 112 104 142 L80 156 L56 142 C22 112 14 72 18 42 Z"
+                fill="#FFFFFF"
+                stroke="#010101"
+                strokeWidth="6"
                 strokeLinejoin="round"
               />
-
+              {/* Top Chevron: Vibrant Gold #FEC90E */}
               <path
-                d="M50 22 L78 35 L70 66 L50 84 L30 66 L22 35 Z"
-                fill="#090D16"
-                stroke="url(#ogCoreGrad)"
+                d="M80 20 L134 46 L120 62 L80 42 L40 62 L26 46 Z"
+                fill="#FEC90E"
+                stroke="#010101"
                 strokeWidth="4"
+                strokeLinejoin="round"
               />
-
+              {/* Left Wing: Electric Blue #0B89FD */}
               <path
-                d="M50 48 L66 36 L50 78 L34 36 Z"
-                fill="url(#ogShieldGrad)"
+                d="M34 56 L76 72 L76 112 L44 98 C36 84 34 70 34 56 Z"
+                fill="#0B89FD"
+                stroke="#010101"
+                strokeWidth="4"
+                strokeLinejoin="round"
+              />
+              {/* Right Wing: Arcade Red-Orange #FD3F01 */}
+              <path
+                d="M126 56 L84 72 L84 112 L116 98 C124 84 126 70 126 56 Z"
+                fill="#FD3F01"
+                stroke="#010101"
+                strokeWidth="4"
+                strokeLinejoin="round"
+              />
+              {/* Center Controller D-Pad */}
+              <circle cx="80" cy="84" r="16" fill="#FFFFFF" stroke="#010101" strokeWidth="4" />
+              <rect x="76" y="74" width="8" height="20" rx="2" fill="#010101" />
+              <rect x="70" y="80" width="20" height="8" rx="2" fill="#010101" />
+              {/* Bottom V-Tip */}
+              <path
+                d="M60 112 L80 146 L100 112 L80 124 Z"
+                fill="#0B89FD"
+                stroke="#010101"
+                strokeWidth="4"
+                strokeLinejoin="round"
               />
             </svg>
 
-            {/* Glowing Wordmark */}
-            <h1
-              style={{
-                fontSize: 84,
-                fontWeight: 900,
-                color: '#38F2FF',
-                letterSpacing: '2px',
-                margin: 0,
-                textShadow: '0 0 35px rgba(56, 242, 255, 0.65)'
-              }}
-            >
-              FETO GAMES
-            </h1>
+            {/* Wordmark */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <h1
+                style={{
+                  fontSize: 88,
+                  fontWeight: 900,
+                  color: '#010101',
+                  letterSpacing: '-1px',
+                  margin: 0
+                }}
+              >
+                FETO
+              </h1>
+              <h1
+                style={{
+                  fontSize: 88,
+                  fontWeight: 900,
+                  color: '#0B89FD',
+                  letterSpacing: '-1px',
+                  margin: 0
+                }}
+              >
+                GAMES
+              </h1>
+              <div
+                style={{
+                  width: 24,
+                  height: 24,
+                  borderRadius: '50%',
+                  background: '#FEC90E',
+                  border: '4px solid #010101',
+                  boxShadow: '2px 2px 0px #010101'
+                }}
+              />
+            </div>
           </div>
 
-          {/* Catchy Subtitle */}
+          {/* Subtitle */}
           <p
             style={{
               fontSize: 32,
-              fontWeight: 800,
-              color: '#FFFFFF',
+              fontWeight: 900,
+              color: '#010101',
               margin: 0,
               textAlign: 'center',
               letterSpacing: '0.5px'
@@ -171,13 +191,13 @@ export default function OpenGraphImage() {
           <p
             style={{
               fontSize: 20,
-              fontWeight: 600,
-              color: '#A855F7',
+              fontWeight: 700,
+              color: '#525252',
               margin: 0,
               textAlign: 'center'
             }}
           >
-            Who Is Imposter? • Draw & Guess • Hot Potato • Sip or Spill 🥤 • Truth or Dare
+            Who Is Imposter? • Draw & Guess • Quiz Battle • Hot Potato • Sip or Spill 🥤
           </p>
         </div>
 
@@ -191,21 +211,22 @@ export default function OpenGraphImage() {
           }}
         >
           {[
-            { label: '🎮 10 Full Party Games', color: '#38F2FF' },
-            { label: '👥 Up to 15 Players', color: '#FACC15' },
-            { label: '⚡ Zero Downloads Required', color: '#4ADE80' },
-            { label: '🥤 Sip Edition & Sabotage', color: '#F472B6' }
+            { label: '🎮 10 Full Party Games', color: '#0B89FD', bg: '#FFFFFF' },
+            { label: '👥 Up to 15 Players', color: '#010101', bg: '#FEC90E' },
+            { label: '⚡ Zero Downloads Required', color: '#010101', bg: '#FFFFFF' },
+            { label: '🥤 Sip Edition & Sabotage', color: '#FFFFFF', bg: '#FD3F01' }
           ].map((item) => (
             <div
               key={item.label}
               style={{
-                padding: '10px 20px',
+                padding: '10px 22px',
                 borderRadius: 14,
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: `1.5px solid ${item.color}55`,
+                background: item.bg,
+                border: '3px solid #010101',
+                boxShadow: '3px 3px 0px #010101',
                 color: item.color,
                 fontSize: 16,
-                fontWeight: 800
+                fontWeight: 900
               }}
             >
               {item.label}
@@ -221,13 +242,13 @@ export default function OpenGraphImage() {
             justifyContent: 'space-between',
             width: '100%',
             paddingTop: 12,
-            borderTop: '1px solid rgba(255, 255, 255, 0.1)'
+            borderTop: '2px solid #010101'
           }}
         >
-          <span style={{ color: '#94A3B8', fontSize: 16, fontWeight: 700 }}>
+          <span style={{ color: '#525252', fontSize: 16, fontWeight: 800 }}>
             Play Instantly in Your Mobile or Desktop Browser
           </span>
-          <span style={{ color: '#38F2FF', fontSize: 18, fontWeight: 900, letterSpacing: '1px' }}>
+          <span style={{ color: '#0B89FD', fontSize: 20, fontWeight: 900, letterSpacing: '1px' }}>
             fetogames.com
           </span>
         </div>

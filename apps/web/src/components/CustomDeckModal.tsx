@@ -134,10 +134,10 @@ export function CustomDeckModal({ isOpen, onClose, gameMode, onDeckCreated }: Cu
               sound.playClick();
               onClose();
             }}
-            className="absolute top-5 right-5 p-2 rounded-xl text-[#010101] bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101] transition-all font-black"
+            className="absolute top-5 right-5 w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center shrink-0 rounded-xl text-[#010101] bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101] transition-all font-black"
             aria-label="Close"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 shrink-0" strokeWidth={2.5} />
           </button>
 
           {/* TITLE */}

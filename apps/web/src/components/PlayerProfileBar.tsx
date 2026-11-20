@@ -229,9 +229,9 @@ export function PlayerProfileBar({
               {/* Avatar Picker (10 Neon Avatars) */}
               <div className="mb-5">
                 <label className="text-xs font-black uppercase tracking-wider text-[#010101] block mb-2">
-                  Choose Avatar
+                  Choose Avatar (16 Characters)
                 </label>
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
                   {(Object.keys(NEON_AVATARS) as NeonAvatarId[]).map((avId) => (
                     <button
                       key={avId}
@@ -245,8 +245,9 @@ export function PlayerProfileBar({
                           ? 'bg-[#0B89FD] scale-105 shadow-[2px_2px_0px_#010101]'
                           : 'bg-[#FFFFFF] hover:bg-[#F8F8F8]'
                       }`}
+                      title={NEON_AVATARS[avId].name}
                     >
-                      <NeonAvatarDisplay avatarId={avId} size="sm" showGlow={false} />
+                      <NeonAvatarDisplay avatarId={avId} size="sm" className="w-8 h-8" />
                     </button>
                   ))}
                 </div>

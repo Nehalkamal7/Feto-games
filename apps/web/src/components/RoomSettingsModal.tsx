@@ -97,8 +97,8 @@ export function RoomSettingsModal({
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b-2 border-[#010101] bg-[#F8F8F8]">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-[#0B89FD] text-white border-2 border-[#010101] flex items-center justify-center shadow-[2px_2px_0px_#010101]">
-                <Settings className="w-5 h-5 text-white" />
+              <div className="w-9 h-9 rounded-xl bg-[#0B89FD] text-white border-2 border-[#010101] inline-flex items-center justify-center shrink-0 shadow-[2px_2px_0px_#010101]">
+                <Settings className="w-5 h-5 text-white shrink-0" strokeWidth={2.5} />
               </div>
               <div>
                 <h2 className="text-base font-black text-[#010101] tracking-wide flex items-center gap-2">
@@ -117,10 +117,10 @@ export function RoomSettingsModal({
                 sound.playClick();
                 onClose();
               }}
-              className="w-8 h-8 rounded-xl bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101] text-[#010101] flex items-center justify-center transition-colors touch-manipulation font-black"
+              className="w-9 h-9 inline-flex items-center justify-center shrink-0 rounded-xl bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101] text-[#010101] transition-colors touch-manipulation font-black"
               aria-label="Close modal"
             >
-              <X className="w-4 h-4" />
+              <X className="w-4 h-4 shrink-0" strokeWidth={2.5} />
             </button>
           </div>
 

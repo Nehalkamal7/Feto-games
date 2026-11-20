@@ -11,7 +11,15 @@ export type NeonAvatarId =
   | 'robo_pug'
   | 'cosmic_panda'
   | 'solar_falcon'
-  | 'hyper_bunny';
+  | 'hyper_bunny'
+  | 'arcade_ghost'
+  | 'party_dino'
+  | 'laser_shark'
+  | 'turbo_monkey'
+  | 'speedy_cheetah'
+  | 'mech_bear'
+  | 'pixel_wizard'
+  | 'astro_bot';
 
 export interface NeonAvatarMetadata {
   id: NeonAvatarId;
@@ -26,58 +34,114 @@ export const NEON_AVATARS: Record<NeonAvatarId, NeonAvatarMetadata> = {
   cyber_cat: {
     id: 'cyber_cat',
     name: 'Cyber Cat',
-    primaryColor: '#00F0FF', // Neon Cyan
-    glowColor: 'rgba(0, 240, 255, 0.6)',
+    primaryColor: '#0B89FD', // Electric Blue
+    glowColor: 'rgba(11, 137, 253, 0.4)',
     emoji: '🐱'
   },
   neon_fox: {
     id: 'neon_fox',
     name: 'Neon Fox',
-    primaryColor: '#FF5E00', // Neon Orange
-    glowColor: 'rgba(255, 94, 0, 0.6)',
+    primaryColor: '#FD3F01', // Arcade Red-Orange
+    glowColor: 'rgba(253, 63, 1, 0.4)',
     emoji: '🦊'
   },
   pixel_alien: {
     id: 'pixel_alien',
     name: 'Pixel Alien',
-    primaryColor: '#39FF14', // Neon Green
-    glowColor: 'rgba(57, 255, 20, 0.6)',
+    primaryColor: '#10B981', // Bauhaus Emerald Green
+    glowColor: 'rgba(16, 185, 129, 0.4)',
     emoji: '👾'
   },
   glitch_skull: {
     id: 'glitch_skull',
     name: 'Glitch Skull',
-    primaryColor: '#FF0055', // Neon Pink / Rose
-    glowColor: 'rgba(255, 0, 85, 0.6)',
+    primaryColor: '#FD3F01', // Arcade Red-Orange
+    glowColor: 'rgba(253, 63, 1, 0.4)',
     emoji: '💀'
   },
   robo_pug: {
     id: 'robo_pug',
     name: 'Robo Pug',
-    primaryColor: '#FFE600', // Neon Yellow
-    glowColor: 'rgba(255, 230, 0, 0.6)',
+    primaryColor: '#FEC90E', // Vibrant Gold
+    glowColor: 'rgba(254, 201, 14, 0.4)',
     emoji: '🐶'
   },
   cosmic_panda: {
     id: 'cosmic_panda',
     name: 'Cosmic Panda',
-    primaryColor: '#BF00FF', // Neon Violet
-    glowColor: 'rgba(191, 0, 255, 0.6)',
+    primaryColor: '#0B89FD', // Electric Blue
+    glowColor: 'rgba(11, 137, 253, 0.4)',
     emoji: '🐼'
   },
   solar_falcon: {
     id: 'solar_falcon',
     name: 'Solar Falcon',
-    primaryColor: '#00FFCC', // Neon Mint
-    glowColor: 'rgba(0, 255, 204, 0.6)',
+    primaryColor: '#FEC90E', // Vibrant Gold
+    glowColor: 'rgba(254, 201, 14, 0.4)',
     emoji: '🦅'
   },
   hyper_bunny: {
     id: 'hyper_bunny',
     name: 'Hyper Bunny',
-    primaryColor: '#FF00A0', // Neon Magenta
-    glowColor: 'rgba(255, 0, 160, 0.6)',
+    primaryColor: '#FD3F01', // Arcade Red-Orange
+    glowColor: 'rgba(253, 63, 1, 0.4)',
     emoji: '🐰'
+  },
+  arcade_ghost: {
+    id: 'arcade_ghost',
+    name: 'Arcade Ghost',
+    primaryColor: '#0B89FD', // Electric Blue
+    glowColor: 'rgba(11, 137, 253, 0.4)',
+    emoji: '👻'
+  },
+  party_dino: {
+    id: 'party_dino',
+    name: 'Party Dino',
+    primaryColor: '#10B981', // Emerald Green
+    glowColor: 'rgba(16, 185, 129, 0.4)',
+    emoji: '🦖'
+  },
+  laser_shark: {
+    id: 'laser_shark',
+    name: 'Laser Shark',
+    primaryColor: '#0B89FD', // Electric Blue
+    glowColor: 'rgba(11, 137, 253, 0.4)',
+    emoji: '🦈'
+  },
+  turbo_monkey: {
+    id: 'turbo_monkey',
+    name: 'Turbo Monkey',
+    primaryColor: '#FEC90E', // Vibrant Gold
+    glowColor: 'rgba(254, 201, 14, 0.4)',
+    emoji: '🐵'
+  },
+  speedy_cheetah: {
+    id: 'speedy_cheetah',
+    name: 'Speedy Cheetah',
+    primaryColor: '#FEC90E', // Vibrant Gold
+    glowColor: 'rgba(254, 201, 14, 0.4)',
+    emoji: '🐆'
+  },
+  mech_bear: {
+    id: 'mech_bear',
+    name: 'Mech Bear',
+    primaryColor: '#FD3F01', // Arcade Red-Orange
+    glowColor: 'rgba(253, 63, 1, 0.4)',
+    emoji: '🐻'
+  },
+  pixel_wizard: {
+    id: 'pixel_wizard',
+    name: 'Pixel Wizard',
+    primaryColor: '#0B89FD', // Electric Blue
+    glowColor: 'rgba(11, 137, 253, 0.4)',
+    emoji: '🧙'
+  },
+  astro_bot: {
+    id: 'astro_bot',
+    name: 'Astro Bot',
+    primaryColor: '#10B981', // Emerald Green
+    glowColor: 'rgba(16, 185, 129, 0.4)',
+    emoji: '🤖'
   }
 };
 

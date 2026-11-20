@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Shuffle
 } from 'lucide-react';
+import { GameIcon } from './GameIcon';
 import { sound } from '@/lib/sound';
 
 export interface GameInfo {
@@ -140,12 +141,12 @@ export function GamePlaylistQueue({
                       : 'bg-[#F8F8F8] text-[#010101] shadow-[2px_2px_0px_#010101]'
                   }`}
                 >
-                  <span className={`font-mono text-[10px] font-black px-1.5 py-0.5 rounded-md border border-[#010101] ${
+                  <span className={`font-mono text-[10px] font-black px-1.5 py-0.5 rounded-md border border-[#010101] shrink-0 ${
                     isCurrent ? 'bg-[#FEC90E] text-[#010101]' : 'bg-[#FFFFFF] text-[#010101]'
                   }`}>
                     #{idx + 1}
                   </span>
-                  <span className="text-base font-emoji">{game?.emoji || '🎮'}</span>
+                  <GameIcon gameMode={gameId} size="sm" />
                   <div className="text-left">
                     <div className="text-xs font-black truncate max-w-[120px]">{game?.title}</div>
                     <div className={`text-[9px] font-bold ${isCurrent ? 'text-white/80' : 'text-[#010101]/60'}`}>
@@ -157,7 +158,7 @@ export function GamePlaylistQueue({
                     <button
                       type="button"
                       onClick={() => handleRemoveAt(idx)}
-                      className={`ml-1 p-1 rounded-lg border border-[#010101] transition-colors touch-manipulation ${
+                      className={`ml-1 w-6 h-6 inline-flex items-center justify-center shrink-0 rounded-lg border border-[#010101] transition-colors touch-manipulation ${
                         isCurrent
                           ? 'bg-[#FD3F01] text-white'
                           : 'bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white text-[#010101]'
@@ -165,13 +166,13 @@ export function GamePlaylistQueue({
                       title="Remove from queue"
                       aria-label={`Remove ${game?.title} from playlist`}
                     >
-                      <Trash2 className="w-3 h-3" />
+                      <Trash2 className="w-3 h-3 shrink-0" strokeWidth={2.5} />
                     </button>
                   )}
                 </div>
 
                 {idx < currentQueue.length - 1 && (
-                  <ChevronRight className="w-3.5 h-3.5 text-[#010101]/40 flex-shrink-0" />
+                  <ChevronRight className="w-3.5 h-3.5 text-[#010101]/40 shrink-0" strokeWidth={2.5} />
                 )}
               </React.Fragment>
             );
@@ -208,13 +209,13 @@ export function GamePlaylistQueue({
                   }`}
                 >
                   {inQueue && (
-                    <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-[#FEC90E] text-[#010101] border border-[#010101] font-mono text-[10px] font-black flex items-center justify-center">
+                    <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-[#FEC90E] text-[#010101] border border-[#010101] font-mono text-[10px] font-black flex items-center justify-center shrink-0">
                       #{queuePosition + 1}
                     </div>
                   )}
 
                   <div className="flex items-center gap-1.5">
-                    <span className="text-lg font-emoji">{game.emoji}</span>
+                    <GameIcon gameMode={game.id} size="sm" />
                     <span className={`text-[9px] font-mono font-bold ${inQueue ? 'text-white/80' : 'text-[#010101]/60'}`}>
                       {game.players}
                     </span>

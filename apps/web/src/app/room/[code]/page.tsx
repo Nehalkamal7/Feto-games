@@ -1203,23 +1203,23 @@ export default function RoomPage() {
                     sound.playClick();
                     setShowSettingsModal(true);
                   }}
-                  className="px-3 py-2 rounded-xl bg-[#FFFFFF] hover:bg-[#F8F8F8] border-2 border-[#010101] text-[#010101] text-xs font-black flex items-center gap-1.5 transition-all shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] touch-manipulation"
+                  className="h-9 sm:h-10 px-3 rounded-xl bg-[#FFFFFF] hover:bg-[#F8F8F8] border-2 border-[#010101] text-[#010101] text-xs font-black inline-flex items-center justify-center shrink-0 gap-1.5 transition-all shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] touch-manipulation"
                   title="Live In-Room Settings Editor"
                   aria-label="Room Settings"
                 >
-                  <Settings className="w-3.5 h-3.5 text-[#010101]" />
+                  <Settings className="w-4 h-4 text-[#010101] shrink-0" strokeWidth={2.5} />
                   <span>Settings</span>
                 </button>
 
                 {room.config.vibeMode === 'sip_edition' && (
                   <button
                     onClick={handleQuickTakeSip}
-                    className="px-3 py-2 rounded-xl bg-[#FD3F01] hover:bg-[#e03800] border-2 border-[#010101] text-white text-xs font-black flex items-center gap-1.5 transition-all shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] touch-target"
+                    className="h-9 sm:h-10 px-3 rounded-xl bg-[#FD3F01] hover:bg-[#e03800] border-2 border-[#010101] text-white text-xs font-black inline-flex items-center justify-center shrink-0 gap-1.5 transition-all shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] touch-target"
                     title="Take a drink & log it on the leaderboard!"
                   >
-                    <Wine className="w-3.5 h-3.5 text-white" />
+                    <Wine className="w-4 h-4 text-white shrink-0" strokeWidth={2.5} />
                     <span>Take Sip! 🥤</span>
-                    <span className="font-mono text-[10px] px-1.5 py-0.2 bg-white text-[#FD3F01] rounded-full border border-[#010101] font-black">
+                    <span className="font-mono text-[10px] px-1.5 py-0.2 bg-white text-[#FD3F01] rounded-full border border-[#010101] font-black shrink-0">
                       {room.sipsCount?.[currentPlayer?.id || ''] || 0}
                     </span>
                   </button>
@@ -1230,13 +1230,13 @@ export default function RoomPage() {
                     sound.playClick();
                     setShowCustomCardModal(true);
                   }}
-                  className="px-3 py-2 rounded-xl bg-[#FFFFFF] hover:bg-[#F8F8F8] border-2 border-[#010101] text-[#010101] text-xs font-black flex items-center gap-1.5 transition-all shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] touch-target"
+                  className="h-9 sm:h-10 px-3 rounded-xl bg-[#FFFFFF] hover:bg-[#F8F8F8] border-2 border-[#010101] text-[#010101] text-xs font-black inline-flex items-center justify-center shrink-0 gap-1.5 transition-all shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] touch-target"
                   title="Submit your own question or dare"
                 >
-                  <PlusCircle className="w-3.5 h-3.5 text-[#0B89FD]" />
+                  <PlusCircle className="w-4 h-4 text-[#0B89FD] shrink-0" strokeWidth={2.5} />
                   <span className="hidden sm:inline">Custom Card</span>
                   {room.customCardsCount ? (
-                    <span className="font-mono text-[10px] px-1 py-0.2 bg-[#FEC90E] border border-[#010101] rounded-full text-[#010101] font-black">
+                    <span className="font-mono text-[10px] px-1 py-0.2 bg-[#FEC90E] border border-[#010101] rounded-full text-[#010101] font-black shrink-0">
                       +{room.customCardsCount}
                     </span>
                   ) : null}
@@ -1248,18 +1248,22 @@ export default function RoomPage() {
 
                 <button
                   onClick={handleCopyInviteLink}
-                  className="px-3.5 py-2 rounded-xl bg-[#0B89FD] hover:bg-[#0977db] text-white border-2 border-[#010101] text-xs font-black flex items-center gap-1.5 shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] transition-all touch-target"
+                  className="h-9 sm:h-10 px-3.5 rounded-xl bg-[#0B89FD] hover:bg-[#0977db] text-white border-2 border-[#010101] text-xs font-black inline-flex items-center justify-center shrink-0 gap-1.5 shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] transition-all touch-target"
                 >
-                  {copiedLink ? <Check className="w-3.5 h-3.5 text-white" /> : <Share2 className="w-3.5 h-3.5 text-white" />}
+                  {copiedLink ? (
+                    <Check className="w-4 h-4 text-white shrink-0" strokeWidth={2.5} />
+                  ) : (
+                    <Share2 className="w-4 h-4 text-white shrink-0" strokeWidth={2.5} />
+                  )}
                   <span>{copiedLink ? 'Copied!' : 'Invite'}</span>
                 </button>
 
                 <button
                   onClick={handleLeaveRoom}
-                  className="p-2 rounded-xl bg-[#FFFFFF] hover:bg-[#FD3F01]/20 border-2 border-[#010101] text-[#010101] shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] transition-all touch-target"
+                  className="w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center shrink-0 rounded-xl bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white border-2 border-[#010101] text-[#010101] shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] transition-all touch-target"
                   title="Leave Room"
                 >
-                  <LogOut className="w-3.5 h-3.5" />
+                  <LogOut className="w-4 h-4 shrink-0" strokeWidth={2.5} />
                 </button>
               </div>
             </div>
@@ -1510,10 +1514,11 @@ export default function RoomPage() {
                                 e.stopPropagation();
                                 setKickTarget(player);
                               }}
-                              className="mt-1 text-[10px] text-[#FD3F01] hover:bg-[#FD3F01]/10 bg-[#FFFFFF] font-black flex items-center gap-1 py-0.5 px-2 rounded-md border border-[#010101] shadow-[1px_1px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] transition-all relative z-20 pointer-events-auto touch-manipulation"
+                              className="mt-1 text-[10px] text-[#FD3F01] hover:bg-[#FD3F01] hover:text-white bg-[#FFFFFF] font-black inline-flex items-center justify-center shrink-0 gap-1 py-1 px-2.5 rounded-lg border-2 border-[#010101] shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] transition-all relative z-20 pointer-events-auto touch-manipulation"
                               title={`Kick ${player.username}`}
                             >
-                              <UserX className="w-2.5 h-2.5 text-[#FD3F01]" /> Kick
+                              <UserX className="w-3 h-3 text-current shrink-0" strokeWidth={2.5} />
+                              <span>Kick</span>
                             </button>
                           ) : (
                             <div className="h-3" />
@@ -2008,10 +2013,10 @@ export default function RoomPage() {
                                 e.stopPropagation();
                                 setKickTarget(player);
                               }}
-                              className="text-[#FD3F01] hover:bg-[#FD3F01] hover:text-white p-1 rounded-md border-2 border-[#010101] transition-all relative z-20 pointer-events-auto"
+                              className="text-[#FD3F01] hover:bg-[#FD3F01] hover:text-white w-7 h-7 inline-flex items-center justify-center shrink-0 rounded-lg border-2 border-[#010101] shadow-[2px_2px_0px_#010101] transition-all relative z-20 pointer-events-auto active:translate-x-[1px] active:translate-y-[1px]"
                               title={`Kick ${player.username}`}
                             >
-                              <UserX className="w-3.5 h-3.5" />
+                              <UserX className="w-3.5 h-3.5 shrink-0" strokeWidth={2.5} />
                             </button>
                           )}
                         </div>

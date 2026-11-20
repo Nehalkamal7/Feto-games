@@ -8,6 +8,7 @@ import {
   WordBattleSubmission
 } from '@feto-games/shared-types';
 import { NeonAvatarDisplay } from '../NeonAvatarDisplay';
+import { GameIcon } from '../GameIcon';
 import {
   Zap,
   Flame,
@@ -133,13 +134,13 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
 
   return (
     <div
-      className="w-full max-w-5xl mx-auto flex flex-col gap-4 sm:gap-6 p-2 md:p-4 transition-transform duration-200"
+      className="w-full max-w-5xl mx-auto flex flex-col gap-4 sm:gap-6 p-2 md:p-4 transition-transform duration-200 select-none"
       style={isKeyboardOpen ? { transform: `scale(${scaleFactor})`, transformOrigin: 'top center' } : undefined}
     >
       {/* ======================================================== */}
       {/* HEADER: ROUND, LETTER & CATEGORY BANNER                  */}
       {/* ======================================================== */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 glass-panel p-4 md:p-6 rounded-3xl border border-feto-border shadow-neon-cyan">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-[#FFFFFF] p-4 md:p-6 rounded-3xl border-2 border-[#010101] shadow-[4px_4px_0px_#010101]">
         <div className="flex items-center gap-4">
           <div className="relative">
             <motion.div
@@ -147,7 +148,7 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
               initial={{ scale: 0.5, rotate: -20, opacity: 0 }}
               animate={{ scale: 1, rotate: 0, opacity: 1 }}
               transition={{ type: 'spring', damping: 12 }}
-              className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-cyan-400 via-feto-magenta to-yellow-400 flex items-center justify-center text-4xl md:text-5xl font-black text-black shadow-neon-magenta font-display"
+              className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-[#0B89FD] border-2 border-[#010101] flex items-center justify-center text-4xl md:text-5xl font-black text-white shadow-[3px_3px_0px_#010101]"
             >
               {gameState.startingLetter}
             </motion.div>
@@ -155,35 +156,35 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
 
           <div>
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 text-xs font-bold uppercase tracking-wider border border-cyan-500/30">
+              <span className="px-3 py-1 rounded-full bg-[#FFFFFF] text-[#010101] text-xs font-black uppercase tracking-wider border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
                 Round {gameState.round} of {gameState.totalRounds}
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-feto-magenta/20 text-feto-magenta text-xs font-bold uppercase tracking-wider border border-feto-magenta/30 flex items-center gap-1">
-                <Zap className="w-3 h-3" />
+              <span className="px-3 py-1 rounded-full bg-[#FEC90E] text-[#010101] text-xs font-black uppercase tracking-wider border-2 border-[#010101] shadow-[2px_2px_0px_#010101] flex items-center gap-1.5">
+                <GameIcon gameMode="word_battle" size="xs" />
                 Word Battle
               </span>
             </div>
-            <h2 className="text-xl md:text-3xl font-black text-white mt-1">
-              Category: <span className="text-cyan-400">{gameState.category}</span>
+            <h2 className="text-xl md:text-2xl font-black text-[#010101] mt-1">
+              Category: <span className="text-[#0B89FD]">{gameState.category}</span>
             </h2>
-            <p className="text-slate-400 text-xs md:text-sm">
-              Submit words starting with letter <strong className="text-yellow-400 font-bold">{gameState.startingLetter}</strong>! First to submit claims the word!
+            <p className="text-[#010101]/70 text-xs md:text-sm font-bold">
+              Submit words starting with letter <strong className="text-[#FD3F01] font-black">{gameState.startingLetter}</strong>! First to submit claims the word!
             </p>
           </div>
         </div>
 
         {/* 25-Second Authoritative Timer */}
         <div className="w-full md:w-64 flex flex-col items-center md:items-end">
-          <div className="flex items-center gap-2 text-sm font-bold uppercase text-cyan-300 mb-1">
-            <Clock className="w-4 h-4 animate-spin" />
+          <div className="flex items-center gap-2 text-sm font-black uppercase text-[#010101] mb-1.5">
+            <Clock strokeWidth={2.5} className="w-4 h-4 text-[#FD3F01] animate-spin shrink-0" />
             <span>{gameState.remainingSeconds}s Remaining</span>
           </div>
-          <div className="w-full h-3 bg-feto-dark rounded-full overflow-hidden border border-cyan-500/30">
+          <div className="w-full h-3 bg-[#F8F8F8] rounded-full overflow-hidden border-2 border-[#010101]">
             <div
               className={`h-full transition-all duration-1000 ease-linear ${
                 gameState.remainingSeconds <= 5
-                  ? 'bg-gradient-to-r from-red-500 to-yellow-400 animate-pulse'
-                  : 'bg-gradient-to-r from-cyan-400 to-feto-magenta'
+                  ? 'bg-[#FD3F01] animate-pulse'
+                  : 'bg-[#0B89FD]'
               }`}
               style={{ width: `${progressPercent}%` }}
             />
@@ -195,28 +196,28 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
       {/* MAIN RACING AREA & SUBMISSION BAR                        */}
       {/* ======================================================== */}
       {gameState.phase === 'starting' ? (
-        <div className="glass-panel p-12 rounded-3xl text-center space-y-4 border border-cyan-500/40">
+        <div className="bg-[#FFFFFF] p-8 md:p-12 rounded-3xl text-center space-y-4 border-2 border-[#010101] shadow-[4px_4px_0px_#010101]">
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-feto-magenta to-yellow-400 font-display animate-pulse"
+            className="text-4xl md:text-5xl font-black text-[#010101] uppercase tracking-tight animate-pulse"
           >
             GET READY!
           </motion.div>
-          <p className="text-slate-300 text-lg">
-            Letter is <strong className="text-cyan-400 text-2xl">{gameState.startingLetter}</strong> &bull; Category:{' '}
-            <strong className="text-yellow-400 text-xl">{gameState.category}</strong>
+          <p className="text-[#010101]/80 text-lg font-bold">
+            Letter is <strong className="text-[#0B89FD] text-2xl font-black">{gameState.startingLetter}</strong> &bull; Category:{' '}
+            <strong className="text-[#FD3F01] text-xl font-black">{gameState.category}</strong>
           </p>
         </div>
       ) : gameState.phase === 'round_results' ? (
-        <div className="glass-panel p-8 rounded-3xl text-center space-y-6 border border-yellow-400/40 shadow-neon-yellow">
-          <h3 className="text-3xl font-black text-white flex items-center justify-center gap-2">
-            <Trophy className="w-8 h-8 text-yellow-400" />
+        <div className="bg-[#FFFFFF] p-6 sm:p-8 rounded-3xl text-center space-y-6 border-2 border-[#010101] shadow-[4px_4px_0px_#010101]">
+          <h3 className="text-2xl sm:text-3xl font-black text-[#010101] flex items-center justify-center gap-2">
+            <Trophy strokeWidth={2.5} className="w-7 h-7 text-[#FEC90E] shrink-0" />
             <span>Round {gameState.round} Completed!</span>
           </h3>
-          <p className="text-slate-300">
+          <p className="text-[#010101]/80 font-bold">
             Total unique words claimed this round:{' '}
-            <strong className="text-cyan-400 font-bold">{gameState.claimedWords.length}</strong>
+            <strong className="text-[#0B89FD] font-black">{gameState.claimedWords.length}</strong>
           </p>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
@@ -226,14 +227,14 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
               return (
                 <div
                   key={p.id}
-                  className="p-3 bg-feto-card rounded-2xl border border-feto-border flex flex-col items-center"
+                  className="p-3 bg-[#F8F8F8] rounded-2xl border-2 border-[#010101] shadow-[2px_2px_0px_#010101] flex flex-col items-center"
                 >
-                  <NeonAvatarDisplay avatarId={p.avatar} size="sm" isGlowing={wordsCount > 0} />
-                  <span className="text-white font-bold text-xs truncate max-w-[100px] mt-1">
+                  <NeonAvatarDisplay avatarId={p.avatar} size="sm" showGlow={false} />
+                  <span className="text-[#010101] font-black text-xs truncate max-w-[100px] mt-1.5">
                     {p.username}
                   </span>
-                  <span className="text-cyan-400 text-xs font-medium">{wordsCount} words</span>
-                  <span className="text-yellow-400 font-black text-sm">+{roundScore} pts</span>
+                  <span className="text-[#0B89FD] text-xs font-bold">{wordsCount} words</span>
+                  <span className="text-[#010101] font-black text-sm">+{roundScore} pts</span>
                 </div>
               );
             })}
@@ -256,22 +257,21 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
                   onChange={(e) => setInputWord(e.target.value)}
                   placeholder={`Word starting with "${gameState.startingLetter}"...`}
                   disabled={gameState.phase !== 'word_racing'}
-                  className={`w-full min-h-[48px] bg-feto-card border-2 rounded-2xl px-4 sm:px-5 py-3 sm:py-4 text-white text-base sm:text-lg md:text-xl font-bold outline-none transition-all shadow-inner placeholder:text-slate-500 placeholder:text-xs sm:placeholder:text-sm md:placeholder:text-base ${
+                  className={`w-full min-h-[48px] bg-[#FFFFFF] border-2 rounded-2xl px-4 sm:px-5 py-3 sm:py-4 text-[#010101] text-base sm:text-lg font-black outline-none transition-all placeholder:text-[#010101]/40 shadow-[4px_4px_0px_#010101] ${
                     rejectFeedback
-                      ? 'border-red-500 shadow-neon-pink'
-                      : 'border-feto-border focus:border-cyan-400 focus:shadow-neon-cyan'
+                      ? 'border-[#FD3F01]'
+                      : 'border-[#010101] focus:border-[#0B89FD]'
                   }`}
                 />
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-400/40 text-xl font-black pointer-events-none" />
               </div>
 
               <button
                 type="submit"
                 disabled={!inputWord.trim() || gameState.phase !== 'word_racing' || isSubmitting}
-                className="min-h-[48px] px-5 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-cyan-400 to-feto-magenta hover:brightness-110 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-black font-black text-sm sm:text-lg rounded-2xl transition-all shadow-neon-cyan flex items-center justify-center gap-1.5 sm:gap-2 touch-target"
+                className="min-h-[48px] px-6 sm:px-8 py-3 sm:py-4 bg-[#0B89FD] hover:bg-[#0977db] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] disabled:opacity-40 disabled:cursor-not-allowed text-white font-black text-sm sm:text-base uppercase tracking-wider rounded-2xl border-2 border-[#010101] shadow-[4px_4px_0px_#010101] transition-all flex items-center justify-center gap-2 shrink-0 touch-target"
               >
                 <span>CLAIM</span>
-                <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+                <Send strokeWidth={2.5} className="w-4 h-4 shrink-0" />
               </button>
             </motion.div>
 
@@ -282,9 +282,9 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
                   initial={{ opacity: 0, y: -5 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -5 }}
-                  className="flex items-center gap-2 text-red-400 text-sm font-bold mt-2 px-2"
+                  className="flex items-center gap-2 text-[#FD3F01] text-sm font-black mt-2 px-2"
                 >
-                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <AlertCircle strokeWidth={2.5} className="w-4 h-4 shrink-0" />
                   <span>{rejectFeedback}</span>
                 </motion.div>
               )}
@@ -297,9 +297,9 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
-                  className="flex items-center gap-2 text-green-400 text-sm font-bold mt-2 px-2"
+                  className="flex items-center gap-2 text-[#10B981] text-sm font-black mt-2 px-2"
                 >
-                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                  <CheckCircle2 strokeWidth={2.5} className="w-4 h-4 shrink-0" />
                   <span>
                     Claimed &ldquo;{lastAcceptedWord.word}&rdquo;! (+{lastAcceptedWord.points} points)
                   </span>
@@ -311,23 +311,23 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
           {/* ======================================================== */}
           {/* TWO-COLUMN GRID: CLAIMED WORDS FEED & LIVE PLAYERS       */}
           {/* ======================================================== */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             {/* Left 2 Cols: Live Claimed Words Stream */}
-            <div className="md:col-span-2 glass-panel p-5 rounded-3xl border border-feto-border flex flex-col min-h-[300px]">
-              <div className="flex items-center justify-between mb-3 border-b border-feto-border pb-2">
-                <h3 className="text-white font-bold flex items-center gap-2">
-                  <Flame className="w-4 h-4 text-feto-magenta" />
+            <div className="md:col-span-2 bg-[#FFFFFF] p-5 rounded-3xl border-2 border-[#010101] shadow-[4px_4px_0px_#010101] flex flex-col min-h-[300px]">
+              <div className="flex items-center justify-between mb-3 border-b-2 border-[#010101]/10 pb-2">
+                <h3 className="text-[#010101] font-black flex items-center gap-2">
+                  <Flame strokeWidth={2.5} className="w-4 h-4 text-[#FD3F01] shrink-0" />
                   <span>Claimed Words Stream</span>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-mono">
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#FEC90E] text-[#010101] border border-[#010101] font-black">
                     {gameState.claimedWords.length} Words
                   </span>
                 </h3>
-                <span className="text-xs text-slate-400">Unique words per round</span>
+                <span className="text-xs text-[#010101]/60 font-bold">Unique words per round</span>
               </div>
 
               {gameState.recentSubmissions.length === 0 ? (
-                <div className="flex-1 flex flex-col items-center justify-center text-slate-500 text-sm italic py-12">
-                  <Sparkles className="w-8 h-8 text-cyan-400/40 mb-2 animate-bounce" />
+                <div className="flex-1 flex flex-col items-center justify-center text-[#010101]/50 text-sm font-bold py-12">
+                  <Sparkles strokeWidth={2.5} className="w-8 h-8 text-[#FEC90E] mb-2 animate-bounce shrink-0" />
                   <span>No words claimed yet! Be the fastest to submit!</span>
                 </div>
               ) : (
@@ -339,16 +339,16 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
                         key={`${sub.word}-${sub.submittedAt}-${i}`}
                         initial={{ scale: 0.7, opacity: 0, y: 10 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
-                        className={`px-3 py-2 rounded-xl flex items-center gap-2 border text-sm font-bold shadow-sm ${
+                        className={`px-3 py-1.5 rounded-xl flex items-center gap-2 border-2 border-[#010101] text-sm font-black shadow-[2px_2px_0px_#010101] ${
                           isMine
-                            ? 'bg-cyan-950/60 border-cyan-400 text-cyan-200 shadow-neon-cyan'
-                            : 'bg-feto-card border-feto-border text-white'
+                            ? 'bg-[#0B89FD] text-white'
+                            : 'bg-[#FFFFFF] text-[#010101]'
                         }`}
                       >
-                        <NeonAvatarDisplay avatarId={sub.avatar} size="sm" isGlowing={isMine} />
-                        <span className="font-extrabold capitalize">{sub.word}</span>
-                        <span className="text-xs text-yellow-400 font-mono">+{sub.points}</span>
-                        <span className="text-[10px] text-slate-400">({sub.username})</span>
+                        <NeonAvatarDisplay avatarId={sub.avatar} size="sm" showGlow={false} />
+                        <span className="font-black capitalize">{sub.word}</span>
+                        <span className="text-xs text-[#FEC90E] font-black">+{sub.points}</span>
+                        <span className="text-[10px] opacity-75">({sub.username})</span>
                       </motion.div>
                     );
                   })}
@@ -357,13 +357,13 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
             </div>
 
             {/* Right Col: 15-Player Word Race Tally */}
-            <div className="glass-panel p-5 rounded-3xl border border-feto-border flex flex-col min-h-[300px]">
-              <div className="flex items-center justify-between mb-3 border-b border-feto-border pb-2">
-                <h3 className="text-white font-bold flex items-center gap-2">
-                  <Hash className="w-4 h-4 text-cyan-400" />
+            <div className="bg-[#FFFFFF] p-5 rounded-3xl border-2 border-[#010101] shadow-[4px_4px_0px_#010101] flex flex-col min-h-[300px]">
+              <div className="flex items-center justify-between mb-3 border-b-2 border-[#010101]/10 pb-2">
+                <h3 className="text-[#010101] font-black flex items-center gap-2">
+                  <Hash strokeWidth={2.5} className="w-4 h-4 text-[#0B89FD] shrink-0" />
                   <span>Race Leaderboard</span>
                 </h3>
-                <span className="text-xs text-slate-400">{players.length} Players</span>
+                <span className="text-xs text-[#010101]/60 font-bold">{players.length} Players</span>
               </div>
 
               <div className="flex-1 overflow-y-auto max-h-[320px] space-y-2">
@@ -376,24 +376,24 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
                     return (
                       <div
                         key={p.id}
-                        className={`flex items-center justify-between p-2 rounded-xl border text-xs ${
+                        className={`flex items-center justify-between p-2 rounded-xl border-2 border-[#010101] text-xs font-black shadow-[1px_1px_0px_#010101] ${
                           isMe
-                            ? 'bg-cyan-950/40 border-cyan-400/50 text-white'
-                            : 'bg-feto-dark border-feto-border text-slate-300'
+                            ? 'bg-[#FEC90E]/30 text-[#010101]'
+                            : 'bg-[#F8F8F8] text-[#010101]'
                         }`}
                       >
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-slate-500 w-4 text-center">
+                          <span className="font-black text-[#010101]/60 w-4 text-center">
                             #{rank + 1}
                           </span>
-                          <NeonAvatarDisplay avatarId={p.avatar} size="sm" isGlowing={wordsCount > 0} />
-                          <span className="font-bold truncate max-w-[85px]">{p.username}</span>
+                          <NeonAvatarDisplay avatarId={p.avatar} size="sm" showGlow={false} />
+                          <span className="font-black truncate max-w-[85px]">{p.username}</span>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-mono">
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded-full bg-[#FFFFFF] border border-[#010101] text-[#0B89FD] font-black">
                             {wordsCount} w
                           </span>
-                          <span className="font-bold text-yellow-400 font-mono">
+                          <span className="font-black text-[#010101]">
                             {p.score || 0} pts
                           </span>
                         </div>

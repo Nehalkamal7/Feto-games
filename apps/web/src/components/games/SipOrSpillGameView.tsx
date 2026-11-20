@@ -14,6 +14,7 @@ import {
   VibeMode
 } from '@feto-games/shared-types';
 import { NeonAvatarDisplay } from '../NeonAvatarDisplay';
+import { GameIcon } from '../GameIcon';
 import { sound } from '@/lib/sound';
 
 interface SipOrSpillGameViewProps {
@@ -95,7 +96,7 @@ export function SipOrSpillGameView({
       <div className="flex items-center justify-between mb-3 px-1">
         <div className="flex items-center gap-2">
           <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-[#FFFFFF] text-[#010101] border-2 border-[#010101] flex items-center gap-1.5 shadow-[2px_2px_0px_#010101]">
-            <Wine className="w-3.5 h-3.5 text-[#FD3F01]" />
+            <GameIcon gameMode="sip_or_spill" size="xs" />
             Round {state.round} / {state.totalRounds}
           </span>
           <span className="hidden sm:inline-block px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-[#FEC90E] text-[#010101] border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
@@ -111,7 +112,7 @@ export function SipOrSpillGameView({
               : 'bg-[#FFFFFF] text-[#0B89FD]'
           }`}
         >
-          <Clock className="w-3.5 h-3.5" />
+          <Clock strokeWidth={2.5} className="w-3.5 h-3.5 shrink-0" />
           <span>{state.remainingSeconds}s</span>
         </div>
       </div>
@@ -179,7 +180,7 @@ export function SipOrSpillGameView({
                 onClick={() => setShowConfessionModal(true)}
                 className="p-5 rounded-2xl flex flex-col items-center justify-center text-center gap-2 bg-[#0B89FD] hover:bg-[#0977db] text-white border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all"
               >
-                <MessageSquare className="w-8 h-8 text-white" />
+                <MessageSquare strokeWidth={2.5} className="w-8 h-8 text-white shrink-0" />
                 <span className="text-base sm:text-lg font-black uppercase tracking-wider text-white">
                   Spill The Truth!
                 </span>
@@ -193,7 +194,7 @@ export function SipOrSpillGameView({
                 onClick={handleTakeSip}
                 className="p-5 rounded-2xl flex flex-col items-center justify-center text-center gap-2 bg-[#FD3F01] hover:bg-[#e03700] text-white border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all"
               >
-                <Wine className="w-8 h-8 text-white" />
+                <Wine strokeWidth={2.5} className="w-8 h-8 text-white shrink-0" />
                 <span className="text-base sm:text-lg font-black uppercase tracking-wider text-white">
                   Take A Sip! 🥤
                 </span>
@@ -297,7 +298,7 @@ export function SipOrSpillGameView({
                   onClick={handleSpillTruth}
                   className="flex-1 py-2.5 rounded-xl bg-[#0B89FD] hover:bg-[#0977db] text-white border-2 border-[#010101] font-black text-xs uppercase flex items-center justify-center gap-1.5 shadow-[2px_2px_0px_#010101]"
                 >
-                  <Send className="w-3.5 h-3.5" />
+                  <Send strokeWidth={2.5} className="w-3.5 h-3.5 shrink-0" />
                   <span>Submit</span>
                 </button>
               </div>

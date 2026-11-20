@@ -8,6 +8,7 @@ import {
   PrivateRolePayload
 } from '@feto-games/shared-types';
 import { NeonAvatarDisplay } from '../NeonAvatarDisplay';
+import { GameIcon } from '../GameIcon';
 import {
   Eye,
   EyeOff,
@@ -126,9 +127,7 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
       <div className="bg-[#FFFFFF] rounded-3xl p-5 md:p-6 border-2 border-[#010101] shadow-[4px_4px_0px_#010101] relative overflow-hidden">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-[#0B89FD] rounded-2xl border-2 border-[#010101] text-white shadow-[2px_2px_0px_#010101]">
-              <Shield className="w-6 h-6 text-white" />
-            </div>
+            <GameIcon gameMode="who_is_imposter" size="lg" showContainer />
             <div>
               <div className="text-xs uppercase tracking-widest text-[#010101]/60 font-black">
                 Category
@@ -145,7 +144,11 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
               onClick={() => setShowRoleSecret(!showRoleSecret)}
               className="px-4 py-2.5 bg-[#FFFFFF] hover:bg-[#F8F8F8] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] rounded-xl text-xs font-black text-[#010101] flex items-center gap-1.5 transition-all"
             >
-              {showRoleSecret ? <EyeOff className="w-4 h-4 text-[#FD3F01]" /> : <Eye className="w-4 h-4 text-[#0B89FD]" />}
+              {showRoleSecret ? (
+                <EyeOff className="w-4 h-4 text-[#FD3F01] shrink-0" strokeWidth={2.5} />
+              ) : (
+                <Eye className="w-4 h-4 text-[#0B89FD] shrink-0" strokeWidth={2.5} />
+              )}
               <span>{showRoleSecret ? 'Hide Role' : 'Tap to View Secret'}</span>
             </button>
           </div>

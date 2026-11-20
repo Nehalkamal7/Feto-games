@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { GameMode, PartyAward, PlayerSummary, PublicRoomState } from '@feto-games/shared-types';
 import { NeonAvatarDisplay } from '@/components/NeonAvatarDisplay';
+import { GameIcon } from '@/components/GameIcon';
 import { BrandLogo } from '@/components/BrandLogo';
 import { ShareRecapCard } from '@/components/ShareRecapCard';
 import { socketRematch } from '@/lib/socket';
@@ -566,13 +567,14 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
                     sound.playClick();
                     setSelectedNextGame(g.id);
                   }}
-                  className={`min-h-[48px] p-2.5 rounded-xl border-2 border-[#010101] text-xs font-black transition-all touch-target flex items-center justify-start ${
+                  className={`min-h-[48px] p-2.5 rounded-xl border-2 border-[#010101] text-xs font-black transition-all touch-target flex items-center gap-2 ${
                     selectedNextGame === g.id
                       ? 'bg-[#0B89FD] text-white shadow-[2px_2px_0px_#010101]'
                       : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
                   }`}
                 >
-                  {g.name}
+                  <GameIcon gameMode={g.id} size="sm" />
+                  <span className="truncate">{g.name}</span>
                 </button>
               ))}
             </div>

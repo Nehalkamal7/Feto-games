@@ -1,25 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --font-heading: 'Plus Jakarta Sans', sans-serif;
-  --font-body: 'Inter', sans-serif;
+  --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   --font-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
   
-  /* Bold Bauhaus / Neo-Brutalist Primary Colors Palette */
-  --canvas-bg: #F8F8F8;
+  /* Ultra-Clean Modern Light Palette */
+  --canvas-bg: #F9FAFB;
   --surface-card: #FFFFFF;
-  --surface-card-hover: #F2F2F2;
-  --ink-primary: #010101;
-  --ink-border: #010101;
-  --blue-primary: #0B89FD;
-  --yellow-accent: #FEC90E;
-  --red-alert: #FD3F01;
-  --green-ready: #10B981;
+  --surface-subtle: #F3F4F6;
+  --ink-primary: #111827;
+  --ink-secondary: #4B5563;
+  --ink-muted: #9CA3AF;
+  --ink-border: #E5E7EB;
+  
+  /* Brand Accents */
+  --blue-primary: #2563EB;
+  --blue-hover: #1D4ED8;
+  --blue-tint: #EFF6FF;
+  --emerald-ready: #10B981;
+  --red-alert: #EF4444;
+  --amber-gold: #F59E0B;
   
   --sat: env(safe-area-inset-top, 0px);
   --sab: env(safe-area-inset-bottom, 0px);
@@ -28,7 +34,6 @@
 }
 
 html {
-  height: 100%;
   min-height: 100dvh;
   -webkit-text-size-adjust: 100%;
   touch-action: manipulation;
@@ -40,14 +45,11 @@ body {
   background-color: var(--canvas-bg);
   color: var(--ink-primary);
   overflow-x: hidden;
-  /* Bauhaus Geometric Architectural Dot Grid Pattern */
-  background-image: radial-gradient(rgba(1, 1, 1, 0.08) 1.5px, transparent 1.5px);
-  background-size: 28px 28px;
-  background-attachment: fixed;
   min-height: 100dvh;
-  height: 100%;
   padding-top: var(--sat);
   padding-bottom: var(--sab);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Explicit cross-platform emoji font stack */
@@ -62,7 +64,8 @@ body {
 h1, h2, h3, h4, h5, h6, .font-heading {
   font-family: var(--font-heading);
   color: var(--ink-primary);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
+  font-weight: 700;
 }
 
 /* Safe Area Inset Utility Classes */
@@ -82,23 +85,10 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   padding-right: env(safe-area-inset-right, 0px);
 }
 
-.safe-pb-nav {
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
-}
-
-/* Dynamic Viewport Utilities */
-.min-h-dvh {
-  min-height: 100dvh;
-}
-
-.h-dvh {
-  height: 100dvh;
-}
-
-/* Touch Control Helpers (Minimum 48px Touch Targets) */
+/* Touch Control Helpers (Minimum 44px Touch Targets) */
 .touch-target {
-  min-height: 48px;
-  min-width: 48px;
+  min-height: 44px;
+  min-width: 44px;
   touch-action: manipulation;
 }
 
@@ -121,76 +111,76 @@ canvas.canvas-touch-safe {
 }
 
 /* ============================================================== */
-/* BAUHAUS NEO-BRUTALIST SURFACES & HARD OFFSET SHADOWS           */
+/* CLEAN MODERN CARD SURFACES & SHADOWS                           */
 /* ============================================================== */
 
 .glass-panel,
 .glass-panel-neon,
 .neo-card {
   background: #FFFFFF !important;
-  border: 2px solid #010101 !important;
-  box-shadow: 4px 4px 0px #010101 !important;
-  border-radius: 18px;
-  color: #010101;
+  border: 1px solid #E5E7EB !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
+  border-radius: 1rem;
+  color: #111827;
 }
 
 .neo-card-lg {
   background: #FFFFFF !important;
-  border: 3px solid #010101 !important;
-  box-shadow: 6px 6px 0px #010101 !important;
-  border-radius: 22px;
-  color: #010101;
+  border: 1px solid #E5E7EB !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
+  border-radius: 1.25rem;
+  color: #111827;
 }
 
 .neo-card-sm {
   background: #FFFFFF !important;
-  border: 2px solid #010101 !important;
-  box-shadow: 2px 2px 0px #010101 !important;
-  border-radius: 12px;
-  color: #010101;
+  border: 1px solid #E5E7EB !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04) !important;
+  border-radius: 0.75rem;
+  color: #111827;
 }
 
-/* Corner Bauhaus Geometric Decors */
+/* Modern Minimal Badges */
 .bauhaus-badge-blue {
-  background: #0B89FD;
-  color: #FFFFFF;
-  border: 2px solid #010101;
-  box-shadow: 2px 2px 0px #010101;
-  font-weight: 800;
+  background: #EFF6FF;
+  color: #1D4ED8;
+  border: 1px solid #BFDBFE;
+  font-weight: 600;
+  border-radius: 9999px;
 }
 
 .bauhaus-badge-yellow {
-  background: #FEC90E;
-  color: #010101;
-  border: 2px solid #010101;
-  box-shadow: 2px 2px 0px #010101;
-  font-weight: 800;
+  background: #FEF3C7;
+  color: #B45309;
+  border: 1px solid #FDE68A;
+  font-weight: 600;
+  border-radius: 9999px;
 }
 
 .bauhaus-badge-red {
-  background: #FD3F01;
-  color: #FFFFFF;
-  border: 2px solid #010101;
-  box-shadow: 2px 2px 0px #010101;
-  font-weight: 800;
+  background: #FEE2E2;
+  color: #DC2626;
+  border: 1px solid #FECACA;
+  font-weight: 600;
+  border-radius: 9999px;
 }
 
 /* ============================================================== */
-/* TACTILE HARD-SHADOW BUTTONS & TAP TRANSLATION                  */
+/* CLEAN MODERN BUTTONS (NO HARSH OFFSET SHADOWS)                 */
 /* ============================================================== */
 
-/* Primary Action: Electric Blue (#0B89FD) */
+/* Primary Action: Clean Electric Blue */
 .btn-glow-cyan,
 .btn-glow-start,
 .btn-neo-blue,
 .btn-neon-cyan {
-  background: #0B89FD !important;
+  background: #2563EB !important;
   color: #FFFFFF !important;
-  border: 2px solid #010101 !important;
-  box-shadow: 4px 4px 0px #010101 !important;
-  font-weight: 800;
-  border-radius: 14px;
-  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
+  border: 1px solid #2563EB !important;
+  box-shadow: 0 1px 2px 0 rgba(37, 99, 235, 0.2) !important;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  transition: all 0.15s ease;
   min-height: 48px;
   touch-action: manipulation;
 }
@@ -199,57 +189,70 @@ canvas.canvas-touch-safe {
 .btn-glow-start:hover:not(:disabled),
 .btn-neo-blue:hover:not(:disabled),
 .btn-neon-cyan:hover:not(:disabled) {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0px #010101 !important;
-  background: #0875da !important;
+  background: #1D4ED8 !important;
+  border-color: #1D4ED8 !important;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.25) !important;
 }
 
 .btn-glow-cyan:active:not(:disabled),
 .btn-glow-start:active:not(:disabled),
 .btn-neo-blue:active:not(:disabled),
 .btn-neon-cyan:active:not(:disabled) {
-  transform: translate(4px, 4px);
-  box-shadow: 0px 0px 0px #010101 !important;
+  transform: scale(0.98);
 }
 
-/* Secondary / Highlight Action: Vibrant Gold/Yellow (#FEC90E) */
+/* Secondary Neutral Action: Crisp Clean White */
+.btn-neo-white {
+  background: #FFFFFF !important;
+  color: #111827 !important;
+  border: 1px solid #E5E7EB !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  transition: all 0.15s ease;
+  min-height: 48px;
+  touch-action: manipulation;
+}
+
+.btn-neo-white:hover:not(:disabled) {
+  background: #F9FAFB !important;
+  border-color: #D1D5DB !important;
+}
+
+.btn-neo-white:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Highlight / Amber Action */
 .btn-glow-amber,
 .btn-neo-yellow {
-  background: #FEC90E !important;
-  color: #010101 !important;
-  border: 2px solid #010101 !important;
-  box-shadow: 4px 4px 0px #010101 !important;
-  font-weight: 800;
-  border-radius: 14px;
-  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
+  background: #F59E0B !important;
+  color: #FFFFFF !important;
+  border: 1px solid #F59E0B !important;
+  box-shadow: 0 1px 2px 0 rgba(245, 158, 11, 0.2) !important;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  transition: all 0.15s ease;
   min-height: 48px;
   touch-action: manipulation;
 }
 
 .btn-glow-amber:hover:not(:disabled),
 .btn-neo-yellow:hover:not(:disabled) {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0px #010101 !important;
-  background: #e6b40a !important;
+  background: #D97706 !important;
 }
 
-.btn-glow-amber:active:not(:disabled),
-.btn-neo-yellow:active:not(:disabled) {
-  transform: translate(4px, 4px);
-  box-shadow: 0px 0px 0px #010101 !important;
-}
-
-/* Alert / Chaos / Destructive Action: Punchy Red-Orange (#FD3F01) */
+/* Alert / Danger Action */
 .btn-glow-purple,
 .btn-neon-magenta,
 .btn-neo-red {
-  background: #FD3F01 !important;
+  background: #EF4444 !important;
   color: #FFFFFF !important;
-  border: 2px solid #010101 !important;
-  box-shadow: 4px 4px 0px #010101 !important;
-  font-weight: 800;
-  border-radius: 14px;
-  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
+  border: 1px solid #EF4444 !important;
+  box-shadow: 0 1px 2px 0 rgba(239, 68, 68, 0.2) !important;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  transition: all 0.15s ease;
   min-height: 48px;
   touch-action: manipulation;
 }
@@ -257,63 +260,30 @@ canvas.canvas-touch-safe {
 .btn-glow-purple:hover:not(:disabled),
 .btn-neon-magenta:hover:not(:disabled),
 .btn-neo-red:hover:not(:disabled) {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0px #010101 !important;
-  background: #dc3700 !important;
-}
-
-.btn-glow-purple:active:not(:disabled),
-.btn-neon-magenta:active:not(:disabled),
-.btn-neo-red:active:not(:disabled) {
-  transform: translate(4px, 4px);
-  box-shadow: 0px 0px 0px #010101 !important;
-}
-
-/* Crisp Clean Neutral White Button */
-.btn-neo-white {
-  background: #FFFFFF !important;
-  color: #010101 !important;
-  border: 2px solid #010101 !important;
-  box-shadow: 4px 4px 0px #010101 !important;
-  font-weight: 800;
-  border-radius: 14px;
-  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
-  min-height: 48px;
-  touch-action: manipulation;
-}
-
-.btn-neo-white:hover:not(:disabled) {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0px #010101 !important;
-  background: #F4F4F5 !important;
-}
-
-.btn-neo-white:active:not(:disabled) {
-  transform: translate(4px, 4px);
-  box-shadow: 0px 0px 0px #010101 !important;
+  background: #DC2626 !important;
 }
 
 /* ============================================================== */
-/* HIGH-CONTRAST TYPOGRAPHY PALETTE                               */
+/* CLEAN MODERN TYPOGRAPHY & TEXT STYLES                          */
 /* ============================================================== */
 
 .text-neon-cyan {
-  color: #0B89FD !important;
+  color: #2563EB !important;
   text-shadow: none !important;
 }
 
 .text-neon-purple {
-  color: #010101 !important;
+  color: #111827 !important;
   text-shadow: none !important;
 }
 
 .text-neon-magenta {
-  color: #FD3F01 !important;
+  color: #EF4444 !important;
   text-shadow: none !important;
 }
 
 .text-neon-yellow {
-  color: #FEC90E !important;
+  color: #F59E0B !important;
   text-shadow: none !important;
 }
 
@@ -322,54 +292,45 @@ canvas.canvas-touch-safe {
   text-shadow: none !important;
 }
 
-/* Custom Bauhaus Scrollbar */
+/* Clean, Sleek Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #F8F8F8;
-  border-left: 2px solid #010101;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #010101;
-  border-radius: 0px;
+  background: #D1D5DB;
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #0B89FD;
+  background: #9CA3AF;
 }
 
-/* Screen Shake Arcade Effect */
+/* Screen Shake Effect */
 @keyframes screenShake {
-  0% { transform: translate(0, 0) rotate(0deg); }
-  10% { transform: translate(-8px, -6px) rotate(-1.5deg); }
-  20% { transform: translate(7px, 5px) rotate(1.2deg); }
-  30% { transform: translate(-7px, 6px) rotate(-1deg); }
-  40% { transform: translate(6px, -5px) rotate(1deg); }
-  50% { transform: translate(-4px, 3px) rotate(-0.5deg); }
-  60% { transform: translate(4px, -3px) rotate(0.5deg); }
-  70% { transform: translate(-2px, 2px) rotate(0deg); }
-  80% { transform: translate(2px, -1px) rotate(0deg); }
-  100% { transform: translate(0, 0) rotate(0deg); }
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-4px, 2px); }
+  40% { transform: translate(4px, -2px); }
+  60% { transform: translate(-3px, 1px); }
+  80% { transform: translate(3px, -1px); }
+  100% { transform: translate(0, 0); }
 }
 
 .shake-screen {
-  animation: screenShake 0.65s cubic-bezier(0.36, 0.07, 0.19, 0.97) both !important;
+  animation: screenShake 0.4s ease-in-out both !important;
 }
 
-/* Tension Pulse Screen Border (Final 5 Seconds) */
-@keyframes tensionVignette {
-  0%, 100% {
-    box-shadow: inset 0 0 0px 4px #FD3F01;
-  }
-  50% {
-    box-shadow: inset 0 0 0px 12px #FD3F01;
-  }
+/* Timer Urgency Pulse */
+@keyframes urgencyPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.75; }
 }
 
 .tension-pulse {
-  animation: tensionVignette 0.8s infinite ease-in-out !important;
+  animation: urgencyPulse 1s infinite ease-in-out !important;
 }

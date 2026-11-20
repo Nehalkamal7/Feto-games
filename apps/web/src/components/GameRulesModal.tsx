@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Users, Sparkles, BookOpen, Clock, ShieldCheck, Flame } from 'lucide-react';
 import { GameMode } from '@feto-games/shared-types';
+import { GameIcon } from './GameIcon';
 import { sound } from '@/lib/sound';
 
 export interface GameRuleDetails {
@@ -299,15 +300,18 @@ export function GameRulesModal({
                     sound.playClick();
                     setActiveMode(mode);
                   }}
-                  className={`p-2.5 rounded-xl border-2 border-[#010101] text-xs font-black text-left transition-all ${
+                  className={`p-2 rounded-xl border-2 border-[#010101] text-xs font-black text-left transition-all flex items-center gap-2 ${
                     isSelected
                       ? 'bg-[#0B89FD] text-white shadow-[2px_2px_0px_#010101]'
                       : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
                   }`}
                 >
-                  <div className="truncate">{item.name}</div>
-                  <div className={`text-[10px] font-medium ${isSelected ? 'text-white/80' : 'text-[#010101]/60'}`}>
-                    {item.playerRange}
+                  <GameIcon gameMode={mode} size="sm" />
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate">{item.name}</div>
+                    <div className={`text-[10px] font-medium ${isSelected ? 'text-white/80' : 'text-[#010101]/60'}`}>
+                      {item.playerRange}
+                    </div>
                   </div>
                 </button>
               );
@@ -317,16 +321,21 @@ export function GameRulesModal({
           {/* ACTIVE GAME DETAILS */}
           <div className="space-y-6">
             <div>
-              <div className="flex flex-wrap items-center gap-2 mb-2">
-                <h2 className="text-2xl font-black text-[#010101]">{rule.name}</h2>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-black border-2 border-[#010101] bg-[#FEC90E] text-[#010101]">
-                  {rule.playerRange}
-                </span>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-[#F8F8F8] text-[#010101] border-2 border-[#010101]">
-                  {rule.difficulty}
-                </span>
+              <div className="flex flex-wrap items-center gap-3 mb-2">
+                <GameIcon gameMode={activeMode} size="lg" showContainer />
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-2xl font-black text-[#010101]">{rule.name}</h2>
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-black border-2 border-[#010101] bg-[#FEC90E] text-[#010101]">
+                      {rule.playerRange}
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-[#F8F8F8] text-[#010101] border-2 border-[#010101]">
+                      {rule.difficulty}
+                    </span>
+                  </div>
+                  <p className="text-[#010101]/80 text-sm font-medium mt-1">{rule.overview}</p>
+                </div>
               </div>
-              <p className="text-[#010101]/80 text-sm font-medium">{rule.overview}</p>
             </div>
 
             {/* HOW TO PLAY */}

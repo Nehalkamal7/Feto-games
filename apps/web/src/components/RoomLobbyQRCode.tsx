@@ -37,10 +37,10 @@ export function RoomLobbyQRCode({ roomCode, isStreamerMode = false }: RoomLobbyQ
             sound.playClick();
             setIsOpen(true);
           }}
-          className="px-3 py-2 rounded-xl bg-[#FFFFFF] hover:bg-[#F8F8F8] border-2 border-[#010101] text-[#010101] text-xs font-black flex items-center gap-1.5 transition-all shadow-[2px_2px_0px_#010101] touch-target"
+          className="h-9 sm:h-10 px-3 rounded-xl bg-[#FFFFFF] hover:bg-[#F8F8F8] border-2 border-[#010101] text-[#010101] text-xs font-black inline-flex items-center gap-1.5 transition-all shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] touch-target"
           title="Open Scannable Party QR Code"
         >
-          <QrCode className="w-3.5 h-3.5 text-[#010101]" />
+          <QrCode className="w-4 h-4 text-[#010101] shrink-0" strokeWidth={2.5} />
           <span className="hidden sm:inline">Scan QR</span>
         </button>
       </div>
@@ -57,10 +57,10 @@ export function RoomLobbyQRCode({ roomCode, isStreamerMode = false }: RoomLobbyQ
             >
               <button
                 onClick={() => setIsOpen(false)}
-                className="absolute top-4 right-4 p-1.5 rounded-xl bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101] text-[#010101] transition-colors"
+                className="absolute top-4 right-4 w-9 h-9 inline-flex items-center justify-center shrink-0 rounded-xl bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101] text-[#010101] transition-colors"
                 title="Close"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5 shrink-0" strokeWidth={2.5} />
               </button>
 
               <div className="flex items-center justify-center gap-2 mb-2">
@@ -109,7 +109,11 @@ export function RoomLobbyQRCode({ roomCode, isStreamerMode = false }: RoomLobbyQ
                   onClick={handleCopy}
                   className="px-3 py-2 rounded-xl bg-[#0B89FD] hover:bg-[#0977db] text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101] text-xs font-black flex items-center gap-1 active:translate-x-[1px] active:translate-y-[1px] transition-all"
                 >
-                  {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copied ? (
+                    <Check className="w-3.5 h-3.5 shrink-0" strokeWidth={2.5} />
+                  ) : (
+                    <Copy className="w-3.5 h-3.5 shrink-0" strokeWidth={2.5} />
+                  )}
                   <span>{copied ? 'Copied' : 'Copy'}</span>
                 </button>
               </div>

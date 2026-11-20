@@ -14,6 +14,7 @@ import {
   VibeMode
 } from '@feto-games/shared-types';
 import { NeonAvatarDisplay } from '../NeonAvatarDisplay';
+import { GameIcon } from '../GameIcon';
 import { sound } from '@/lib/sound';
 
 interface HotPotatoGameViewProps {
@@ -109,7 +110,7 @@ export function HotPotatoGameView({
       <div className="flex items-center justify-between mb-3 px-1">
         <div className="flex items-center gap-2">
           <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-[#FFFFFF] text-[#010101] border-2 border-[#010101] flex items-center gap-1.5 shadow-[2px_2px_0px_#010101]">
-            <Bomb className="w-3.5 h-3.5 text-[#FD3F01]" />
+            <GameIcon gameMode="hot_potato" size="xs" />
             Round {state.round} / {state.totalRounds}
           </span>
           <span className="px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-[#FEC90E] text-[#010101] border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
@@ -125,7 +126,7 @@ export function HotPotatoGameView({
               : 'bg-[#FFFFFF] text-[#FD3F01]'
           }`}
         >
-          <Clock className="w-3.5 h-3.5" />
+          <Clock strokeWidth={2.5} className="w-3.5 h-3.5 shrink-0" />
           <span>{state.remainingSeconds}s FUSE</span>
         </div>
       </div>
@@ -203,7 +204,7 @@ export function HotPotatoGameView({
                 className="bg-[#0B89FD] hover:bg-[#0977db] text-white px-6 py-3 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-wider flex items-center gap-1.5 border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all disabled:opacity-50"
               >
                 <span>PASS</span>
-                <Send className="w-3.5 h-3.5" />
+                <Send strokeWidth={2.5} className="w-3.5 h-3.5 shrink-0" />
               </button>
             </motion.form>
           ) : (
@@ -258,7 +259,7 @@ export function HotPotatoGameView({
                 onClick={handleNextRound}
                 className="mt-4 px-8 py-3.5 rounded-2xl bg-[#0B89FD] hover:bg-[#0977db] text-white font-black text-sm uppercase tracking-wider flex items-center gap-2 border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all"
               >
-                <Sparkles className="w-4 h-4 text-[#FEC90E]" />
+                <Sparkles strokeWidth={2.5} className="w-4 h-4 text-[#FEC90E] shrink-0" />
                 <span>Next Round →</span>
               </button>
             )}

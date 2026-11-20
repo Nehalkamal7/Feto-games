@@ -415,9 +415,9 @@ export function ShareRecapCard({
                 sound.playClick();
                 onClose();
               }}
-              className="absolute top-4 right-4 p-2 rounded-full bg-[#FFFFFF] hover:bg-[#F8F8F8] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] text-[#010101] transition-colors z-20 active:translate-x-[1px] active:translate-y-[1px]"
+              className="absolute top-4 right-4 w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center shrink-0 rounded-xl bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101] text-[#010101] transition-colors z-20 active:translate-x-[1px] active:translate-y-[1px]"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5 shrink-0" strokeWidth={2.5} />
             </button>
 
             {/* Visual 9:16 Story Preview Container */}
@@ -529,7 +529,7 @@ export function ShareRecapCard({
                 disabled={isExporting}
                 className="w-full py-3.5 px-4 rounded-xl bg-[#0B89FD] hover:bg-[#0977db] text-white font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all disabled:opacity-50 touch-target"
               >
-                <Download className="w-4 h-4 text-white" />
+                <Download className="w-4 h-4 text-white shrink-0" strokeWidth={2.5} />
                 <span>{isExporting ? 'Generating PNG...' : 'Download 9:16 Story (PNG)'}</span>
               </button>
 
@@ -537,7 +537,11 @@ export function ShareRecapCard({
                 onClick={handleShareDirect}
                 className="w-full py-3 px-4 rounded-xl bg-[#FEC90E] hover:bg-[#fed338] border-2 border-[#010101] text-[#010101] font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-[3px_3px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#010101] transition-all touch-target"
               >
-                {copiedLink ? <Check className="w-4 h-4 text-[#010101]" /> : <Share2 className="w-4 h-4 text-[#010101]" />}
+                {copiedLink ? (
+                  <Check className="w-4 h-4 text-[#010101] shrink-0" strokeWidth={2.5} />
+                ) : (
+                  <Share2 className="w-4 h-4 text-[#010101] shrink-0" strokeWidth={2.5} />
+                )}
                 <span>{copiedLink ? 'Story Copied!' : 'Share to Instagram / TikTok / WhatsApp'}</span>
               </button>
             </div>
