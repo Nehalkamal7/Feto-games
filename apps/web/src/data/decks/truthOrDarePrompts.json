@@ -1,0 +1,667 @@
+[
+  {
+    "id": "t_01",
+    "type": "truth",
+    "intensity": "chill",
+    "prompt": "What is the most embarrassing song in your music playlist?",
+    "promptAr": "إيه أكتر أغنية محرجة ومكسوف منها في بلاي ليست أغانيك وبتسمعها في السر؟"
+  },
+  {
+    "id": "t_02",
+    "type": "truth",
+    "intensity": "chill",
+    "prompt": "What was your childhood nickname and how did you get it?",
+    "promptAr": "إيه كان لقبك وإنت صغير وسط أهلك وصحابك وإزاي طلع عليك؟"
+  },
+  {
+    "id": "t_03",
+    "type": "truth",
+    "intensity": "chill",
+    "prompt": "What's the weirdest food combination you secretly enjoy?",
+    "promptAr": "إيه أغرب ميكس أكل بتعشقه والناس كلها بتشوفه غريب أو مقزز؟"
+  },
+  {
+    "id": "t_04",
+    "type": "truth",
+    "intensity": "chill",
+    "prompt": "Have you ever accidentally waved back at someone who was waving at someone behind you?",
+    "promptAr": "صراحة: Have you ever accidentally waved back at someone who was waving at someone behind you?"
+  },
+  {
+    "id": "t_05",
+    "type": "truth",
+    "intensity": "chill",
+    "prompt": "What's the longest amount of time you've spent binge-watching a TV show in one sitting?",
+    "promptAr": "صراحة: What's the longest amount of time you've spent binge-watching a TV show in one sitting?"
+  },
+  {
+    "id": "t_06",
+    "type": "truth",
+    "intensity": "chill",
+    "prompt": "If you could trade lives with one person in this room for 24 hours, who would it be?",
+    "promptAr": "صراحة: If you could trade lives with one person in this room for 24 hours, who would it be?"
+  },
+  {
+    "id": "t_07",
+    "type": "truth",
+    "intensity": "chill",
+    "prompt": "What's the silliest lie you told as a kid that an adult actually believed?",
+    "promptAr": "صراحة: What's the silliest lie you told as a kid that an adult actually believed?"
+  },
+  {
+    "id": "t_08",
+    "type": "truth",
+    "intensity": "chill",
+    "prompt": "What is the worst haircut or hairstyle you've ever had?",
+    "promptAr": "صراحة: What is the worst haircut or hairstyle you've ever had?"
+  },
+  {
+    "id": "t_09",
+    "type": "truth",
+    "intensity": "chill",
+    "prompt": "If your pet could talk, what is one embarrassing secret it would expose about you?",
+    "promptAr": "صراحة: If your pet could talk, what is one embarrassing secret it would expose about you?"
+  },
+  {
+    "id": "t_10",
+    "type": "truth",
+    "intensity": "chill",
+    "prompt": "What is something popular that everyone loves but you secretly dislike?",
+    "promptAr": "صراحة: What is something popular that everyone loves but you secretly dislike?"
+  },
+  {
+    "id": "t_11",
+    "type": "truth",
+    "intensity": "chill",
+    "prompt": "What is your biggest irrational fear?",
+    "promptAr": "صراحة: What is your biggest irrational fear?"
+  },
+  {
+    "id": "t_12",
+    "type": "truth",
+    "intensity": "chill",
+    "prompt": "What is the most useless talent or skill you have?",
+    "promptAr": "صراحة: What is the most useless talent or skill you have?"
+  },
+  {
+    "id": "t_13",
+    "type": "truth",
+    "intensity": "chill",
+    "prompt": "Have you ever pretended to be sick to avoid hanging out with friends?",
+    "promptAr": "صراحة: Have you ever pretended to be sick to avoid hanging out with friends?"
+  },
+  {
+    "id": "t_14",
+    "type": "truth",
+    "intensity": "chill",
+    "prompt": "What was the last thing you Googled in incognito mode?",
+    "promptAr": "صراحة: What was the last thing you Googled in incognito mode?"
+  },
+  {
+    "id": "t_15",
+    "type": "truth",
+    "intensity": "chill",
+    "prompt": "If you had to be stranded on an island with one player in this room, who would you choose?",
+    "promptAr": "صراحة: If you had to be stranded on an island with one player in this room, who would you choose?"
+  },
+  {
+    "id": "t_16",
+    "type": "truth",
+    "intensity": "chill",
+    "prompt": "What's the most awkward text you ever sent to the wrong person?",
+    "promptAr": "صراحة: What's the most awkward text you ever sent to the wrong person?"
+  },
+  {
+    "id": "t_17",
+    "type": "truth",
+    "intensity": "chill",
+    "prompt": "What is your most ridiculous impulse purchase that you never used?",
+    "promptAr": "صراحة: What is your most ridiculous impulse purchase that you never used?"
+  },
+  {
+    "id": "t_18",
+    "type": "truth",
+    "intensity": "chill",
+    "prompt": "What cartoon character did you have a crush on when you were young?",
+    "promptAr": "صراحة: What cartoon character did you have a crush on when you were young?"
+  },
+  {
+    "id": "d_01",
+    "type": "dare",
+    "intensity": "chill",
+    "prompt": "Speak with a dramatic British or pirate accent for the next 2 rounds.",
+    "promptAr": "جرأة: Speak with a dramatic British or pirate accent for the next 2 rounds."
+  },
+  {
+    "id": "d_02",
+    "type": "dare",
+    "intensity": "chill",
+    "prompt": "Do your best impression of another player in the room until someone guesses who it is.",
+    "promptAr": "جرأة: Do your best impression of another player in the room until someone guesses who it is."
+  },
+  {
+    "id": "d_03",
+    "type": "dare",
+    "intensity": "chill",
+    "prompt": "Sing the chorus of your favorite pop song in an opera voice.",
+    "promptAr": "جرأة: Sing the chorus of your favorite pop song in an opera voice."
+  },
+  {
+    "id": "d_04",
+    "type": "dare",
+    "intensity": "chill",
+    "prompt": "Hold a plank or do 10 pushups right now while counting out loud in another language.",
+    "promptAr": "جرأة: Hold a plank or do 10 pushups right now while counting out loud in another language."
+  },
+  {
+    "id": "d_05",
+    "type": "dare",
+    "intensity": "chill",
+    "prompt": "Make up an impromptu 30-second commercial selling an imaginary bizarre product.",
+    "promptAr": "جرأة: Make up an impromptu 30-second commercial selling an imaginary bizarre product."
+  },
+  {
+    "id": "d_06",
+    "type": "dare",
+    "intensity": "chill",
+    "prompt": "Balance a spoon or small item on your nose for 15 seconds without letting it fall.",
+    "promptAr": "جرأة: Balance a spoon or small item on your nose for 15 seconds without letting it fall."
+  },
+  {
+    "id": "d_07",
+    "type": "dare",
+    "intensity": "chill",
+    "prompt": "Show the room the 5th photo currently in your camera roll.",
+    "promptAr": "جرأة: Show the room the 5th photo currently in your camera roll."
+  },
+  {
+    "id": "d_08",
+    "type": "dare",
+    "intensity": "chill",
+    "prompt": "Do your most convincing robot dance for 20 seconds.",
+    "promptAr": "جرأة: Do your most convincing robot dance for 20 seconds."
+  },
+  {
+    "id": "d_09",
+    "type": "dare",
+    "intensity": "chill",
+    "prompt": "Say the alphabet backwards from Z to A as fast as you can without messing up.",
+    "promptAr": "جرأة: Say the alphabet backwards from Z to A as fast as you can without messing up."
+  },
+  {
+    "id": "d_10",
+    "type": "dare",
+    "intensity": "chill",
+    "prompt": "Act like a chicken searching for seeds on the floor for 15 seconds.",
+    "promptAr": "جرأة: Act like a chicken searching for seeds on the floor for 15 seconds."
+  },
+  {
+    "id": "d_11",
+    "type": "dare",
+    "intensity": "chill",
+    "prompt": "Let another player write one funny word on your hand with a pen or finger.",
+    "promptAr": "جرأة: Let another player write one funny word on your hand with a pen or finger."
+  },
+  {
+    "id": "d_12",
+    "type": "dare",
+    "intensity": "chill",
+    "prompt": "Try to lick your own elbow for 10 seconds.",
+    "promptAr": "جرأة: Try to lick your own elbow for 10 seconds."
+  },
+  {
+    "id": "d_13",
+    "type": "dare",
+    "intensity": "chill",
+    "prompt": "Whisper everything you say for the next 3 minutes.",
+    "promptAr": "جرأة: Whisper everything you say for the next 3 minutes."
+  },
+  {
+    "id": "d_14",
+    "type": "dare",
+    "intensity": "chill",
+    "prompt": "Pretend you are an auctioneer and rapidly sell off one item near you.",
+    "promptAr": "جرأة: Pretend you are an auctioneer and rapidly sell off one item near you."
+  },
+  {
+    "id": "d_15",
+    "type": "dare",
+    "intensity": "chill",
+    "prompt": "Strike three dramatic superhero poses and hold each for 5 seconds.",
+    "promptAr": "جرأة: Strike three dramatic superhero poses and hold each for 5 seconds."
+  },
+  {
+    "id": "t_19",
+    "type": "truth",
+    "intensity": "party",
+    "prompt": "Who in this room do you think would survive the shortest amount of time in a zombie apocalypse?",
+    "promptAr": "صراحة: Who in this room do you think would survive the shortest amount of time in a zombie apocalypse?"
+  },
+  {
+    "id": "t_20",
+    "type": "truth",
+    "intensity": "party",
+    "prompt": "Have you ever stalked an ex or a crush on social media for more than an hour?",
+    "promptAr": "صراحة: Have you ever stalked an ex or a crush on social media for more than an hour?"
+  },
+  {
+    "id": "t_21",
+    "type": "truth",
+    "intensity": "party",
+    "prompt": "What was your most disastrous first date experience?",
+    "promptAr": "صراحة: What was your most disastrous first date experience?"
+  },
+  {
+    "id": "t_22",
+    "type": "truth",
+    "intensity": "party",
+    "prompt": "Have you ever regifted a present that someone in this room gave you?",
+    "promptAr": "صراحة: Have you ever regifted a present that someone in this room gave you?"
+  },
+  {
+    "id": "t_23",
+    "type": "truth",
+    "intensity": "party",
+    "prompt": "What's the pettiest reason you ever broke up with someone or stopped talking to them?",
+    "promptAr": "صراحة: What's the pettiest reason you ever broke up with someone or stopped talking to them?"
+  },
+  {
+    "id": "t_24",
+    "type": "truth",
+    "intensity": "party",
+    "prompt": "Have you ever blamed a terrible smell on a pet or someone else when it was actually you?",
+    "promptAr": "صراحة: Have you ever blamed a terrible smell on a pet or someone else when it was actually you?"
+  },
+  {
+    "id": "t_25",
+    "type": "truth",
+    "intensity": "party",
+    "prompt": "Who is your celebrity pass or biggest guilty pleasure crush?",
+    "promptAr": "صراحة: Who is your celebrity pass or biggest guilty pleasure crush?"
+  },
+  {
+    "id": "t_26",
+    "type": "truth",
+    "intensity": "party",
+    "prompt": "What's the most ridiculous lie on your resume or dating profile?",
+    "promptAr": "صراحة: What's the most ridiculous lie on your resume or dating profile?"
+  },
+  {
+    "id": "t_27",
+    "type": "truth",
+    "intensity": "party",
+    "prompt": "What's the biggest secret you've kept from your parents or best friend?",
+    "promptAr": "صراحة: What's the biggest secret you've kept from your parents or best friend?"
+  },
+  {
+    "id": "t_28",
+    "type": "truth",
+    "intensity": "party",
+    "prompt": "If you had to delete one social media app forever, which one would break your heart most?",
+    "promptAr": "صراحة: If you had to delete one social media app forever, which one would break your heart most?"
+  },
+  {
+    "id": "t_29",
+    "type": "truth",
+    "intensity": "party",
+    "prompt": "Have you ever accidentally said 'I love you' to someone without meaning it?",
+    "promptAr": "صراحة: Have you ever accidentally said 'I love you' to someone without meaning it?"
+  },
+  {
+    "id": "t_30",
+    "type": "truth",
+    "intensity": "party",
+    "prompt": "Who in this room would you trust the least with your unlocked smartphone for 10 minutes?",
+    "promptAr": "صراحة: Who in this room would you trust the least with your unlocked smartphone for 10 minutes?"
+  },
+  {
+    "id": "t_31",
+    "type": "truth",
+    "intensity": "party",
+    "prompt": "What's the most cringe-worthy username or email address you ever created?",
+    "promptAr": "صراحة: What's the most cringe-worthy username or email address you ever created?"
+  },
+  {
+    "id": "t_32",
+    "type": "truth",
+    "intensity": "party",
+    "prompt": "Have you ever lied about your age to get into somewhere or impress someone?",
+    "promptAr": "صراحة: Have you ever lied about your age to get into somewhere or impress someone?"
+  },
+  {
+    "id": "t_33",
+    "type": "truth",
+    "intensity": "party",
+    "prompt": "What's the most awkward encounter you've ever had with an ex in public?",
+    "promptAr": "صراحة: What's the most awkward encounter you've ever had with an ex in public?"
+  },
+  {
+    "id": "t_34",
+    "type": "truth",
+    "intensity": "party",
+    "prompt": "What is the worst piece of advice you've ever given someone that they actually followed?",
+    "promptAr": "صراحة: What is the worst piece of advice you've ever given someone that they actually followed?"
+  },
+  {
+    "id": "t_35",
+    "type": "truth",
+    "intensity": "party",
+    "prompt": "Have you ever practiced kissing a pillow or mirror when you were younger?",
+    "promptAr": "صراحة: Have you ever practiced kissing a pillow or mirror when you were younger?"
+  },
+  {
+    "id": "t_36",
+    "type": "truth",
+    "intensity": "party",
+    "prompt": "If you were arrested today, what would your friends automatically assume it was for?",
+    "promptAr": "صراحة: If you were arrested today, what would your friends automatically assume it was for?"
+  },
+  {
+    "id": "d_16",
+    "type": "dare",
+    "intensity": "party",
+    "prompt": "Send a random single emoji (like 🦞 or 🧄) to the 3rd person on your chat list with no context.",
+    "promptAr": "جرأة: Send a random single emoji (like 🦞 or 🧄) to the 3rd person on your chat list with no context."
+  },
+  {
+    "id": "d_17",
+    "type": "dare",
+    "intensity": "party",
+    "prompt": "Let the group choose your display name in this room for the rest of the game.",
+    "promptAr": "جرأة: Let the group choose your display name in this room for the rest of the game."
+  },
+  {
+    "id": "d_18",
+    "type": "dare",
+    "intensity": "party",
+    "prompt": "Call a friend or family member and sing 'Happy Birthday' to them even if it's not their birthday.",
+    "promptAr": "جرأة: Call a friend or family member and sing 'Happy Birthday' to them even if it's not their birthday."
+  },
+  {
+    "id": "d_19",
+    "type": "dare",
+    "intensity": "party",
+    "prompt": "Do 15 squats while loudly narrating an intense football game.",
+    "promptAr": "جرأة: Do 15 squats while loudly narrating an intense football game."
+  },
+  {
+    "id": "d_20",
+    "type": "dare",
+    "intensity": "party",
+    "prompt": "Eat a spoonful of a condiment chosen by the group (mustard, ketchup, hot sauce).",
+    "promptAr": "جرأة: Eat a spoonful of a condiment chosen by the group (mustard, ketchup, hot sauce)."
+  },
+  {
+    "id": "d_21",
+    "type": "dare",
+    "intensity": "party",
+    "prompt": "Freestyle rap for 30 seconds about the players currently in this room.",
+    "promptAr": "جرأة: Freestyle rap for 30 seconds about the players currently in this room."
+  },
+  {
+    "id": "d_22",
+    "type": "dare",
+    "intensity": "party",
+    "prompt": "Show your screen time stats on your phone to the camera or room.",
+    "promptAr": "جرأة: Show your screen time stats on your phone to the camera or room."
+  },
+  {
+    "id": "d_23",
+    "type": "dare",
+    "intensity": "party",
+    "prompt": "Imitate your boss or a strict teacher scolding someone for 20 seconds.",
+    "promptAr": "جرأة: Imitate your boss or a strict teacher scolding someone for 20 seconds."
+  },
+  {
+    "id": "d_24",
+    "type": "dare",
+    "intensity": "party",
+    "prompt": "Post a status on your favorite social app saying 'I think pineapples belong on pizza' and leave it for 1 hour.",
+    "promptAr": "جرأة: Post a status on your favorite social app saying 'I think pineapples belong on pizza' and leave it for 1 hour."
+  },
+  {
+    "id": "d_25",
+    "type": "dare",
+    "intensity": "party",
+    "prompt": "Drink a glass of water without using your hands.",
+    "promptAr": "جرأة: Drink a glass of water without using your hands."
+  },
+  {
+    "id": "d_26",
+    "type": "dare",
+    "intensity": "party",
+    "prompt": "Do your best catwalk model strut across the room, finishing with a fierce freeze pose.",
+    "promptAr": "جرأة: Do your best catwalk model strut across the room, finishing with a fierce freeze pose."
+  },
+  {
+    "id": "d_27",
+    "type": "dare",
+    "intensity": "party",
+    "prompt": "Act like an over-caffeinated workout instructor and get everyone to do 3 jumping jacks.",
+    "promptAr": "جرأة: Act like an over-caffeinated workout instructor and get everyone to do 3 jumping jacks."
+  },
+  {
+    "id": "d_28",
+    "type": "dare",
+    "intensity": "party",
+    "prompt": "Re-enact a famous dramatic movie scene using only hand gestures and emotional groans.",
+    "promptAr": "جرأة: Re-enact a famous dramatic movie scene using only hand gestures and emotional groans."
+  },
+  {
+    "id": "d_29",
+    "type": "dare",
+    "intensity": "party",
+    "prompt": "Let the player to your left or right style your hair however they want for the next round.",
+    "promptAr": "جرأة: Let the player to your left or right style your hair however they want for the next round."
+  },
+  {
+    "id": "t_37",
+    "type": "truth",
+    "intensity": "wild",
+    "prompt": "What is the biggest romantic disaster or wildest hookup story of your life?",
+    "promptAr": "صراحة: What is the biggest romantic disaster or wildest hookup story of your life?"
+  },
+  {
+    "id": "t_38",
+    "type": "truth",
+    "intensity": "wild",
+    "prompt": "Have you ever had feelings for a friend's partner or sibling?",
+    "promptAr": "صراحة: Have you ever had feelings for a friend's partner or sibling?"
+  },
+  {
+    "id": "t_39",
+    "type": "truth",
+    "intensity": "wild",
+    "prompt": "What's the most scandalous thing you've ever gotten away with without anyone catching you?",
+    "promptAr": "صراحة: What's the most scandalous thing you've ever gotten away with without anyone catching you?"
+  },
+  {
+    "id": "t_40",
+    "type": "truth",
+    "intensity": "wild",
+    "prompt": "Have you ever sent a spicy photo or text to the wrong person by accident?",
+    "promptAr": "صراحة: Have you ever sent a spicy photo or text to the wrong person by accident?"
+  },
+  {
+    "id": "t_41",
+    "type": "truth",
+    "intensity": "wild",
+    "prompt": "What is the boldest, most audacious lie you've told to get out of serious trouble?",
+    "promptAr": "صراحة: What is the boldest, most audacious lie you've told to get out of serious trouble?"
+  },
+  {
+    "id": "t_42",
+    "type": "truth",
+    "intensity": "wild",
+    "prompt": "If you had to hook up with someone currently in this room, who would it be?",
+    "promptAr": "صراحة: If you had to hook up with someone currently in this room, who would it be?"
+  },
+  {
+    "id": "t_43",
+    "type": "truth",
+    "intensity": "wild",
+    "prompt": "Have you ever ghosted someone after talking to them for weeks, and why?",
+    "promptAr": "صراحة: Have you ever ghosted someone after talking to them for weeks, and why?"
+  },
+  {
+    "id": "t_44",
+    "type": "truth",
+    "intensity": "wild",
+    "prompt": "What's something you've done that you swore you would take to the grave?",
+    "promptAr": "صراحة: What's something you've done that you swore you would take to the grave?"
+  },
+  {
+    "id": "t_45",
+    "type": "truth",
+    "intensity": "wild",
+    "prompt": "What is the wildest thing you've ever done at a party or festival?",
+    "promptAr": "صراحة: What is the wildest thing you've ever done at a party or festival?"
+  },
+  {
+    "id": "t_46",
+    "type": "truth",
+    "intensity": "wild",
+    "prompt": "Have you ever broken the law, and if so, what was it?",
+    "promptAr": "صراحة: Have you ever broken the law, and if so, what was it?"
+  },
+  {
+    "id": "t_47",
+    "type": "truth",
+    "intensity": "wild",
+    "prompt": "Who was your worst kiss ever and what made it so horrific?",
+    "promptAr": "صراحة: Who was your worst kiss ever and what made it so horrific?"
+  },
+  {
+    "id": "t_48",
+    "type": "truth",
+    "intensity": "wild",
+    "prompt": "What's the most dramatic fight or public scene you've ever made?",
+    "promptAr": "صراحة: What's the most dramatic fight or public scene you've ever made?"
+  },
+  {
+    "id": "t_49",
+    "type": "truth",
+    "intensity": "wild",
+    "prompt": "Have you ever snooped through someone else's messages or diary?",
+    "promptAr": "صراحة: Have you ever snooped through someone else's messages or diary?"
+  },
+  {
+    "id": "t_50",
+    "type": "truth",
+    "intensity": "wild",
+    "prompt": "What's the most expensive thing you've accidentally broken and hid the evidence?",
+    "promptAr": "صراحة: What's the most expensive thing you've accidentally broken and hid the evidence?"
+  },
+  {
+    "id": "d_30",
+    "type": "dare",
+    "intensity": "wild",
+    "prompt": "Let another player scroll through your camera roll for 20 seconds.",
+    "promptAr": "جرأة: Let another player scroll through your camera roll for 20 seconds."
+  },
+  {
+    "id": "d_31",
+    "type": "dare",
+    "intensity": "wild",
+    "prompt": "Text your crush or ex 'I need to tell you something...' and don't reply for 10 minutes.",
+    "promptAr": "جرأة: Text your crush or ex 'I need to tell you something...' and don't reply for 10 minutes."
+  },
+  {
+    "id": "d_32",
+    "type": "dare",
+    "intensity": "wild",
+    "prompt": "Eat a bite of a raw onion, lemon slice, or spicy pepper with a straight face.",
+    "promptAr": "جرأة: Eat a bite of a raw onion, lemon slice, or spicy pepper with a straight face."
+  },
+  {
+    "id": "d_33",
+    "type": "dare",
+    "intensity": "wild",
+    "prompt": "Serenade the player across from you with a passionate love song while on one knee.",
+    "promptAr": "جرأة: Serenade the player across from you with a passionate love song while on one knee."
+  },
+  {
+    "id": "d_34",
+    "type": "dare",
+    "intensity": "wild",
+    "prompt": "Let the group compose a text message and send it to any contact in your phone.",
+    "promptAr": "جرأة: Let the group compose a text message and send it to any contact in your phone."
+  },
+  {
+    "id": "d_35",
+    "type": "dare",
+    "intensity": "wild",
+    "prompt": "Do 20 burpees in under 45 seconds or take a double penalty!",
+    "promptAr": "جرأة: Do 20 burpees in under 45 seconds or take a double penalty!"
+  },
+  {
+    "id": "d_36",
+    "type": "dare",
+    "intensity": "wild",
+    "prompt": "Show the last 3 searches in your YouTube or TikTok history.",
+    "promptAr": "جرأة: Show the last 3 searches in your YouTube or TikTok history."
+  },
+  {
+    "id": "d_37",
+    "type": "dare",
+    "intensity": "wild",
+    "prompt": "Perform an interpretive dance expressing heartbreak and despair for 30 seconds.",
+    "promptAr": "جرأة: Perform an interpretive dance expressing heartbreak and despair for 30 seconds."
+  },
+  {
+    "id": "d_38",
+    "type": "dare",
+    "intensity": "wild",
+    "prompt": "Let another player draw a mustache on your face with a washable marker.",
+    "promptAr": "جرأة: Let another player draw a mustache on your face with a washable marker."
+  },
+  {
+    "id": "d_39",
+    "type": "dare",
+    "intensity": "wild",
+    "prompt": "Call a local pizza place and ask if they sell hot dogs.",
+    "promptAr": "جرأة: Call a local pizza place and ask if they sell hot dogs."
+  },
+  {
+    "id": "d_40",
+    "type": "dare",
+    "intensity": "wild",
+    "prompt": "Put ice cubes down your shirt and keep them there for 30 seconds.",
+    "promptAr": "جرأة: Put ice cubes down your shirt and keep them there for 30 seconds."
+  },
+  {
+    "id": "d_41",
+    "type": "dare",
+    "intensity": "wild",
+    "prompt": "Wear your socks on your hands for the remainder of the round.",
+    "promptAr": "جرأة: Wear your socks on your hands for the remainder of the round."
+  },
+  {
+    "id": "d_42",
+    "type": "dare",
+    "intensity": "wild",
+    "prompt": "Give your best impression of an alien attempting human romance.",
+    "promptAr": "جرأة: Give your best impression of an alien attempting human romance."
+  },
+  {
+    "id": "d_43",
+    "type": "dare",
+    "intensity": "wild",
+    "prompt": "Say yes to everything anyone asks you for the next 2 minutes.",
+    "promptAr": "جرأة: Say yes to everything anyone asks you for the next 2 minutes."
+  },
+  {
+    "id": "d_44",
+    "type": "dare",
+    "intensity": "wild",
+    "prompt": "Pretend you are in a high-stakes telenovela and dramatically slap an invisible foe.",
+    "promptAr": "جرأة: Pretend you are in a high-stakes telenovela and dramatically slap an invisible foe."
+  },
+  {
+    "id": "d_45",
+    "type": "dare",
+    "intensity": "wild",
+    "prompt": "Take a goofy selfie with your best double chin and make it your profile avatar.",
+    "promptAr": "جرأة: Take a goofy selfie with your best double chin and make it your profile avatar."
+  }
+]

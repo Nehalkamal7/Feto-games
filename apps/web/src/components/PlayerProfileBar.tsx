@@ -7,6 +7,7 @@ import { NeonAvatarDisplay } from './NeonAvatarDisplay';
 import { Dices, Edit3, Check, Sparkles, Star, Zap } from 'lucide-react';
 import { PINNED_NICKNAMES, rollDynamicNicknames } from '@/lib/nicknames';
 import { sound } from '@/lib/sound';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface PlayerProfileBarProps {
   username: string;
@@ -23,6 +24,8 @@ export function PlayerProfileBar({
   onAvatarChange,
   onRandomize
 }: PlayerProfileBarProps) {
+  const { language } = useLanguage();
+  const isAr = language === 'ar';
   const [isOpen, setIsOpen] = useState(false);
   const [tempName, setTempName] = useState(username);
   const [dynamicChips, setDynamicChips] = useState<string[]>(() =>
@@ -71,20 +74,20 @@ export function PlayerProfileBar({
   return (
     <>
       {/* SLEEK COMPACT PROFILE BAR */}
-      <div className="inline-flex items-center gap-2.5 p-1.5 pr-3.5 rounded-2xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] hover:shadow-[3px_3px_0px_#010101] transition-all group">
+      <div className="inline-flex items-center gap-2.5 p-1.5 pr-3.5 rtl:pr-1.5 rtl:pl-3.5 rounded-2xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] hover:shadow-[3px_3px_0px_#010101] transition-all group">
         <button
           type="button"
           onClick={handleOpen}
-          className="flex items-center gap-2.5 touch-target text-left"
+          className="flex items-center gap-2.5 touch-target text-start"
         >
           <NeonAvatarDisplay avatarId={avatar} size="sm" showGlow={false} />
           <div>
             <div className="text-[10px] font-black text-[#010101]/60 uppercase tracking-widest flex items-center gap-1">
-              <span>PLAYER PROFILE</span>
+              <span>{isAr ? 'الملف الشخصي' : 'PLAYER PROFILE'}</span>
               <Edit3 className="w-2.5 h-2.5 text-[#0B89FD] group-hover:scale-110 transition-transform" />
             </div>
             <div className="text-xs sm:text-sm font-black text-[#010101] truncate max-w-[130px] sm:max-w-[180px]">
-              {username || 'Player'}
+              {username || (isAr ? 'لاعب' : 'Player')}
             </div>
           </div>
         </button>
@@ -96,8 +99,8 @@ export function PlayerProfileBar({
             onRandomize();
           }}
           className="p-1.5 rounded-xl bg-[#FFFFFF] hover:bg-[#FEC90E] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] text-[#010101] transition-all touch-manipulation"
-          title="Randomize Nickname"
-          aria-label="Randomize Nickname"
+          title={isAr ? 'اسم عشوائي' : 'Randomize Nickname'}
+          aria-label={isAr ? 'اسم عشوائي' : 'Randomize Nickname'}
         >
           <Dices className="w-4 h-4" />
         </button>
@@ -116,7 +119,9 @@ export function PlayerProfileBar({
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-[#FEC90E]" />
-                  <h3 className="text-xl font-black text-[#010101]">Customize Profile</h3>
+                  <h3 className="text-xl font-black text-[#010101]">
+                    {isAr ? 'تخصيص الملف الشخصي' : 'Customize Profile'}
+                  </h3>
                 </div>
                 <button
                   type="button"
@@ -130,7 +135,7 @@ export function PlayerProfileBar({
               {/* Username Input & Randomizer */}
               <div className="space-y-2 mb-3">
                 <label className="text-xs font-black uppercase tracking-wider text-[#010101] block">
-                  Player Nickname
+                  {isAr ? 'اسم اللاعب' : 'Player Nickname'}
                 </label>
                 <div className="flex items-center gap-2">
                   <input
@@ -138,7 +143,7 @@ export function PlayerProfileBar({
                     maxLength={18}
                     value={tempName}
                     onChange={(e) => setTempName(e.target.value)}
-                    placeholder="Enter nickname..."
+                    placeholder={isAr ? 'اكتب اسمك المستعار...' : 'Enter nickname...'}
                     className="flex-1 min-h-[46px] bg-[#F8F8F8] border-2 border-[#010101] focus:border-[#0B89FD] rounded-xl px-4 text-[#010101] font-bold text-sm outline-none"
                   />
                   <motion.button
@@ -155,7 +160,7 @@ export function PlayerProfileBar({
                     >
                       <Dices className="w-4 h-4 text-[#010101]" />
                     </motion.div>
-                    <span>Roll</span>
+                    <span>{isAr ? 'تدوير' : 'Roll'}</span>
                   </motion.button>
                 </div>
               </div>
@@ -165,7 +170,11 @@ export function PlayerProfileBar({
                 <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-[#010101]/70">
                   <div className="flex items-center gap-1">
                     <Sparkles className="w-3 h-3 text-[#0B89FD]" />
-                    <span>Suggested Gamer Tags (4 Pinned + 4 Dynamic)</span>
+                    <span>
+                      {isAr
+                        ? 'ألقاب مقترحة (٤ مميزة + ٤ متغيرة)'
+                        : 'Suggested Gamer Tags (4 Pinned + 4 Dynamic)'}
+                    </span>
                   </div>
                 </div>
 
@@ -226,10 +235,10 @@ export function PlayerProfileBar({
                 </div>
               </div>
 
-              {/* Avatar Picker (10 Neon Avatars) */}
+              {/* Avatar Picker (16 Characters) */}
               <div className="mb-5">
                 <label className="text-xs font-black uppercase tracking-wider text-[#010101] block mb-2">
-                  Choose Avatar (16 Characters)
+                  {isAr ? 'اختر شخصيتك (١٦ شخصية)' : 'Choose Avatar (16 Characters)'}
                 </label>
                 <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
                   {(Object.keys(NEON_AVATARS) as NeonAvatarId[]).map((avId) => (
@@ -260,7 +269,7 @@ export function PlayerProfileBar({
                 className="w-full min-h-[48px] bg-[#0B89FD] hover:bg-[#0977db] text-white border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] py-3 rounded-2xl font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all touch-target"
               >
                 <Check className="w-4 h-4" />
-                <span>Confirm &amp; Save</span>
+                <span>{isAr ? 'حفظ وتأكيد' : 'Confirm & Save'}</span>
               </button>
             </motion.div>
           </div>

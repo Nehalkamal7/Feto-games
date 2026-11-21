@@ -16,6 +16,8 @@ import {
 import { NeonAvatarDisplay } from '../NeonAvatarDisplay';
 import { GameIcon } from '../GameIcon';
 import { sound } from '@/lib/sound';
+import { useGameTimer } from '@/hooks/useGameTimer';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface HotPotatoGameViewProps {
   state: HotPotatoPublicState;
@@ -34,9 +36,19 @@ export function HotPotatoGameView({
   vibeMode: _vibeMode,
   onAction
 }: HotPotatoGameViewProps) {
+  const { language } = useLanguage();
+  const isAr = language === 'ar';
   const [wordInput, setWordInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const timer = useGameTimer({
+    phaseEndsAt: state.phaseEndsAt,
+    durationSeconds: 8,
+    enabled: state.phase === 'bomb_ticking',
+    onTimeout: () => onAction('PHASE_TIMEOUT', {})
+  });
+  const remainingSeconds = timer.remainingSeconds;
 
   const isHoldingBomb = currentPlayerId === state.activeHolderId;
   const _currentHolder = players.find((p) => p.id === state.activeHolderId);
@@ -54,8 +66,8 @@ export function HotPotatoGameView({
   // Periodic bomb tick sound with urgency multiplier based on remaining time
   useEffect(() => {
     if (state.phase === 'bomb_ticking') {
-      const urgency = Math.max(1, 4 - state.remainingSeconds * 0.5);
-      const intervalMs = Math.max(250, state.remainingSeconds * 120);
+      const urgency = Math.max(1, 4 - remainingSeconds * 0.5);
+      const intervalMs = Math.max(250, remainingSeconds * 120);
 
       const interval = setInterval(() => {
         sound.playBombTick(urgency);
@@ -63,7 +75,7 @@ export function HotPotatoGameView({
 
       return () => clearInterval(interval);
     }
-  }, [state.phase, state.remainingSeconds]);
+  }, [state.phase, remainingSeconds]);
 
   // Handle explosion effects
   useEffect(() => {
@@ -111,10 +123,10 @@ export function HotPotatoGameView({
         <div className="flex items-center gap-2">
           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white border border-gray-200 text-gray-800 flex items-center gap-1.5 shadow-sm">
             <GameIcon gameMode="hot_potato" size="xs" />
-            Round {state.round} of {state.totalRounds}
+            {isAr ? `الجولة ${state.round} من ${state.totalRounds}` : `Round ${state.round} of ${state.totalRounds}`}
           </span>
           <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-            Passes: {state.passCount} ⚡
+            {isAr ? `التمريرات: ${state.passCount} ⚡` : `Passes: ${state.passCount} ⚡`}
           </span>
         </div>
 
@@ -127,7 +139,7 @@ export function HotPotatoGameView({
           }`}
         >
           <Clock className={`w-3.5 h-3.5 ${state.remainingSeconds <= 3 ? 'text-red-500' : 'text-blue-600'}`} />
-          <span>{state.remainingSeconds}s Fuse</span>
+          <span className="force-ltr">{state.remainingSeconds}s {isAr ? 'فتيل' : 'Fuse'}</span>
         </div>
       </div>
 
@@ -138,10 +150,10 @@ export function HotPotatoGameView({
         className="bg-white p-6 sm:p-7 rounded-2xl border border-gray-200 text-center relative overflow-hidden mb-4 shadow-sm"
       >
         <span className="text-xs font-semibold uppercase tracking-wider text-rose-600 block mb-1">
-          Rapid Category • Type &amp; Pass Quick!
+          {isAr ? 'فئة سريعة • اكتب ومرر في ثانية!' : 'Rapid Category • Type & Pass Quick!'}
         </span>
         <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight leading-snug">
-          &ldquo;{state.category}&rdquo;
+          &ldquo;{isAr && state.categoryAr ? state.categoryAr : state.category}&rdquo;
         </h2>
       </motion.div>
 
@@ -177,7 +189,7 @@ export function HotPotatoGameView({
             <div className="mt-4 flex items-center gap-2.5 bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-sm">
               <NeonAvatarDisplay avatarId={state.activeHolderAvatar} size="sm" showGlow={false} />
               <span className="text-sm sm:text-base font-bold text-gray-900">
-                {state.activeHolderUsername} {isHoldingBomb && '(YOU HAVE THE BOMB!)'}
+                {state.activeHolderUsername} {isHoldingBomb && (isAr ? '(القنبلة معاك! تكتك بسرعة!)' : '(YOU HAVE THE BOMB!)')}
               </span>
             </div>
           </div>
@@ -195,7 +207,7 @@ export function HotPotatoGameView({
                 type="text"
                 value={wordInput}
                 onChange={(e) => setWordInput(e.target.value)}
-                placeholder="Type answer & tap Pass Bomb..."
+                placeholder={isAr ? 'اكتب كلمة تنتمي للفئة ومرر القنبلة...' : 'Type answer & tap Pass Bomb...'}
                 className="w-full flex-1 h-12 px-4 rounded-xl bg-white border border-gray-300 text-gray-900 font-medium text-sm focus:outline-none focus:border-blue-600 shadow-sm placeholder-gray-400"
               />
               <button
@@ -203,13 +215,15 @@ export function HotPotatoGameView({
                 disabled={!wordInput.trim() || isSubmitting}
                 className="w-full sm:w-auto h-12 bg-blue-600 hover:bg-blue-700 text-white px-5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all disabled:opacity-50 shrink-0"
               >
-                <span>Pass Bomb</span>
-                <Send className="w-3.5 h-3.5 shrink-0" />
+                <span>{isAr ? 'مرر القنبلة 💣' : 'Pass Bomb'}</span>
+                <Send className={`w-3.5 h-3.5 shrink-0 ${isAr ? 'rotate-180' : ''}`} />
               </button>
             </motion.form>
           ) : (
             <div className="text-center py-2 text-xs font-medium text-gray-500">
-              ⚡ Waiting for {state.activeHolderUsername} to type an answer and pass the bomb...
+              {isAr
+                ? `⚡ في انتظار ${state.activeHolderUsername} يكتب كلمة ويمرر القنبلة...`
+                : `⚡ Waiting for ${state.activeHolderUsername} to type an answer and pass the bomb...`}
             </div>
           )}
 
@@ -239,17 +253,21 @@ export function HotPotatoGameView({
           >
             <div className="text-5xl mb-2">💥</div>
             <h3 className="text-2xl sm:text-3xl font-extrabold text-rose-600 mb-2 uppercase tracking-tight">
-              KABOOM! Bomb Exploded!
+              {isAr ? '💥 بوم! القنبلة انفجرت!' : 'KABOOM! Bomb Exploded!'}
             </h3>
 
             {victimPlayer && (
               <div className="flex flex-col items-center my-3">
                 <NeonAvatarDisplay avatarId={victimPlayer.avatar} size="md" showGlow={false} />
                 <span className="text-base sm:text-lg font-bold text-gray-900 mt-2">
-                  {victimPlayer.username} got caught holding the bomb!
+                  {isAr
+                    ? `${victimPlayer.username} اتدبس بالقنبلة لما فرقعت!`
+                    : `${victimPlayer.username} got caught holding the bomb!`}
                 </span>
                 <div className="mt-2 px-3 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-xs font-semibold">
-                  Consequence: 2 Sips Penalty 🥤
+                  {isAr && state.goofyConsequenceAr
+                    ? state.goofyConsequenceAr
+                    : (isAr ? 'العقاب: رشفة عقاب مضحكة 🥤' : (state.goofyConsequence || 'Consequence: 2 Sips Penalty 🥤'))}
                 </div>
               </div>
             )}
@@ -259,8 +277,8 @@ export function HotPotatoGameView({
                 onClick={handleNextRound}
                 className="mt-4 h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm flex items-center gap-2 shadow-sm transition-all"
               >
-                <span>Next Round</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>{isAr ? 'الجولة القادمة' : 'Next Round'}</span>
+                <ArrowRight className={`w-4 h-4 ${isAr ? 'rotate-180' : ''}`} />
               </button>
             )}
           </motion.div>

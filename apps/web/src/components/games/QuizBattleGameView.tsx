@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { sound } from '@/lib/sound';
 import { getSocket } from '@/lib/socket';
+import { useGameTimer } from '@/hooks/useGameTimer';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface QuizBattleGameViewProps {
   gameState: QuizPublicState;
@@ -31,31 +33,30 @@ export const QuizBattleGameView: React.FC<QuizBattleGameViewProps> = ({
   gameState,
   currentPlayer,
   players,
-  roomCode: _roomCode
+  roomCode
 }) => {
   const socket = getSocket();
+  const { language } = useLanguage();
+  const isAr = language === 'ar';
 
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
 
   const currentQ = gameState.currentQuestion;
   const hasAnswered = gameState.answeredPlayerIds.includes(currentPlayer.id);
 
-  // Synchronized question timer
+  const timer = useGameTimer({
+    phaseEndsAt: currentQ?.phaseEndsAt,
+    durationSeconds: currentQ?.durationSeconds || 20,
+    roomCode,
+    enabled: gameState.phase === 'question'
+  });
+
+  const remainingSeconds = timer.remainingSeconds;
+
+  // Reset selected option when question changes
   useEffect(() => {
-    if (!currentQ || gameState.phase !== 'question') return;
-
     setSelectedOption(null);
-
-    const interval = setInterval(() => {
-      const now = Date.now();
-      const diff = Math.max(0, Math.ceil((currentQ.phaseEndsAt - now) / 1000));
-      setRemainingSeconds(diff);
-      if (diff === 0) clearInterval(interval);
-    }, 250);
-
-    return () => clearInterval(interval);
-  }, [currentQ, gameState.phase]);
+  }, [currentQ?.id]);
 
   // Handle Option Click
   const handleSelectOption = (idx: number) => {
@@ -85,24 +86,32 @@ export const QuizBattleGameView: React.FC<QuizBattleGameViewProps> = ({
           <div className="flex items-center gap-2.5">
             <GameIcon gameMode="quiz_battle" size="md" showContainer />
             <span className="px-3 py-1 bg-blue-50 border border-blue-200 rounded-full text-xs font-semibold text-blue-700">
-              Question {gameState.questionNumber} / {gameState.totalQuestions}
+              {isAr
+                ? `السؤال ${gameState.questionNumber} / ${gameState.totalQuestions}`
+                : `Question ${gameState.questionNumber} / ${gameState.totalQuestions}`}
             </span>
             {currentQ && (
               <span className="px-3 py-1 bg-gray-50 border border-gray-200 rounded-full text-xs font-medium text-gray-600">
-                {currentQ.category} • <span className="capitalize">{currentQ.difficulty}</span>
+                {isAr
+                  ? `${currentQ.categoryAr || currentQ.category} • ${currentQ.difficulty === 'easy' ? 'سهل' : currentQ.difficulty === 'hard' ? 'صعب' : 'متوسط'}`
+                  : `${currentQ.category} • ${currentQ.difficulty}`}
               </span>
             )}
           </div>
 
           <div className="flex items-center gap-3">
             <div className="text-right">
-              <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider block">Timer</span>
-              <span className={`text-xl font-bold font-mono ${remainingSeconds <= 3 ? 'text-red-600' : 'text-blue-600'}`}>
+              <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider block">
+                {isAr ? 'الوقت' : 'Timer'}
+              </span>
+              <span className={`text-xl font-bold font-mono force-ltr ${remainingSeconds <= 3 ? 'text-red-600' : 'text-blue-600'}`}>
                 {remainingSeconds}s
               </span>
             </div>
             <div className="text-xs px-3 py-1.5 rounded-full bg-gray-50 border border-gray-200 text-gray-700 font-semibold">
-              {gameState.answeredPlayerIds.length} / {gameState.totalActivePlayers} Answered
+              {isAr
+                ? `${gameState.answeredPlayerIds.length} / ${gameState.totalActivePlayers} جاوبوا`
+                : `${gameState.answeredPlayerIds.length} / ${gameState.totalActivePlayers} Answered`}
             </div>
           </div>
         </div>
@@ -132,10 +141,10 @@ export const QuizBattleGameView: React.FC<QuizBattleGameViewProps> = ({
         >
           <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-semibold">
             <Zap className="w-3.5 h-3.5" />
-            <span>Answer Faster For Higher Speed Bonus!</span>
+            <span>{isAr ? 'جاوب أسرع لتكسب نقاط سرعة إضافية!' : 'Answer Faster For Higher Speed Bonus!'}</span>
           </div>
           <h2 className="text-xl md:text-2xl font-bold text-gray-900 leading-snug pt-1">
-            {currentQ.question}
+            {isAr && currentQ.questionAr ? currentQ.questionAr : currentQ.question}
           </h2>
         </motion.div>
       )}
@@ -149,6 +158,11 @@ export const QuizBattleGameView: React.FC<QuizBattleGameViewProps> = ({
             const isCorrect = gameState.correctAnswerIndex === idx;
             const isWrongSelection =
               gameState.phase === 'reveal' && isSelected && !isCorrect;
+
+            const displayOptionText =
+              isAr && currentQ.optionsAr && currentQ.optionsAr[idx]
+                ? currentQ.optionsAr[idx]
+                : optText;
 
             let cardStyle = 'bg-white text-gray-900 border border-gray-200 hover:bg-gray-50 hover:border-blue-300 shadow-xs';
 
@@ -184,7 +198,7 @@ export const QuizBattleGameView: React.FC<QuizBattleGameViewProps> = ({
                     {letter}
                   </div>
                   <span className="text-sm sm:text-base font-semibold leading-tight">
-                    {optText}
+                    {displayOptionText}
                   </span>
                 </div>
 
@@ -197,7 +211,7 @@ export const QuizBattleGameView: React.FC<QuizBattleGameViewProps> = ({
                   ) : null
                 ) : isSelected ? (
                   <span className="text-xs font-semibold text-blue-700 px-2.5 py-1 bg-blue-100/60 rounded-md shrink-0">
-                    Locked In
+                    {isAr ? 'تم الاختيار ✓' : 'Locked In'}
                   </span>
                 ) : null}
               </motion.button>
@@ -215,8 +229,14 @@ export const QuizBattleGameView: React.FC<QuizBattleGameViewProps> = ({
         >
           <div className="text-center mb-4">
             <Trophy className="w-8 h-8 text-amber-500 mx-auto mb-1.5" />
-            <h3 className="text-xl font-bold text-gray-900">Round Leaderboard</h3>
-            <p className="text-xs text-gray-500">Scores after Question {gameState.questionNumber}</p>
+            <h3 className="text-xl font-bold text-gray-900">
+              {isAr ? 'لوحة صدارة الجولة' : 'Round Leaderboard'}
+            </h3>
+            <p className="text-xs text-gray-500">
+              {isAr
+                ? `النتائج بعد السؤال ${gameState.questionNumber}`
+                : `Scores after Question ${gameState.questionNumber}`}
+            </p>
           </div>
 
           <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
@@ -242,19 +262,21 @@ export const QuizBattleGameView: React.FC<QuizBattleGameViewProps> = ({
                     <div className="font-semibold text-sm text-gray-900">
                       {scoreItem.username}
                       {scoreItem.playerId === currentPlayer.id && (
-                        <span className="ml-1 text-xs text-blue-600 font-semibold">(You)</span>
+                        <span className="mx-1 text-xs text-blue-600 font-semibold">
+                          {isAr ? '(أنت)' : '(You)'}
+                        </span>
                       )}
                     </div>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <div className="text-sm font-bold text-gray-900 font-mono">
-                    {scoreItem.totalScore} pts
+                  <div className="text-sm font-bold text-gray-900 font-mono force-ltr">
+                    {scoreItem.totalScore} {isAr ? 'نقطة' : 'pts'}
                   </div>
                   {scoreItem.roundScoreDelta > 0 && (
-                    <div className="text-xs font-semibold text-emerald-600">
-                      +{scoreItem.roundScoreDelta} pts
+                    <div className="text-xs font-semibold text-emerald-600 force-ltr">
+                      +{scoreItem.roundScoreDelta} {isAr ? 'نقطة' : 'pts'}
                     </div>
                   )}
                 </div>

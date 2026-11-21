@@ -37,9 +37,11 @@ import {
 import { cleanRoomCode, socketCreateRoom, socketJoinRoom, socketQuickPlay } from '@/lib/socket';
 import { PINNED_NICKNAMES } from '@/lib/nicknames';
 import { sound } from '@/lib/sound';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export default function HomePage() {
   const router = useRouter();
+  const { isArabic, t } = useLanguage();
   const gamesGridRef = useRef<HTMLDivElement>(null);
 
   // Player Profile State
@@ -316,22 +318,33 @@ export default function HomePage() {
       {/* 2. HERO SECTION */}
       <section className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center my-3 sm:my-6 md:my-8 relative z-10">
         {/* Left Column: Branding, Headline, Onboarding, Action Buttons */}
-        <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
+        <div className={`lg:col-span-7 flex flex-col items-center ${isArabic ? 'lg:items-start text-center lg:text-right' : 'lg:items-start text-center lg:text-left'}`}>
           {/* Eyebrow Pill */}
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-gray-200 text-xs font-semibold text-gray-700 mb-4 shadow-xs">
             <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-            <span>Instant Browser Party Games • Up to 15 Players</span>
+            <span>{isArabic ? 'ألعاب بارتي جماعية في المتصفح • حتى 15 لاعب' : 'Instant Browser Party Games • Up to 15 Players'}</span>
           </div>
 
           {/* Clean Headline */}
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900 mb-3 leading-tight">
-            The modern{' '}
-            <span className="text-blue-600">party game hub</span>
+            {isArabic ? (
+              <>
+                منصة ألعاب البارتي{' '}
+                <span className="text-blue-600">الأحدث والأمتع</span>
+              </>
+            ) : (
+              <>
+                The modern{' '}
+                <span className="text-blue-600">party game hub</span>
+              </>
+            )}
           </h1>
 
           {/* Subtitle */}
           <p className="text-gray-500 text-sm sm:text-base max-w-xl mb-6 leading-relaxed">
-            Real-time multiplayer games for friends and remote teams. Social deduction, live drawing, speed trivia, word battles, and hilarious challenges with zero downloads.
+            {isArabic
+              ? 'ألعاب جماعية أونلاين في الوقت الفعلي مع صحابك وفريقك. ألعاب شك وتخمين، رسم مباشر، معلومات عامة، تحديات مضحكة بدون أي تحميل أو تطبيقات.'
+              : 'Real-time multiplayer games for friends and remote teams. Social deduction, live drawing, speed trivia, word battles, and hilarious challenges with zero downloads.'}
           </p>
 
           {/* Player Onboarding & Nickname Selection */}
@@ -358,7 +371,7 @@ export default function HomePage() {
               id="btn-create-room"
             >
               <Plus className="w-4 h-4 text-white" />
-              <span>Create Room</span>
+              <span>{isArabic ? 'إنشاء غرفة' : 'Create Room'}</span>
             </motion.button>
 
             {/* 2. JOIN VIA CODE -> Crisp White Surface */}
@@ -373,7 +386,7 @@ export default function HomePage() {
               id="btn-join-code"
             >
               <Hash className="w-4 h-4 text-gray-500" />
-              <span>Join Via Code</span>
+              <span>{isArabic ? 'انضمام بكود' : 'Join Via Code'}</span>
             </motion.button>
 
             {/* 3. QUICK PLAY -> Soft Tinted Blue */}
@@ -390,7 +403,11 @@ export default function HomePage() {
               ) : (
                 <Play className="w-4 h-4 fill-blue-600 text-blue-600" />
               )}
-              <span>{isQuickPlaying ? 'Matching...' : 'Quick Match'}</span>
+              <span>
+                {isQuickPlaying
+                  ? (isArabic ? 'جاري البحث...' : 'Matching...')
+                  : (isArabic ? 'لعب سريع' : 'Quick Match')}
+              </span>
             </motion.button>
           </div>
         </div>
@@ -426,10 +443,10 @@ export default function HomePage() {
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-bold text-gray-900">
-                Live Public Rooms
+                {isArabic ? 'الغرف العامة المباشرة' : 'Live Public Rooms'}
               </h2>
               <p className="text-xs text-gray-500 font-normal">
-                Join an active community room with one click
+                {isArabic ? 'انضم إلى غرفة مفتوحة في المجتمع بضغطة زر واحدة' : 'Join an active community room with one click'}
               </p>
             </div>
           </div>
@@ -443,16 +460,24 @@ export default function HomePage() {
             className="px-3.5 py-1.5 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-xs font-semibold text-gray-700 flex items-center gap-1.5 transition-all shadow-xs"
           >
             <Radio className={`w-3.5 h-3.5 text-blue-600 ${isFetchingRooms ? 'animate-spin' : 'animate-pulse'}`} />
-            <span>{isFetchingRooms ? 'Refreshing...' : 'Refresh Lobbies'}</span>
+            <span>
+              {isFetchingRooms
+                ? (isArabic ? 'جاري التحديث...' : 'Refreshing...')
+                : (isArabic ? 'تحديث الغرف' : 'Refresh Lobbies')}
+            </span>
           </button>
         </div>
 
         {publicRooms.length === 0 ? (
           <div className="text-center py-10 text-gray-400 space-y-2">
             <Gamepad2 className="w-8 h-8 mx-auto text-gray-300 mb-1" />
-            <p className="text-sm font-semibold text-gray-700">No public rooms are currently open.</p>
+            <p className="text-sm font-semibold text-gray-700">
+              {isArabic ? 'لا توجد غرف عامة مفتوحة حالياً.' : 'No public rooms are currently open.'}
+            </p>
             <p className="text-xs text-gray-500">
-              Click &quot;Create Room&quot; above and invite up to 14 friends with your room link!
+              {isArabic
+                ? 'اضغط "إنشاء غرفة" في الأعلى وشارك الرابط مع حتى 14 من أصحابك!'
+                : 'Click "Create Room" above and invite up to 14 friends with your room link!'}
             </p>
           </div>
         ) : (
@@ -466,23 +491,23 @@ export default function HomePage() {
                   <NeonAvatarDisplay avatarId={room.hostAvatar as NeonAvatarId} size="sm" showGlow={false} />
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-gray-900 text-sm tracking-wider">{room.code}</span>
+                      <span className="font-bold text-gray-900 text-sm tracking-wider font-mono force-ltr" data-room-code>{room.code}</span>
                       {room.hasPin && (
-                        <span title="PIN Protected">
+                        <span title={isArabic ? 'محمية برمز PIN' : 'PIN Protected'}>
                           <Lock className="w-3.5 h-3.5 text-amber-500" />
                         </span>
                       )}
                     </div>
                     <div className="text-xs text-gray-500 font-normal">
-                      Host: <span className="text-gray-800 font-semibold">{room.hostUsername}</span> •{' '}
+                      {isArabic ? 'المضيف:' : 'Host:'} <span className="text-gray-800 font-semibold">{room.hostUsername}</span> •{' '}
                       <span className="capitalize text-blue-600 font-semibold">{room.gameMode.replace(/_/g, ' ')}</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <div className="text-xs font-bold text-gray-900">
+                  <div className={isArabic ? 'text-left' : 'text-right'}>
+                    <div className="text-xs font-bold text-gray-900 force-ltr">
                       {room.playerCount}/{room.maxPlayers}
                     </div>
                     <div className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">{room.status}</div>
@@ -495,7 +520,7 @@ export default function HomePage() {
                     }}
                     className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors"
                   >
-                    Join
+                    {isArabic ? 'انضمام' : 'Join'}
                   </button>
                 </div>
               </div>
@@ -522,7 +547,7 @@ export default function HomePage() {
                     <Sparkles className="w-4 h-4" />
                   </div>
                   <h3 className="text-lg sm:text-xl font-bold text-gray-900">
-                    Create New Room
+                    {isArabic ? 'إنشاء غرفة جديدة' : 'Create New Room'}
                   </h3>
                 </div>
                 <button
@@ -551,14 +576,14 @@ export default function HomePage() {
                 {/* Host Nickname */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
-                    Host Nickname
+                    {isArabic ? 'اسم المضيف' : 'Host Nickname'}
                   </label>
                   <input
                     type="text"
                     maxLength={20}
                     value={username}
                     onChange={(e) => handleUsernameChange(e.target.value)}
-                    placeholder="Enter your nickname..."
+                    placeholder={isArabic ? 'اكتب اسمك...' : 'Enter your nickname...'}
                     className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 rounded-xl px-4 py-2.5 text-gray-900 text-sm font-semibold outline-none"
                   />
                 </div>
@@ -566,20 +591,20 @@ export default function HomePage() {
                 {/* Select Game Mode */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
-                    Select Game Mode
+                    {isArabic ? 'اختر نوع اللعبة' : 'Select Game Mode'}
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     {[
-                      { id: 'who_is_imposter', title: 'Who Is Imposter?', desc: 'Social deduction (3-15p)' },
-                      { id: 'draw_and_guess', title: 'Draw & Guess', desc: 'Live canvas (2-15p)' },
-                      { id: 'quiz_battle', title: 'Quiz Battle', desc: 'Speed trivia (2-15p)' },
-                      { id: 'word_battle', title: 'Word Battle', desc: 'Word race (2-15p)' },
-                      { id: 'truth_or_dare', title: 'Truth or Dare', desc: 'Party voting (2-15p)' },
-                      { id: 'never_have_i_ever', title: 'Never Have I Ever', desc: 'Confessions (2-15p)' },
-                      { id: 'most_likely_to', title: 'Most Likely To...', desc: 'Roast & votes (2-15p)' },
-                      { id: 'sip_or_spill', title: 'Sip or Spill 🥤', desc: 'Party drink dilemma (2-15p)' },
-                      { id: 'silly_roulette', title: 'Silly Roulette', desc: 'Spin the chaos (2-15p)' },
-                      { id: 'hot_potato', title: 'Hot Potato', desc: 'Bomb pass panic (2-15p)' }
+                      { id: 'who_is_imposter', title: isArabic ? 'مين الجاسوس؟' : 'Who Is Imposter?', desc: isArabic ? 'شك وتخمين (3-15)' : 'Social deduction (3-15p)' },
+                      { id: 'draw_and_guess', title: isArabic ? 'ارسم وخمّن' : 'Draw & Guess', desc: isArabic ? 'رسم مباشر (2-15)' : 'Live canvas (2-15p)' },
+                      { id: 'quiz_battle', title: isArabic ? 'تحدي المعلومات' : 'Quiz Battle', desc: isArabic ? 'معلومات سريعة (2-15)' : 'Speed trivia (2-15p)' },
+                      { id: 'word_battle', title: isArabic ? 'حرب الكلمات' : 'Word Battle', desc: isArabic ? 'سباق كلمات (2-15)' : 'Word race (2-15p)' },
+                      { id: 'truth_or_dare', title: isArabic ? 'صراحة ولا جرأة' : 'Truth or Dare', desc: isArabic ? 'تصويت بارتي (2-15)' : 'Party voting (2-15p)' },
+                      { id: 'never_have_i_ever', title: isArabic ? 'عمري ما عملت...' : 'Never Have I Ever', desc: isArabic ? 'اعترافات (2-15)' : 'Confessions (2-15p)' },
+                      { id: 'most_likely_to', title: isArabic ? 'مين أكتر واحد فينا...' : 'Most Likely To...', desc: isArabic ? 'تريقة وتصويت (2-15)' : 'Roast & votes (2-15p)' },
+                      { id: 'sip_or_spill', title: isArabic ? 'جاوب ولا اشرب 🥤' : 'Sip or Spill 🥤', desc: isArabic ? 'اعترافات وشرب (2-15)' : 'Party drink dilemma (2-15p)' },
+                      { id: 'silly_roulette', title: isArabic ? 'عجلة الجنون' : 'Silly Roulette', desc: isArabic ? 'تحديات مضحكة (2-15)' : 'Spin the chaos (2-15p)' },
+                      { id: 'hot_potato', title: isArabic ? 'القنبلة الموقوتة' : 'Hot Potato', desc: isArabic ? 'توتر وسرعة (2-15)' : 'Bomb pass panic (2-15p)' }
                     ].map((mode) => (
                       <button
                         key={mode.id}
@@ -606,15 +631,15 @@ export default function HomePage() {
                   <div className="flex items-center justify-between mb-2">
                     <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 flex items-center gap-1.5">
                       <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-                      <span>Party Vibe Mode</span>
+                      <span>{isArabic ? 'أجواء الحفلة' : 'Party Vibe Mode'}</span>
                     </label>
                     <span className="text-xs text-blue-600 font-semibold uppercase">{vibeMode.replace('_', ' ')}</span>
                   </div>
                   <div className="grid grid-cols-3 gap-2">
                     {[
-                      { id: 'chill', label: 'Chill & Funny', desc: 'Safe & lighthearted party fun' },
-                      { id: 'chaotic', label: 'Silly & Chaotic', desc: 'Absurd dares & accents' },
-                      { id: 'sip_edition', label: 'Sip Edition 🥤', desc: 'Live sip counters & skips' }
+                      { id: 'chill', label: isArabic ? 'رايق ومرح' : 'Chill & Funny', desc: isArabic ? 'أجواء خفيفة وممتعة' : 'Safe & lighthearted party fun' },
+                      { id: 'chaotic', label: isArabic ? 'مجنون وتحديات' : 'Silly & Chaotic', desc: isArabic ? 'جرأة وأصوات مجنونة' : 'Absurd dares & accents' },
+                      { id: 'sip_edition', label: isArabic ? 'إصدار الشرب 🥤' : 'Sip Edition 🥤', desc: isArabic ? 'عداد رشفات وتخطي' : 'Live sip counters & skips' }
                     ].map((v) => (
                       <button
                         key={v.id}
@@ -641,8 +666,12 @@ export default function HomePage() {
                   <div className="flex items-center gap-2.5">
                     <Shield className="w-5 h-5 text-blue-600" />
                     <div>
-                      <div className="text-xs sm:text-sm font-semibold text-gray-900">Team Mode (3 Squads)</div>
-                      <div className="text-[11px] text-gray-500">Split up to 15 players into Red, Blue, Green</div>
+                      <div className="text-xs sm:text-sm font-semibold text-gray-900">
+                        {isArabic ? 'وضع الفرق (3 فرق)' : 'Team Mode (3 Squads)'}
+                      </div>
+                      <div className="text-[11px] text-gray-500">
+                        {isArabic ? 'تقسيم اللاعبين إلى أحمر، أزرق، وأخضر' : 'Split up to 15 players into Red, Blue, Green'}
+                      </div>
                     </div>
                   </div>
                   <input
@@ -657,9 +686,11 @@ export default function HomePage() {
                 <div>
                   <div className="flex justify-between items-center mb-1.5">
                     <label className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                      Player Capacity (2 - 15)
+                      {isArabic ? 'عدد اللاعبين (2 - 15)' : 'Player Capacity (2 - 15)'}
                     </label>
-                    <span className="text-blue-600 font-bold text-sm">{maxPlayers} Players</span>
+                    <span className="text-blue-600 font-bold text-sm">
+                      {maxPlayers} {isArabic ? 'لاعبين' : 'Players'}
+                    </span>
                   </div>
                   <input
                     type="range"
@@ -674,7 +705,7 @@ export default function HomePage() {
                 {/* Round Duration */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
-                    Round Timer
+                    {isArabic ? 'مدة الجولة' : 'Round Timer'}
                   </label>
                   <div className="grid grid-cols-4 gap-2">
                     {[20, 30, 45, 60].map((sec) => (
@@ -691,7 +722,7 @@ export default function HomePage() {
                             : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
                         }`}
                       >
-                        {sec}s
+                        {sec}{isArabic ? 'ث' : 's'}
                       </button>
                     ))}
                   </div>
@@ -701,8 +732,12 @@ export default function HomePage() {
                 <div className="space-y-3 pt-3 border-t border-gray-100">
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="text-xs sm:text-sm font-semibold text-gray-900">Private Room</div>
-                      <div className="text-[11px] text-gray-500">Requires 4-digit PIN to join</div>
+                      <div className="text-xs sm:text-sm font-semibold text-gray-900">
+                        {isArabic ? 'غرفة خاصة برمز سري' : 'Private Room'}
+                      </div>
+                      <div className="text-[11px] text-gray-500">
+                        {isArabic ? 'تتطلب رمز PIN مكون من 4 أرقام للانضمام' : 'Requires 4-digit PIN to join'}
+                      </div>
                     </div>
                     <input
                       type="checkbox"
@@ -717,10 +752,10 @@ export default function HomePage() {
                       <input
                         type="text"
                         maxLength={4}
-                        placeholder="Enter 4-digit numeric PIN..."
+                        placeholder={isArabic ? 'أدخل رمز PIN من 4 أرقام...' : 'Enter 4-digit numeric PIN...'}
                         value={pin}
                         onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
-                        className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 rounded-xl px-4 py-2.5 text-gray-900 text-center font-mono font-bold tracking-widest text-base outline-none"
+                        className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 rounded-xl px-4 py-2.5 text-gray-900 text-center font-mono font-bold tracking-widest text-base outline-none force-ltr"
                       />
                     </motion.div>
                   )}
@@ -735,12 +770,12 @@ export default function HomePage() {
                   {isLoading ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Creating Room...</span>
+                      <span>{isArabic ? 'جاري إنشاء الغرفة...' : 'Creating Room...'}</span>
                     </>
                   ) : (
                     <>
                       <Plus className="w-4 h-4" />
-                      <span>Launch Room</span>
+                      <span>{isArabic ? 'ابدأ الغرفة الآن' : 'Launch Room'}</span>
                     </>
                   )}
                 </button>
@@ -768,7 +803,7 @@ export default function HomePage() {
                     <Hash className="w-4 h-4" />
                   </div>
                   <h3 className="text-lg sm:text-xl font-bold text-gray-900">
-                    Join Room
+                    {isArabic ? 'الانضمام إلى غرفة' : 'Join Room'}
                   </h3>
                 </div>
                 <button
@@ -796,7 +831,7 @@ export default function HomePage() {
 
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
-                    Enter 6-character room code
+                    {isArabic ? 'أدخل كود الغرفة المكون من 6 رموز' : 'Enter 6-character room code'}
                   </label>
                   <input
                     type="text"
@@ -804,21 +839,22 @@ export default function HomePage() {
                     placeholder="e.g. K8M4P2"
                     value={joinCode}
                     onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                    className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 rounded-xl px-4 py-3 text-gray-900 text-center font-mono font-bold tracking-widest text-2xl outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 rounded-xl px-4 py-3 text-gray-900 text-center font-mono font-bold tracking-widest text-2xl outline-none force-ltr"
+                    data-room-code
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
-                    Room PIN (If Private)
+                    {isArabic ? 'رمز PIN السري (إن وجد)' : 'Room PIN (If Private)'}
                   </label>
                   <input
                     type="password"
                     maxLength={4}
-                    placeholder="Optional 4-digit PIN"
+                    placeholder={isArabic ? 'رمز PIN اختياري من 4 أرقام' : 'Optional 4-digit PIN'}
                     value={joinPin}
                     onChange={(e) => setJoinPin(e.target.value.replace(/\D/g, ''))}
-                    className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 rounded-xl px-4 py-2.5 text-gray-900 text-center font-mono font-semibold tracking-widest text-base outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 rounded-xl px-4 py-2.5 text-gray-900 text-center font-mono font-semibold tracking-widest text-base outline-none force-ltr"
                   />
                 </div>
 
@@ -830,12 +866,12 @@ export default function HomePage() {
                   {isLoading ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Joining Room...</span>
+                      <span>{isArabic ? 'جاري الانضمام...' : 'Joining Room...'}</span>
                     </>
                   ) : (
                     <>
-                      <ArrowRight className="w-4 h-4 text-white" />
-                      <span>Enter Lobby</span>
+                      <ArrowRight className={`w-4 h-4 text-white ${isArabic ? 'rotate-180' : ''}`} />
+                      <span>{isArabic ? 'دخول اللوبي' : 'Enter Lobby'}</span>
                     </>
                   )}
                 </button>

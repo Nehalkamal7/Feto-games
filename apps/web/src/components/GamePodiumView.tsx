@@ -21,21 +21,22 @@ import { NeonAvatarDisplay } from '@/components/NeonAvatarDisplay';
 import { GameIcon } from '@/components/GameIcon';
 import { BrandLogo } from '@/components/BrandLogo';
 import { ShareRecapCard } from '@/components/ShareRecapCard';
-import { socketRematch } from '@/lib/socket';
+import { socketRematch, socketBackToLobby } from '@/lib/socket';
 import { sound } from '@/lib/sound';
 import confetti from 'canvas-confetti';
+import { useLanguage } from '@/hooks/useLanguage';
 
-const GAME_OPTIONS: { id: GameMode; name: string }[] = [
-  { id: 'who_is_imposter', name: 'Who Is Imposter?' },
-  { id: 'draw_and_guess', name: 'Draw & Guess' },
-  { id: 'quiz_battle', name: 'Quiz Battle' },
-  { id: 'word_battle', name: 'Word Battle' },
-  { id: 'truth_or_dare', name: 'Truth or Dare' },
-  { id: 'never_have_i_ever', name: 'Never Have I Ever' },
-  { id: 'most_likely_to', name: 'Most Likely To...' },
-  { id: 'sip_or_spill', name: 'Sip or Spill 🥤' },
-  { id: 'silly_roulette', name: 'Silly Roulette' },
-  { id: 'hot_potato', name: 'Hot Potato' }
+const GAME_OPTIONS: { id: GameMode; name: string; nameAr: string }[] = [
+  { id: 'who_is_imposter', name: 'Who Is Imposter?', nameAr: 'مين الجاسوس؟' },
+  { id: 'draw_and_guess', name: 'Draw & Guess', nameAr: 'ارسم وخمّن' },
+  { id: 'quiz_battle', name: 'Quiz Battle', nameAr: 'تحدي المعلومات' },
+  { id: 'word_battle', name: 'Word Battle', nameAr: 'حرب الكلمات' },
+  { id: 'truth_or_dare', name: 'Truth or Dare', nameAr: 'صراحة ولا جرأة' },
+  { id: 'never_have_i_ever', name: 'Never Have I Ever', nameAr: 'عمري ما عملت...' },
+  { id: 'most_likely_to', name: 'Most Likely To...', nameAr: 'مين أكتر واحد ممكن...' },
+  { id: 'sip_or_spill', name: 'Sip or Spill 🥤', nameAr: 'جاوب ولا اشرب 🥤' },
+  { id: 'silly_roulette', name: 'Silly Roulette', nameAr: 'عجلة الجنون' },
+  { id: 'hot_potato', name: 'Hot Potato', nameAr: 'القنبلة الموقوتة' }
 ];
 
 interface GamePodiumViewProps {
@@ -44,8 +45,13 @@ interface GamePodiumViewProps {
   onRematchRequested?: () => void;
 }
 
+
 export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
+  const { language } = useLanguage();
+  const isArabic = language === 'ar';
+
   const [isRematching, setIsRematching] = useState(false);
+  const [isReturningToLobby, setIsReturningToLobby] = useState(false);
   const [selectedNextGame, setSelectedNextGame] = useState<GameMode>(room.config.gameMode);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [copiedShareLink, setCopiedShareLink] = useState(false);
@@ -69,8 +75,10 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
     : [
         {
           id: 'award_mvp',
-          title: 'Player of the Match (MVP)',
-          description: 'Dominated the match with top score and quick reflexes!',
+          title: isArabic ? 'نجم المباراة (MVP) 👑' : 'Player of the Match (MVP)',
+          description: isArabic
+            ? 'اكتسح الجولات بأعلى سكور وسرعة بديهة خيالية!'
+            : 'Dominated the match with top score and quick reflexes!',
           recipientId: firstPlace?.id || 'p1',
           recipientUsername: firstPlace?.username || 'Champion',
           recipientAvatar: firstPlace?.avatar || 'cyber_cat',
@@ -79,8 +87,10 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
         },
         {
           id: 'award_sips',
-          title: 'Most Sips Taken 🥤',
-          description: 'Drank through all the spicy dilemmas with unflinching cheer!',
+          title: isArabic ? 'بطل الرشفات 🥤' : 'Most Sips Taken 🥤',
+          description: isArabic
+            ? 'شرب كل الأحكام بقلب جامد وبدون أي تردد!'
+            : 'Drank through all the spicy dilemmas with unflinching cheer!',
           recipientId: sortedPlayers[1]?.id || 'p2',
           recipientUsername: sortedPlayers[1]?.username || 'Party Legend',
           recipientAvatar: sortedPlayers[1]?.avatar || 'neon_fox',
@@ -89,8 +99,10 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
         },
         {
           id: 'award_chaos',
-          title: 'The Chaos Agent 🔥',
-          description: 'Brought the loudest laughs and unpredictable party energy!',
+          title: isArabic ? 'صانع الفوضى والضحك 🔥' : 'The Chaos Agent 🔥',
+          description: isArabic
+            ? 'ولّع القعدة بأعلى ضحك وجنون غير متوقع!'
+            : 'Brought the loudest laughs and unpredictable party energy!',
           recipientId: sortedPlayers[2]?.id || 'p3',
           recipientUsername: sortedPlayers[2]?.username || 'Wild Card',
           recipientAvatar: sortedPlayers[2]?.avatar || 'toxic_frog',
@@ -98,6 +110,7 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
           scoreOrStat: '100% CHAOS'
         }
       ];
+
 
   // Confetti cascade on mount
   useEffect(() => {
@@ -141,6 +154,20 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to start rematch.');
       setIsRematching(false);
+    }
+  };
+
+  const handleBackToLobby = async (resetScores = false) => {
+    if (!isHost) return;
+    setIsReturningToLobby(true);
+    setErrorMessage(null);
+    sound.playClick();
+
+    try {
+      await socketBackToLobby(resetScores, room.code);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to return to lobby.');
+      setIsReturningToLobby(false);
     }
   };
 
@@ -192,13 +219,19 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
       >
         <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white border border-gray-200 text-xs font-semibold text-gray-700 mb-3 shadow-xs">
           <Sparkles className="w-4 h-4 text-amber-500" />
-          <span>Match Concluded • Victory Ceremony</span>
+          <span>{isArabic ? 'انتهت المباراة • منصة التتويج' : 'Match Concluded • Victory Ceremony'}</span>
         </div>
         <h1 className="text-3xl md:text-5xl font-bold text-gray-900 tracking-tight">
-          Final <span className="text-blue-600">Leaderboard</span>
+          {isArabic ? (
+            <>الترتيب <span className="text-blue-600">النهائي</span></>
+          ) : (
+            <>Final <span className="text-blue-600">Leaderboard</span></>
+          )}
         </h1>
         <p className="text-gray-500 text-sm mt-1">
-          {room.config.isTeamMode ? 'Team & Individual Standings' : 'All players ranked by match points'}
+          {room.config.isTeamMode
+            ? (isArabic ? 'ترتيب الفرق والأفراد' : 'Team & Individual Standings')
+            : (isArabic ? 'ترتيب جميع اللاعبين حسب مجموع النقاط' : 'All players ranked by match points')}
         </p>
       </motion.div>
 
@@ -211,7 +244,7 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
         >
           <div className="flex items-center gap-2 mb-4 text-xs font-semibold uppercase tracking-wider text-gray-700">
             <Shield className="w-4 h-4 text-blue-600" />
-            <span>Team Championship Leaderboard</span>
+            <span>{isArabic ? 'ترتيب بطولة الفرق' : 'Team Championship Leaderboard'}</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {teamsRanked.map((t, idx) => (
@@ -221,11 +254,19 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
               >
                 <div className="flex items-center gap-2 font-bold text-sm">
                   {idx === 0 && <Crown className="w-4 h-4 text-amber-500 fill-amber-400" />}
-                  <span className={t.color}>{t.name}</span>
+                  <span className={t.color}>
+                    {t.team === 'red'
+                      ? (isArabic ? 'الفريق الأحمر' : 'Red Team')
+                      : t.team === 'blue'
+                      ? (isArabic ? 'الفريق الأزرق' : 'Blue Team')
+                      : (isArabic ? 'الفريق الأخضر' : 'Green Team')}
+                  </span>
                 </div>
-                <div className="text-2xl font-bold text-gray-900 my-1">{t.score} pts</div>
+                <div className="text-2xl font-bold text-gray-900 my-1 force-ltr">
+                  {t.score} {isArabic ? 'نقطة' : 'pts'}
+                </div>
                 <div className="text-xs text-gray-500">
-                  {room.players.filter((p) => p.team === t.team).length} players
+                  {room.players.filter((p) => p.team === t.team).length} {isArabic ? 'لاعبين' : 'players'}
                 </div>
               </div>
             ))}
@@ -245,21 +286,23 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
           >
             <div className="relative mb-2">
               <NeonAvatarDisplay avatarId={secondPlace.avatar} size="sm" showGlow={false} />
-              <div className="absolute -top-2 -left-1.5 w-6 h-6 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center font-bold text-xs text-slate-800 shadow-xs">
+              <div className="absolute -top-2 -left-1.5 w-6 h-6 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center font-bold text-xs text-slate-800 shadow-xs force-ltr">
                 2
               </div>
             </div>
             <div className="font-semibold text-xs sm:text-sm text-gray-900 truncate max-w-full mb-0.5">
               {secondPlace.username}
             </div>
-            <div className="text-xs font-semibold text-blue-600 mb-2">
-              {secondPlace.score || 0} pts
+            <div className="text-xs font-semibold text-blue-600 mb-2 force-ltr">
+              {secondPlace.score || 0} {isArabic ? 'نقطة' : 'pts'}
             </div>
 
             {/* Silver Pedestal */}
             <div className="w-full h-28 sm:h-36 md:h-40 rounded-t-2xl bg-slate-50 border border-slate-200 flex flex-col items-center justify-start pt-3 shadow-xs">
               <Medal className="w-5 h-5 text-slate-600 mb-1" />
-              <span className="text-xs font-bold text-slate-600 tracking-wider">SILVER</span>
+              <span className="text-xs font-bold text-slate-600 tracking-wider">
+                {isArabic ? 'الفضي' : 'SILVER'}
+              </span>
             </div>
           </motion.div>
         )}
@@ -277,21 +320,23 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
                 <Crown className="w-7 h-7 sm:w-8 sm:h-8 text-amber-500 fill-amber-400" />
               </div>
               <NeonAvatarDisplay avatarId={firstPlace.avatar} size="md" showGlow={false} />
-              <div className="absolute -bottom-1 right-0 w-7 h-7 rounded-full bg-amber-400 border border-amber-500 flex items-center justify-center font-bold text-xs text-amber-950 shadow-xs">
+              <div className="absolute -bottom-1 right-0 w-7 h-7 rounded-full bg-amber-400 border border-amber-500 flex items-center justify-center font-bold text-xs text-amber-950 shadow-xs force-ltr">
                 1
               </div>
             </div>
             <div className="font-bold text-xs sm:text-base text-gray-900 truncate max-w-full mb-0.5">
               {firstPlace.username}
             </div>
-            <div className="text-xs sm:text-sm font-semibold text-amber-600 mb-2">
-              {firstPlace.score || 0} pts
+            <div className="text-xs sm:text-sm font-semibold text-amber-600 mb-2 force-ltr">
+              {firstPlace.score || 0} {isArabic ? 'نقطة' : 'pts'}
             </div>
 
             {/* Gold Pedestal */}
             <div className="w-full h-36 sm:h-48 md:h-56 rounded-t-2xl bg-amber-50 border border-amber-200 flex flex-col items-center justify-start pt-3 shadow-sm">
               <Trophy className="w-7 h-7 text-amber-500 fill-amber-400 mb-1" />
-              <span className="text-xs sm:text-sm font-bold text-amber-800 tracking-wider">CHAMPION</span>
+              <span className="text-xs sm:text-sm font-bold text-amber-800 tracking-wider">
+                {isArabic ? 'البطل' : 'CHAMPION'}
+              </span>
             </div>
           </motion.div>
         )}
@@ -306,21 +351,23 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
           >
             <div className="relative mb-2">
               <NeonAvatarDisplay avatarId={thirdPlace.avatar} size="sm" showGlow={false} />
-              <div className="absolute -top-2 -right-1.5 w-6 h-6 rounded-full bg-orange-200 border border-orange-300 flex items-center justify-center font-bold text-xs text-orange-800 shadow-xs">
+              <div className="absolute -top-2 -right-1.5 w-6 h-6 rounded-full bg-orange-200 border border-orange-300 flex items-center justify-center font-bold text-xs text-orange-800 shadow-xs force-ltr">
                 3
               </div>
             </div>
             <div className="font-semibold text-xs sm:text-sm text-gray-900 truncate max-w-full mb-0.5">
               {thirdPlace.username}
             </div>
-            <div className="text-xs font-semibold text-orange-600 mb-2">
-              {thirdPlace.score || 0} pts
+            <div className="text-xs font-semibold text-orange-600 mb-2 force-ltr">
+              {thirdPlace.score || 0} {isArabic ? 'نقطة' : 'pts'}
             </div>
 
             {/* Bronze Pedestal */}
             <div className="w-full h-24 sm:h-28 md:h-32 rounded-t-2xl bg-orange-50 border border-orange-200 flex flex-col items-center justify-start pt-3 shadow-xs">
               <Medal className="w-5 h-5 text-orange-600 mb-1" />
-              <span className="text-xs font-bold text-orange-700 tracking-wider">BRONZE</span>
+              <span className="text-xs font-bold text-orange-700 tracking-wider">
+                {isArabic ? 'البرونزي' : 'BRONZE'}
+              </span>
             </div>
           </motion.div>
         )}
@@ -337,10 +384,10 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
           <div className="flex items-center gap-2">
             <Award className="w-5 h-5 text-amber-500" />
             <h3 className="text-sm sm:text-base font-bold text-gray-900">
-              Match Highlights & Awards
+              {isArabic ? 'أوسمة وجوائز السهرة' : 'Match Highlights & Awards'}
             </h3>
           </div>
-          <span className="text-xs text-gray-500 font-medium">Party Recap</span>
+          <span className="text-xs text-gray-500 font-medium">{isArabic ? 'ملخص الحفلة' : 'Party Recap'}</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -352,7 +399,7 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-2xl">{award.badgeIcon}</span>
-                  <span className="px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-800 font-mono">
+                  <span className="px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-800 font-mono force-ltr">
                     {award.scoreOrStat}
                   </span>
                 </div>
@@ -365,7 +412,7 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
                 {award.thumbnail && (
                   <div className="mt-2.5 p-1.5 rounded-lg border border-gray-200 bg-white flex flex-col items-center">
                     <img src={award.thumbnail} alt="Masterpiece" className="w-full h-24 object-contain rounded" />
-                    <span className="text-[10px] text-gray-500 font-mono mt-1">Drawing Snapshot 🎨</span>
+                    <span className="text-[10px] text-gray-500 font-mono mt-1">{isArabic ? 'لقطة من الرسمة 🎨' : 'Drawing Snapshot 🎨'}</span>
                   </div>
                 )}
               </div>
@@ -394,7 +441,7 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
             <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-gray-200">
               <BrandLogo size="nav" showSubtitle={false} />
               <div className="px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-[11px] font-semibold text-blue-700">
-                Match Recap
+                {isArabic ? 'ملخص المباراة' : 'Match Recap'}
               </div>
             </div>
 
@@ -405,35 +452,35 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
                   size="md"
                   showGlow={false}
                 />
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shadow-xs">
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shadow-xs force-ltr">
                   #{myRank}
                 </div>
               </div>
               <div className="min-w-0 flex-1">
                 <div className="text-xs uppercase tracking-wider text-gray-500 font-medium">
-                  Player Standings
+                  {isArabic ? 'ترتيب اللاعب' : 'Player Standings'}
                 </div>
                 <div className="text-base font-bold text-gray-900 truncate">
                   {currentPlayer?.username || firstPlace?.username}
                 </div>
-                <div className="text-xs font-semibold text-blue-600 font-mono">
-                  Score: {currentPlayer?.score || firstPlace?.score || 0} pts
+                <div className="text-xs font-semibold text-blue-600 font-mono force-ltr">
+                  {isArabic ? 'السكور:' : 'Score:'} {currentPlayer?.score || firstPlace?.score || 0} pts
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-2 mt-3 pt-2.5 border-t border-gray-200 text-center">
               <div className="bg-white border border-gray-200 p-2 rounded-lg">
-                <div className="text-[10px] uppercase font-medium text-gray-500">Room</div>
-                <div className="text-xs font-bold text-blue-600 font-mono">{room.code}</div>
+                <div className="text-[10px] uppercase font-medium text-gray-500">{isArabic ? 'الروم' : 'Room'}</div>
+                <div className="text-xs font-bold text-blue-600 font-mono force-ltr">{room.code}</div>
               </div>
               <div className="bg-white border border-gray-200 p-2 rounded-lg">
-                <div className="text-[10px] uppercase font-medium text-gray-500">Players</div>
-                <div className="text-xs font-bold text-gray-800 font-mono">{room.players.length}</div>
+                <div className="text-[10px] uppercase font-medium text-gray-500">{isArabic ? 'اللاعبين' : 'Players'}</div>
+                <div className="text-xs font-bold text-gray-800 font-mono force-ltr">{room.players.length}</div>
               </div>
               <div className="bg-white border border-gray-200 p-2 rounded-lg">
-                <div className="text-[10px] uppercase font-medium text-gray-500">Total Sips</div>
-                <div className="text-xs font-bold text-rose-600 font-mono">
+                <div className="text-[10px] uppercase font-medium text-gray-500">{isArabic ? 'الرشفات' : 'Total Sips'}</div>
+                <div className="text-xs font-bold text-rose-600 font-mono force-ltr">
                   {Object.values(room.sipsCount || {}).reduce((a, b) => a + b, 0)} 🥤
                 </div>
               </div>
@@ -443,9 +490,9 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
           {/* Right: Quick Share Buttons */}
           <div className="w-full md:w-2/5 flex flex-col gap-2.5">
             <div>
-              <h4 className="text-base font-bold text-gray-900">Share Results</h4>
+              <h4 className="text-base font-bold text-gray-900">{isArabic ? 'مشاركة النتائج' : 'Share Results'}</h4>
               <p className="text-xs text-gray-500 mt-0.5">
-                Share your score card with friends or export as image
+                {isArabic ? 'شارك كارت النتيجة مع صحابك أو احفظه كصورة' : 'Share your score card with friends or export as image'}
               </p>
             </div>
 
@@ -457,7 +504,7 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
               className="w-full h-11 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-all"
             >
               <Sparkles className="w-4 h-4 text-amber-300" />
-              <span>Export Story Card (PNG)</span>
+              <span>{isArabic ? 'تصدير ستوري كارد (PNG)' : 'Export Story Card (PNG)'}</span>
             </button>
 
             <button
@@ -465,7 +512,7 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
               className="w-full h-11 px-4 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-800 font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-all"
             >
               {copiedStats ? <Check className="w-4 h-4 text-emerald-600" /> : <Share2 className="w-4 h-4 text-gray-600" />}
-              <span>{copiedStats ? 'Copied to Clipboard!' : 'Share Match Recap'}</span>
+              <span>{copiedStats ? (isArabic ? 'تم النسخ للحافظة!' : 'Copied to Clipboard!') : (isArabic ? 'مشاركة ملخص الماتش' : 'Share Match Recap')}</span>
             </button>
 
             <button
@@ -473,7 +520,7 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
               className="w-full h-10 px-4 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 font-medium text-xs flex items-center justify-center gap-2 shadow-xs transition-all"
             >
               {copiedShareLink ? <Check className="w-4 h-4 text-blue-600" /> : <Copy className="w-4 h-4 text-gray-500" />}
-              <span>{copiedShareLink ? 'Link Copied!' : 'Copy Room Invite Link'}</span>
+              <span>{copiedShareLink ? (isArabic ? 'تم نسخ الرابط!' : 'Link Copied!') : (isArabic ? 'نسخ رابط دعوة الروم' : 'Copy Room Invite Link')}</span>
             </button>
           </div>
         </div>
@@ -483,7 +530,7 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
       <div className="w-full bg-white border border-gray-200 shadow-sm rounded-2xl p-4 sm:p-6 mb-6">
         <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-gray-700 mb-3 flex items-center gap-2">
           <Users className="w-4 h-4 text-blue-600" />
-          <span>Full Scoreboard ({sortedPlayers.length} Players)</span>
+          <span>{isArabic ? `لوحة الشرف الكاملة (${sortedPlayers.length} لاعبين)` : `Full Scoreboard (${sortedPlayers.length} Players)`}</span>
         </h3>
 
         <div className="space-y-1.5">
@@ -495,13 +542,13 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
               }`}
             >
               <div className="flex items-center gap-2.5 truncate">
-                <span className="w-5 text-center font-bold text-xs text-gray-500">#{idx + 1}</span>
+                <span className="w-5 text-center font-bold text-xs text-gray-500 force-ltr">#{idx + 1}</span>
                 <NeonAvatarDisplay avatarId={player.avatar} size="sm" showGlow={false} />
                 <div className="flex items-center gap-1.5 truncate">
                   <span className="font-semibold text-xs sm:text-sm text-gray-900 truncate max-w-[120px] sm:max-w-none">{player.username}</span>
                   {player.id === currentPlayer?.id && (
                     <span className="text-[10px] bg-blue-600 text-white px-1.5 py-0.5 rounded font-semibold">
-                      You
+                      {isArabic ? 'أنت' : 'You'}
                     </span>
                   )}
                   {room.config.isTeamMode && player.team && (
@@ -519,12 +566,12 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
               </div>
               <div className="flex items-center gap-3">
                 {room.sipsCount?.[player.id] !== undefined && (
-                  <span className="text-xs font-medium text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
-                    {room.sipsCount[player.id]} Sips 🥤
+                  <span className="text-xs font-medium text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200 force-ltr">
+                    {room.sipsCount[player.id]} {isArabic ? 'رشفات 🥤' : 'Sips 🥤'}
                   </span>
                 )}
-                <div className="font-mono font-bold text-xs sm:text-sm text-gray-900 flex-shrink-0">
-                  {player.score || 0} pts
+                <div className="font-mono font-bold text-xs sm:text-sm text-gray-900 flex-shrink-0 force-ltr">
+                  {player.score || 0} {isArabic ? 'نقطة' : 'pts'}
                 </div>
               </div>
             </div>
@@ -544,13 +591,13 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
           <div className="space-y-4 max-w-md mx-auto">
             <h4 className="text-sm sm:text-base font-bold text-gray-900 flex items-center justify-center gap-2">
               <RotateCcw className="w-4 h-4 text-blue-600" />
-              <span>Next Game Selection (Keep All Players in Room)</span>
+              <span>{isArabic ? 'اختيار اللعبة التالية (نفس المجموعة في الروم)' : 'Next Game Selection (Keep All Players in Room)'}</span>
             </h4>
             <p className="text-xs text-gray-500">
-              Pick the next game mode and launch instantly without having to rejoin:
+              {isArabic ? 'اختر اللعبة التالية وابدأ فوراً بدون ما حد يخرج من الروم:' : 'Pick the next game mode and launch instantly without having to rejoin:'}
             </p>
 
-            <div className="grid grid-cols-2 gap-2 text-left">
+            <div className="grid grid-cols-2 gap-2 text-left rtl:text-right">
               {GAME_OPTIONS.map((g) => (
                 <button
                   key={g.id}
@@ -565,34 +612,51 @@ export function GamePodiumView({ room, currentPlayer }: GamePodiumViewProps) {
                   }`}
                 >
                   <GameIcon gameMode={g.id} size="sm" />
-                  <span className="truncate">{g.name}</span>
+                  <span className="truncate">{isArabic ? g.nameAr : g.name}</span>
                 </button>
               ))}
             </div>
 
-            <button
-              onClick={handleRematch}
-              disabled={isRematching}
-              className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm uppercase tracking-wide flex items-center justify-center gap-2 shadow-sm transition-all disabled:opacity-50"
-            >
-              {isRematching ? (
-                <span>Starting Rematch...</span>
-              ) : (
-                <>
-                  <span>Play Rematch Now</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
+            <div className="flex flex-col sm:flex-row items-center gap-2.5 pt-1">
+              <button
+                onClick={handleRematch}
+                disabled={isRematching || isReturningToLobby}
+                className="w-full sm:flex-1 h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm uppercase tracking-wide flex items-center justify-center gap-2 shadow-sm transition-all disabled:opacity-50"
+              >
+                {isRematching ? (
+                  <span>{isArabic ? 'جاري بدء الماتش...' : 'Starting Rematch...'}</span>
+                ) : (
+                  <>
+                    <span>{isArabic ? 'العب ماتش جديد الآن' : 'Play Rematch Now'}</span>
+                    <ArrowRight className="w-4 h-4 rtl:rotate-180" />
+                  </>
+                )}
+              </button>
+
+              <button
+                onClick={() => handleBackToLobby(false)}
+                disabled={isRematching || isReturningToLobby}
+                className="w-full sm:flex-1 h-12 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-800 font-semibold text-xs sm:text-sm uppercase tracking-wide flex items-center justify-center gap-2 shadow-xs transition-all disabled:opacity-50"
+              >
+                {isReturningToLobby ? (
+                  <span>{isArabic ? 'جاري العودة للوبي...' : 'Returning to Lobby...'}</span>
+                ) : (
+                  <>
+                    <Users className="w-4 h-4 text-blue-600" />
+                    <span>{isArabic ? 'العودة للوبي (بنفس الروم)' : 'Back to Lobby (Same Crew)'}</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         ) : (
           <div className="space-y-2 py-3">
             <div className="flex items-center justify-center gap-2 text-blue-600 font-semibold text-sm">
               <RotateCcw className="w-4 h-4 animate-spin" />
-              <span>Waiting for Host to Choose the Next Game...</span>
+              <span>{isArabic ? 'في انتظار المضيف لاختيار اللعبة التالية أو العودة للوبي...' : 'Waiting for Host to Choose Next Game or Return to Lobby...'}</span>
             </div>
             <p className="text-xs text-gray-500">
-              Stay in the room! All players will automatically transition to the next match together.
+              {isArabic ? 'خليك في الروم! كل اللاعبين هينتقلوا مع بعض تلقائياً بدون الحاجة لإعادة الدخول.' : 'Stay in the room! All players will automatically transition together without needing to re-join.'}
             </p>
           </div>
         )}

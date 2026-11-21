@@ -58,6 +58,8 @@ export const viewport: Viewport = {
   themeColor: '#F9FAFB'
 };
 
+import { LanguageProvider } from '@/hooks/useLanguage';
+
 export default function RootLayout({
   children,
 }: {
@@ -66,7 +68,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="bg-[#F9FAFB]">
       <body className="min-h-[100dvh] w-full bg-[#F9FAFB] text-gray-900 antialiased selection:bg-blue-600 selection:text-white overflow-x-hidden">
-        {children}
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

@@ -1,0 +1,2638 @@
+[
+  {
+    "category": "Animals",
+    "letter": "A",
+    "validWords": [
+      "alligator",
+      "antelope",
+      "anteater",
+      "armadillo",
+      "alpaca",
+      "albatross",
+      "anaconda",
+      "aardvark",
+      "ant",
+      "ape"
+    ],
+    "categoryAr": "حيوانات",
+    "letterAr": "أ",
+    "validWordsAr": [
+      "alligator",
+      "antelope",
+      "anteater",
+      "armadillo",
+      "alpaca",
+      "albatross",
+      "anaconda",
+      "aardvark",
+      "ant",
+      "ape"
+    ]
+  },
+  {
+    "category": "Animals",
+    "letter": "B",
+    "validWords": [
+      "bear",
+      "beaver",
+      "bison",
+      "badger",
+      "baboon",
+      "bat",
+      "bull",
+      "butterfly",
+      "buffalo",
+      "boar"
+    ],
+    "categoryAr": "حيوانات",
+    "letterAr": "ب",
+    "validWordsAr": [
+      "bear",
+      "beaver",
+      "bison",
+      "badger",
+      "baboon",
+      "bat",
+      "bull",
+      "butterfly",
+      "buffalo",
+      "boar"
+    ]
+  },
+  {
+    "category": "Animals",
+    "letter": "C",
+    "validWords": [
+      "cheetah",
+      "chimpanzee",
+      "camel",
+      "crocodile",
+      "coyote",
+      "cougar",
+      "crab",
+      "cat",
+      "chameleon",
+      "cobra"
+    ],
+    "categoryAr": "حيوانات",
+    "letterAr": "ك",
+    "validWordsAr": [
+      "cheetah",
+      "chimpanzee",
+      "camel",
+      "crocodile",
+      "coyote",
+      "cougar",
+      "crab",
+      "cat",
+      "chameleon",
+      "cobra"
+    ]
+  },
+  {
+    "category": "Animals",
+    "letter": "D",
+    "validWords": [
+      "dolphin",
+      "deer",
+      "dingo",
+      "donkey",
+      "duck",
+      "dog",
+      "dragonfly",
+      "dove",
+      "dormouse"
+    ],
+    "categoryAr": "حيوانات",
+    "letterAr": "د",
+    "validWordsAr": [
+      "dolphin",
+      "deer",
+      "dingo",
+      "donkey",
+      "duck",
+      "dog",
+      "dragonfly",
+      "dove",
+      "dormouse"
+    ]
+  },
+  {
+    "category": "Animals",
+    "letter": "E",
+    "validWords": [
+      "elephant",
+      "eagle",
+      "emu",
+      "echidna",
+      "eel",
+      "elk",
+      "earthworm"
+    ],
+    "categoryAr": "حيوانات",
+    "letterAr": "إ",
+    "validWordsAr": [
+      "elephant",
+      "eagle",
+      "emu",
+      "echidna",
+      "eel",
+      "elk",
+      "earthworm"
+    ]
+  },
+  {
+    "category": "Animals",
+    "letter": "F",
+    "validWords": [
+      "fox",
+      "flamingo",
+      "falcon",
+      "ferret",
+      "frog",
+      "fish",
+      "firefly",
+      "finch"
+    ],
+    "categoryAr": "حيوانات",
+    "letterAr": "ف",
+    "validWordsAr": [
+      "fox",
+      "flamingo",
+      "falcon",
+      "ferret",
+      "frog",
+      "fish",
+      "firefly",
+      "finch"
+    ]
+  },
+  {
+    "category": "Animals",
+    "letter": "G",
+    "validWords": [
+      "giraffe",
+      "gorilla",
+      "gazelle",
+      "goat",
+      "gecko",
+      "goose",
+      "gibbon",
+      "goldfish"
+    ],
+    "categoryAr": "حيوانات",
+    "letterAr": "ج",
+    "validWordsAr": [
+      "giraffe",
+      "gorilla",
+      "gazelle",
+      "goat",
+      "gecko",
+      "goose",
+      "gibbon",
+      "goldfish"
+    ]
+  },
+  {
+    "category": "Animals",
+    "letter": "H",
+    "validWords": [
+      "hippopotamus",
+      "hyena",
+      "hedgehog",
+      "horse",
+      "hawk",
+      "hamster",
+      "hummingbird",
+      "hare"
+    ],
+    "categoryAr": "حيوانات",
+    "letterAr": "هـ",
+    "validWordsAr": [
+      "hippopotamus",
+      "hyena",
+      "hedgehog",
+      "horse",
+      "hawk",
+      "hamster",
+      "hummingbird",
+      "hare"
+    ]
+  },
+  {
+    "category": "Animals",
+    "letter": "I",
+    "validWords": [
+      "iguana",
+      "impala",
+      "ibis",
+      "insect",
+      "indri"
+    ],
+    "categoryAr": "حيوانات",
+    "letterAr": "ي",
+    "validWordsAr": [
+      "iguana",
+      "impala",
+      "ibis",
+      "insect",
+      "indri"
+    ]
+  },
+  {
+    "category": "Animals",
+    "letter": "J",
+    "validWords": [
+      "jaguar",
+      "jellyfish",
+      "jackal",
+      "jay",
+      "jerboa"
+    ],
+    "categoryAr": "حيوانات",
+    "letterAr": "ج",
+    "validWordsAr": [
+      "jaguar",
+      "jellyfish",
+      "jackal",
+      "jay",
+      "jerboa"
+    ]
+  },
+  {
+    "category": "Animals",
+    "letter": "K",
+    "validWords": [
+      "kangaroo",
+      "koala",
+      "kingfisher",
+      "kiwi",
+      "komodo",
+      "kudu"
+    ],
+    "categoryAr": "حيوانات",
+    "letterAr": "ك",
+    "validWordsAr": [
+      "kangaroo",
+      "koala",
+      "kingfisher",
+      "kiwi",
+      "komodo",
+      "kudu"
+    ]
+  },
+  {
+    "category": "Animals",
+    "letter": "L",
+    "validWords": [
+      "lion",
+      "leopard",
+      "lemur",
+      "llama",
+      "lynx",
+      "lizard",
+      "lobster",
+      "leech"
+    ],
+    "categoryAr": "حيوانات",
+    "letterAr": "ل",
+    "validWordsAr": [
+      "lion",
+      "leopard",
+      "lemur",
+      "llama",
+      "lynx",
+      "lizard",
+      "lobster",
+      "leech"
+    ]
+  },
+  {
+    "category": "Animals",
+    "letter": "M",
+    "validWords": [
+      "monkey",
+      "meerkat",
+      "moose",
+      "mole",
+      "mongoose",
+      "moth",
+      "mouse",
+      "marmot"
+    ],
+    "categoryAr": "حيوانات",
+    "letterAr": "م",
+    "validWordsAr": [
+      "monkey",
+      "meerkat",
+      "moose",
+      "mole",
+      "mongoose",
+      "moth",
+      "mouse",
+      "marmot"
+    ]
+  },
+  {
+    "category": "Animals",
+    "letter": "N",
+    "validWords": [
+      "narwhal",
+      "newt",
+      "nightingale",
+      "numbat",
+      "nuthatch"
+    ],
+    "categoryAr": "حيوانات",
+    "letterAr": "ن",
+    "validWordsAr": [
+      "narwhal",
+      "newt",
+      "nightingale",
+      "numbat",
+      "nuthatch"
+    ]
+  },
+  {
+    "category": "Animals",
+    "letter": "O",
+    "validWords": [
+      "octopus",
+      "otter",
+      "owl",
+      "ostrich",
+      "oryx",
+      "ocelot",
+      "opossum"
+    ],
+    "categoryAr": "حيوانات",
+    "letterAr": "و",
+    "validWordsAr": [
+      "octopus",
+      "otter",
+      "owl",
+      "ostrich",
+      "oryx",
+      "ocelot",
+      "opossum"
+    ]
+  },
+  {
+    "category": "Animals",
+    "letter": "P",
+    "validWords": [
+      "panther",
+      "panda",
+      "penguin",
+      "platypus",
+      "pelican",
+      "porcupine",
+      "peacock",
+      "parrot"
+    ],
+    "categoryAr": "حيوانات",
+    "letterAr": "ب",
+    "validWordsAr": [
+      "panther",
+      "panda",
+      "penguin",
+      "platypus",
+      "pelican",
+      "porcupine",
+      "peacock",
+      "parrot"
+    ]
+  },
+  {
+    "category": "Animals",
+    "letter": "R",
+    "validWords": [
+      "rhinoceros",
+      "rabbit",
+      "raccoon",
+      "rat",
+      "raven",
+      "reindeer",
+      "rooster"
+    ],
+    "categoryAr": "حيوانات",
+    "letterAr": "ر",
+    "validWordsAr": [
+      "rhinoceros",
+      "rabbit",
+      "raccoon",
+      "rat",
+      "raven",
+      "reindeer",
+      "rooster"
+    ]
+  },
+  {
+    "category": "Animals",
+    "letter": "S",
+    "validWords": [
+      "sloth",
+      "snake",
+      "shark",
+      "seal",
+      "scorpion",
+      "spider",
+      "swan",
+      "squirrel",
+      "sheep"
+    ],
+    "categoryAr": "حيوانات",
+    "letterAr": "س",
+    "validWordsAr": [
+      "sloth",
+      "snake",
+      "shark",
+      "seal",
+      "scorpion",
+      "spider",
+      "swan",
+      "squirrel",
+      "sheep"
+    ]
+  },
+  {
+    "category": "Animals",
+    "letter": "T",
+    "validWords": [
+      "tiger",
+      "turtle",
+      "toucan",
+      "tarantula",
+      "tapir",
+      "tortoise",
+      "turkey",
+      "toad"
+    ],
+    "categoryAr": "حيوانات",
+    "letterAr": "ت",
+    "validWordsAr": [
+      "tiger",
+      "turtle",
+      "toucan",
+      "tarantula",
+      "tapir",
+      "tortoise",
+      "turkey",
+      "toad"
+    ]
+  },
+  {
+    "category": "Animals",
+    "letter": "W",
+    "validWords": [
+      "whale",
+      "wolf",
+      "walrus",
+      "wombat",
+      "warthog",
+      "woodpecker",
+      "weasel",
+      "wasp"
+    ],
+    "categoryAr": "حيوانات",
+    "letterAr": "و",
+    "validWordsAr": [
+      "whale",
+      "wolf",
+      "walrus",
+      "wombat",
+      "warthog",
+      "woodpecker",
+      "weasel",
+      "wasp"
+    ]
+  },
+  {
+    "category": "Animals",
+    "letter": "Z",
+    "validWords": [
+      "zebra",
+      "zebu",
+      "zonkey"
+    ],
+    "categoryAr": "حيوانات",
+    "letterAr": "ز",
+    "validWordsAr": [
+      "zebra",
+      "zebu",
+      "zonkey"
+    ]
+  },
+  {
+    "category": "Countries & Capitals",
+    "letter": "A",
+    "validWords": [
+      "argentina",
+      "australia",
+      "austria",
+      "albania",
+      "algeria",
+      "amsterdam",
+      "athens",
+      "ankara",
+      "abu dhabi",
+      "armenia"
+    ],
+    "categoryAr": "Countries & Capitals",
+    "letterAr": "أ",
+    "validWordsAr": [
+      "argentina",
+      "australia",
+      "austria",
+      "albania",
+      "algeria",
+      "amsterdam",
+      "athens",
+      "ankara",
+      "abu dhabi",
+      "armenia"
+    ]
+  },
+  {
+    "category": "Countries & Capitals",
+    "letter": "B",
+    "validWords": [
+      "brazil",
+      "belgium",
+      "bangladesh",
+      "berlin",
+      "beijing",
+      "bangkok",
+      "brussels",
+      "buenos aires",
+      "bolivia",
+      "bahamas"
+    ],
+    "categoryAr": "Countries & Capitals",
+    "letterAr": "ب",
+    "validWordsAr": [
+      "brazil",
+      "belgium",
+      "bangladesh",
+      "berlin",
+      "beijing",
+      "bangkok",
+      "brussels",
+      "buenos aires",
+      "bolivia",
+      "bahamas"
+    ]
+  },
+  {
+    "category": "Countries & Capitals",
+    "letter": "C",
+    "validWords": [
+      "canada",
+      "colombia",
+      "cuba",
+      "chile",
+      "cairo",
+      "canberra",
+      "copenhagen",
+      "croatia",
+      "cyprus",
+      "cameroon"
+    ],
+    "categoryAr": "Countries & Capitals",
+    "letterAr": "ك",
+    "validWordsAr": [
+      "canada",
+      "colombia",
+      "cuba",
+      "chile",
+      "cairo",
+      "canberra",
+      "copenhagen",
+      "croatia",
+      "cyprus",
+      "cameroon"
+    ]
+  },
+  {
+    "category": "Countries & Capitals",
+    "letter": "D",
+    "validWords": [
+      "denmark",
+      "dublin",
+      "delhi",
+      "damascus",
+      "doha",
+      "djibouti",
+      "dhaka"
+    ],
+    "categoryAr": "Countries & Capitals",
+    "letterAr": "د",
+    "validWordsAr": [
+      "denmark",
+      "dublin",
+      "delhi",
+      "damascus",
+      "doha",
+      "djibouti",
+      "dhaka"
+    ]
+  },
+  {
+    "category": "Countries & Capitals",
+    "letter": "E",
+    "validWords": [
+      "egypt",
+      "ethiopia",
+      "ecuador",
+      "estonia",
+      "edinburgh"
+    ],
+    "categoryAr": "Countries & Capitals",
+    "letterAr": "إ",
+    "validWordsAr": [
+      "egypt",
+      "ethiopia",
+      "ecuador",
+      "estonia",
+      "edinburgh"
+    ]
+  },
+  {
+    "category": "Countries & Capitals",
+    "letter": "F",
+    "validWords": [
+      "france",
+      "finland",
+      "fiji",
+      "frankfurt"
+    ],
+    "categoryAr": "Countries & Capitals",
+    "letterAr": "ف",
+    "validWordsAr": [
+      "france",
+      "finland",
+      "fiji",
+      "frankfurt"
+    ]
+  },
+  {
+    "category": "Countries & Capitals",
+    "letter": "G",
+    "validWords": [
+      "germany",
+      "greece",
+      "georgia",
+      "ghana",
+      "guatemala"
+    ],
+    "categoryAr": "Countries & Capitals",
+    "letterAr": "ج",
+    "validWordsAr": [
+      "germany",
+      "greece",
+      "georgia",
+      "ghana",
+      "guatemala"
+    ]
+  },
+  {
+    "category": "Countries & Capitals",
+    "letter": "H",
+    "validWords": [
+      "hungary",
+      "honduras",
+      "helsinki",
+      "havana",
+      "haiti"
+    ],
+    "categoryAr": "Countries & Capitals",
+    "letterAr": "هـ",
+    "validWordsAr": [
+      "hungary",
+      "honduras",
+      "helsinki",
+      "havana",
+      "haiti"
+    ]
+  },
+  {
+    "category": "Countries & Capitals",
+    "letter": "I",
+    "validWords": [
+      "italy",
+      "india",
+      "indonesia",
+      "ireland",
+      "iceland",
+      "iran",
+      "iraq",
+      "islamabad"
+    ],
+    "categoryAr": "Countries & Capitals",
+    "letterAr": "ي",
+    "validWordsAr": [
+      "italy",
+      "india",
+      "indonesia",
+      "ireland",
+      "iceland",
+      "iran",
+      "iraq",
+      "islamabad"
+    ]
+  },
+  {
+    "category": "Countries & Capitals",
+    "letter": "J",
+    "validWords": [
+      "japan",
+      "jordan",
+      "jamaica",
+      "jakarta",
+      "jerusalem"
+    ],
+    "categoryAr": "Countries & Capitals",
+    "letterAr": "ج",
+    "validWordsAr": [
+      "japan",
+      "jordan",
+      "jamaica",
+      "jakarta",
+      "jerusalem"
+    ]
+  },
+  {
+    "category": "Countries & Capitals",
+    "letter": "K",
+    "validWords": [
+      "kenya",
+      "kuwait",
+      "kiev",
+      "kingston",
+      "kathmandu"
+    ],
+    "categoryAr": "Countries & Capitals",
+    "letterAr": "ك",
+    "validWordsAr": [
+      "kenya",
+      "kuwait",
+      "kiev",
+      "kingston",
+      "kathmandu"
+    ]
+  },
+  {
+    "category": "Countries & Capitals",
+    "letter": "L",
+    "validWords": [
+      "lebanon",
+      "libya",
+      "lithuania",
+      "london",
+      "lisbon",
+      "lima",
+      "luxembourg"
+    ],
+    "categoryAr": "Countries & Capitals",
+    "letterAr": "ل",
+    "validWordsAr": [
+      "lebanon",
+      "libya",
+      "lithuania",
+      "london",
+      "lisbon",
+      "lima",
+      "luxembourg"
+    ]
+  },
+  {
+    "category": "Countries & Capitals",
+    "letter": "M",
+    "validWords": [
+      "mexico",
+      "morocco",
+      "malaysia",
+      "madrid",
+      "moscow",
+      "manila",
+      "mongolia",
+      "monaco"
+    ],
+    "categoryAr": "Countries & Capitals",
+    "letterAr": "م",
+    "validWordsAr": [
+      "mexico",
+      "morocco",
+      "malaysia",
+      "madrid",
+      "moscow",
+      "manila",
+      "mongolia",
+      "monaco"
+    ]
+  },
+  {
+    "category": "Countries & Capitals",
+    "letter": "N",
+    "validWords": [
+      "norway",
+      "netherlands",
+      "new zealand",
+      "nigeria",
+      "nairobi",
+      "nepal"
+    ],
+    "categoryAr": "Countries & Capitals",
+    "letterAr": "ن",
+    "validWordsAr": [
+      "norway",
+      "netherlands",
+      "new zealand",
+      "nigeria",
+      "nairobi",
+      "nepal"
+    ]
+  },
+  {
+    "category": "Countries & Capitals",
+    "letter": "P",
+    "validWords": [
+      "portugal",
+      "poland",
+      "peru",
+      "paris",
+      "prague",
+      "philippines",
+      "pakistan"
+    ],
+    "categoryAr": "Countries & Capitals",
+    "letterAr": "ب",
+    "validWordsAr": [
+      "portugal",
+      "poland",
+      "peru",
+      "paris",
+      "prague",
+      "philippines",
+      "pakistan"
+    ]
+  },
+  {
+    "category": "Countries & Capitals",
+    "letter": "R",
+    "validWords": [
+      "russia",
+      "romania",
+      "rome",
+      "riyadh",
+      "rwanda",
+      "rabat"
+    ],
+    "categoryAr": "Countries & Capitals",
+    "letterAr": "ر",
+    "validWordsAr": [
+      "russia",
+      "romania",
+      "rome",
+      "riyadh",
+      "rwanda",
+      "rabat"
+    ]
+  },
+  {
+    "category": "Countries & Capitals",
+    "letter": "S",
+    "validWords": [
+      "spain",
+      "sweden",
+      "switzerland",
+      "seoul",
+      "singapore",
+      "sydney",
+      "santiago",
+      "senegal",
+      "serbia"
+    ],
+    "categoryAr": "Countries & Capitals",
+    "letterAr": "س",
+    "validWordsAr": [
+      "spain",
+      "sweden",
+      "switzerland",
+      "seoul",
+      "singapore",
+      "sydney",
+      "santiago",
+      "senegal",
+      "serbia"
+    ]
+  },
+  {
+    "category": "Countries & Capitals",
+    "letter": "T",
+    "validWords": [
+      "turkey",
+      "thailand",
+      "tokyo",
+      "tunisia",
+      "taipei",
+      "tanzania",
+      "tehran"
+    ],
+    "categoryAr": "Countries & Capitals",
+    "letterAr": "ت",
+    "validWordsAr": [
+      "turkey",
+      "thailand",
+      "tokyo",
+      "tunisia",
+      "taipei",
+      "tanzania",
+      "tehran"
+    ]
+  },
+  {
+    "category": "Countries & Capitals",
+    "letter": "U",
+    "validWords": [
+      "uganda",
+      "ukraine",
+      "uruguay",
+      "uzbekistan"
+    ],
+    "categoryAr": "Countries & Capitals",
+    "letterAr": "أ",
+    "validWordsAr": [
+      "uganda",
+      "ukraine",
+      "uruguay",
+      "uzbekistan"
+    ]
+  },
+  {
+    "category": "Foods & Drinks",
+    "letter": "A",
+    "validWords": [
+      "apple",
+      "avocado",
+      "almond",
+      "apricot",
+      "artichoke",
+      "asparagus",
+      "ale",
+      "anchovy"
+    ],
+    "categoryAr": "Foods & Drinks",
+    "letterAr": "أ",
+    "validWordsAr": [
+      "apple",
+      "avocado",
+      "almond",
+      "apricot",
+      "artichoke",
+      "asparagus",
+      "ale",
+      "anchovy"
+    ]
+  },
+  {
+    "category": "Foods & Drinks",
+    "letter": "B",
+    "validWords": [
+      "banana",
+      "bread",
+      "burger",
+      "burrito",
+      "bacon",
+      "bagel",
+      "broccoli",
+      "beer",
+      "blueberry",
+      "butter"
+    ],
+    "categoryAr": "Foods & Drinks",
+    "letterAr": "ب",
+    "validWordsAr": [
+      "banana",
+      "bread",
+      "burger",
+      "burrito",
+      "bacon",
+      "bagel",
+      "broccoli",
+      "beer",
+      "blueberry",
+      "butter"
+    ]
+  },
+  {
+    "category": "Foods & Drinks",
+    "letter": "C",
+    "validWords": [
+      "chocolate",
+      "coffee",
+      "cheese",
+      "cake",
+      "carrot",
+      "chicken",
+      "cookie",
+      "cherry",
+      "croissant",
+      "cappuccino"
+    ],
+    "categoryAr": "Foods & Drinks",
+    "letterAr": "ك",
+    "validWordsAr": [
+      "chocolate",
+      "coffee",
+      "cheese",
+      "cake",
+      "carrot",
+      "chicken",
+      "cookie",
+      "cherry",
+      "croissant",
+      "cappuccino"
+    ]
+  },
+  {
+    "category": "Foods & Drinks",
+    "letter": "D",
+    "validWords": [
+      "donut",
+      "dumpling",
+      "date",
+      "duck",
+      "dorito",
+      "dill",
+      "dressing"
+    ],
+    "categoryAr": "Foods & Drinks",
+    "letterAr": "د",
+    "validWordsAr": [
+      "donut",
+      "dumpling",
+      "date",
+      "duck",
+      "dorito",
+      "dill",
+      "dressing"
+    ]
+  },
+  {
+    "category": "Foods & Drinks",
+    "letter": "E",
+    "validWords": [
+      "egg",
+      "eggplant",
+      "espresso",
+      "eclair",
+      "enchilada",
+      "edamame"
+    ],
+    "categoryAr": "Foods & Drinks",
+    "letterAr": "إ",
+    "validWordsAr": [
+      "egg",
+      "eggplant",
+      "espresso",
+      "eclair",
+      "enchilada",
+      "edamame"
+    ]
+  },
+  {
+    "category": "Foods & Drinks",
+    "letter": "F",
+    "validWords": [
+      "fries",
+      "fish",
+      "fig",
+      "fudge",
+      "falafel",
+      "frappe",
+      "fondue"
+    ],
+    "categoryAr": "Foods & Drinks",
+    "letterAr": "ف",
+    "validWordsAr": [
+      "fries",
+      "fish",
+      "fig",
+      "fudge",
+      "falafel",
+      "frappe",
+      "fondue"
+    ]
+  },
+  {
+    "category": "Foods & Drinks",
+    "letter": "G",
+    "validWords": [
+      "grape",
+      "garlic",
+      "ginger",
+      "guacamole",
+      "gelato",
+      "grapefruit",
+      "granola"
+    ],
+    "categoryAr": "Foods & Drinks",
+    "letterAr": "ج",
+    "validWordsAr": [
+      "grape",
+      "garlic",
+      "ginger",
+      "guacamole",
+      "gelato",
+      "grapefruit",
+      "granola"
+    ]
+  },
+  {
+    "category": "Foods & Drinks",
+    "letter": "H",
+    "validWords": [
+      "hotdog",
+      "honey",
+      "hamburger",
+      "hummus",
+      "hazelnut",
+      "ham"
+    ],
+    "categoryAr": "Foods & Drinks",
+    "letterAr": "هـ",
+    "validWordsAr": [
+      "hotdog",
+      "honey",
+      "hamburger",
+      "hummus",
+      "hazelnut",
+      "ham"
+    ]
+  },
+  {
+    "category": "Foods & Drinks",
+    "letter": "I",
+    "validWords": [
+      "ice cream",
+      "iced tea",
+      "irish stew",
+      "icing"
+    ],
+    "categoryAr": "Foods & Drinks",
+    "letterAr": "ي",
+    "validWordsAr": [
+      "ice cream",
+      "iced tea",
+      "irish stew",
+      "icing"
+    ]
+  },
+  {
+    "category": "Foods & Drinks",
+    "letter": "K",
+    "validWords": [
+      "kiwi",
+      "kebab",
+      "ketchup",
+      "kale",
+      "kimchi",
+      "kumquat"
+    ],
+    "categoryAr": "Foods & Drinks",
+    "letterAr": "ك",
+    "validWordsAr": [
+      "kiwi",
+      "kebab",
+      "ketchup",
+      "kale",
+      "kimchi",
+      "kumquat"
+    ]
+  },
+  {
+    "category": "Foods & Drinks",
+    "letter": "L",
+    "validWords": [
+      "lemon",
+      "lime",
+      "lasagna",
+      "lobster",
+      "lettuce",
+      "latte",
+      "lollipop"
+    ],
+    "categoryAr": "Foods & Drinks",
+    "letterAr": "ل",
+    "validWordsAr": [
+      "lemon",
+      "lime",
+      "lasagna",
+      "lobster",
+      "lettuce",
+      "latte",
+      "lollipop"
+    ]
+  },
+  {
+    "category": "Foods & Drinks",
+    "letter": "M",
+    "validWords": [
+      "mango",
+      "milk",
+      "muffin",
+      "mushroom",
+      "mojito",
+      "macaroni",
+      "meatball",
+      "melon"
+    ],
+    "categoryAr": "Foods & Drinks",
+    "letterAr": "م",
+    "validWordsAr": [
+      "mango",
+      "milk",
+      "muffin",
+      "mushroom",
+      "mojito",
+      "macaroni",
+      "meatball",
+      "melon"
+    ]
+  },
+  {
+    "category": "Foods & Drinks",
+    "letter": "N",
+    "validWords": [
+      "noodle",
+      "nacho",
+      "nutella",
+      "nectarine",
+      "nugget"
+    ],
+    "categoryAr": "Foods & Drinks",
+    "letterAr": "ن",
+    "validWordsAr": [
+      "noodle",
+      "nacho",
+      "nutella",
+      "nectarine",
+      "nugget"
+    ]
+  },
+  {
+    "category": "Foods & Drinks",
+    "letter": "O",
+    "validWords": [
+      "orange",
+      "onion",
+      "olive",
+      "omelet",
+      "oatmeal",
+      "oreo"
+    ],
+    "categoryAr": "Foods & Drinks",
+    "letterAr": "و",
+    "validWordsAr": [
+      "orange",
+      "onion",
+      "olive",
+      "omelet",
+      "oatmeal",
+      "oreo"
+    ]
+  },
+  {
+    "category": "Foods & Drinks",
+    "letter": "P",
+    "validWords": [
+      "pizza",
+      "pasta",
+      "pancake",
+      "pineapple",
+      "popcorn",
+      "potato",
+      "peach",
+      "pie",
+      "peanut"
+    ],
+    "categoryAr": "Foods & Drinks",
+    "letterAr": "ب",
+    "validWordsAr": [
+      "pizza",
+      "pasta",
+      "pancake",
+      "pineapple",
+      "popcorn",
+      "potato",
+      "peach",
+      "pie",
+      "peanut"
+    ]
+  },
+  {
+    "category": "Foods & Drinks",
+    "letter": "R",
+    "validWords": [
+      "rice",
+      "ramen",
+      "ravioli",
+      "raspberry",
+      "radish",
+      "ribs",
+      "roast"
+    ],
+    "categoryAr": "Foods & Drinks",
+    "letterAr": "ر",
+    "validWordsAr": [
+      "rice",
+      "ramen",
+      "ravioli",
+      "raspberry",
+      "radish",
+      "ribs",
+      "roast"
+    ]
+  },
+  {
+    "category": "Foods & Drinks",
+    "letter": "S",
+    "validWords": [
+      "sushi",
+      "salad",
+      "sandwich",
+      "soup",
+      "steak",
+      "strawberry",
+      "spaghetti",
+      "sausage",
+      "smoothie"
+    ],
+    "categoryAr": "Foods & Drinks",
+    "letterAr": "س",
+    "validWordsAr": [
+      "sushi",
+      "salad",
+      "sandwich",
+      "soup",
+      "steak",
+      "strawberry",
+      "spaghetti",
+      "sausage",
+      "smoothie"
+    ]
+  },
+  {
+    "category": "Foods & Drinks",
+    "letter": "T",
+    "validWords": [
+      "taco",
+      "tea",
+      "tomato",
+      "toast",
+      "turkey",
+      "tiramisu",
+      "tofu",
+      "tuna"
+    ],
+    "categoryAr": "Foods & Drinks",
+    "letterAr": "ت",
+    "validWordsAr": [
+      "taco",
+      "tea",
+      "tomato",
+      "toast",
+      "turkey",
+      "tiramisu",
+      "tofu",
+      "tuna"
+    ]
+  },
+  {
+    "category": "Foods & Drinks",
+    "letter": "W",
+    "validWords": [
+      "watermelon",
+      "waffle",
+      "wine",
+      "walnut",
+      "wasabi",
+      "wrap"
+    ],
+    "categoryAr": "Foods & Drinks",
+    "letterAr": "و",
+    "validWordsAr": [
+      "watermelon",
+      "waffle",
+      "wine",
+      "walnut",
+      "wasabi",
+      "wrap"
+    ]
+  },
+  {
+    "category": "Sports & Athletics",
+    "letter": "B",
+    "validWords": [
+      "basketball",
+      "baseball",
+      "badminton",
+      "boxing",
+      "bowling",
+      "bobsled",
+      "billiards"
+    ],
+    "categoryAr": "Sports & Athletics",
+    "letterAr": "ب",
+    "validWordsAr": [
+      "basketball",
+      "baseball",
+      "badminton",
+      "boxing",
+      "bowling",
+      "bobsled",
+      "billiards"
+    ]
+  },
+  {
+    "category": "Sports & Athletics",
+    "letter": "C",
+    "validWords": [
+      "cricket",
+      "cycling",
+      "curling",
+      "climbing",
+      "canoeing",
+      "cheerleading"
+    ],
+    "categoryAr": "Sports & Athletics",
+    "letterAr": "ك",
+    "validWordsAr": [
+      "cricket",
+      "cycling",
+      "curling",
+      "climbing",
+      "canoeing",
+      "cheerleading"
+    ]
+  },
+  {
+    "category": "Sports & Athletics",
+    "letter": "F",
+    "validWords": [
+      "football",
+      "fencing",
+      "fishing",
+      "figure skating",
+      "frisbee"
+    ],
+    "categoryAr": "Sports & Athletics",
+    "letterAr": "ف",
+    "validWordsAr": [
+      "football",
+      "fencing",
+      "fishing",
+      "figure skating",
+      "frisbee"
+    ]
+  },
+  {
+    "category": "Sports & Athletics",
+    "letter": "G",
+    "validWords": [
+      "golf",
+      "gymnastics",
+      "grappling",
+      "goalball"
+    ],
+    "categoryAr": "Sports & Athletics",
+    "letterAr": "ج",
+    "validWordsAr": [
+      "golf",
+      "gymnastics",
+      "grappling",
+      "goalball"
+    ]
+  },
+  {
+    "category": "Sports & Athletics",
+    "letter": "H",
+    "validWords": [
+      "hockey",
+      "handball",
+      "hiking",
+      "hurdles",
+      "horse racing"
+    ],
+    "categoryAr": "Sports & Athletics",
+    "letterAr": "هـ",
+    "validWordsAr": [
+      "hockey",
+      "handball",
+      "hiking",
+      "hurdles",
+      "horse racing"
+    ]
+  },
+  {
+    "category": "Sports & Athletics",
+    "letter": "K",
+    "validWords": [
+      "karate",
+      "kayaking",
+      "kickboxing",
+      "krav maga",
+      "kiteboarding"
+    ],
+    "categoryAr": "Sports & Athletics",
+    "letterAr": "ك",
+    "validWordsAr": [
+      "karate",
+      "kayaking",
+      "kickboxing",
+      "krav maga",
+      "kiteboarding"
+    ]
+  },
+  {
+    "category": "Sports & Athletics",
+    "letter": "R",
+    "validWords": [
+      "rugby",
+      "rowing",
+      "running",
+      "rafting",
+      "racquetball"
+    ],
+    "categoryAr": "Sports & Athletics",
+    "letterAr": "ر",
+    "validWordsAr": [
+      "rugby",
+      "rowing",
+      "running",
+      "rafting",
+      "racquetball"
+    ]
+  },
+  {
+    "category": "Sports & Athletics",
+    "letter": "S",
+    "validWords": [
+      "soccer",
+      "swimming",
+      "skiing",
+      "snowboarding",
+      "surfing",
+      "skateboarding",
+      "squash",
+      "sailing"
+    ],
+    "categoryAr": "Sports & Athletics",
+    "letterAr": "س",
+    "validWordsAr": [
+      "soccer",
+      "swimming",
+      "skiing",
+      "snowboarding",
+      "surfing",
+      "skateboarding",
+      "squash",
+      "sailing"
+    ]
+  },
+  {
+    "category": "Sports & Athletics",
+    "letter": "T",
+    "validWords": [
+      "tennis",
+      "table tennis",
+      "taekwondo",
+      "track",
+      "triathlon"
+    ],
+    "categoryAr": "Sports & Athletics",
+    "letterAr": "ت",
+    "validWordsAr": [
+      "tennis",
+      "table tennis",
+      "taekwondo",
+      "track",
+      "triathlon"
+    ]
+  },
+  {
+    "category": "Sports & Athletics",
+    "letter": "V",
+    "validWords": [
+      "volleyball",
+      "velodrome",
+      "vaulting"
+    ],
+    "categoryAr": "Sports & Athletics",
+    "letterAr": "ف",
+    "validWordsAr": [
+      "volleyball",
+      "velodrome",
+      "vaulting"
+    ]
+  },
+  {
+    "category": "Sports & Athletics",
+    "letter": "W",
+    "validWords": [
+      "wrestling",
+      "weightlifting",
+      "water polo",
+      "windsurfing",
+      "wakeboarding"
+    ],
+    "categoryAr": "Sports & Athletics",
+    "letterAr": "و",
+    "validWordsAr": [
+      "wrestling",
+      "weightlifting",
+      "water polo",
+      "windsurfing",
+      "wakeboarding"
+    ]
+  },
+  {
+    "category": "Tech & Gadgets",
+    "letter": "A",
+    "validWords": [
+      "android",
+      "apple",
+      "algorithm",
+      "antivirus",
+      "application",
+      "adapter"
+    ],
+    "categoryAr": "Tech & Gadgets",
+    "letterAr": "أ",
+    "validWordsAr": [
+      "android",
+      "apple",
+      "algorithm",
+      "antivirus",
+      "application",
+      "adapter"
+    ]
+  },
+  {
+    "category": "Tech & Gadgets",
+    "letter": "B",
+    "validWords": [
+      "bluetooth",
+      "browser",
+      "battery",
+      "bitcoin",
+      "broadband",
+      "byte"
+    ],
+    "categoryAr": "Tech & Gadgets",
+    "letterAr": "ب",
+    "validWordsAr": [
+      "bluetooth",
+      "browser",
+      "battery",
+      "bitcoin",
+      "broadband",
+      "byte"
+    ]
+  },
+  {
+    "category": "Tech & Gadgets",
+    "letter": "C",
+    "validWords": [
+      "computer",
+      "camera",
+      "cloud",
+      "chipset",
+      "cpu",
+      "charger",
+      "cable"
+    ],
+    "categoryAr": "Tech & Gadgets",
+    "letterAr": "ك",
+    "validWordsAr": [
+      "computer",
+      "camera",
+      "cloud",
+      "chipset",
+      "cpu",
+      "charger",
+      "cable"
+    ]
+  },
+  {
+    "category": "Tech & Gadgets",
+    "letter": "D",
+    "validWords": [
+      "drone",
+      "display",
+      "database",
+      "desktop",
+      "dialpad",
+      "dongle"
+    ],
+    "categoryAr": "Tech & Gadgets",
+    "letterAr": "د",
+    "validWordsAr": [
+      "drone",
+      "display",
+      "database",
+      "desktop",
+      "dialpad",
+      "dongle"
+    ]
+  },
+  {
+    "category": "Tech & Gadgets",
+    "letter": "E",
+    "validWords": [
+      "ethernet",
+      "earphones",
+      "emulator",
+      "encoder",
+      "electron"
+    ],
+    "categoryAr": "Tech & Gadgets",
+    "letterAr": "إ",
+    "validWordsAr": [
+      "ethernet",
+      "earphones",
+      "emulator",
+      "encoder",
+      "electron"
+    ]
+  },
+  {
+    "category": "Tech & Gadgets",
+    "letter": "F",
+    "validWords": [
+      "firewall",
+      "fiber",
+      "flash drive",
+      "firmware",
+      "frequency"
+    ],
+    "categoryAr": "Tech & Gadgets",
+    "letterAr": "ف",
+    "validWordsAr": [
+      "firewall",
+      "fiber",
+      "flash drive",
+      "firmware",
+      "frequency"
+    ]
+  },
+  {
+    "category": "Tech & Gadgets",
+    "letter": "G",
+    "validWords": [
+      "gpu",
+      "google",
+      "gigabyte",
+      "gaming",
+      "gateway",
+      "glasses"
+    ],
+    "categoryAr": "Tech & Gadgets",
+    "letterAr": "ج",
+    "validWordsAr": [
+      "gpu",
+      "google",
+      "gigabyte",
+      "gaming",
+      "gateway",
+      "glasses"
+    ]
+  },
+  {
+    "category": "Tech & Gadgets",
+    "letter": "H",
+    "validWords": [
+      "headset",
+      "hard drive",
+      "hardware",
+      "hdmi",
+      "hologram",
+      "hub"
+    ],
+    "categoryAr": "Tech & Gadgets",
+    "letterAr": "هـ",
+    "validWordsAr": [
+      "headset",
+      "hard drive",
+      "hardware",
+      "hdmi",
+      "hologram",
+      "hub"
+    ]
+  },
+  {
+    "category": "Tech & Gadgets",
+    "letter": "I",
+    "validWords": [
+      "internet",
+      "iphone",
+      "ipad",
+      "interface",
+      "intel",
+      "ios"
+    ],
+    "categoryAr": "Tech & Gadgets",
+    "letterAr": "ي",
+    "validWordsAr": [
+      "internet",
+      "iphone",
+      "ipad",
+      "interface",
+      "intel",
+      "ios"
+    ]
+  },
+  {
+    "category": "Tech & Gadgets",
+    "letter": "K",
+    "validWords": [
+      "keyboard",
+      "kindle",
+      "kernel",
+      "kilobyte"
+    ],
+    "categoryAr": "Tech & Gadgets",
+    "letterAr": "ك",
+    "validWordsAr": [
+      "keyboard",
+      "kindle",
+      "kernel",
+      "kilobyte"
+    ]
+  },
+  {
+    "category": "Tech & Gadgets",
+    "letter": "L",
+    "validWords": [
+      "laptop",
+      "laser",
+      "linux",
+      "logic",
+      "lcd"
+    ],
+    "categoryAr": "Tech & Gadgets",
+    "letterAr": "ل",
+    "validWordsAr": [
+      "laptop",
+      "laser",
+      "linux",
+      "logic",
+      "lcd"
+    ]
+  },
+  {
+    "category": "Tech & Gadgets",
+    "letter": "M",
+    "validWords": [
+      "mouse",
+      "monitor",
+      "microphone",
+      "modem",
+      "memory",
+      "motherboard",
+      "mobile"
+    ],
+    "categoryAr": "Tech & Gadgets",
+    "letterAr": "م",
+    "validWordsAr": [
+      "mouse",
+      "monitor",
+      "microphone",
+      "modem",
+      "memory",
+      "motherboard",
+      "mobile"
+    ]
+  },
+  {
+    "category": "Tech & Gadgets",
+    "letter": "P",
+    "validWords": [
+      "printer",
+      "processor",
+      "projector",
+      "pixel",
+      "power bank",
+      "playstation"
+    ],
+    "categoryAr": "Tech & Gadgets",
+    "letterAr": "ب",
+    "validWordsAr": [
+      "printer",
+      "processor",
+      "projector",
+      "pixel",
+      "power bank",
+      "playstation"
+    ]
+  },
+  {
+    "category": "Tech & Gadgets",
+    "letter": "R",
+    "validWords": [
+      "router",
+      "ram",
+      "robot",
+      "radar",
+      "receiver",
+      "raspberry pi"
+    ],
+    "categoryAr": "Tech & Gadgets",
+    "letterAr": "ر",
+    "validWordsAr": [
+      "router",
+      "ram",
+      "robot",
+      "radar",
+      "receiver",
+      "raspberry pi"
+    ]
+  },
+  {
+    "category": "Tech & Gadgets",
+    "letter": "S",
+    "validWords": [
+      "smartphone",
+      "screen",
+      "sensor",
+      "software",
+      "server",
+      "speaker",
+      "switch"
+    ],
+    "categoryAr": "Tech & Gadgets",
+    "letterAr": "س",
+    "validWordsAr": [
+      "smartphone",
+      "screen",
+      "sensor",
+      "software",
+      "server",
+      "speaker",
+      "switch"
+    ]
+  },
+  {
+    "category": "Tech & Gadgets",
+    "letter": "T",
+    "validWords": [
+      "tablet",
+      "television",
+      "touchscreen",
+      "trackpad",
+      "transmitter"
+    ],
+    "categoryAr": "Tech & Gadgets",
+    "letterAr": "ت",
+    "validWordsAr": [
+      "tablet",
+      "television",
+      "touchscreen",
+      "trackpad",
+      "transmitter"
+    ]
+  },
+  {
+    "category": "Tech & Gadgets",
+    "letter": "W",
+    "validWords": [
+      "wifi",
+      "webcam",
+      "wireless",
+      "watch",
+      "windows",
+      "website"
+    ],
+    "categoryAr": "Tech & Gadgets",
+    "letterAr": "و",
+    "validWordsAr": [
+      "wifi",
+      "webcam",
+      "wireless",
+      "watch",
+      "windows",
+      "website"
+    ]
+  },
+  {
+    "category": "Everyday Objects",
+    "letter": "B",
+    "validWords": [
+      "bottle",
+      "book",
+      "backpack",
+      "blanket",
+      "brush",
+      "belt",
+      "box",
+      "bucket",
+      "bulb"
+    ],
+    "categoryAr": "Everyday Objects",
+    "letterAr": "ب",
+    "validWordsAr": [
+      "bottle",
+      "book",
+      "backpack",
+      "blanket",
+      "brush",
+      "belt",
+      "box",
+      "bucket",
+      "bulb"
+    ]
+  },
+  {
+    "category": "Everyday Objects",
+    "letter": "C",
+    "validWords": [
+      "chair",
+      "clock",
+      "cup",
+      "candle",
+      "comb",
+      "cushion",
+      "curtain",
+      "coin",
+      "coat"
+    ],
+    "categoryAr": "Everyday Objects",
+    "letterAr": "ك",
+    "validWordsAr": [
+      "chair",
+      "clock",
+      "cup",
+      "candle",
+      "comb",
+      "cushion",
+      "curtain",
+      "coin",
+      "coat"
+    ]
+  },
+  {
+    "category": "Everyday Objects",
+    "letter": "D",
+    "validWords": [
+      "door",
+      "desk",
+      "drawer",
+      "dish",
+      "dice",
+      "detergent",
+      "diary"
+    ],
+    "categoryAr": "Everyday Objects",
+    "letterAr": "د",
+    "validWordsAr": [
+      "door",
+      "desk",
+      "drawer",
+      "dish",
+      "dice",
+      "detergent",
+      "diary"
+    ]
+  },
+  {
+    "category": "Everyday Objects",
+    "letter": "F",
+    "validWords": [
+      "fork",
+      "fan",
+      "flashlight",
+      "frame",
+      "folder",
+      "flute",
+      "faucet"
+    ],
+    "categoryAr": "Everyday Objects",
+    "letterAr": "ف",
+    "validWordsAr": [
+      "fork",
+      "fan",
+      "flashlight",
+      "frame",
+      "folder",
+      "flute",
+      "faucet"
+    ]
+  },
+  {
+    "category": "Everyday Objects",
+    "letter": "G",
+    "validWords": [
+      "glasses",
+      "guitar",
+      "glove",
+      "glue",
+      "glass",
+      "grater"
+    ],
+    "categoryAr": "Everyday Objects",
+    "letterAr": "ج",
+    "validWordsAr": [
+      "glasses",
+      "guitar",
+      "glove",
+      "glue",
+      "glass",
+      "grater"
+    ]
+  },
+  {
+    "category": "Everyday Objects",
+    "letter": "H",
+    "validWords": [
+      "hammer",
+      "hat",
+      "hanger",
+      "helmet",
+      "headphones",
+      "hose"
+    ],
+    "categoryAr": "Everyday Objects",
+    "letterAr": "هـ",
+    "validWordsAr": [
+      "hammer",
+      "hat",
+      "hanger",
+      "helmet",
+      "headphones",
+      "hose"
+    ]
+  },
+  {
+    "category": "Everyday Objects",
+    "letter": "K",
+    "validWords": [
+      "knife",
+      "kettle",
+      "key",
+      "keychain",
+      "kite"
+    ],
+    "categoryAr": "Everyday Objects",
+    "letterAr": "ك",
+    "validWordsAr": [
+      "knife",
+      "kettle",
+      "key",
+      "keychain",
+      "kite"
+    ]
+  },
+  {
+    "category": "Everyday Objects",
+    "letter": "L",
+    "validWords": [
+      "lamp",
+      "lock",
+      "ladder",
+      "laptop",
+      "lipstick",
+      "lighter",
+      "lantern"
+    ],
+    "categoryAr": "Everyday Objects",
+    "letterAr": "ل",
+    "validWordsAr": [
+      "lamp",
+      "lock",
+      "ladder",
+      "laptop",
+      "lipstick",
+      "lighter",
+      "lantern"
+    ]
+  },
+  {
+    "category": "Everyday Objects",
+    "letter": "M",
+    "validWords": [
+      "mirror",
+      "mug",
+      "mat",
+      "magnet",
+      "marker",
+      "mask",
+      "mop"
+    ],
+    "categoryAr": "Everyday Objects",
+    "letterAr": "م",
+    "validWordsAr": [
+      "mirror",
+      "mug",
+      "mat",
+      "magnet",
+      "marker",
+      "mask",
+      "mop"
+    ]
+  },
+  {
+    "category": "Everyday Objects",
+    "letter": "P",
+    "validWords": [
+      "pillow",
+      "plate",
+      "pen",
+      "pencil",
+      "purse",
+      "pot",
+      "pan",
+      "paper"
+    ],
+    "categoryAr": "Everyday Objects",
+    "letterAr": "ب",
+    "validWordsAr": [
+      "pillow",
+      "plate",
+      "pen",
+      "pencil",
+      "purse",
+      "pot",
+      "pan",
+      "paper"
+    ]
+  },
+  {
+    "category": "Everyday Objects",
+    "letter": "R",
+    "validWords": [
+      "remote",
+      "rug",
+      "ring",
+      "rope",
+      "radio",
+      "ruler",
+      "razor"
+    ],
+    "categoryAr": "Everyday Objects",
+    "letterAr": "ر",
+    "validWordsAr": [
+      "remote",
+      "rug",
+      "ring",
+      "rope",
+      "radio",
+      "ruler",
+      "razor"
+    ]
+  },
+  {
+    "category": "Everyday Objects",
+    "letter": "S",
+    "validWords": [
+      "spoon",
+      "scissors",
+      "soap",
+      "shoe",
+      "socks",
+      "sponge",
+      "sofa",
+      "suitcase"
+    ],
+    "categoryAr": "Everyday Objects",
+    "letterAr": "س",
+    "validWordsAr": [
+      "spoon",
+      "scissors",
+      "soap",
+      "shoe",
+      "socks",
+      "sponge",
+      "sofa",
+      "suitcase"
+    ]
+  },
+  {
+    "category": "Everyday Objects",
+    "letter": "T",
+    "validWords": [
+      "table",
+      "towel",
+      "toothbrush",
+      "toaster",
+      "telephone",
+      "thermometer",
+      "torch"
+    ],
+    "categoryAr": "Everyday Objects",
+    "letterAr": "ت",
+    "validWordsAr": [
+      "table",
+      "towel",
+      "toothbrush",
+      "toaster",
+      "telephone",
+      "thermometer",
+      "torch"
+    ]
+  },
+  {
+    "category": "Everyday Objects",
+    "letter": "U",
+    "validWords": [
+      "umbrella",
+      "utensil",
+      "uniform"
+    ],
+    "categoryAr": "Everyday Objects",
+    "letterAr": "أ",
+    "validWordsAr": [
+      "umbrella",
+      "utensil",
+      "uniform"
+    ]
+  },
+  {
+    "category": "Everyday Objects",
+    "letter": "W",
+    "validWords": [
+      "wallet",
+      "watch",
+      "window",
+      "wheel",
+      "wire",
+      "whistle"
+    ],
+    "categoryAr": "Everyday Objects",
+    "letterAr": "و",
+    "validWordsAr": [
+      "wallet",
+      "watch",
+      "window",
+      "wheel",
+      "wire",
+      "whistle"
+    ]
+  },
+  {
+    "category": "Movies & Entertainment",
+    "letter": "A",
+    "validWords": [
+      "avatar",
+      "avengers",
+      "aladdin",
+      "alien",
+      "aquaman",
+      "amadeus"
+    ],
+    "categoryAr": "Movies & Entertainment",
+    "letterAr": "أ",
+    "validWordsAr": [
+      "avatar",
+      "avengers",
+      "aladdin",
+      "alien",
+      "aquaman",
+      "amadeus"
+    ]
+  },
+  {
+    "category": "Movies & Entertainment",
+    "letter": "B",
+    "validWords": [
+      "batman",
+      "barbie",
+      "blade",
+      "braveheart",
+      "beetlejuice",
+      "bambi"
+    ],
+    "categoryAr": "Movies & Entertainment",
+    "letterAr": "ب",
+    "validWordsAr": [
+      "batman",
+      "barbie",
+      "blade",
+      "braveheart",
+      "beetlejuice",
+      "bambi"
+    ]
+  },
+  {
+    "category": "Movies & Entertainment",
+    "letter": "C",
+    "validWords": [
+      "casablanca",
+      "cars",
+      "cinderella",
+      "coraline",
+      "coco",
+      "chucky"
+    ],
+    "categoryAr": "Movies & Entertainment",
+    "letterAr": "ك",
+    "validWordsAr": [
+      "casablanca",
+      "cars",
+      "cinderella",
+      "coraline",
+      "coco",
+      "chucky"
+    ]
+  },
+  {
+    "category": "Movies & Entertainment",
+    "letter": "D",
+    "validWords": [
+      "deadpool",
+      "dune",
+      "dracula",
+      "django",
+      "divergent",
+      "dumbo"
+    ],
+    "categoryAr": "Movies & Entertainment",
+    "letterAr": "د",
+    "validWordsAr": [
+      "deadpool",
+      "dune",
+      "dracula",
+      "django",
+      "divergent",
+      "dumbo"
+    ]
+  },
+  {
+    "category": "Movies & Entertainment",
+    "letter": "F",
+    "validWords": [
+      "frozen",
+      "forrest gump",
+      "fight club",
+      "fargo",
+      "fantasia"
+    ],
+    "categoryAr": "Movies & Entertainment",
+    "letterAr": "ف",
+    "validWordsAr": [
+      "frozen",
+      "forrest gump",
+      "fight club",
+      "fargo",
+      "fantasia"
+    ]
+  },
+  {
+    "category": "Movies & Entertainment",
+    "letter": "G",
+    "validWords": [
+      "godfather",
+      "gladiator",
+      "godzilla",
+      "ghostbusters",
+      "gravity"
+    ],
+    "categoryAr": "Movies & Entertainment",
+    "letterAr": "ج",
+    "validWordsAr": [
+      "godfather",
+      "gladiator",
+      "godzilla",
+      "ghostbusters",
+      "gravity"
+    ]
+  },
+  {
+    "category": "Movies & Entertainment",
+    "letter": "H",
+    "validWords": [
+      "harry potter",
+      "hulk",
+      "hercules",
+      "halloween",
+      "hitchcock"
+    ],
+    "categoryAr": "Movies & Entertainment",
+    "letterAr": "هـ",
+    "validWordsAr": [
+      "harry potter",
+      "hulk",
+      "hercules",
+      "halloween",
+      "hitchcock"
+    ]
+  },
+  {
+    "category": "Movies & Entertainment",
+    "letter": "I",
+    "validWords": [
+      "inception",
+      "interstellar",
+      "iron man",
+      "indiana jones",
+      "it"
+    ],
+    "categoryAr": "Movies & Entertainment",
+    "letterAr": "ي",
+    "validWordsAr": [
+      "inception",
+      "interstellar",
+      "iron man",
+      "indiana jones",
+      "it"
+    ]
+  },
+  {
+    "category": "Movies & Entertainment",
+    "letter": "J",
+    "validWords": [
+      "jurassic park",
+      "joker",
+      "jaws",
+      "jumanji",
+      "john wick"
+    ],
+    "categoryAr": "Movies & Entertainment",
+    "letterAr": "ج",
+    "validWordsAr": [
+      "jurassic park",
+      "joker",
+      "jaws",
+      "jumanji",
+      "john wick"
+    ]
+  },
+  {
+    "category": "Movies & Entertainment",
+    "letter": "M",
+    "validWords": [
+      "matrix",
+      "mulan",
+      "moana",
+      "mad max",
+      "minions",
+      "memento"
+    ],
+    "categoryAr": "Movies & Entertainment",
+    "letterAr": "م",
+    "validWordsAr": [
+      "matrix",
+      "mulan",
+      "moana",
+      "mad max",
+      "minions",
+      "memento"
+    ]
+  },
+  {
+    "category": "Movies & Entertainment",
+    "letter": "S",
+    "validWords": [
+      "star wars",
+      "shrek",
+      "spider-man",
+      "superman",
+      "saw",
+      "scarface",
+      "scream"
+    ],
+    "categoryAr": "Movies & Entertainment",
+    "letterAr": "س",
+    "validWordsAr": [
+      "star wars",
+      "shrek",
+      "spider-man",
+      "superman",
+      "saw",
+      "scarface",
+      "scream"
+    ]
+  },
+  {
+    "category": "Movies & Entertainment",
+    "letter": "T",
+    "validWords": [
+      "titanic",
+      "thor",
+      "transformers",
+      "terminator",
+      "tarzan",
+      "twilight"
+    ],
+    "categoryAr": "Movies & Entertainment",
+    "letterAr": "ت",
+    "validWordsAr": [
+      "titanic",
+      "thor",
+      "transformers",
+      "terminator",
+      "tarzan",
+      "twilight"
+    ]
+  }
+]

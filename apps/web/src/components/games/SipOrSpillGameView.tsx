@@ -19,6 +19,8 @@ import {
 import { NeonAvatarDisplay } from '../NeonAvatarDisplay';
 import { GameIcon } from '../GameIcon';
 import { sound } from '@/lib/sound';
+import { useGameTimer } from '@/hooks/useGameTimer';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface SipOrSpillGameViewProps {
   state: SipOrSpillPublicState;
@@ -26,6 +28,7 @@ interface SipOrSpillGameViewProps {
   currentPlayerId: string;
   isHost: boolean;
   vibeMode?: VibeMode;
+  roomCode?: string;
   onAction: (actionType: string, payload: any) => Promise<void>;
 }
 
@@ -35,11 +38,26 @@ export function SipOrSpillGameView({
   currentPlayerId,
   isHost,
   vibeMode: _vibeMode,
+  roomCode,
   onAction
 }: SipOrSpillGameViewProps) {
+  const { language } = useLanguage();
+  const isAr = language === 'ar';
   const [confessionInput, setConfessionInput] = useState('');
   const [showConfessionModal, setShowConfessionModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const timer = useGameTimer({
+    phaseEndsAt: (state as any)?.phaseEndsAt,
+    roomCode: roomCode || '',
+    phase: state.phase,
+    round: state.round,
+    onTimeout: () => {
+      onAction('PHASE_TIMEOUT', {});
+    }
+  });
+
+  const remainingSecs = timer.remainingSeconds > 0 ? timer.remainingSeconds : state.remainingSeconds;
 
   const isMyTurn = currentPlayerId === state.targetPlayerId;
   const _targetPlayer = players.find((p) => p.id === state.targetPlayerId);
@@ -94,23 +112,25 @@ export function SipOrSpillGameView({
         <div className="flex items-center gap-2">
           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white border border-gray-200 text-gray-800 flex items-center gap-1.5 shadow-sm">
             <GameIcon gameMode="sip_or_spill" size="xs" />
-            Round {state.round} of {state.totalRounds}
+            {isAr
+              ? `الجولة ${state.round} من ${state.totalRounds}`
+              : `Round ${state.round} of ${state.totalRounds}`}
           </span>
           <span className="hidden sm:inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">
-            Spicy Level {state.spicyLevel || 1} 🔥
+            {isAr ? `مستوى الجرأة ${state.spicyLevel || 1} 🔥` : `Spicy Level ${state.spicyLevel || 1} 🔥`}
           </span>
         </div>
 
         {/* TIMER */}
         <div
           className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold transition-all ${
-            state.remainingSeconds <= 5
+            remainingSecs <= 5
               ? 'bg-red-50 text-red-600 border-red-200 animate-pulse'
               : 'bg-white text-gray-800 border-gray-200 shadow-sm'
           }`}
         >
-          <Clock className={`w-3.5 h-3.5 ${state.remainingSeconds <= 5 ? 'text-red-500' : 'text-blue-600'}`} />
-          <span>{state.remainingSeconds}s</span>
+          <Clock className={`w-3.5 h-3.5 ${remainingSecs <= 5 ? 'text-red-500' : 'text-blue-600'}`} />
+          <span className="force-ltr">{remainingSecs}s</span>
         </div>
       </div>
 
@@ -124,16 +144,18 @@ export function SipOrSpillGameView({
           <NeonAvatarDisplay avatarId={state.targetAvatar} size="sm" showGlow={false} />
           <div>
             <span className="text-[10px] font-semibold uppercase tracking-wider text-blue-600 block">
-              In The Hot Seat
+              {isAr ? 'تحت الميكروسكوب 🎯' : 'In The Hot Seat'}
             </span>
             <span className="text-sm sm:text-base font-bold text-gray-900">
-              {state.targetUsername} {isMyTurn && '(You!)'}
+              {state.targetUsername} {isMyTurn && (isAr ? '(أنت!)' : '(You!)')}
             </span>
           </div>
         </div>
 
         <div className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
-          {isMyTurn ? 'Your Turn' : 'Listening'}
+          {isMyTurn
+            ? (isAr ? 'دورك' : 'Your Turn')
+            : (isAr ? 'مستمع' : 'Listening')}
         </div>
       </motion.div>
 
@@ -144,14 +166,14 @@ export function SipOrSpillGameView({
         className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 text-center relative overflow-hidden mb-5 shadow-sm"
       >
         <span className="text-xs font-semibold uppercase tracking-wider text-rose-600 block mb-2">
-          Dilemma
+          {isAr ? 'المأزق المحرج' : 'Dilemma'}
         </span>
         <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight leading-snug mb-3">
-          {state.dilemma}
+          {isAr && state.dilemmaAr ? state.dilemmaAr : state.dilemma}
         </h2>
-        {state.question && (
+        {(state.question || state.questionAr) && (
           <p className="text-xs sm:text-sm text-blue-600 font-medium max-w-lg mx-auto bg-blue-50 py-2 px-3 rounded-xl border border-blue-100">
-            {state.question}
+            {isAr && state.questionAr ? state.questionAr : state.question}
           </p>
         )}
       </motion.div>
@@ -163,17 +185,17 @@ export function SipOrSpillGameView({
             <div className="w-full max-w-lg grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               {/* BUTTON 1: ANSWERED LIVE */}
               <button
-                onClick={() => handleSpillTruth('Answered Live to the room!')}
+                onClick={() => handleSpillTruth(isAr ? 'جاوب بصراحة أمام الروم مباشرة!' : 'Answered Live to the room!')}
                 className="p-5 rounded-2xl flex flex-col items-center justify-center text-center gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all min-h-[110px]"
               >
                 <div className="flex items-center gap-2">
                   <Check className="w-5 h-5 text-white" />
                   <span className="text-base font-bold uppercase tracking-wider">
-                    Answered Live
+                    {isAr ? 'جاوب بصراحة' : 'Answered Live'}
                   </span>
                 </div>
                 <span className="text-xs font-medium text-blue-100">
-                  +150 pts • Confess to the room
+                  {isAr ? '+150 نقطة • اعترف أمام الجميع' : '+150 pts • Confess to the room'}
                 </span>
               </button>
 
@@ -185,21 +207,23 @@ export function SipOrSpillGameView({
                 <div className="flex items-center gap-2">
                   <Wine className="w-5 h-5 text-white" />
                   <span className="text-base font-bold uppercase tracking-wider">
-                    Take a Sip 🥤
+                    {isAr ? 'اشرب رشفة 🥤' : 'Take a Sip 🥤'}
                   </span>
                 </div>
                 <span className="text-xs font-medium text-rose-100">
-                  Take a sip to skip question
+                  {isAr ? 'اشرب واهرب من الإجابة' : 'Take a sip to skip question'}
                 </span>
               </button>
             </div>
           ) : (
             <div className="text-center py-6 px-4 rounded-2xl bg-white border border-gray-200 shadow-sm max-w-md">
               <span className="text-xs font-semibold uppercase tracking-wider text-blue-600 block mb-1">
-                Awaiting Decision
+                {isAr ? 'في انتظار القرار' : 'Awaiting Decision'}
               </span>
               <p className="text-sm font-medium text-gray-700">
-                Watching {state.targetUsername} make their choice! Will they confess or drink?
+                {isAr
+                  ? `نراقب ${state.targetUsername} وهو بيختار! هيعترف ولا يشرب؟`
+                  : `Watching ${state.targetUsername} make their choice! Will they confess or drink?`}
               </p>
             </div>
           )}
@@ -219,10 +243,14 @@ export function SipOrSpillGameView({
                 🥤
               </div>
               <h3 className="text-2xl font-extrabold text-rose-600 mb-1">
-                {state.targetUsername} Chose To Sip!
+                {isAr
+                  ? `${state.targetUsername} فضّل يشرب ويهرب!`
+                  : `${state.targetUsername} Chose To Sip!`}
               </h3>
               <p className="text-sm text-gray-600 font-medium mb-4">
-                Took a sip to skip the question.
+                {isAr
+                  ? 'شرب رشفة لتخطي السؤال المحرج.'
+                  : 'Took a sip to skip the question.'}
               </p>
             </div>
           ) : (
@@ -231,7 +259,9 @@ export function SipOrSpillGameView({
                 <MessageSquare className="w-7 h-7 text-blue-600" />
               </div>
               <h3 className="text-2xl font-extrabold text-gray-900 mb-2">
-                {state.targetUsername} Spilled The Truth!
+                {isAr
+                  ? `${state.targetUsername} اعترف بكل صراحة!`
+                  : `${state.targetUsername} Spilled The Truth!`}
               </h3>
               {state.confessionText && (
                 <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 text-sm font-medium text-gray-700 mb-4 italic">
@@ -246,8 +276,8 @@ export function SipOrSpillGameView({
               onClick={handleNextRound}
               className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm flex items-center gap-2 shadow-sm transition-all mt-2"
             >
-              <span>Next Round</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>{isAr ? 'الجولة القادمة' : 'Next Round'}</span>
+              <ArrowRight className={`w-4 h-4 ${isAr ? 'rotate-180' : ''}`} />
             </button>
           )}
         </motion.div>
@@ -264,16 +294,18 @@ export function SipOrSpillGameView({
               className="w-full max-w-md p-6 rounded-2xl bg-white border border-gray-200 shadow-xl text-center"
             >
               <h3 className="text-lg font-bold text-gray-900 mb-1">
-                Spill Your Confession
+                {isAr ? 'اكتب اعترافك' : 'Spill Your Confession'}
               </h3>
               <p className="text-xs text-gray-500 mb-4">
-                Type your answer or confess out loud to the room:
+                {isAr
+                  ? 'اكتب إجابتك أو قولها بصوتك للروم:'
+                  : 'Type your answer or confess out loud to the room:'}
               </p>
 
               <textarea
                 value={confessionInput}
                 onChange={(e) => setConfessionInput(e.target.value)}
-                placeholder="Type your confession here..."
+                placeholder={isAr ? 'اكتب اعترافك هنا...' : 'Type your confession here...'}
                 rows={3}
                 className="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 text-sm font-medium focus:outline-none focus:border-blue-500 mb-4"
               />
@@ -283,14 +315,14 @@ export function SipOrSpillGameView({
                   onClick={() => setShowConfessionModal(false)}
                   className="flex-1 h-11 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs"
                 >
-                  Cancel
+                  {isAr ? 'إلغاء' : 'Cancel'}
                 </button>
                 <button
                   onClick={() => handleSpillTruth()}
                   className="flex-1 h-11 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm"
                 >
-                  <Send className="w-3.5 h-3.5 shrink-0" />
-                  <span>Submit</span>
+                  <Send className={`w-3.5 h-3.5 shrink-0 ${isAr ? 'rotate-180' : ''}`} />
+                  <span>{isAr ? 'إرسال' : 'Submit'}</span>
                 </button>
               </div>
             </motion.div>

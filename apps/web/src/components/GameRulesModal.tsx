@@ -6,6 +6,8 @@ import { X, Users, Sparkles, BookOpen, Clock, ShieldCheck, Flame } from 'lucide-
 import { GameMode } from '@feto-games/shared-types';
 import { GameIcon } from './GameIcon';
 import { sound } from '@/lib/sound';
+import { useLanguage } from '@/hooks/useLanguage';
+import { GAME_TITLES_AR } from './GamePlaylistQueue';
 
 export interface GameRuleDetails {
   id: GameMode;
@@ -251,6 +253,8 @@ export function GameRulesModal({
   gameMode,
   initialGameMode = 'who_is_imposter'
 }: GameRulesModalProps) {
+  const { language } = useLanguage();
+  const isAr = language === 'ar';
   const [activeMode, setActiveMode] = useState<GameMode>(gameMode || initialGameMode);
 
   React.useEffect(() => {
@@ -260,6 +264,7 @@ export function GameRulesModal({
   if (!isOpen) return null;
 
   const rule = GAME_RULES_DATA[activeMode] || GAME_RULES_DATA['who_is_imposter'];
+  const arInfo = GAME_TITLES_AR[activeMode];
 
   return (
     <AnimatePresence>
@@ -276,8 +281,8 @@ export function GameRulesModal({
               sound.playClick();
               onClose();
             }}
-            className="absolute top-5 right-5 p-2 rounded-xl text-[#010101] bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101] transition-all font-black"
-            aria-label="Close"
+            className="absolute top-5 right-5 rtl:right-auto rtl:left-5 p-2 rounded-xl text-[#010101] bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101] transition-all font-black"
+            aria-label={isAr ? 'إغلاق' : 'Close'}
           >
             <X className="w-5 h-5" />
           </button>
@@ -285,13 +290,14 @@ export function GameRulesModal({
           {/* TITLE */}
           <div className="flex items-center gap-2 mb-6 text-[#0B89FD] text-xs font-black uppercase tracking-wider">
             <BookOpen className="w-4 h-4 text-[#0B89FD]" />
-            <span>Party Game Rulebooks</span>
+            <span>{isAr ? 'كتيب قواعد ألعاب فيتو' : 'Party Game Rulebooks'}</span>
           </div>
 
           {/* GAME SELECTION TABS */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-6">
             {(Object.keys(GAME_RULES_DATA) as GameMode[]).map((mode) => {
               const item = GAME_RULES_DATA[mode];
+              const modeAr = GAME_TITLES_AR[mode];
               const isSelected = activeMode === mode;
               return (
                 <button
@@ -300,7 +306,7 @@ export function GameRulesModal({
                     sound.playClick();
                     setActiveMode(mode);
                   }}
-                  className={`p-2 rounded-xl border-2 border-[#010101] text-xs font-black text-left transition-all flex items-center gap-2 ${
+                  className={`p-2 rounded-xl border-2 border-[#010101] text-xs font-black text-start transition-all flex items-center gap-2 ${
                     isSelected
                       ? 'bg-[#0B89FD] text-white shadow-[2px_2px_0px_#010101]'
                       : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
@@ -308,9 +314,9 @@ export function GameRulesModal({
                 >
                   <GameIcon gameMode={mode} size="sm" />
                   <div className="min-w-0 flex-1">
-                    <div className="truncate">{item.name}</div>
+                    <div className="truncate">{isAr && modeAr ? modeAr.title : item.name}</div>
                     <div className={`text-[10px] font-medium ${isSelected ? 'text-white/80' : 'text-[#010101]/60'}`}>
-                      {item.playerRange}
+                      {isAr && modeAr ? modeAr.players : item.playerRange}
                     </div>
                   </div>
                 </button>
@@ -325,15 +331,19 @@ export function GameRulesModal({
                 <GameIcon gameMode={activeMode} size="lg" showContainer />
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="text-2xl font-black text-[#010101]">{rule.name}</h2>
+                    <h2 className="text-2xl font-black text-[#010101]">
+                      {isAr && arInfo ? arInfo.title : rule.name}
+                    </h2>
                     <span className="px-2.5 py-0.5 rounded-full text-xs font-black border-2 border-[#010101] bg-[#FEC90E] text-[#010101]">
-                      {rule.playerRange}
+                      {isAr && arInfo ? arInfo.players : rule.playerRange}
                     </span>
                     <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-[#F8F8F8] text-[#010101] border-2 border-[#010101]">
                       {rule.difficulty}
                     </span>
                   </div>
-                  <p className="text-[#010101]/80 text-sm font-medium mt-1">{rule.overview}</p>
+                  <p className="text-[#010101]/80 text-sm font-medium mt-1">
+                    {isAr && arInfo ? arInfo.tagline : rule.overview}
+                  </p>
                 </div>
               </div>
             </div>
@@ -342,12 +352,12 @@ export function GameRulesModal({
             <div className="bg-[#F8F8F8] p-4 rounded-2xl border-2 border-[#010101] shadow-[3px_3px_0px_#010101]">
               <h3 className="text-xs font-black uppercase tracking-wider text-[#010101] mb-3 flex items-center gap-2">
                 <Sparkles className="w-3.5 h-3.5 text-[#0B89FD]" />
-                <span>How to Play</span>
+                <span>{isAr ? 'طريقة اللعب' : 'How to Play'}</span>
               </h3>
               <ul className="space-y-2">
                 {rule.howToPlay.map((step, idx) => (
-                  <li key={idx} className="text-xs text-[#010101]/90 flex items-start gap-2.5 leading-relaxed font-medium">
-                    <span className="w-5 h-5 rounded-full bg-[#0B89FD] text-white border border-[#010101] font-black flex items-center justify-center flex-shrink-0 text-[10px]">
+                  <li key={idx} className="text-xs text-[#010101]/90 flex items-start gap-2.5 leading-relaxed font-medium text-start">
+                    <span className="w-5 h-5 rounded-full bg-[#0B89FD] text-white border border-[#010101] font-black flex items-center justify-center flex-shrink-0 text-[10px] force-ltr">
                       {idx + 1}
                     </span>
                     <span>{step}</span>
@@ -360,11 +370,11 @@ export function GameRulesModal({
             <div className="bg-[#F8F8F8] p-4 rounded-2xl border-2 border-[#010101] shadow-[3px_3px_0px_#010101]">
               <h3 className="text-xs font-black uppercase tracking-wider text-[#FD3F01] mb-3 flex items-center gap-2">
                 <Flame className="w-3.5 h-3.5 text-[#FD3F01]" />
-                <span>Scoring &amp; Strategy</span>
+                <span>{isAr ? 'النقاط والتكتيك' : 'Scoring & Strategy'}</span>
               </h3>
               <ul className="space-y-1.5">
                 {rule.scoringTips.map((tip, idx) => (
-                  <li key={idx} className="text-xs text-[#010101]/90 flex items-start gap-2 font-medium">
+                  <li key={idx} className="text-xs text-[#010101]/90 flex items-start gap-2 font-medium text-start">
                     <span className="text-[#FD3F01] font-black">•</span>
                     <span>{tip}</span>
                   </li>

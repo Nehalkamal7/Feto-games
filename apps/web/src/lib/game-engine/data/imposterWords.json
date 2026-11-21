@@ -1,112 +1,662 @@
 [
-  { "category": "Animals", "word": "Elephant" },
-  { "category": "Animals", "word": "Penguin" },
-  { "category": "Animals", "word": "Kangaroo" },
-  { "category": "Animals", "word": "Chameleon" },
-  { "category": "Animals", "word": "Flamingo" },
-  { "category": "Animals", "word": "Octopus" },
-  { "category": "Animals", "word": "Giraffe" },
-  { "category": "Animals", "word": "Hedgehog" },
-  { "category": "Animals", "word": "Dolphin" },
-  { "category": "Animals", "word": "Cheetah" },
-  { "category": "Technology", "word": "Smartphone" },
-  { "category": "Technology", "word": "Virtual Reality" },
-  { "category": "Technology", "word": "Drone" },
-  { "category": "Technology", "word": "Artificial Intelligence" },
-  { "category": "Technology", "word": "Blockchain" },
-  { "category": "Technology", "word": "Quantum Computer" },
-  { "category": "Technology", "word": "Smartwatch" },
-  { "category": "Technology", "word": "Cybersecurity" },
-  { "category": "Technology", "word": "3D Printer" },
-  { "category": "Technology", "word": "Microchip" },
-  { "category": "Food & Drinks", "word": "Sushi" },
-  { "category": "Food & Drinks", "word": "Pizza" },
-  { "category": "Food & Drinks", "word": "Cheeseburger" },
-  { "category": "Food & Drinks", "word": "Tacos" },
-  { "category": "Food & Drinks", "word": "Croissant" },
-  { "category": "Food & Drinks", "word": "Espresso" },
-  { "category": "Food & Drinks", "word": "Chocolate Fondue" },
-  { "category": "Food & Drinks", "word": "Ice Cream Sundae" },
-  { "category": "Food & Drinks", "word": "Ramen" },
-  { "category": "Food & Drinks", "word": "Guacamole" },
-  { "category": "Space & Cosmos", "word": "Black Hole" },
-  { "category": "Space & Cosmos", "word": "Supernova" },
-  { "category": "Space & Cosmos", "word": "Asteroid" },
-  { "category": "Space & Cosmos", "word": "International Space Station" },
-  { "category": "Space & Cosmos", "word": "Telescope" },
-  { "category": "Space & Cosmos", "word": "Mars Rover" },
-  { "category": "Space & Cosmos", "word": "Solar Eclipse" },
-  { "category": "Space & Cosmos", "word": "Nebula" },
-  { "category": "Space & Cosmos", "word": "Comet" },
-  { "category": "Space & Cosmos", "word": "Milky Way" },
-  { "category": "Movies & Entertainment", "word": "Popcorn" },
-  { "category": "Movies & Entertainment", "word": "Hollywood" },
-  { "category": "Movies & Entertainment", "word": "Oscar Trophy" },
-  { "category": "Movies & Entertainment", "word": "Stunt Double" },
-  { "category": "Movies & Entertainment", "word": "Director" },
-  { "category": "Movies & Entertainment", "word": "Red Carpet" },
-  { "category": "Movies & Entertainment", "word": "Soundtrack" },
-  { "category": "Movies & Entertainment", "word": "Blockbuster" },
-  { "category": "Movies & Entertainment", "word": "Animation" },
-  { "category": "Movies & Entertainment", "word": "Cliffhanger" },
-  { "category": "Sports & Games", "word": "Basketball" },
-  { "category": "Sports & Games", "word": "Snowboarding" },
-  { "category": "Sports & Games", "word": "Olympic Torch" },
-  { "category": "Sports & Games", "word": "Checkmate" },
-  { "category": "Sports & Games", "word": "Parachute" },
-  { "category": "Sports & Games", "word": "Surfing" },
-  { "category": "Sports & Games", "word": "Archery" },
-  { "category": "Sports & Games", "word": "Billiards" },
-  { "category": "Sports & Games", "word": "Go-Kart" },
-  { "category": "Sports & Games", "word": "Marathon" },
-  { "category": "World Landmarks", "word": "Eiffel Tower" },
-  { "category": "World Landmarks", "word": "Great Wall of China" },
-  { "category": "World Landmarks", "word": "Pyramids of Giza" },
-  { "category": "World Landmarks", "word": "Statue of Liberty" },
-  { "category": "World Landmarks", "word": "Colosseum" },
-  { "category": "World Landmarks", "word": "Taj Mahal" },
-  { "category": "World Landmarks", "word": "Sydney Opera House" },
-  { "category": "World Landmarks", "word": "Machu Picchu" },
-  { "category": "World Landmarks", "word": "Big Ben" },
-  { "category": "World Landmarks", "word": "Grand Canyon" },
-  { "category": "Professions", "word": "Astronaut" },
-  { "category": "Professions", "word": "Firefighter" },
-  { "category": "Professions", "word": "Detective" },
-  { "category": "Professions", "word": "Brain Surgeon" },
-  { "category": "Professions", "word": "Archaeologist" },
-  { "category": "Professions", "word": "Chef" },
-  { "category": "Professions", "word": "Submarine Pilot" },
-  { "category": "Professions", "word": "Magician" },
-  { "category": "Professions", "word": "Architect" },
-  { "category": "Professions", "word": "Blacksmith" },
-  { "category": "Vehicles & Transport", "word": "Helicopter" },
-  { "category": "Vehicles & Transport", "word": "Bullet Train" },
-  { "category": "Vehicles & Transport", "word": "Hot Air Balloon" },
-  { "category": "Vehicles & Transport", "word": "Submarine" },
-  { "category": "Vehicles & Transport", "word": "Hovercraft" },
-  { "category": "Vehicles & Transport", "word": "Cruise Ship" },
-  { "category": "Vehicles & Transport", "word": "Monster Truck" },
-  { "category": "Vehicles & Transport", "word": "Skateboard" },
-  { "category": "Vehicles & Transport", "word": "Spaceship" },
-  { "category": "Vehicles & Transport", "word": "Segway" },
-  { "category": "Mythology & Fantasy", "word": "Dragon" },
-  { "category": "Mythology & Fantasy", "word": "Unicorn" },
-  { "category": "Mythology & Fantasy", "word": "Phoenix" },
-  { "category": "Mythology & Fantasy", "word": "Mermaid" },
-  { "category": "Mythology & Fantasy", "word": "Centaur" },
-  { "category": "Mythology & Fantasy", "word": "Kraken" },
-  { "category": "Mythology & Fantasy", "word": "Magic Wand" },
-  { "category": "Mythology & Fantasy", "word": "Invisibility Cloak" },
-  { "category": "Mythology & Fantasy", "word": "Crystal Ball" },
-  { "category": "Mythology & Fantasy", "word": "Treasure Chest" },
-  { "category": "Music & Instruments", "word": "Electric Guitar" },
-  { "category": "Music & Instruments", "word": "Grand Piano" },
-  { "category": "Music & Instruments", "word": "Saxophone" },
-  { "category": "Music & Instruments", "word": "Drum Kit" },
-  { "category": "Music & Instruments", "word": "Violin" },
-  { "category": "Music & Instruments", "word": "Bagpipes" },
-  { "category": "Music & Instruments", "word": "Microphone" },
-  { "category": "Music & Instruments", "word": "Synthesizer" },
-  { "category": "Music & Instruments", "word": "Accordion" },
-  { "category": "Music & Instruments", "word": "Harmonica" }
+  {
+    "category": "Animals",
+    "word": "Elephant",
+    "categoryAr": "حيوانات",
+    "wordAr": "فيل"
+  },
+  {
+    "category": "Animals",
+    "word": "Penguin",
+    "categoryAr": "حيوانات",
+    "wordAr": "بطريق"
+  },
+  {
+    "category": "Animals",
+    "word": "Kangaroo",
+    "categoryAr": "حيوانات",
+    "wordAr": "كنغر"
+  },
+  {
+    "category": "Animals",
+    "word": "Chameleon",
+    "categoryAr": "حيوانات",
+    "wordAr": "حرباء"
+  },
+  {
+    "category": "Animals",
+    "word": "Flamingo",
+    "categoryAr": "حيوانات",
+    "wordAr": "فلامينجو"
+  },
+  {
+    "category": "Animals",
+    "word": "Octopus",
+    "categoryAr": "حيوانات",
+    "wordAr": "أخطبوط"
+  },
+  {
+    "category": "Animals",
+    "word": "Giraffe",
+    "categoryAr": "حيوانات",
+    "wordAr": "زرافة"
+  },
+  {
+    "category": "Animals",
+    "word": "Hedgehog",
+    "categoryAr": "حيوانات",
+    "wordAr": "قنفذ"
+  },
+  {
+    "category": "Animals",
+    "word": "Dolphin",
+    "categoryAr": "حيوانات",
+    "wordAr": "دولفين"
+  },
+  {
+    "category": "Animals",
+    "word": "Cheetah",
+    "categoryAr": "حيوانات",
+    "wordAr": "فهد"
+  },
+  {
+    "category": "Technology",
+    "word": "Smartphone",
+    "categoryAr": "تكنولوجيا واختراعات",
+    "wordAr": "موبايل"
+  },
+  {
+    "category": "Technology",
+    "word": "Virtual Reality",
+    "categoryAr": "تكنولوجيا واختراعات",
+    "wordAr": "نظارة واقع افتراضي"
+  },
+  {
+    "category": "Technology",
+    "word": "Drone",
+    "categoryAr": "تكنولوجيا واختراعات",
+    "wordAr": "طيارة درون"
+  },
+  {
+    "category": "Technology",
+    "word": "Artificial Intelligence",
+    "categoryAr": "تكنولوجيا واختراعات",
+    "wordAr": "ذكاء اصطناعي"
+  },
+  {
+    "category": "Technology",
+    "word": "Blockchain",
+    "categoryAr": "تكنولوجيا واختراعات",
+    "wordAr": "بلوك تشين"
+  },
+  {
+    "category": "Technology",
+    "word": "Quantum Computer",
+    "categoryAr": "تكنولوجيا واختراعات",
+    "wordAr": "كمبيوتر كمي"
+  },
+  {
+    "category": "Technology",
+    "word": "Smartwatch",
+    "categoryAr": "تكنولوجيا واختراعات",
+    "wordAr": "ساعة ذكية"
+  },
+  {
+    "category": "Technology",
+    "word": "Cybersecurity",
+    "categoryAr": "تكنولوجيا واختراعات",
+    "wordAr": "أمن سيبراني"
+  },
+  {
+    "category": "Technology",
+    "word": "3D Printer",
+    "categoryAr": "تكنولوجيا واختراعات",
+    "wordAr": "طابعة ثلاثية الأبعاد"
+  },
+  {
+    "category": "Technology",
+    "word": "Microchip",
+    "categoryAr": "تكنولوجيا واختراعات",
+    "wordAr": "شريحة إلكترونية"
+  },
+  {
+    "category": "Food & Drinks",
+    "word": "Sushi",
+    "categoryAr": "أكلات ومشروبات",
+    "wordAr": "سوشي"
+  },
+  {
+    "category": "Food & Drinks",
+    "word": "Pizza",
+    "categoryAr": "أكلات ومشروبات",
+    "wordAr": "بيتزا"
+  },
+  {
+    "category": "Food & Drinks",
+    "word": "Cheeseburger",
+    "categoryAr": "أكلات ومشروبات",
+    "wordAr": "برجر بالجبنة"
+  },
+  {
+    "category": "Food & Drinks",
+    "word": "Tacos",
+    "categoryAr": "أكلات ومشروبات",
+    "wordAr": "تاكو"
+  },
+  {
+    "category": "Food & Drinks",
+    "word": "Croissant",
+    "categoryAr": "أكلات ومشروبات",
+    "wordAr": "كرواسون"
+  },
+  {
+    "category": "Food & Drinks",
+    "word": "Espresso",
+    "categoryAr": "أكلات ومشروبات",
+    "wordAr": "إسبريسو"
+  },
+  {
+    "category": "Food & Drinks",
+    "word": "Chocolate Fondue",
+    "categoryAr": "أكلات ومشروبات",
+    "wordAr": "فوندو شوكولاتة"
+  },
+  {
+    "category": "Food & Drinks",
+    "word": "Ice Cream Sundae",
+    "categoryAr": "أكلات ومشروبات",
+    "wordAr": "آيس كريم صنداي"
+  },
+  {
+    "category": "Food & Drinks",
+    "word": "Ramen",
+    "categoryAr": "أكلات ومشروبات",
+    "wordAr": "رامن"
+  },
+  {
+    "category": "Food & Drinks",
+    "word": "Guacamole",
+    "categoryAr": "أكلات ومشروبات",
+    "wordAr": "جواكامولي"
+  },
+  {
+    "category": "Space & Cosmos",
+    "word": "Black Hole",
+    "categoryAr": "فضاء وكواكب",
+    "wordAr": "ثقب أسود"
+  },
+  {
+    "category": "Space & Cosmos",
+    "word": "Supernova",
+    "categoryAr": "فضاء وكواكب",
+    "wordAr": "مستعر أعظم"
+  },
+  {
+    "category": "Space & Cosmos",
+    "word": "Asteroid",
+    "categoryAr": "فضاء وكواكب",
+    "wordAr": "كويكب"
+  },
+  {
+    "category": "Space & Cosmos",
+    "word": "International Space Station",
+    "categoryAr": "فضاء وكواكب",
+    "wordAr": "محطة الفضاء الدولية"
+  },
+  {
+    "category": "Space & Cosmos",
+    "word": "Telescope",
+    "categoryAr": "فضاء وكواكب",
+    "wordAr": "تلسكوب"
+  },
+  {
+    "category": "Space & Cosmos",
+    "word": "Mars Rover",
+    "categoryAr": "فضاء وكواكب",
+    "wordAr": "مسبار المريخ"
+  },
+  {
+    "category": "Space & Cosmos",
+    "word": "Solar Eclipse",
+    "categoryAr": "فضاء وكواكب",
+    "wordAr": "كسوف الشمس"
+  },
+  {
+    "category": "Space & Cosmos",
+    "word": "Nebula",
+    "categoryAr": "فضاء وكواكب",
+    "wordAr": "سديم"
+  },
+  {
+    "category": "Space & Cosmos",
+    "word": "Comet",
+    "categoryAr": "فضاء وكواكب",
+    "wordAr": "مذنب"
+  },
+  {
+    "category": "Space & Cosmos",
+    "word": "Milky Way",
+    "categoryAr": "فضاء وكواكب",
+    "wordAr": "Milky Way"
+  },
+  {
+    "category": "Movies & Entertainment",
+    "word": "Popcorn",
+    "categoryAr": "Movies & Entertainment",
+    "wordAr": "فشار"
+  },
+  {
+    "category": "Movies & Entertainment",
+    "word": "Hollywood",
+    "categoryAr": "Movies & Entertainment",
+    "wordAr": "Hollywood"
+  },
+  {
+    "category": "Movies & Entertainment",
+    "word": "Oscar Trophy",
+    "categoryAr": "Movies & Entertainment",
+    "wordAr": "Oscar Trophy"
+  },
+  {
+    "category": "Movies & Entertainment",
+    "word": "Stunt Double",
+    "categoryAr": "Movies & Entertainment",
+    "wordAr": "Stunt Double"
+  },
+  {
+    "category": "Movies & Entertainment",
+    "word": "Director",
+    "categoryAr": "Movies & Entertainment",
+    "wordAr": "Director"
+  },
+  {
+    "category": "Movies & Entertainment",
+    "word": "Red Carpet",
+    "categoryAr": "Movies & Entertainment",
+    "wordAr": "Red Carpet"
+  },
+  {
+    "category": "Movies & Entertainment",
+    "word": "Soundtrack",
+    "categoryAr": "Movies & Entertainment",
+    "wordAr": "Soundtrack"
+  },
+  {
+    "category": "Movies & Entertainment",
+    "word": "Blockbuster",
+    "categoryAr": "Movies & Entertainment",
+    "wordAr": "Blockbuster"
+  },
+  {
+    "category": "Movies & Entertainment",
+    "word": "Animation",
+    "categoryAr": "Movies & Entertainment",
+    "wordAr": "Animation"
+  },
+  {
+    "category": "Movies & Entertainment",
+    "word": "Cliffhanger",
+    "categoryAr": "Movies & Entertainment",
+    "wordAr": "Cliffhanger"
+  },
+  {
+    "category": "Sports & Games",
+    "word": "Basketball",
+    "categoryAr": "Sports & Games",
+    "wordAr": "Basketball"
+  },
+  {
+    "category": "Sports & Games",
+    "word": "Snowboarding",
+    "categoryAr": "Sports & Games",
+    "wordAr": "Snowboarding"
+  },
+  {
+    "category": "Sports & Games",
+    "word": "Olympic Torch",
+    "categoryAr": "Sports & Games",
+    "wordAr": "Olympic Torch"
+  },
+  {
+    "category": "Sports & Games",
+    "word": "Checkmate",
+    "categoryAr": "Sports & Games",
+    "wordAr": "Checkmate"
+  },
+  {
+    "category": "Sports & Games",
+    "word": "Parachute",
+    "categoryAr": "Sports & Games",
+    "wordAr": "Parachute"
+  },
+  {
+    "category": "Sports & Games",
+    "word": "Surfing",
+    "categoryAr": "Sports & Games",
+    "wordAr": "Surfing"
+  },
+  {
+    "category": "Sports & Games",
+    "word": "Archery",
+    "categoryAr": "Sports & Games",
+    "wordAr": "Archery"
+  },
+  {
+    "category": "Sports & Games",
+    "word": "Billiards",
+    "categoryAr": "Sports & Games",
+    "wordAr": "Billiards"
+  },
+  {
+    "category": "Sports & Games",
+    "word": "Go-Kart",
+    "categoryAr": "Sports & Games",
+    "wordAr": "Go-Kart"
+  },
+  {
+    "category": "Sports & Games",
+    "word": "Marathon",
+    "categoryAr": "Sports & Games",
+    "wordAr": "Marathon"
+  },
+  {
+    "category": "World Landmarks",
+    "word": "Eiffel Tower",
+    "categoryAr": "World Landmarks",
+    "wordAr": "برج إيفل"
+  },
+  {
+    "category": "World Landmarks",
+    "word": "Great Wall of China",
+    "categoryAr": "World Landmarks",
+    "wordAr": "سور الصين العظيم"
+  },
+  {
+    "category": "World Landmarks",
+    "word": "Pyramids of Giza",
+    "categoryAr": "World Landmarks",
+    "wordAr": "Pyramids of Giza"
+  },
+  {
+    "category": "World Landmarks",
+    "word": "Statue of Liberty",
+    "categoryAr": "World Landmarks",
+    "wordAr": "تمثال الحرية"
+  },
+  {
+    "category": "World Landmarks",
+    "word": "Colosseum",
+    "categoryAr": "World Landmarks",
+    "wordAr": "الكولوسيوم"
+  },
+  {
+    "category": "World Landmarks",
+    "word": "Taj Mahal",
+    "categoryAr": "World Landmarks",
+    "wordAr": "تاج محل"
+  },
+  {
+    "category": "World Landmarks",
+    "word": "Sydney Opera House",
+    "categoryAr": "World Landmarks",
+    "wordAr": "Sydney Opera House"
+  },
+  {
+    "category": "World Landmarks",
+    "word": "Machu Picchu",
+    "categoryAr": "World Landmarks",
+    "wordAr": "Machu Picchu"
+  },
+  {
+    "category": "World Landmarks",
+    "word": "Big Ben",
+    "categoryAr": "World Landmarks",
+    "wordAr": "Big Ben"
+  },
+  {
+    "category": "World Landmarks",
+    "word": "Grand Canyon",
+    "categoryAr": "World Landmarks",
+    "wordAr": "Grand Canyon"
+  },
+  {
+    "category": "Professions",
+    "word": "Astronaut",
+    "categoryAr": "مهن ووظائف",
+    "wordAr": "رائد فضاء"
+  },
+  {
+    "category": "Professions",
+    "word": "Firefighter",
+    "categoryAr": "مهن ووظائف",
+    "wordAr": "رجل إطفاء"
+  },
+  {
+    "category": "Professions",
+    "word": "Detective",
+    "categoryAr": "مهن ووظائف",
+    "wordAr": "مخبر سري"
+  },
+  {
+    "category": "Professions",
+    "word": "Brain Surgeon",
+    "categoryAr": "مهن ووظائف",
+    "wordAr": "Brain Surgeon"
+  },
+  {
+    "category": "Professions",
+    "word": "Archaeologist",
+    "categoryAr": "مهن ووظائف",
+    "wordAr": "Archaeologist"
+  },
+  {
+    "category": "Professions",
+    "word": "Chef",
+    "categoryAr": "مهن ووظائف",
+    "wordAr": "شيف"
+  },
+  {
+    "category": "Professions",
+    "word": "Submarine Pilot",
+    "categoryAr": "مهن ووظائف",
+    "wordAr": "Submarine Pilot"
+  },
+  {
+    "category": "Professions",
+    "word": "Magician",
+    "categoryAr": "مهن ووظائف",
+    "wordAr": "Magician"
+  },
+  {
+    "category": "Professions",
+    "word": "Architect",
+    "categoryAr": "مهن ووظائف",
+    "wordAr": "مهندس معماري"
+  },
+  {
+    "category": "Professions",
+    "word": "Blacksmith",
+    "categoryAr": "مهن ووظائف",
+    "wordAr": "Blacksmith"
+  },
+  {
+    "category": "Vehicles & Transport",
+    "word": "Helicopter",
+    "categoryAr": "Vehicles & Transport",
+    "wordAr": "هليكوبتر"
+  },
+  {
+    "category": "Vehicles & Transport",
+    "word": "Bullet Train",
+    "categoryAr": "Vehicles & Transport",
+    "wordAr": "Bullet Train"
+  },
+  {
+    "category": "Vehicles & Transport",
+    "word": "Hot Air Balloon",
+    "categoryAr": "Vehicles & Transport",
+    "wordAr": "Hot Air Balloon"
+  },
+  {
+    "category": "Vehicles & Transport",
+    "word": "Submarine",
+    "categoryAr": "Vehicles & Transport",
+    "wordAr": "غواصة"
+  },
+  {
+    "category": "Vehicles & Transport",
+    "word": "Hovercraft",
+    "categoryAr": "Vehicles & Transport",
+    "wordAr": "Hovercraft"
+  },
+  {
+    "category": "Vehicles & Transport",
+    "word": "Cruise Ship",
+    "categoryAr": "Vehicles & Transport",
+    "wordAr": "Cruise Ship"
+  },
+  {
+    "category": "Vehicles & Transport",
+    "word": "Monster Truck",
+    "categoryAr": "Vehicles & Transport",
+    "wordAr": "Monster Truck"
+  },
+  {
+    "category": "Vehicles & Transport",
+    "word": "Skateboard",
+    "categoryAr": "Vehicles & Transport",
+    "wordAr": "Skateboard"
+  },
+  {
+    "category": "Vehicles & Transport",
+    "word": "Spaceship",
+    "categoryAr": "Vehicles & Transport",
+    "wordAr": "Spaceship"
+  },
+  {
+    "category": "Vehicles & Transport",
+    "word": "Segway",
+    "categoryAr": "Vehicles & Transport",
+    "wordAr": "Segway"
+  },
+  {
+    "category": "Mythology & Fantasy",
+    "word": "Dragon",
+    "categoryAr": "Mythology & Fantasy",
+    "wordAr": "Dragon"
+  },
+  {
+    "category": "Mythology & Fantasy",
+    "word": "Unicorn",
+    "categoryAr": "Mythology & Fantasy",
+    "wordAr": "Unicorn"
+  },
+  {
+    "category": "Mythology & Fantasy",
+    "word": "Phoenix",
+    "categoryAr": "Mythology & Fantasy",
+    "wordAr": "Phoenix"
+  },
+  {
+    "category": "Mythology & Fantasy",
+    "word": "Mermaid",
+    "categoryAr": "Mythology & Fantasy",
+    "wordAr": "Mermaid"
+  },
+  {
+    "category": "Mythology & Fantasy",
+    "word": "Centaur",
+    "categoryAr": "Mythology & Fantasy",
+    "wordAr": "Centaur"
+  },
+  {
+    "category": "Mythology & Fantasy",
+    "word": "Kraken",
+    "categoryAr": "Mythology & Fantasy",
+    "wordAr": "Kraken"
+  },
+  {
+    "category": "Mythology & Fantasy",
+    "word": "Magic Wand",
+    "categoryAr": "Mythology & Fantasy",
+    "wordAr": "Magic Wand"
+  },
+  {
+    "category": "Mythology & Fantasy",
+    "word": "Invisibility Cloak",
+    "categoryAr": "Mythology & Fantasy",
+    "wordAr": "Invisibility Cloak"
+  },
+  {
+    "category": "Mythology & Fantasy",
+    "word": "Crystal Ball",
+    "categoryAr": "Mythology & Fantasy",
+    "wordAr": "Crystal Ball"
+  },
+  {
+    "category": "Mythology & Fantasy",
+    "word": "Treasure Chest",
+    "categoryAr": "Mythology & Fantasy",
+    "wordAr": "Treasure Chest"
+  },
+  {
+    "category": "Music & Instruments",
+    "word": "Electric Guitar",
+    "categoryAr": "مزيكا وآلات",
+    "wordAr": "Electric Guitar"
+  },
+  {
+    "category": "Music & Instruments",
+    "word": "Grand Piano",
+    "categoryAr": "مزيكا وآلات",
+    "wordAr": "Grand Piano"
+  },
+  {
+    "category": "Music & Instruments",
+    "word": "Saxophone",
+    "categoryAr": "مزيكا وآلات",
+    "wordAr": "Saxophone"
+  },
+  {
+    "category": "Music & Instruments",
+    "word": "Drum Kit",
+    "categoryAr": "مزيكا وآلات",
+    "wordAr": "Drum Kit"
+  },
+  {
+    "category": "Music & Instruments",
+    "word": "Violin",
+    "categoryAr": "مزيكا وآلات",
+    "wordAr": "كمانجة"
+  },
+  {
+    "category": "Music & Instruments",
+    "word": "Bagpipes",
+    "categoryAr": "مزيكا وآلات",
+    "wordAr": "Bagpipes"
+  },
+  {
+    "category": "Music & Instruments",
+    "word": "Microphone",
+    "categoryAr": "مزيكا وآلات",
+    "wordAr": "Microphone"
+  },
+  {
+    "category": "Music & Instruments",
+    "word": "Synthesizer",
+    "categoryAr": "مزيكا وآلات",
+    "wordAr": "Synthesizer"
+  },
+  {
+    "category": "Music & Instruments",
+    "word": "Accordion",
+    "categoryAr": "مزيكا وآلات",
+    "wordAr": "Accordion"
+  },
+  {
+    "category": "Music & Instruments",
+    "word": "Harmonica",
+    "categoryAr": "مزيكا وآلات",
+    "wordAr": "Harmonica"
+  }
 ]

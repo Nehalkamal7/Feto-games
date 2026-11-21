@@ -18,6 +18,8 @@ import { NeonAvatarDisplay } from '../NeonAvatarDisplay';
 import { GameIcon } from '../GameIcon';
 import { sound } from '@/lib/sound';
 import confetti from 'canvas-confetti';
+import { useGameTimer } from '@/hooks/useGameTimer';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface SillyRouletteGameViewProps {
   state: SillyRoulettePublicState;
@@ -25,6 +27,7 @@ interface SillyRouletteGameViewProps {
   currentPlayerId: string;
   isHost: boolean;
   vibeMode?: VibeMode;
+  roomCode?: string;
   onAction: (actionType: string, payload: any) => Promise<void>;
 }
 
@@ -34,10 +37,25 @@ export function SillyRouletteGameView({
   currentPlayerId,
   isHost,
   vibeMode: _vibeMode,
+  roomCode,
   onAction
 }: SillyRouletteGameViewProps) {
+  const { language } = useLanguage();
+  const isAr = language === 'ar';
   const [hasVoted, setHasVoted] = useState(false);
   const isMyTurn = currentPlayerId === state.targetPlayerId;
+
+  const timer = useGameTimer({
+    phaseEndsAt: (state as any)?.phaseEndsAt,
+    roomCode: roomCode || '',
+    phase: state.phase,
+    round: state.round,
+    onTimeout: () => {
+      onAction('PHASE_TIMEOUT', {});
+    }
+  });
+
+  const remainingSecs = timer.remainingSeconds > 0 ? timer.remainingSeconds : state.remainingSeconds;
 
   // Trigger wheel clicks during spinning phase
   useEffect(() => {
@@ -88,6 +106,13 @@ export function SillyRouletteGameView({
     }
   };
 
+  const categoryMap: Record<string, { en: string; ar: string }> = {
+    physical: { en: 'Physical Dare', ar: 'تحدي حركي' },
+    vocal: { en: 'Vocal Dare', ar: 'تحدي صوتي' },
+    acting: { en: 'Acting Dare', ar: 'تحدي تمثيل' },
+    absurd: { en: 'Absurd Dare', ar: 'تحدي مجنون' },
+  };
+
   return (
     <div className="flex flex-col h-full w-full max-w-md mx-auto px-2 sm:px-4 py-2 overflow-x-hidden select-none">
       {/* 1. TOP HEADER */}
@@ -95,23 +120,25 @@ export function SillyRouletteGameView({
         <div className="flex items-center gap-2">
           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white border border-gray-200 text-gray-800 flex items-center gap-1.5 shadow-sm">
             <GameIcon gameMode="silly_roulette" size="xs" />
-            Round {state.round} of {state.totalRounds}
+            {isAr ? `الجولة ${state.round} من ${state.totalRounds}` : `Round ${state.round} of ${state.totalRounds}`}
           </span>
           <span className="hidden sm:inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-            {state.challengeCategory}
+            {isAr
+              ? (categoryMap[state.challengeCategory]?.ar || state.challengeCategory)
+              : (categoryMap[state.challengeCategory]?.en || state.challengeCategory)}
           </span>
         </div>
 
         {/* TIMER */}
         <div
           className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold transition-all ${
-            state.remainingSeconds <= 5
+            remainingSecs <= 5
               ? 'bg-red-50 text-red-600 border-red-200 animate-pulse'
               : 'bg-white text-gray-800 border-gray-200 shadow-sm'
           }`}
         >
-          <Clock className={`w-3.5 h-3.5 ${state.remainingSeconds <= 5 ? 'text-red-500' : 'text-blue-600'}`} />
-          <span>{state.remainingSeconds}s</span>
+          <Clock className={`w-3.5 h-3.5 ${remainingSecs <= 5 ? 'text-red-500' : 'text-blue-600'}`} />
+          <span className="force-ltr">{remainingSecs}s</span>
         </div>
       </div>
 
@@ -150,10 +177,10 @@ export function SillyRouletteGameView({
           </div>
 
           <h3 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
-            Spinning Roulette...
+            {isAr ? 'عجلة الروليت تدور...' : 'Spinning Roulette...'}
           </h3>
           <p className="text-xs text-gray-500 font-medium mt-1">
-            Selecting a random player for the party dare!
+            {isAr ? 'نختار لاعباً عشوائياً لتنفيذ التحدي الجريء!' : 'Selecting a random player for the party dare!'}
           </p>
         </div>
       )}
@@ -169,22 +196,22 @@ export function SillyRouletteGameView({
           >
             <div className="flex items-center justify-center gap-3 mb-3">
               <NeonAvatarDisplay avatarId={state.targetAvatar} size="md" showGlow={false} />
-              <div className="text-left">
+              <div className="text-start">
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-blue-600 block">
-                  Selected Player:
+                  {isAr ? 'اللاعب المختار:' : 'Selected Player:'}
                 </span>
                 <span className="text-lg sm:text-2xl font-bold text-gray-900">
-                  {state.targetUsername} {isMyTurn && '(You!)'}
+                  {state.targetUsername} {isMyTurn && (isAr ? '(أنت!)' : '(You!)')}
                 </span>
               </div>
             </div>
 
             <div className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 mb-3">
-              {state.challengeTitle}
+              {isAr && state.challengeTitleAr ? state.challengeTitleAr : state.challengeTitle}
             </div>
 
             <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900 leading-snug">
-              &ldquo;{state.challengeText}&rdquo;
+              &ldquo;{isAr && state.challengeTextAr ? state.challengeTextAr : state.challengeText}&rdquo;
             </h2>
           </motion.div>
 
@@ -192,12 +219,14 @@ export function SillyRouletteGameView({
           {state.phase === 'voting' && (
             <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center mb-3">
               <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 block mb-3">
-                Did they complete the dare?
+                {isAr ? 'هل نفّذ التحدي ببراعة؟' : 'Did they complete the dare?'}
               </span>
 
               {isMyTurn ? (
                 <p className="text-sm font-medium text-gray-500 italic">
-                  Awaiting the crew&apos;s vote on your performance...
+                  {isAr
+                    ? 'في انتظار تصويت الروم على أدائك...'
+                    : 'Awaiting the crew\'s vote on your performance...'}
                 </p>
               ) : (
                 <div className="flex items-center justify-center gap-3 max-w-sm mx-auto">
@@ -211,7 +240,7 @@ export function SillyRouletteGameView({
                     }`}
                   >
                     <ThumbsUp className="w-4 h-4 shrink-0" />
-                    <span>Nailed It! (+180)</span>
+                    <span>{isAr ? 'بدّع فيها! (+180)' : 'Nailed It! (+180)'}</span>
                   </button>
 
                   <button
@@ -224,7 +253,7 @@ export function SillyRouletteGameView({
                     }`}
                   >
                     <ThumbsDown className="w-4 h-4 shrink-0" />
-                    <span>Penalty</span>
+                    <span>{isAr ? 'عقاب وكسوف' : 'Penalty'}</span>
                   </button>
                 </div>
               )}
@@ -236,12 +265,13 @@ export function SillyRouletteGameView({
             <div className="text-center py-6 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
               <h3 className="text-2xl font-extrabold text-gray-900 mb-2">
                 {state.voteTallies.nailed_it >= state.voteTallies.shame_penalty
-                  ? '🎉 Challenge Victorious!'
-                  : '💀 The Crowd Demanded Penalty!'}
+                  ? (isAr ? '🎉 بدّع وانتصر بالتحدي!' : '🎉 Challenge Victorious!')
+                  : (isAr ? '💀 الجمهور قرر العقاب!' : '💀 The Crowd Demanded Penalty!')}
               </h3>
               <p className="text-xs sm:text-sm font-medium text-gray-600 mb-4">
-                Nailed It: {state.voteTallies.nailed_it} • Penalty:{' '}
-                {state.voteTallies.shame_penalty}
+                {isAr
+                  ? `بدّع: ${state.voteTallies.nailed_it} • عقاب: ${state.voteTallies.shame_penalty}`
+                  : `Nailed It: ${state.voteTallies.nailed_it} • Penalty: ${state.voteTallies.shame_penalty}`}
               </p>
 
               {isHost && (
@@ -249,8 +279,8 @@ export function SillyRouletteGameView({
                   onClick={handleNextRound}
                   className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-sm text-sm font-bold flex items-center gap-2 mx-auto transition-all"
                 >
-                  <span>Next Turn</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <span>{isAr ? 'الدور القادم' : 'Next Turn'}</span>
+                  <ArrowRight className={`w-4 h-4 ${isAr ? 'rotate-180' : ''}`} />
                 </button>
               )}
             </div>

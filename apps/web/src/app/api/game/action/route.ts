@@ -10,6 +10,7 @@ import {
 } from '@/lib/redis';
 import { publishToPlayer, publishToRoom } from '@/lib/ably-server';
 import {
+  endRoundNow,
   getPublicGameState,
   handleGameAction,
   initGameSession,
@@ -331,6 +332,139 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, room: publicRoom });
     }
 
+    if (actionType === 'BACK_TO_LOBBY' || actionType === 'RETURN_TO_LOBBY') {
+      if (room.hostId !== playerId) {
+        return NextResponse.json({ success: false, error: { message: 'Only host can return room to lobby.' } }, { status: 403 });
+      }
+
+      room.status = 'lobby';
+      room.currentRound = 0;
+      room.gameData = null;
+      if (payload.resetScores === true) {
+        for (const p of Object.values(room.players)) {
+          p.score = 0;
+        }
+      }
+      for (const p of Object.values(room.players)) {
+        p.isReady = p.isHost;
+      }
+
+      room.updatedAt = Date.now();
+      room.lastActivityAt = Date.now();
+      await saveRoomState(room, 7200);
+
+      if (!room.config.isPrivate && Object.keys(room.players).length < (room.config.maxPlayers || 15)) {
+        await addPublicRoomDirectory(room.code);
+      }
+
+      const publicRoom = sanitizeRoomState(room);
+      await publishToRoom(roomCode, 'room:updated', publicRoom);
+      await publishToRoom(roomCode, 'room:state', publicRoom);
+      await publishToRoom(roomCode, 'room_state', publicRoom);
+      await publishToRoom(roomCode, 'game:lobby_returned', { room: publicRoom });
+
+      return NextResponse.json({ success: true, room: publicRoom });
+    }
+
+    if (actionType === 'END_ROUND' || actionType === 'SKIP_ROUND') {
+      if (room.hostId !== playerId) {
+        return NextResponse.json({ success: false, error: { message: 'Only host can end or skip round.' } }, { status: 403 });
+      }
+
+      if (room.status !== 'playing' && room.status !== 'in_game') {
+        return NextResponse.json({ success: false, error: { message: 'Game is not currently active.' } }, { status: 400 });
+      }
+
+      const result = endRoundNow(room);
+      result.updatedRoom.updatedAt = Date.now();
+      await saveRoomState(result.updatedRoom, 7200);
+
+      const publicRoom = sanitizeRoomState(result.updatedRoom);
+      await publishToRoom(roomCode, 'room:updated', publicRoom);
+      await publishToRoom(roomCode, 'room:state', publicRoom);
+      await publishToRoom(roomCode, 'room_state', publicRoom);
+      await publishToRoom(roomCode, 'game:phase-change', {
+        phase: result.updatedRoom.gameData?.phase || 'round_results',
+        round: result.updatedRoom.currentRound,
+        totalRounds: result.updatedRoom.config.totalRounds,
+        endsAt: result.updatedRoom.gameData?.phaseEndsAt
+      });
+      await publishToRoom(roomCode, 'game:state_sync', {
+        gameMode: room.config.gameMode,
+        state: result.publicState
+      });
+
+      return NextResponse.json({
+        success: true,
+        room: publicRoom,
+        gameState: result.publicState
+      });
+    }
+
+    if (actionType === 'NEXT_ROUND') {
+      if (room.hostId !== playerId) {
+        return NextResponse.json({ success: false, error: { message: 'Only host can advance round.' } }, { status: 403 });
+      }
+
+      const allowSolo = Boolean(payload?.force) || Boolean(payload?.isSoloDevMode) || Boolean((room.config as any)?.isSoloDevMode);
+      let result: any;
+      if (room.currentRound >= room.config.totalRounds) {
+        const isPlaylistNext = Array.isArray(room.selectedGames) &&
+          room.selectedGames.length > 1 &&
+          typeof room.currentGameIndex === 'number' &&
+          room.currentGameIndex + 1 < room.selectedGames.length;
+
+        if (isPlaylistNext && room.selectedGames) {
+          room.currentGameIndex = (room.currentGameIndex || 0) + 1;
+          room.config.gameMode = room.selectedGames[room.currentGameIndex];
+          room.currentRound = 1;
+          result = initGameSession(room, allowSolo);
+        } else {
+          room.status = 'game_over';
+          result = { updatedRoom: room, publicState: getPublicGameState(room) };
+        }
+      } else {
+        room.currentRound += 1;
+        result = initGameSession(room, allowSolo);
+      }
+
+      const isGameOver = result.updatedRoom.status === 'game_over' || (result.updatedRoom.status as string) === 'finished';
+      if (isGameOver) {
+        await removePublicRoomDirectory(roomCode);
+        await saveRoomState(result.updatedRoom, 300);
+      } else {
+        await saveRoomState(result.updatedRoom, 7200);
+      }
+
+      if (result.privateRoles) {
+        for (const [pId, roleData] of Object.entries(result.privateRoles)) {
+          await publishToPlayer(pId, 'game:private_role', roleData);
+          await publishToPlayer(pId, 'game:secret-role', roleData);
+        }
+      }
+
+      const publicRoom = sanitizeRoomState(result.updatedRoom);
+      await publishToRoom(roomCode, 'room:updated', publicRoom);
+      await publishToRoom(roomCode, 'room:state', publicRoom);
+      await publishToRoom(roomCode, 'room_state', publicRoom);
+      await publishToRoom(roomCode, 'game:phase-change', {
+        phase: result.updatedRoom.gameData?.phase || 'active',
+        round: result.updatedRoom.currentRound,
+        totalRounds: result.updatedRoom.config.totalRounds,
+        endsAt: result.updatedRoom.gameData?.phaseEndsAt
+      });
+      await publishToRoom(roomCode, 'game:state_sync', {
+        gameMode: room.config.gameMode,
+        state: result.publicState
+      });
+
+      return NextResponse.json({
+        success: true,
+        room: publicRoom,
+        gameState: result.publicState
+      });
+    }
+
     if (actionType === 'EMOJI_REACTION') {
       const emoji = payload.emoji || '🔥';
       const player = room.players[playerId] || room.spectators[playerId];
@@ -349,13 +483,13 @@ export async function POST(req: NextRequest) {
     // 2. CLIENT-SIDE COUNTDOWN RESOLUTION WITH IDEMPOTENCY LOCK
     // ========================================================
 
-    if (actionType === 'RESOLVE_PHASE') {
+    if (actionType === 'RESOLVE_PHASE' || actionType === 'PHASE_TIMEOUT') {
       const round = room.currentRound || 1;
       const currentPhase = room.gameData?.phase || 'default';
-      const lockKey = `phase:${roomCode}:${round}:${currentPhase}`;
+      const lockKey = `lock:timeout:${roomCode}:${round}:${currentPhase}`;
 
       // Acquire idempotency lock so only 1 client call resolves the phase when timer hits 0
-      const acquired = await acquireLock(lockKey, 6);
+      const acquired = await acquireLock(lockKey, 10);
       if (!acquired) {
         return NextResponse.json({
           success: true,
@@ -371,6 +505,11 @@ export async function POST(req: NextRequest) {
         await saveRoomState(result.updatedRoom, 300);
       } else {
         await saveRoomState(result.updatedRoom, 7200);
+      }
+
+      // If action triggered an explicit broadcast event (e.g. bomb:exploded)
+      if (result.broadcastEvent) {
+        await publishToRoom(roomCode, result.broadcastEvent.name, result.broadcastEvent.data);
       }
 
       // Publish private roles if new round generated private roles

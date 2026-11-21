@@ -16,27 +16,52 @@ import {
   Sparkles,
   Send,
   Clock,
-  Hash
+  Hash,
+  ArrowRight
 } from 'lucide-react';
 import { sound } from '@/lib/sound';
 import { getSocket } from '@/lib/socket';
 import { useVisualViewport } from '@/hooks/useVisualViewport';
+import { useGameTimer } from '@/hooks/useGameTimer';
+
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface WordBattleGameViewProps {
   gameState: WordBattlePublicState;
   currentPlayer: PlayerSummary;
   players: PlayerSummary[];
   roomCode: string;
+  onAction?: (actionType: string, payload?: any) => Promise<any>;
+  isHost?: boolean;
 }
 
 export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
   gameState,
   currentPlayer,
   players,
-  roomCode: _roomCode
+  roomCode: _roomCode,
+  onAction,
+  isHost
 }) => {
   const socket = getSocket();
+  const { language } = useLanguage();
+  const isAr = language === 'ar';
   const { isKeyboardOpen, scaleFactor } = useVisualViewport();
+
+  const activeCategory = isAr ? (gameState.categoryAr || gameState.category) : gameState.category;
+  const activeLetter = isAr ? (gameState.startingLetterAr || gameState.startingLetter) : gameState.startingLetter;
+
+  const timer = useGameTimer({
+    phaseEndsAt: (gameState as any)?.phaseEndsAt,
+    roomCode: _roomCode,
+    phase: gameState.phase,
+    round: gameState.round,
+    onTimeout: () => {
+      if (onAction) {
+        onAction('PHASE_TIMEOUT');
+      }
+    }
+  });
 
   const [inputWord, setInputWord] = useState('');
   const [rejectFeedback, setRejectFeedback] = useState<string | null>(null);
@@ -59,13 +84,19 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
       setShakeInput(true);
       setTimeout(() => setShakeInput(false), 500);
 
-      let msg = 'Word rejected.';
+      let msg = isAr ? 'تم رفض الكلمة.' : 'Word rejected.';
       if (data.reason === 'already_taken') {
-        msg = `"${data.word}" was already claimed by another player!`;
+        msg = isAr
+          ? `"${data.word}" تم حجزها بالفعل من لاعب آخر!`
+          : `"${data.word}" was already claimed by another player!`;
       } else if (data.reason === 'invalid_letter') {
-        msg = `Must start with "${gameState.startingLetter}"!`;
+        msg = isAr
+          ? `يجب أن تبدأ بحرف "${activeLetter}"!`
+          : `Must start with "${gameState.startingLetter}"!`;
       } else if (data.reason === 'invalid_word') {
-        msg = `"${data.word}" is not a recognized word!`;
+        msg = isAr
+          ? `"${data.word}" ليست كلمة مسجلة!`
+          : `"${data.word}" is not a recognized word!`;
       }
       setRejectFeedback(msg);
       setIsSubmitting(false);
@@ -89,18 +120,25 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
       socket.off('word_battle:rejected', handleRejected);
       socket.off('word_battle:accepted', handleAccepted);
     };
-  }, [socket, currentPlayer.username, gameState.startingLetter]);
+  }, [socket, currentPlayer.username, gameState.startingLetter, activeLetter, isAr]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const clean = inputWord.trim();
     if (!clean || gameState.phase !== 'word_racing' || isSubmitting) return;
 
-    if (!clean.toLowerCase().startsWith(gameState.startingLetter.toLowerCase())) {
+    const startsWithEn = clean.toLowerCase().startsWith(gameState.startingLetter.toLowerCase());
+    const startsWithAr = gameState.startingLetterAr && clean.startsWith(gameState.startingLetterAr);
+
+    if (!startsWithEn && !startsWithAr) {
       sound.playUnready();
       setShakeInput(true);
       setTimeout(() => setShakeInput(false), 500);
-      setRejectFeedback(`Word must start with letter "${gameState.startingLetter}"!`);
+      setRejectFeedback(
+        isAr
+          ? `يجب أن تبدأ الكلمة بحرف "${activeLetter}"!`
+          : `Word must start with letter "${gameState.startingLetter}"!`
+      );
       return;
     }
 
@@ -108,25 +146,31 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
       sound.playUnready();
       setShakeInput(true);
       setTimeout(() => setShakeInput(false), 500);
-      setRejectFeedback(`"${clean}" is already claimed!`);
+      setRejectFeedback(
+        isAr ? `"${clean}" محجوزة بالفعل!` : `"${clean}" is already claimed!`
+      );
       return;
     }
 
     setRejectFeedback(null);
     setIsSubmitting(true);
+    if (onAction) {
+      onAction('SUBMIT_WORD', { word: clean });
+    }
     socket.emit('word_battle:submit_word', { word: clean }, (res: any) => {
       setIsSubmitting(false);
       if (res && res.success && res.data?.accepted) {
         setInputWord('');
       } else if (res && !res.success) {
-        setRejectFeedback(res.error?.message || 'Submission error');
+        setRejectFeedback(res.error?.message || (isAr ? 'خطأ في الإرسال' : 'Submission error'));
       }
     });
 
     setInputWord('');
   };
 
-  const progressPercent = Math.max(0, Math.min(100, (gameState.remainingSeconds / 25) * 100));
+  const remainingSecs = timer.remainingSeconds > 0 ? timer.remainingSeconds : gameState.remainingSeconds;
+  const progressPercent = Math.max(0, Math.min(100, (remainingSecs / 25) * 100));
 
   return (
     <div
@@ -137,29 +181,40 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm">
         <div className="flex items-center gap-3.5">
           <motion.div
-            key={gameState.startingLetter}
+            key={activeLetter}
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-3xl md:text-4xl font-bold text-blue-600 shadow-xs shrink-0"
           >
-            {gameState.startingLetter}
+            {activeLetter}
           </motion.div>
 
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-700 text-xs font-semibold">
-                Round {gameState.round} of {gameState.totalRounds}
+                {isAr
+                  ? `الجولة ${gameState.round} من ${gameState.totalRounds}`
+                  : `Round ${gameState.round} of ${gameState.totalRounds}`}
               </span>
               <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold flex items-center gap-1">
                 <GameIcon gameMode="word_battle" size="xs" />
-                Word Battle
+                {isAr ? 'حرب الكلمات' : 'Word Battle'}
               </span>
             </div>
             <h2 className="text-lg md:text-xl font-bold text-gray-900">
-              Category: <span className="text-blue-600">{gameState.category}</span>
+              {isAr ? 'الفئة: ' : 'Category: '}
+              <span className="text-blue-600">{activeCategory}</span>
             </h2>
             <p className="text-xs text-gray-500">
-              Submit words starting with letter <strong className="text-blue-700 font-bold">{gameState.startingLetter}</strong>!
+              {isAr ? (
+                <>
+                  اكتب كلمات تبدأ بحرف <strong className="text-blue-700 font-bold">{activeLetter}</strong>!
+                </>
+              ) : (
+                <>
+                  Submit words starting with letter <strong className="text-blue-700 font-bold">{gameState.startingLetter}</strong>!
+                </>
+              )}
             </p>
           </div>
         </div>
@@ -168,12 +223,14 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
         <div className="w-full md:w-56 flex flex-col items-center md:items-end">
           <div className="flex items-center gap-1.5 text-xs font-semibold uppercase text-gray-500 mb-1">
             <Clock className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-            <span>{gameState.remainingSeconds}s Remaining</span>
+            <span className={`force-ltr ${remainingSecs <= 5 ? 'text-red-600 font-bold' : ''}`}>
+              {isAr ? `متبقي ${remainingSecs} ثانية` : `${remainingSecs}s Remaining`}
+            </span>
           </div>
           <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
             <div
               className={`h-full transition-all duration-1000 ease-linear rounded-full ${
-                gameState.remainingSeconds <= 5
+                remainingSecs <= 5
                   ? 'bg-red-500'
                   : 'bg-blue-600'
               }`}
@@ -191,21 +248,34 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
             animate={{ scale: 1, opacity: 1 }}
             className="text-3xl md:text-4xl font-bold text-gray-900"
           >
-            Get Ready!
+            {isAr ? 'استعد للسباق!' : 'Get Ready!'}
           </motion.div>
           <p className="text-gray-500 text-base">
-            Starting letter is <strong className="text-blue-600 text-xl font-bold">{gameState.startingLetter}</strong> &bull; Category:{' '}
-            <strong className="text-gray-800 font-bold">{gameState.category}</strong>
+            {isAr ? (
+              <>
+                الحرف المختار: <strong className="text-blue-600 text-xl font-bold">{activeLetter}</strong> &bull; الفئة:{' '}
+                <strong className="text-gray-800 font-bold">{activeCategory}</strong>
+              </>
+            ) : (
+              <>
+                Starting letter is <strong className="text-blue-600 text-xl font-bold">{gameState.startingLetter}</strong> &bull; Category:{' '}
+                <strong className="text-gray-800 font-bold">{gameState.category}</strong>
+              </>
+            )}
           </p>
         </div>
       ) : gameState.phase === 'round_results' ? (
         <div className="bg-white p-6 sm:p-8 rounded-2xl text-center space-y-5 border border-gray-200 shadow-sm">
           <h3 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center justify-center gap-2">
             <Trophy className="w-6 h-6 text-amber-500" />
-            <span>Round {gameState.round} Completed!</span>
+            <span>
+              {isAr
+                ? `انتهت الجولة ${gameState.round}!`
+                : `Round ${gameState.round} Completed!`}
+            </span>
           </h3>
           <p className="text-gray-500 text-sm">
-            Total unique words claimed this round:{' '}
+            {isAr ? 'إجمالي الكلمات المحجوزة في الجولة: ' : 'Total unique words claimed this round: '}
             <strong className="text-blue-600 font-bold">{gameState.claimedWords.length}</strong>
           </p>
 
@@ -222,12 +292,33 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
                   <span className="text-gray-900 font-semibold text-xs truncate max-w-[100px] mt-1.5">
                     {p.username}
                   </span>
-                  <span className="text-blue-600 text-xs font-medium">{wordsCount} words</span>
-                  <span className="text-gray-900 font-bold text-xs mt-0.5">+{roundScore} pts</span>
+                  <span className="text-blue-600 text-xs font-medium">
+                    {wordsCount} {isAr ? 'كلمات' : 'words'}
+                  </span>
+                  <span className="text-gray-900 font-bold text-xs mt-0.5 force-ltr">
+                    +{roundScore} {isAr ? 'نقطة' : 'pts'}
+                  </span>
                 </div>
               );
             })}
           </div>
+
+          {isHost && (
+            <button
+              onClick={() => {
+                sound.playClick();
+                if (onAction) {
+                  onAction('NEXT_ROUND', {});
+                } else {
+                  socket.emit('lobby:advance-round');
+                }
+              }}
+              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 mt-4"
+            >
+              <span>{isAr ? 'الجولة القادمة' : 'Next Round'}</span>
+              <ArrowRight className={`w-4 h-4 ${isAr ? 'rotate-180' : ''}`} />
+            </button>
+          )}
         </div>
       ) : (
         <div className="flex flex-col gap-3">
@@ -244,7 +335,11 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
                   type="text"
                   value={inputWord}
                   onChange={(e) => setInputWord(e.target.value)}
-                  placeholder={`Word starting with "${gameState.startingLetter}"...`}
+                  placeholder={
+                    isAr
+                      ? `اكتب كلمة تبدأ بحرف "${activeLetter}"...`
+                      : `Word starting with "${gameState.startingLetter}"...`
+                  }
                   disabled={gameState.phase !== 'word_racing'}
                   className={`w-full h-12 bg-white border rounded-xl px-4 text-gray-900 text-sm sm:text-base font-semibold outline-none transition-all placeholder:text-gray-400 shadow-xs ${
                     rejectFeedback
@@ -259,8 +354,8 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
                 disabled={!inputWord.trim() || gameState.phase !== 'word_racing' || isSubmitting}
                 className="w-full sm:w-auto h-12 px-6 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-sm uppercase tracking-wide rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 shrink-0"
               >
-                <span>Claim</span>
-                <Send className="w-4 h-4" />
+                <span>{isAr ? 'احجز' : 'Claim'}</span>
+                <Send className={`w-4 h-4 ${isAr ? 'rotate-180' : ''}`} />
               </button>
             </motion.div>
 
@@ -290,7 +385,9 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
                 >
                   <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                   <span>
-                    Claimed &ldquo;{lastAcceptedWord.word}&rdquo;! (+{lastAcceptedWord.points} points)
+                    {isAr
+                      ? `تم حجز "${lastAcceptedWord.word}"! (+${lastAcceptedWord.points} نقطة)`
+                      : `Claimed "${lastAcceptedWord.word}"! (+${lastAcceptedWord.points} points)`}
                   </span>
                 </motion.div>
               )}
@@ -304,18 +401,22 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
               <div className="flex items-center justify-between mb-3 border-b border-gray-100 pb-2">
                 <h3 className="text-gray-900 font-bold text-sm flex items-center gap-1.5">
                   <Flame className="w-4 h-4 text-amber-500" />
-                  <span>Claimed Words Stream</span>
+                  <span>{isAr ? 'شريط الكلمات المحجوزة' : 'Claimed Words Stream'}</span>
                   <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-semibold">
-                    {gameState.claimedWords.length} Words
+                    {gameState.claimedWords.length} {isAr ? 'كلمة' : 'Words'}
                   </span>
                 </h3>
-                <span className="text-xs text-gray-500">Unique per round</span>
+                <span className="text-xs text-gray-500">{isAr ? 'فريدة بالجولة' : 'Unique per round'}</span>
               </div>
 
               {gameState.recentSubmissions.length === 0 ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-gray-400 text-xs font-medium py-10">
                   <Sparkles className="w-6 h-6 text-amber-400 mb-1" />
-                  <span>No words claimed yet! Be the fastest to submit!</span>
+                  <span>
+                    {isAr
+                      ? 'لم تُحجز أي كلمة بعد! كن الأسرع في الإرسال!'
+                      : 'No words claimed yet! Be the fastest to submit!'}
+                  </span>
                 </div>
               ) : (
                 <div className="flex flex-wrap gap-2 overflow-y-auto max-h-[300px] p-1">
@@ -348,9 +449,11 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
               <div className="flex items-center justify-between mb-3 border-b border-gray-100 pb-2">
                 <h3 className="text-gray-900 font-bold text-sm flex items-center gap-1.5">
                   <Hash className="w-4 h-4 text-blue-600" />
-                  <span>Round Standings</span>
+                  <span>{isAr ? 'ترتيب الجولة' : 'Round Standings'}</span>
                 </h3>
-                <span className="text-xs text-gray-500">{players.length} Players</span>
+                <span className="text-xs text-gray-500">
+                  {players.length} {isAr ? 'لاعبين' : 'Players'}
+                </span>
               </div>
 
               <div className="flex-1 overflow-y-auto max-h-[300px] space-y-1.5">
@@ -378,10 +481,10 @@ export const WordBattleGameView: React.FC<WordBattleGameViewProps> = ({
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="px-2 py-0.5 rounded-full bg-white border border-gray-200 text-blue-600 font-semibold text-[11px]">
-                            {wordsCount} w
+                            {wordsCount} {isAr ? 'ك' : 'w'}
                           </span>
-                          <span className="font-bold text-gray-900">
-                            {p.score || 0} pts
+                          <span className="font-bold text-gray-900 force-ltr">
+                            {p.score || 0} {isAr ? 'نقطة' : 'pts'}
                           </span>
                         </div>
                       </div>

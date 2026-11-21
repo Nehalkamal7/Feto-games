@@ -21,7 +21,13 @@ class MemoryRedisStore {
     return entry.value as T;
   }
 
-  async set(key: string, value: any, options?: { ex?: number }): Promise<'OK'> {
+  async set(key: string, value: any, options?: { ex?: number; nx?: boolean }): Promise<'OK' | null> {
+    if (options?.nx) {
+      const existing = await this.get(key);
+      if (existing !== null && existing !== undefined) {
+        return null;
+      }
+    }
     const expiresAt = options?.ex ? Date.now() + options.ex * 1000 : undefined;
     this.store.set(key, { value, expiresAt });
     return 'OK';
@@ -388,16 +394,22 @@ export async function getPublicRoomDirectory(): Promise<PublicRoomDirectoryItem[
 
 /**
  * Idempotency lock to prevent duplicate timer/phase resolution when multiple
- * concurrent players trigger /api/game/action at the same second.
+ * concurrent players trigger /api/game/action at the exact same second.
+ * Executes SET lock:timeout:${roomCode}:${round}:${phase} 1 EX ${ttlSeconds} NX atomically.
  */
-export async function acquireLock(lockKey: string, ttlSeconds = 5): Promise<boolean> {
-  const fullKey = `feto:lock:${lockKey}`;
-  const existing = await redis.get(fullKey);
-  if (existing) {
-    return false;
+export async function acquireLock(lockKey: string, ttlSeconds = 10): Promise<boolean> {
+  const fullKey = lockKey.startsWith('lock:') ? lockKey : `feto:lock:${lockKey}`;
+  try {
+    const res = await (redis as any).set(fullKey, '1', { nx: true, ex: ttlSeconds });
+    return res === 'OK' || res === 1 || res === true;
+  } catch {
+    const existing = await redis.get(fullKey);
+    if (existing) {
+      return false;
+    }
+    await redis.set(fullKey, '1', { ex: ttlSeconds });
+    return true;
   }
-  await redis.set(fullKey, 'locked', { ex: ttlSeconds });
-  return true;
 }
 
 /**

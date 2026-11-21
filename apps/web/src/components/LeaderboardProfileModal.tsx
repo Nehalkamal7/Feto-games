@@ -19,6 +19,7 @@ import { NeonAvatarDisplay } from '@/components/NeonAvatarDisplay';
 import { NeonAvatarId } from '@feto-games/shared-types';
 import { sound } from '@/lib/sound';
 import { BACKEND_URL } from '@/lib/socket';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface LeaderboardProfileModalProps {
   isOpen: boolean;
@@ -53,6 +54,8 @@ export function LeaderboardProfileModal({
   currentUsername = 'Player',
   currentAvatar = 'cyber_cat'
 }: LeaderboardProfileModalProps) {
+  const { language } = useLanguage();
+  const isAr = language === 'ar';
   const [activeTab, setActiveTab] = useState<'leaderboard' | 'profile'>('leaderboard');
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -147,8 +150,8 @@ export function LeaderboardProfileModal({
               sound.playClick();
               onClose();
             }}
-            className="absolute top-5 right-5 w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center shrink-0 rounded-xl text-[#010101] bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101] transition-all font-black"
-            aria-label="Close"
+            className="absolute top-5 right-5 rtl:right-auto rtl:left-5 w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center shrink-0 rounded-xl text-[#010101] bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101] transition-all font-black"
+            aria-label={isAr ? 'إغلاق' : 'Close'}
           >
             <X className="w-5 h-5 shrink-0" strokeWidth={2.5} />
           </button>
@@ -167,7 +170,7 @@ export function LeaderboardProfileModal({
               }`}
             >
               <Trophy className="w-4 h-4 text-[#FEC90E] fill-current" />
-              <span>Global Leaderboard</span>
+              <span>{isAr ? 'قائمة المتصدرين' : 'Global Leaderboard'}</span>
             </button>
 
             <button
@@ -182,7 +185,7 @@ export function LeaderboardProfileModal({
               }`}
             >
               <User className="w-4 h-4" />
-              <span>Player Profile &amp; Badges</span>
+              <span>{isAr ? 'الملف الشخصي والأوسمة' : 'Player Profile & Badges'}</span>
             </button>
           </div>
 
@@ -190,10 +193,10 @@ export function LeaderboardProfileModal({
           {activeTab === 'leaderboard' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between text-xs text-[#010101]/60 px-3 font-black">
-                <span>RANK &amp; PLAYER</span>
+                <span>{isAr ? 'الترتيب واللاعب' : 'RANK & PLAYER'}</span>
                 <div className="flex gap-6">
-                  <span>WIN RATE</span>
-                  <span>TOTAL SCORE</span>
+                  <span>{isAr ? 'نسبة الفوز' : 'WIN RATE'}</span>
+                  <span>{isAr ? 'مجموع النقاط' : 'TOTAL SCORE'}</span>
                 </div>
               </div>
 
@@ -205,7 +208,7 @@ export function LeaderboardProfileModal({
                   >
                     <div className="flex items-center gap-3">
                       <span
-                        className={`w-6 text-center font-black text-sm ${
+                        className={`w-6 text-center font-black text-sm force-ltr ${
                           entry.rank === 1
                             ? 'text-[#FEC90E]'
                             : entry.rank === 2
@@ -218,18 +221,20 @@ export function LeaderboardProfileModal({
                         #{entry.rank}
                       </span>
                       <NeonAvatarDisplay avatarId={entry.avatar} size="sm" showGlow={false} />
-                      <div>
+                      <div className="text-start">
                         <div className="font-black text-sm text-[#010101]">{entry.username}</div>
                         <div className="text-[10px] text-[#010101]/60 font-bold">
-                          {entry.gamesWon} wins / {entry.gamesPlayed} games
+                          {isAr
+                            ? `${entry.gamesWon} فوز / ${entry.gamesPlayed} مباراة`
+                            : `${entry.gamesWon} wins / ${entry.gamesPlayed} games`}
                         </div>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-6">
-                      <span className="text-xs font-black text-[#0B89FD]">{entry.winRate}%</span>
-                      <span className="font-mono font-black text-sm text-[#010101] w-20 text-right">
-                        {entry.points.toLocaleString()} pts
+                      <span className="text-xs font-black text-[#0B89FD] force-ltr">{entry.winRate}%</span>
+                      <span className="font-mono font-black text-sm text-[#010101] w-20 text-end force-ltr">
+                        {entry.points.toLocaleString()} {isAr ? 'نقطة' : 'pts'}
                       </span>
                     </div>
                   </div>
@@ -244,23 +249,29 @@ export function LeaderboardProfileModal({
               {/* Profile Card */}
               <div className="bg-[#F8F8F8] border-2 border-[#010101] shadow-[4px_4px_0px_#010101] p-6 rounded-2xl flex flex-col sm:flex-row items-center gap-6">
                 <NeonAvatarDisplay avatarId={currentAvatar} size="lg" showGlow={false} />
-                <div className="flex-1 text-center sm:text-left">
+                <div className="flex-1 text-center sm:text-start">
                   <h3 className="text-2xl font-black text-[#010101]">{currentUsername}</h3>
                   <p className="text-xs text-[#0B89FD] uppercase tracking-wider font-black mb-3">
-                    Arcade Party Veteran
+                    {isAr ? 'محارب الحفلات المخضرم' : 'Arcade Party Veteran'}
                   </p>
                   <div className="grid grid-cols-3 gap-2 text-center">
                     <div className="bg-[#FFFFFF] p-2.5 rounded-xl border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
-                      <div className="text-xs text-[#010101]/60 font-black">Win Rate</div>
-                      <div className="text-base font-black text-[#0B89FD]">68%</div>
+                      <div className="text-xs text-[#010101]/60 font-black">
+                        {isAr ? 'نسبة الفوز' : 'Win Rate'}
+                      </div>
+                      <div className="text-base font-black text-[#0B89FD] force-ltr">68%</div>
                     </div>
                     <div className="bg-[#FFFFFF] p-2.5 rounded-xl border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
-                      <div className="text-xs text-[#010101]/60 font-black">Games</div>
-                      <div className="text-base font-black text-[#010101]">24</div>
+                      <div className="text-xs text-[#010101]/60 font-black">
+                        {isAr ? 'المباريات' : 'Games'}
+                      </div>
+                      <div className="text-base font-black text-[#010101] force-ltr">24</div>
                     </div>
                     <div className="bg-[#FFFFFF] p-2.5 rounded-xl border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
-                      <div className="text-xs text-[#010101]/60 font-black">Total Score</div>
-                      <div className="text-base font-black text-[#FD3F01]">4,820</div>
+                      <div className="text-xs text-[#010101]/60 font-black">
+                        {isAr ? 'مجموع النقاط' : 'Total Score'}
+                      </div>
+                      <div className="text-base font-black text-[#FD3F01] force-ltr">4,820</div>
                     </div>
                   </div>
                 </div>
@@ -270,7 +281,11 @@ export function LeaderboardProfileModal({
               <div>
                 <h4 className="text-xs font-black uppercase tracking-wider text-[#010101] mb-3 flex items-center gap-2">
                   <Award className="w-4 h-4 text-[#FEC90E]" />
-                  <span>Unlockable Achievement Badges (3 / 6 Unlocked)</span>
+                  <span>
+                    {isAr
+                      ? 'أوسمة الإنجازات القابلة للفتح (٣ / ٦ مفتوح)'
+                      : 'Unlockable Achievement Badges (3 / 6 Unlocked)'}
+                  </span>
                 </h4>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -289,7 +304,7 @@ export function LeaderboardProfileModal({
                       >
                         {badge.icon}
                       </div>
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0 text-start">
                         <div className="flex items-center gap-1.5">
                           <span className="font-black text-xs text-[#010101] truncate">{badge.title}</span>
                           {badge.unlocked ? (
@@ -299,7 +314,7 @@ export function LeaderboardProfileModal({
                           )}
                         </div>
                         <p className="text-[11px] text-[#010101]/70 truncate font-medium">{badge.description}</p>
-                        <div className="text-[10px] text-[#0B89FD] font-black mt-1">
+                        <div className="text-[10px] text-[#0B89FD] font-black mt-1 force-ltr">
                           {badge.progress}
                         </div>
                       </div>

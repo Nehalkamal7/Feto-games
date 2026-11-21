@@ -2,9 +2,10 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Gamepad2, Users, Zap, Shield } from 'lucide-react';
+import { X, Gamepad2, Users, Zap, Check } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { sound } from '@/lib/sound';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface AboutModalProps {
   isOpen: boolean;
@@ -12,16 +13,18 @@ interface AboutModalProps {
 }
 
 export function AboutModal({ isOpen, onClose }: AboutModalProps) {
+  const { t } = useLanguage();
   if (!isOpen) return null;
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#010101]/80 backdrop-blur-sm">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
         <motion.div
-          initial={{ opacity: 0, scale: 0.93, y: 10 }}
+          initial={{ opacity: 0, scale: 0.95, y: 8 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.93, y: 10 }}
-          className="w-full max-w-2xl bg-[#FFFFFF] border-3 border-[#010101] shadow-[8px_8px_0px_#010101] rounded-3xl p-5 sm:p-8 relative max-h-[90dvh] overflow-y-auto"
+          exit={{ opacity: 0, scale: 0.95, y: 8 }}
+          transition={{ duration: 0.18, ease: 'easeOut' }}
+          className="w-full max-w-lg bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-xl relative max-h-[90dvh] overflow-y-auto"
         >
           {/* Close Button */}
           <button
@@ -29,85 +32,59 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
               sound.playClick();
               onClose();
             }}
-            className="absolute top-4 right-4 sm:top-6 sm:right-6 w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center shrink-0 rounded-xl text-[#010101] bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101] transition-all font-black"
-            aria-label="Close"
+            className="absolute top-4 right-4 rtl:right-auto rtl:left-4 sm:top-6 sm:right-6 rtl:sm:right-auto rtl:sm:left-6 w-9 h-9 inline-flex items-center justify-center rounded-full text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+            aria-label={t('common.close')}
           >
-            <X className="w-5 h-5 shrink-0" strokeWidth={2.5} />
+            <X className="w-5 h-5" strokeWidth={2} />
           </button>
 
           {/* Modal Header */}
           <div className="flex flex-col items-center text-center mb-6">
             <BrandLogo size="md" showSubtitle={false} className="mb-3" />
-            <h2 className="text-xl sm:text-2xl font-black text-[#010101] uppercase tracking-wider">
-              The Ultimate Party Game Hub
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
+              {t('about.title')}
             </h2>
-            <p className="text-xs sm:text-sm text-[#0B89FD] font-black mt-1">
-              Esports-grade real-time multiplayer gaming for up to 15 players per room
+            <p className="text-sm text-gray-600 mt-3 leading-relaxed max-w-md">
+              {t('about.desc')}
             </p>
           </div>
 
-          {/* Core Feature Highlights */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
-            <div className="bg-[#F8F8F8] rounded-2xl p-4 border-2 border-[#010101] shadow-[3px_3px_0px_#010101] flex items-start gap-3">
-              <div className="p-2 rounded-xl bg-[#0B89FD] border-2 border-[#010101] text-white flex-shrink-0 shadow-[2px_2px_0px_#010101]">
+          {/* 3 Clean Feature Highlights */}
+          <div className="space-y-3 mb-6">
+            <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex items-start gap-3.5">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                <Zap className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 text-start">
+                <h3 className="text-sm font-semibold text-gray-900">{t('about.feature1Title')}</h3>
+                <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">
+                  {t('about.feature1Desc')}
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex items-start gap-3.5">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
                 <Users className="w-5 h-5" />
               </div>
-              <div>
-                <h3 className="text-xs sm:text-sm font-black text-[#010101]">Up to 15 Players</h3>
-                <p className="text-[11px] sm:text-xs text-[#010101]/70 mt-1 font-medium">
-                  Connect friends instantly across mobile, tablet, or desktop with 1-click room code, QR code, or invite link.
+              <div className="min-w-0 text-start">
+                <h3 className="text-sm font-semibold text-gray-900">{t('about.feature2Title')}</h3>
+                <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">
+                  {t('about.feature2Desc')}
                 </p>
               </div>
             </div>
 
-            <div className="bg-[#F8F8F8] rounded-2xl p-4 border-2 border-[#010101] shadow-[3px_3px_0px_#010101] flex items-start gap-3">
-              <div className="p-2 rounded-xl bg-[#FEC90E] border-2 border-[#010101] text-[#010101] flex-shrink-0 shadow-[2px_2px_0px_#010101]">
-                <Zap className="w-5 h-5 fill-current" />
-              </div>
-              <div>
-                <h3 className="text-xs sm:text-sm font-black text-[#010101]">Serverless Real-Time Engine</h3>
-                <p className="text-[11px] sm:text-xs text-[#010101]/70 mt-1 font-medium">
-                  Powered by Ably Realtime &amp; Upstash Redis with sub-30ms synchronized clocks, live buzzers, and stroke sync.
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-[#F8F8F8] rounded-2xl p-4 border-2 border-[#010101] shadow-[3px_3px_0px_#010101] flex items-start gap-3">
-              <div className="p-2 rounded-xl bg-[#FD3F01] border-2 border-[#010101] text-white flex-shrink-0 shadow-[2px_2px_0px_#010101]">
+            <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex items-start gap-3.5">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
                 <Gamepad2 className="w-5 h-5" />
               </div>
-              <div>
-                <h3 className="text-xs sm:text-sm font-black text-[#010101]">10 High-Stakes Party Games</h3>
-                <p className="text-[11px] sm:text-xs text-[#010101]/70 mt-1 font-medium">
-                  Imposter deduction, Draw &amp; Guess, Quiz Battle, Word Battle, Truth or Dare, Never Have I Ever, Most Likely To, Sip or Spill, Silly Roulette &amp; Hot Potato!
+              <div className="min-w-0 text-start">
+                <h3 className="text-sm font-semibold text-gray-900">{t('about.feature3Title')}</h3>
+                <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">
+                  {t('about.feature3Desc')}
                 </p>
               </div>
-            </div>
-
-            <div className="bg-[#F8F8F8] rounded-2xl p-4 border-2 border-[#010101] shadow-[3px_3px_0px_#010101] flex items-start gap-3">
-              <div className="p-2 rounded-xl bg-[#010101] border-2 border-[#010101] text-[#FEC90E] flex-shrink-0 shadow-[2px_2px_0px_#010101]">
-                <Shield className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-xs sm:text-sm font-black text-[#010101]">Anti-Cheat &amp; Grace Reconnect</h3>
-                <p className="text-[11px] sm:text-xs text-[#010101]/70 mt-1 font-medium">
-                  Server-validated secret roles, private channel broadcasts, and automatic session reconnection so nobody drops.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Tech Stack Banner */}
-          <div className="bg-[#F8F8F8] rounded-2xl p-4 border-2 border-[#010101] shadow-[3px_3px_0px_#010101] mb-6 text-center">
-            <span className="text-[10px] uppercase font-black text-[#010101]/60 tracking-wider block mb-2">
-              Engineered with High-Performance Technologies
-            </span>
-            <div className="flex flex-wrap items-center justify-center gap-2 text-xs font-black text-[#010101]">
-              <span className="px-2.5 py-1 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] text-[#0B89FD] shadow-[2px_2px_0px_#010101]">Next.js 14 App Router</span>
-              <span className="px-2.5 py-1 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] text-[#010101] shadow-[2px_2px_0px_#010101]">Ably Realtime</span>
-              <span className="px-2.5 py-1 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] text-[#FD3F01] shadow-[2px_2px_0px_#010101]">Upstash Redis REST</span>
-              <span className="px-2.5 py-1 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] text-[#FEC90E] shadow-[2px_2px_0px_#010101]">Framer Motion</span>
-              <span className="px-2.5 py-1 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] text-[#010101] shadow-[2px_2px_0px_#010101]">Web Audio API</span>
             </div>
           </div>
 
@@ -118,9 +95,10 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
                 sound.playClick();
                 onClose();
               }}
-              className="px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-wider text-white bg-[#0B89FD] hover:bg-[#0977db] border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all"
+              className="w-full sm:w-auto px-8 py-3 rounded-xl font-semibold text-sm text-white bg-blue-600 hover:bg-blue-700 shadow-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2"
             >
-              Let&apos;s Play!
+              <Check className="w-4 h-4" />
+              <span>{t('about.gotItBtn')}</span>
             </button>
           </div>
         </motion.div>

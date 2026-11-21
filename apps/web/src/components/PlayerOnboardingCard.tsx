@@ -7,6 +7,7 @@ import { NeonAvatarDisplay } from './NeonAvatarDisplay';
 import { NeonAvatarId, NEON_AVATARS } from '@feto-games/shared-types';
 import { PINNED_NICKNAMES, rollDynamicNicknames } from '@/lib/nicknames';
 import { sound } from '@/lib/sound';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface PlayerOnboardingCardProps {
   username: string;
@@ -25,6 +26,8 @@ export function PlayerOnboardingCard({
   className = '',
   showAvatarPickerInline = false
 }: PlayerOnboardingCardProps) {
+  const { isArabic, t } = useLanguage();
+
   // 4 dynamic rolled nicknames (initialized with 4 random names from the pool)
   const [dynamicNicknames, setDynamicNicknames] = useState<string[]>(() =>
     rollDynamicNicknames([], 4)
@@ -82,10 +85,10 @@ export function PlayerOnboardingCard({
           </div>
           <div>
             <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 block leading-tight">
-              Player Profile
+              {isArabic ? 'الملف الشخصي' : 'Player Profile'}
             </span>
             <span className="text-sm font-semibold text-gray-900 block leading-tight">
-              Choose Nickname & Avatar
+              {isArabic ? 'اختر اسمك وصورتك الرمزية' : 'Choose Nickname & Avatar'}
             </span>
           </div>
         </div>
@@ -98,11 +101,11 @@ export function PlayerOnboardingCard({
             setShowAvatarDrawer((prev) => !prev);
           }}
           className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gray-50 border border-gray-200 hover:bg-gray-100 text-xs font-medium text-gray-800 transition-all touch-manipulation shadow-xs"
-          title="Change Avatar"
+          title={isArabic ? 'تغيير الصورة الرمزية' : 'Change Avatar'}
         >
           <NeonAvatarDisplay avatarId={avatar} size="sm" showGlow={false} className="w-6 h-6" />
           <span className="hidden xs:inline text-xs font-semibold text-gray-700">
-            Change
+            {isArabic ? 'تغيير' : 'Change'}
           </span>
           <ChevronDown
             className={`w-3.5 h-3.5 text-gray-500 transition-transform duration-200 ${
@@ -124,7 +127,7 @@ export function PlayerOnboardingCard({
             <div className="p-3 rounded-xl bg-gray-50 border border-gray-200">
               <div className="flex items-center justify-between mb-2.5 px-1">
                 <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Select Your Mascot
+                  {isArabic ? 'اختر صورتك الرمزية' : 'Select Your Mascot'}
                 </span>
                 <span className="text-xs font-semibold text-blue-600">
                   {NEON_AVATARS[avatar]?.name || 'Avatar'}
@@ -163,8 +166,10 @@ export function PlayerOnboardingCard({
             value={username}
             onChange={(e) => onUsernameChange(e.target.value)}
             maxLength={18}
-            placeholder="Type nickname or choose below..."
-            className="w-full h-11 sm:h-12 bg-gray-50 border border-gray-200 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 rounded-xl px-3.5 pr-8 text-gray-900 font-semibold text-sm sm:text-base outline-none transition-all placeholder:text-gray-400"
+            placeholder={isArabic ? 'اكتب اسمك أو اختر من المقترحات...' : 'Type nickname or choose below...'}
+            className={`w-full h-11 sm:h-12 bg-gray-50 border border-gray-200 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 rounded-xl px-3.5 ${
+              isArabic ? 'pl-8 pr-3.5 text-right' : 'pr-8 pl-3.5 text-left'
+            } text-gray-900 font-semibold text-sm sm:text-base outline-none transition-all placeholder:text-gray-400`}
           />
           {username && (
             <button
@@ -173,8 +178,10 @@ export function PlayerOnboardingCard({
                 sound.playClick();
                 onUsernameChange('');
               }}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-700"
-              title="Clear"
+              className={`absolute top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-700 ${
+                isArabic ? 'left-2.5' : 'right-2.5'
+              }`}
+              title={isArabic ? 'مسح' : 'Clear'}
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -190,7 +197,7 @@ export function PlayerOnboardingCard({
           disabled={isRolling}
           id="btn-roll-nickname"
           className="h-11 sm:h-12 px-4 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-gray-800 font-semibold text-xs sm:text-sm tracking-wide flex items-center justify-center gap-2 shadow-xs transition-all flex-shrink-0"
-          title="Roll fresh nicknames from pool"
+          title={isArabic ? 'توليد أسماء عشوائية جديدة' : 'Roll fresh nicknames from pool'}
         >
           <motion.div
             animate={isRolling ? { rotate: [0, 360] } : { rotate: 0 }}
@@ -199,7 +206,7 @@ export function PlayerOnboardingCard({
           >
             <Dices className="w-4 h-4 text-blue-600" />
           </motion.div>
-          <span>Roll</span>
+          <span>{isArabic ? 'عشوائي' : 'Roll'}</span>
         </motion.button>
       </div>
 
@@ -209,10 +216,10 @@ export function PlayerOnboardingCard({
         <div className="flex items-center justify-between text-xs text-gray-500">
           <div className="flex items-center gap-1.5 font-medium">
             <Sparkles className="w-3.5 h-3.5 text-blue-500" />
-            <span>Suggested Gamer Tags (tap to pick)</span>
+            <span>{isArabic ? 'أسماء مقترحة (اضغط للاختيار)' : 'Suggested Gamer Tags (tap to pick)'}</span>
           </div>
-          <span className="text-[11px] text-gray-400 font-mono">
-            4 Pinned • 4 Dynamic
+          <span className="text-[11px] text-gray-400 font-mono force-ltr">
+            4 VIP • 4 Party
           </span>
         </div>
 
@@ -220,7 +227,7 @@ export function PlayerOnboardingCard({
         <div className="space-y-1.5">
           <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-600">
             <Star className="w-3 h-3 text-amber-500 fill-amber-400" />
-            <span>Featured VIP Tags</span>
+            <span>{isArabic ? 'أسماء VIP مميزة' : 'Featured VIP Tags'}</span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
             {PINNED_NICKNAMES.map((pinnedName, index) => {
@@ -238,7 +245,7 @@ export function PlayerOnboardingCard({
                   id={`pinned-nickname-${index + 1}`}
                 >
                   <span className="truncate flex items-center gap-1">
-                    <span className="text-[10px] text-gray-400 font-mono">#{index + 1}</span>
+                    <span className="text-[10px] text-gray-400 font-mono force-ltr">#{index + 1}</span>
                     <span>{pinnedName}</span>
                   </span>
                   {selected ? (
@@ -256,7 +263,7 @@ export function PlayerOnboardingCard({
         <div className="space-y-1.5 pt-1">
           <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-600">
             <Zap className="w-3 h-3 text-blue-500 fill-blue-400" />
-            <span>Party Pool</span>
+            <span>{isArabic ? 'أسماء بارتي سريعة' : 'Party Pool'}</span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
             {dynamicNicknames.map((dynName, index) => {

@@ -1,0 +1,642 @@
+[
+  {
+    "id": "sos_01",
+    "dilemma": "Confess your most embarrassing crush from your school days OR take 2 sips! 🥤",
+    "question": "Who was your most cringe-worthy childhood or teen celebrity crush?",
+    "spicyLevel": 1,
+    "dilemmaAr": "اعترف بأكتر كراش محرج ومضحك في أيام المدرسة أو خد رشفة من عصيرك! 🥤",
+    "questionAr": "مين كان الكراش الطفولي اللي مكسوف تفتكره دلوقتي؟"
+  },
+  {
+    "id": "sos_02",
+    "dilemma": "Show the last photo in your phone's camera roll OR take 2 sips! 🥤",
+    "question": "What is the most recent unedited picture saved on your phone?",
+    "spicyLevel": 1,
+    "dilemmaAr": "ورينا آخر صورة موجودة في ألبوم كاميرا موبايلك حالا أو خد 2 رشفة! 🥤",
+    "questionAr": "إيه آخر لقطة أو صورة شاشة متسجلة على موبايلك؟"
+  },
+  {
+    "id": "sos_03",
+    "dilemma": "Spill the biggest lie you ever told on a resume/interview OR take 3 sips! 🥤",
+    "question": "What job skill did you completely fabricate on paper?",
+    "spicyLevel": 2,
+    "dilemmaAr": "قول أكبر كدبة أو تظبيطة كتبتها في الـ CV أو إنترفيو الشغل أو خد 3 رشفات! 🥤",
+    "questionAr": "إيه المهارة أو التجربة اللي ألفتها تماما في السيرة الذاتية؟"
+  },
+  {
+    "id": "sos_04",
+    "dilemma": "Pick which player in this room you would least trust with your unlocked phone OR take 3 sips! 🥤",
+    "question": "Who here is most dangerous with unlimited access to your DMs?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "Who here is most dangerous with unlimited access to your DMs?"
+  },
+  {
+    "id": "sos_05",
+    "dilemma": "Admit your worst first-date disaster in vivid detail OR take 2 sips! 🥤",
+    "question": "What was the quickest date you ever wanted an emergency escape from?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What was the quickest date you ever wanted an emergency escape from?"
+  },
+  {
+    "id": "sos_06",
+    "dilemma": "Spill who you secretly stalk on social media using a burner account OR take 3 sips! 🥤",
+    "question": "Whose profiles are on your regular search history that you'd never admit to?",
+    "spicyLevel": 3,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 3 رشفات! 🥤",
+    "questionAr": "Whose profiles are on your regular search history that you'd never admit to?"
+  },
+  {
+    "id": "sos_07",
+    "dilemma": "Rate every player's gaming skills from best to worst OR take 4 sips! 🥤",
+    "question": "Who is the true MVP and who is the certified deadweight in this crew?",
+    "spicyLevel": 3,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 3 رشفات! 🥤",
+    "questionAr": "Who is the true MVP and who is the certified deadweight in this crew?"
+  },
+  {
+    "id": "sos_08",
+    "dilemma": "Confess the most ridiculous reason you ever ghosted someone OR take 2 sips! 🥤",
+    "question": "What minor petty flaw made you instantly disappear from someone's life?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "What minor petty flaw made you instantly disappear from someone's life?"
+  },
+  {
+    "id": "sos_09",
+    "dilemma": "Reveal the most amount of money you ever wasted on something completely useless OR take 2 sips! 🥤",
+    "question": "What buyer's remorse purchase haunts you to this day?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What buyer's remorse purchase haunts you to this day?"
+  },
+  {
+    "id": "sos_10",
+    "dilemma": "Have you ever faked being sick to avoid hanging out with someone in this room? Spill who OR take 3 sips! 🥤",
+    "question": "Whose plans did you dodge with a phantom fever?",
+    "spicyLevel": 3,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 3 رشفات! 🥤",
+    "questionAr": "Whose plans did you dodge with a phantom fever?"
+  },
+  {
+    "id": "sos_11",
+    "dilemma": "What is your guilty pleasure song that would ruin your street cred if leaked? Spill OR take 2 sips! 🥤",
+    "question": "What track do you blast with windows rolled up?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What track do you blast with windows rolled up?"
+  },
+  {
+    "id": "sos_12",
+    "dilemma": "Spill the pettiest grudge you are still actively holding today OR take 2 sips! 🥤",
+    "question": "What small thing happened years ago that you refuse to forgive?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "What small thing happened years ago that you refuse to forgive?"
+  },
+  {
+    "id": "sos_13",
+    "dilemma": "Have you ever re-gifted a present back to the person who gave it to you? Spill OR take 2 sips! 🥤",
+    "question": "What gift did you recycle with zero shame?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What gift did you recycle with zero shame?"
+  },
+  {
+    "id": "sos_14",
+    "dilemma": "Spill your most awkward encounter with a partner's parents OR take 3 sips! 🥤",
+    "question": "What cringe dinner memory still makes you sweat at night?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "What cringe dinner memory still makes you sweat at night?"
+  },
+  {
+    "id": "sos_15",
+    "dilemma": "If you had to trade lives with one person in this room for a month, who is it and why? Spill OR take 2 sips! 🥤",
+    "question": "Whose daily routine and perks look the most appealing?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "Whose daily routine and perks look the most appealing?"
+  },
+  {
+    "id": "sos_16",
+    "dilemma": "What is the longest you've ever gone without showering while gaming or binge-watching? Spill OR take 2 sips! 🥤",
+    "question": "What was your all-time peak goblin mode marathon record?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What was your all-time peak goblin mode marathon record?"
+  },
+  {
+    "id": "sos_17",
+    "dilemma": "Spill the worst text you ever sent to the wrong chat or person OR take 3 sips! 🥤",
+    "question": "What message caused an instant cold panic sweat?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "What message caused an instant cold panic sweat?"
+  },
+  {
+    "id": "sos_18",
+    "dilemma": "Have you ever snooped through someone's medicine cabinet or bedroom drawers? Spill OR take 2 sips! 🥤",
+    "question": "What was the most curious thing you stumbled upon?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "What was the most curious thing you stumbled upon?"
+  },
+  {
+    "id": "sos_19",
+    "dilemma": "Who in this room would survive the shortest amount of time in a horror movie? Spill OR take 2 sips! 🥤",
+    "question": "Who is getting taken out in the opening 5 minutes?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "Who is getting taken out in the opening 5 minutes?"
+  },
+  {
+    "id": "sos_20",
+    "dilemma": "Spill your most bizarre habit that you do when you are 100% home alone OR take 3 sips! 🥤",
+    "question": "What private quirk would make people look at you sideways?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "What private quirk would make people look at you sideways?"
+  },
+  {
+    "id": "sos_21",
+    "dilemma": "Have you ever pretended to like a gift so much you wore it out of guilt? Spill OR take 2 sips! 🥤",
+    "question": "What ugly item did you parade around to spare feelings?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What ugly item did you parade around to spare feelings?"
+  },
+  {
+    "id": "sos_22",
+    "dilemma": "Spill the weirdest rumor you ever heard about yourself that was actually true OR take 3 sips! 🥤",
+    "question": "What gossip hit the bullseye?",
+    "spicyLevel": 3,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 3 رشفات! 🥤",
+    "questionAr": "What gossip hit the bullseye?"
+  },
+  {
+    "id": "sos_23",
+    "dilemma": "Would you delete your main social media account forever for $20,000 cash? Spill your answer OR take 2 sips! 🥤",
+    "question": "Is your digital presence worth more than cold hard cash?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "Is your digital presence worth more than cold hard cash?"
+  },
+  {
+    "id": "sos_24",
+    "dilemma": "Spill the most ridiculous thing you believed was real until embarrassingly late in life OR take 2 sips! 🥤",
+    "question": "What common sense fact did you learn way too late?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What common sense fact did you learn way too late?"
+  },
+  {
+    "id": "sos_25",
+    "dilemma": "Who was the last person you searched for on Instagram or TikTok? Spill OR take 3 sips! 🥤",
+    "question": "What name is currently sitting in your search bar history?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "What name is currently sitting in your search bar history?"
+  },
+  {
+    "id": "sos_26",
+    "dilemma": "Spill the worst haircut or fashion disaster you voluntarily paid money for OR take 2 sips! 🥤",
+    "question": "What style choice do you pretend was 'just a phase'?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What style choice do you pretend was 'just a phase'?"
+  },
+  {
+    "id": "sos_27",
+    "dilemma": "Have you ever accidentally eaten food off the floor past the 5-second rule? Spill OR take 2 sips! 🥤",
+    "question": "What dropped snack was too precious to sacrifice?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What dropped snack was too precious to sacrifice?"
+  },
+  {
+    "id": "sos_28",
+    "dilemma": "Spill the absolute worst advice you ever gave to a friend going through a breakup OR take 2 sips! 🥤",
+    "question": "What terrible relationship wisdom did you hand out?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "What terrible relationship wisdom did you hand out?"
+  },
+  {
+    "id": "sos_29",
+    "dilemma": "Which player here would make the absolute worst roommate? Spill OR take 3 sips! 🥤",
+    "question": "Whose habits would drive you insane within 72 hours?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "Whose habits would drive you insane within 72 hours?"
+  },
+  {
+    "id": "sos_30",
+    "dilemma": "Spill the biggest temper tantrum you ever threw over a lost multiplayer match OR take 3 sips! 🥤",
+    "question": "What headset, controller, or keyboard suffered your wrath?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "What headset, controller, or keyboard suffered your wrath?"
+  },
+  {
+    "id": "sos_31",
+    "dilemma": "Have you ever claimed credit for someone else's joke at a party? Spill OR take 2 sips! 🥤",
+    "question": "Whose punchline did you repeat slightly louder?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "Whose punchline did you repeat slightly louder?"
+  },
+  {
+    "id": "sos_32",
+    "dilemma": "Spill the most outrageous excuse you used to get out of school or work OR take 2 sips! 🥤",
+    "question": "What wild tale did you craft for a free day off?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What wild tale did you craft for a free day off?"
+  },
+  {
+    "id": "sos_33",
+    "dilemma": "What is your biggest irrational fear that makes zero logical sense? Spill OR take 2 sips! 🥤",
+    "question": "What innocent object or creature terrifies your soul?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What innocent object or creature terrifies your soul?"
+  },
+  {
+    "id": "sos_34",
+    "dilemma": "Spill the most cringe screen name or gamer tag you ever used in your youth OR take 2 sips! 🥤",
+    "question": "What edgy or adorable username did you proudly rock?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What edgy or adorable username did you proudly rock?"
+  },
+  {
+    "id": "sos_35",
+    "dilemma": "Who in this room would you pick as your partner in a high-stakes bank robbery? Spill OR take 2 sips! 🥤",
+    "question": "Who is your ride-or-die mastermind?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "Who is your ride-or-die mastermind?"
+  },
+  {
+    "id": "sos_36",
+    "dilemma": "Spill the most hypocritical thing you constantly preach to others but never do yourself OR take 2 sips! 🥤",
+    "question": "What golden rule do you break daily?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "What golden rule do you break daily?"
+  },
+  {
+    "id": "sos_37",
+    "dilemma": "Have you ever cried during an animated movie? Spill which one OR take 2 sips! 🥤",
+    "question": "Which cartoon broke your emotional defenses?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "Which cartoon broke your emotional defenses?"
+  },
+  {
+    "id": "sos_38",
+    "dilemma": "Spill your most petty dealbreaker when considering dating someone OR take 2 sips! 🥤",
+    "question": "What tiny quirk would send you running for the hills?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "What tiny quirk would send you running for the hills?"
+  },
+  {
+    "id": "sos_39",
+    "dilemma": "If you had to delete every gaming console or your smartphone, which goes? Spill OR take 3 sips! 🥤",
+    "question": "Are you addicted to the screen or the game?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "Are you addicted to the screen or the game?"
+  },
+  {
+    "id": "sos_40",
+    "dilemma": "Spill the biggest secret you kept from your parents for over 5 years OR take 3 sips! 🥤",
+    "question": "What hidden deed finally has expired consequences?",
+    "spicyLevel": 3,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 3 رشفات! 🥤",
+    "questionAr": "What hidden deed finally has expired consequences?"
+  },
+  {
+    "id": "sos_41",
+    "dilemma": "What is the weirdest thing you ever bought online past midnight? Spill OR take 2 sips! 🥤",
+    "question": "What late-night package arrived that shocked your sober self?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What late-night package arrived that shocked your sober self?"
+  },
+  {
+    "id": "sos_42",
+    "dilemma": "Spill who has the worst taste in music in this room right now OR take 3 sips! 🥤",
+    "question": "Whose aux cord privileges should be permanently revoked?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "Whose aux cord privileges should be permanently revoked?"
+  },
+  {
+    "id": "sos_43",
+    "dilemma": "Have you ever blamed a terrible smell on an innocent pet or baby? Spill OR take 2 sips! 🥤",
+    "question": "Who took the blame for your biological betrayal?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "Who took the blame for your biological betrayal?"
+  },
+  {
+    "id": "sos_44",
+    "dilemma": "Spill the most embarrassing video of you that exists on someone's phone right now OR take 3 sips! 🥤",
+    "question": "What clip could be used to blackmail you for eternity?",
+    "spicyLevel": 3,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 3 رشفات! 🥤",
+    "questionAr": "What clip could be used to blackmail you for eternity?"
+  },
+  {
+    "id": "sos_45",
+    "dilemma": "What is the most bizarre food craving you satisfy in complete secrecy? Spill OR take 2 sips! 🥤",
+    "question": "What recipe would gross out the entire room?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What recipe would gross out the entire room?"
+  },
+  {
+    "id": "sos_46",
+    "dilemma": "Spill the worst lie you ever told to get someone off the phone with you OR take 2 sips! 🥤",
+    "question": "What fake tunnel or dead battery story did you invent?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What fake tunnel or dead battery story did you invent?"
+  },
+  {
+    "id": "sos_47",
+    "dilemma": "Who in this room would you bet all your savings on winning a physical combat arena? Spill OR take 2 sips! 🥤",
+    "question": "Who is the undercover gladiator among us?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "Who is the undercover gladiator among us?"
+  },
+  {
+    "id": "sos_48",
+    "dilemma": "Spill your most awkward elevator silence or interaction story OR take 2 sips! 🥤",
+    "question": "What 20-second vertical ride felt like 5 hours of agony?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What 20-second vertical ride felt like 5 hours of agony?"
+  },
+  {
+    "id": "sos_49",
+    "dilemma": "Have you ever stalked your own profile from a friend's phone to check how cool you look? Spill OR take 2 sips! 🥤",
+    "question": "Did you pass your own aesthetic inspection?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "Did you pass your own aesthetic inspection?"
+  },
+  {
+    "id": "sos_50",
+    "dilemma": "Spill the most childish thing you still do regularly as a grown adult OR take 2 sips! 🥤",
+    "question": "What playground habit will you never give up?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What playground habit will you never give up?"
+  },
+  {
+    "id": "sos_51",
+    "dilemma": "Which player here would make the most chaotic politician? Spill OR take 2 sips! 🥤",
+    "question": "Whose press conferences would go completely unhinged?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "Whose press conferences would go completely unhinged?"
+  },
+  {
+    "id": "sos_52",
+    "dilemma": "Spill the story behind the biggest physical scar on your body OR take 2 sips! 🥤",
+    "question": "Was it heroic battle or sheer uncoordinated goofiness?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "Was it heroic battle or sheer uncoordinated goofiness?"
+  },
+  {
+    "id": "sos_53",
+    "dilemma": "Have you ever practiced arguing in the shower and still lost the argument in your head? Spill OR take 2 sips! 🥤",
+    "question": "Who was your imaginary shower opponent?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "Who was your imaginary shower opponent?"
+  },
+  {
+    "id": "sos_54",
+    "dilemma": "Spill the most superficial reason you ever swiped left on someone OR take 2 sips! 🥤",
+    "question": "What tiny profile detail made you instantly decline?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "What tiny profile detail made you instantly decline?"
+  },
+  {
+    "id": "sos_55",
+    "dilemma": "Who in this room has the most infectious, ridiculous laugh? Spill OR take 2 sips! 🥤",
+    "question": "Whose giggle sounds like a malfunctioning tea kettle?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "Whose giggle sounds like a malfunctioning tea kettle?"
+  },
+  {
+    "id": "sos_56",
+    "dilemma": "Spill the most awkward misunderstanding you had with a cashier or waiter OR take 2 sips! 🥤",
+    "question": "What order went completely sideways?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What order went completely sideways?"
+  },
+  {
+    "id": "sos_57",
+    "dilemma": "Have you ever rewatched your own story 15 times just to appreciate your own vibe? Spill OR take 2 sips! 🥤",
+    "question": "Are you your own biggest social media fan?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "Are you your own biggest social media fan?"
+  },
+  {
+    "id": "sos_58",
+    "dilemma": "Spill the secret hobby or obsession nobody in your real life knows about OR take 3 sips! 🥤",
+    "question": "What niche rabbit hole consumes your free time?",
+    "spicyLevel": 3,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 3 رشفات! 🥤",
+    "questionAr": "What niche rabbit hole consumes your free time?"
+  },
+  {
+    "id": "sos_59",
+    "dilemma": "Which player here would be the first to sell out for fame and money? Spill OR take 2 sips! 🥤",
+    "question": "Who is signing the brand deal before reading the contract?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "Who is signing the brand deal before reading the contract?"
+  },
+  {
+    "id": "sos_60",
+    "dilemma": "Spill your most dramatic hospital or emergency room visit story OR take 2 sips! 🥤",
+    "question": "What goofy mistake required medical attention?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What goofy mistake required medical attention?"
+  },
+  {
+    "id": "sos_61",
+    "dilemma": "Have you ever told someone their baby or puppy was cute when you privately thought it was ugly? Spill OR take 2 sips! 🥤",
+    "question": "How did you craft your polite white lie?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "How did you craft your polite white lie?"
+  },
+  {
+    "id": "sos_62",
+    "dilemma": "Spill the most ridiculous thing you did to impress someone you liked OR take 3 sips! 🥤",
+    "question": "What fake personality or hobby did you temporarily adopt?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "What fake personality or hobby did you temporarily adopt?"
+  },
+  {
+    "id": "sos_63",
+    "dilemma": "Who in this room would you leave in charge of watering your plants while away? Spill OR take 2 sips! 🥤",
+    "question": "Who has the green thumb and who brings certain death to flora?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "Who has the green thumb and who brings certain death to flora?"
+  },
+  {
+    "id": "sos_64",
+    "dilemma": "Spill the worst movie you genuinely love and defend with your life OR take 2 sips! 🥤",
+    "question": "What 0% Rotten Tomatoes film is your personal masterpiece?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What 0% Rotten Tomatoes film is your personal masterpiece?"
+  },
+  {
+    "id": "sos_65",
+    "dilemma": "Confess which player here you secretly admire the most and why OR take 3 sips! 🥤",
+    "question": "Give genuine party flowers to one person right now!",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "Give genuine party flowers to one person right now!"
+  },
+  {
+    "id": "sos_66",
+    "dilemma": "Spill the weirdest food combination you eat in secret when no one is watching OR take 2 sips! 🥤",
+    "question": "What gourmet disaster belongs on your private menu?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What gourmet disaster belongs on your private menu?"
+  },
+  {
+    "id": "sos_67",
+    "dilemma": "Spill the pettiest reason you ever stopped replying to someone's messages OR take 3 sips! 🥤",
+    "question": "Was it their punctuation, music taste, or shoe choice?",
+    "spicyLevel": 3,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 3 رشفات! 🥤",
+    "questionAr": "Was it their punctuation, music taste, or shoe choice?"
+  },
+  {
+    "id": "sos_68",
+    "dilemma": "If everyone in this lobby were on a deserted island, who gets voted off first? Spill OR take 3 sips! 🥤",
+    "question": "Who provides the least survival utility in the wild?",
+    "spicyLevel": 3,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 3 رشفات! 🥤",
+    "questionAr": "Who provides the least survival utility in the wild?"
+  },
+  {
+    "id": "sos_69",
+    "dilemma": "Spill your most embarrassing online purchase that arrived and made you question your life OR take 2 sips! 🥤",
+    "question": "What 2 AM internet splurge showed up in a cardboard box?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What 2 AM internet splurge showed up in a cardboard box?"
+  },
+  {
+    "id": "sos_70",
+    "dilemma": "Have you ever blamed a mystery fart on an innocent pet or room draft? Confess OR take 2 sips! 🥤",
+    "question": "Did the dog take the fall for your crime?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "Did the dog take the fall for your crime?"
+  },
+  {
+    "id": "sos_71",
+    "dilemma": "Spill which song you turn down in your car when pulling up next to someone at a red light OR take 2 sips! 🥤",
+    "question": "What guilty pleasure track is strictly for solo ears?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What guilty pleasure track is strictly for solo ears?"
+  },
+  {
+    "id": "sos_72",
+    "dilemma": "Who in this room would crack first under intense police interrogation? Spill OR take 2 sips! 🥤",
+    "question": "Who spills the whole crew's secrets for a warm donut?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "Who spills the whole crew's secrets for a warm donut?"
+  },
+  {
+    "id": "sos_73",
+    "dilemma": "Spill the worst piece of unsolicited advice you have ever given with utter confidence OR take 3 sips! 🥤",
+    "question": "How did your 'expert' guidance backfire spectacularly?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "How did your 'expert' guidance backfire spectacularly?"
+  },
+  {
+    "id": "sos_74",
+    "dilemma": "Confess your biggest fear that is completely irrational (e.g., escalators, stickers, balloons) OR take 2 sips! 🥤",
+    "question": "What harmless object gives you instant goosebumps?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "What harmless object gives you instant goosebumps?"
+  },
+  {
+    "id": "sos_75",
+    "dilemma": "Have you ever stalked an ex or crush on social media and accidentally liked a photo from 2017? Spill OR take 3 sips! 🥤",
+    "question": "Did you immediately delete your account or throw your phone into the sea?",
+    "spicyLevel": 3,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 3 رشفات! 🥤",
+    "questionAr": "Did you immediately delete your account or throw your phone into the sea?"
+  },
+  {
+    "id": "sos_76",
+    "dilemma": "Spill the biggest lie you ever put on your resume or college application OR take 3 sips! 🥤",
+    "question": "Are you really 'proficient in advanced Excel formulas'?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "Are you really 'proficient in advanced Excel formulas'?"
+  },
+  {
+    "id": "sos_77",
+    "dilemma": "Who here would be the first person to betray the group during a zombie outbreak? Spill OR take 3 sips! 🥤",
+    "question": "Who sacrifices the squad to save their own skin?",
+    "spicyLevel": 2,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 2 رشفات! 🥤",
+    "questionAr": "Who sacrifices the squad to save their own skin?"
+  },
+  {
+    "id": "sos_78",
+    "dilemma": "What is the longest you have gone without showering and what was your excuse? Spill OR take 3 sips! 🥤",
+    "question": "Did dry shampoo and positive thinking do the heavy lifting?",
+    "spicyLevel": 3,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 3 رشفات! 🥤",
+    "questionAr": "Did dry shampoo and positive thinking do the heavy lifting?"
+  },
+  {
+    "id": "sos_79",
+    "dilemma": "Spill the most awkward text you sent to the wrong group chat OR take 3 sips! 🥤",
+    "question": "Did you send family group gossip to the family group itself?",
+    "spicyLevel": 3,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 3 رشفات! 🥤",
+    "questionAr": "Did you send family group gossip to the family group itself?"
+  },
+  {
+    "id": "sos_80",
+    "dilemma": "Rank the top 3 players in this room based purely on who has the best gaming setup OR take 2 sips! 🥤",
+    "question": "Whose cyber rig reigns supreme?",
+    "spicyLevel": 1,
+    "dilemmaAr": "جاوب بصراحة على السؤال أو خد 1 رشفات! 🥤",
+    "questionAr": "Whose cyber rig reigns supreme?"
+  }
+]

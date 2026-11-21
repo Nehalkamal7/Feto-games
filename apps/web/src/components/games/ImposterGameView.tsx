@@ -17,11 +17,15 @@ import {
   Sparkles,
   Flame,
   Zap,
-  ArrowRight
+  ArrowRight,
+  Clock
 } from 'lucide-react';
 import { sound } from '@/lib/sound';
 import { getSocket } from '@/lib/socket';
 import { useVisualViewport } from '@/hooks/useVisualViewport';
+import { useGameTimer } from '@/hooks/useGameTimer';
+
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface ImposterGameViewProps {
   gameState: ImposterPublicState;
@@ -43,7 +47,21 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
   isHost
 }) => {
   const socket = getSocket();
+  const { language } = useLanguage();
+  const isAr = language === 'ar';
   const { isKeyboardOpen, scaleFactor } = useVisualViewport();
+
+  const timer = useGameTimer({
+    phaseEndsAt: (gameState as any)?.phaseEndsAt,
+    roomCode: _roomCode,
+    phase: gameState.phase,
+    round: (gameState as any)?.currentRound || 1,
+    onTimeout: () => {
+      if (onAction) {
+        onAction('PHASE_TIMEOUT');
+      }
+    }
+  });
 
   // Role card toggle
   const [showRoleSecret, setShowRoleSecret] = useState(false);
@@ -71,7 +89,17 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
     'FIREFIGHTER'
   ).toUpperCase();
 
-  const categoryName = gameState.category || privateRole?.category || 'Professions';
+  const secretWordAr =
+    privateRole?.secretWordAr ||
+    (gameState as any)?.secretWordAr ||
+    (gameState as any)?.revealedWordAr ||
+    secretWord;
+
+  const displaySecretWord = isAr ? secretWordAr : secretWord;
+
+  const categoryName = isAr
+    ? (gameState.categoryAr || privateRole?.categoryAr || gameState.category || 'فئات عامة')
+    : (gameState.category || privateRole?.category || 'Professions');
 
   // Check if it's the current user's turn to give a clue
   const isMyTurn =
@@ -174,7 +202,7 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
             <GameIcon gameMode="who_is_imposter" size="md" showContainer />
             <div className="min-w-0">
               <div className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">
-                Category
+                {isAr ? 'الفئة' : 'Category'}
               </div>
               <div className="text-lg sm:text-xl font-extrabold text-gray-900 truncate">
                 {categoryName}
@@ -182,21 +210,39 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
             </div>
           </div>
 
-          {/* Privacy Role Reveal Button */}
-          <button
-            onClick={() => {
-              sound.playClick();
-              setShowRoleSecret(!showRoleSecret);
-            }}
-            className="px-3.5 py-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl text-xs font-bold text-gray-800 flex items-center gap-1.5 transition-all shadow-xs shrink-0"
-          >
-            {showRoleSecret ? (
-              <EyeOff className="w-4 h-4 text-rose-500 shrink-0" />
-            ) : (
-              <Eye className="w-4 h-4 text-blue-600 shrink-0" />
+          {/* Live Timer Pill & Privacy Role Reveal Button */}
+          <div className="flex items-center gap-2 shrink-0">
+            {timer.remainingSeconds > 0 && gameState.phase !== 'round_result' && (
+              <div
+                className={`px-2.5 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 force-ltr ${
+                  timer.isUrgent
+                    ? 'bg-rose-50 text-rose-600 border border-rose-200 animate-pulse'
+                    : 'bg-gray-100 text-gray-700'
+                }`}
+              >
+                <Clock className="w-3.5 h-3.5" />
+                <span>{timer.formatted}</span>
+              </div>
             )}
-            <span>{showRoleSecret ? 'Hide Role' : 'Tap to View Secret'}</span>
-          </button>
+            <button
+              onClick={() => {
+                sound.playClick();
+                setShowRoleSecret(!showRoleSecret);
+              }}
+              className="px-3.5 py-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl text-xs font-bold text-gray-800 flex items-center gap-1.5 transition-all shadow-xs shrink-0"
+            >
+              {showRoleSecret ? (
+                <EyeOff className="w-4 h-4 text-rose-500 shrink-0" />
+              ) : (
+                <Eye className="w-4 h-4 text-blue-600 shrink-0" />
+              )}
+              <span>
+                {showRoleSecret
+                  ? (isAr ? 'إخفاء الدور' : 'Hide Role')
+                  : (isAr ? 'انقر لكشف السر 🤫' : 'Tap to View Secret')}
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* Revealed Secret Role Panel */}
@@ -212,20 +258,23 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
                 <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-center space-y-1.5">
                   <div className="text-xs font-extrabold uppercase tracking-wider text-red-600 flex items-center justify-center gap-1.5">
                     <Flame className="w-4 h-4 text-red-600" />
-                    <span>YOU ARE THE IMPOSTER!</span>
+                    <span>{isAr ? 'أنت الجاسوس! 🕵️' : 'YOU ARE THE IMPOSTER!'}</span>
                   </div>
                   <div className="text-xl font-extrabold text-red-600">
-                    YOU ARE THE IMPOSTER!
+                    {isAr ? 'أنت الجاسوس! 🕵️' : 'YOU ARE THE IMPOSTER!'}
                   </div>
                   <p className="text-sm font-semibold text-red-800">
-                    Blend in and guess the secret word!
+                    {isAr ? 'اندسّ وسطهم وخمّن الكلمة السرية!' : 'Blend in and guess the secret word!'}
                   </p>
                   <p className="text-xs text-red-600 font-medium">
-                    You do NOT know the secret word. Listen closely to clues, blend in, and avoid getting voted out.
+                    {isAr
+                      ? 'أنت لا تعرف الكلمة السرية! استمع لتلميحات الباقيين بحذر، اندمج معهم ولا تدعهم يصوّتون ضدك.'
+                      : 'You do NOT know the secret word. Listen closely to clues, blend in, and avoid getting voted out.'}
                   </p>
                   {privateRole?.teammateNames && privateRole.teammateNames.length > 0 && (
                     <div className="text-xs text-red-700 pt-1 font-semibold">
-                      Fellow Imposters: <span>{privateRole.teammateNames.join(', ')}</span>
+                      {isAr ? 'الجواسيس معك: ' : 'Fellow Imposters: '}
+                      <span>{privateRole.teammateNames.join(', ')}</span>
                     </div>
                   )}
                 </div>
@@ -233,13 +282,15 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
                 <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl text-center space-y-1.5">
                   <div className="text-xs font-bold uppercase tracking-wider text-blue-700 flex items-center justify-center gap-1.5">
                     <Sparkles className="w-4 h-4 text-blue-600" />
-                    <span>YOUR SECRET WORD:</span>
+                    <span>{isAr ? 'كلمتك السرية هي:' : 'YOUR SECRET WORD:'}</span>
                   </div>
                   <div className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-wider my-1">
-                    {secretWord}
+                    {displaySecretWord}
                   </div>
                   <p className="text-xs text-blue-800 font-medium">
-                    Give a subtle 1-word or short clue related to this word without making it too obvious for the imposter!
+                    {isAr
+                      ? 'قدّم تلميحاً ذكياً من كلمة أو عبارة قصيرة يرتبط بالسر بدون ما تكشفه للجاسوس!'
+                      : 'Give a subtle 1-word or short clue related to this word without making it too obvious for the imposter!'}
                   </p>
                 </div>
               )}
@@ -262,15 +313,27 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
             {isMyTurn ? (
               <div className="text-sm font-bold flex items-center justify-center gap-2 text-blue-700">
                 <Zap className="w-4 h-4 fill-current text-blue-600" />
-                <span>It is your turn! Submit your clue below</span>
+                <span>{isAr ? 'دورك الآن! اكتب تلميحك بالأسفل' : 'It is your turn! Submit your clue below'}</span>
               </div>
             ) : (
               <div className="text-xs sm:text-sm font-medium text-gray-600">
-                Waiting for{' '}
-                <span className="text-blue-600 font-bold">
-                  {gameState.currentTurnUsername || 'Next Player'}
-                </span>{' '}
-                to submit their clue...
+                {isAr ? (
+                  <>
+                    في انتظار{' '}
+                    <span className="text-blue-600 font-bold">
+                      {gameState.currentTurnUsername || 'اللاعب القادم'}
+                    </span>{' '}
+                    ليكتب تلميحه...
+                  </>
+                ) : (
+                  <>
+                    Waiting for{' '}
+                    <span className="text-blue-600 font-bold">
+                      {gameState.currentTurnUsername || 'Next Player'}
+                    </span>{' '}
+                    to submit their clue...
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -288,7 +351,7 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
                 maxLength={40}
                 value={clueInput}
                 onChange={(e) => setClueInput(e.target.value)}
-                placeholder="Type your 1-word or short clue..."
+                placeholder={isAr ? 'اكتب تلميحك (كلمة أو عبارة قصيرة)...' : 'Type your 1-word or short clue...'}
                 autoFocus
                 className="w-full h-12 bg-white border border-gray-200 focus:border-blue-500 rounded-xl px-4 text-gray-900 text-sm font-semibold outline-none shadow-xs"
               />
@@ -297,8 +360,8 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
                 disabled={isSubmittingClue || !clueInput.trim()}
                 className="w-full sm:w-auto h-12 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm flex items-center justify-center gap-1.5 shadow-sm transition-all disabled:opacity-50 shrink-0"
               >
-                <Send className="w-4 h-4" />
-                <span>Submit</span>
+                <Send className={`w-4 h-4 ${isAr ? 'rotate-180' : ''}`} />
+                <span>{isAr ? 'إرسال' : 'Submit'}</span>
               </button>
             </motion.form>
           )}
@@ -306,7 +369,9 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
           {/* Submitted Clues Timeline */}
           <div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2 px-1">
-              Submitted Clues ({Object.keys(gameState.clues || {}).length} / {gameState.turnOrder?.length || players.length})
+              {isAr
+                ? `التلميحات المسجلة (${Object.keys(gameState.clues || {}).length} / ${gameState.turnOrder?.length || players.length})`
+                : `Submitted Clues (${Object.keys(gameState.clues || {}).length} / ${gameState.turnOrder?.length || players.length})`}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {(gameState.turnOrder || players.map((p) => p.id)).map((pid, idx) => {
@@ -339,10 +404,12 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
                         </div>
                       ) : isCurrent ? (
                         <div className="text-xs text-amber-600 font-semibold animate-pulse">
-                          Thinking...
+                          {isAr ? 'يفكر...' : 'Thinking...'}
                         </div>
                       ) : (
-                        <div className="text-xs text-gray-400 font-normal">Waiting</div>
+                        <div className="text-xs text-gray-400 font-normal">
+                          {isAr ? 'في الانتظار' : 'Waiting'}
+                        </div>
                       )}
                     </div>
                   </div>
@@ -359,10 +426,12 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
           <div className="p-4 bg-white rounded-2xl border border-gray-200 shadow-sm text-center">
             <h3 className="text-base sm:text-lg font-bold text-gray-900 flex items-center justify-center gap-2">
               <Vote className="w-5 h-5 text-blue-600" />
-              <span>Vote For The Imposter</span>
+              <span>{isAr ? 'صوّت لاكتشاف الجاسوس' : 'Vote For The Imposter'}</span>
             </h3>
             <p className="text-xs text-gray-500 mt-1">
-              Who gave a suspicious or out-of-place clue? Tap a player to cast your vote.
+              {isAr
+                ? 'مين قال تلميح مشبوه أو غريب؟ اضغط على اللاعب لتصوّت ضده.'
+                : 'Who gave a suspicious or out-of-place clue? Tap a player to cast your vote.'}
             </p>
           </div>
 
@@ -412,11 +481,13 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
                           : 'bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-800'
                       }`}
                     >
-                      {isMyVote ? 'Voted ✓' : 'Vote'}
+                      {isMyVote
+                        ? (isAr ? 'تم التصويت ✓' : 'Voted ✓')
+                        : (isAr ? 'صوّت' : 'Vote')}
                     </button>
                   ) : (
                     <span className="text-[11px] text-gray-400 font-medium py-1.5">
-                      (You)
+                      {isAr ? '(أنت)' : '(You)'}
                     </span>
                   )}
                 </div>
@@ -442,15 +513,19 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
 
               <div>
                 <span className="text-xs uppercase font-bold tracking-wider text-rose-600">
-                  Imposter Caught!
+                  {isAr ? 'تم كشف الجاسوس!' : 'Imposter Caught!'}
                 </span>
                 <h3 className="text-xl font-bold text-gray-900 mt-1">
-                  Final Guess Chance
+                  {isAr ? 'فرصة التخمين الأخيرة' : 'Final Guess Chance'}
                 </h3>
                 <p className="text-xs text-gray-500 mt-1">
                   {isCaughtImposter
-                    ? 'Guess the secret word to steal victory for the imposters!'
-                    : `${gameState.suddenDeathPlayerUsername || 'The imposter'} was voted out and is attempting a final guess!`}
+                    ? (isAr
+                        ? 'خمّن الكلمة السرية الآن لتخطف الفوز لفريق الجواسيس!'
+                        : 'Guess the secret word to steal victory for the imposters!')
+                    : (isAr
+                        ? `${gameState.suddenDeathPlayerUsername || 'الجاسوس'} انكشف وبيحاول يخمّن الكلمة السرية!`
+                        : `${gameState.suddenDeathPlayerUsername || 'The imposter'} was voted out and is attempting a final guess!`)}
                 </p>
               </div>
 
@@ -460,7 +535,7 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
                     type="text"
                     value={suddenDeathInput}
                     onChange={(e) => setSuddenDeathInput(e.target.value)}
-                    placeholder="Guess the secret word..."
+                    placeholder={isAr ? 'خمّن الكلمة السرية...' : 'Guess the secret word...'}
                     autoFocus
                     required
                     className="w-full h-12 bg-gray-50 border border-gray-200 focus:bg-white focus:border-blue-500 rounded-xl px-4 text-center text-lg font-bold text-gray-900 outline-none uppercase"
@@ -470,12 +545,14 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
                     disabled={isSubmittingGuess || !suddenDeathInput.trim()}
                     className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-sm tracking-wide transition-all"
                   >
-                    Steal Round Win!
+                    {isAr ? 'اخطف الفوز الآن! 🏆' : 'Steal Round Win!'}
                   </button>
                 </form>
               ) : (
                 <div className="p-3 bg-gray-50 rounded-xl border border-gray-200 text-gray-500 text-xs font-medium animate-pulse">
-                  Waiting for imposter to submit final guess...
+                  {isAr
+                    ? 'في انتظار الجاسوس ليقدم تخمينه الأخير...'
+                    : 'Waiting for imposter to submit final guess...'}
                 </div>
               )}
             </motion.div>
@@ -492,19 +569,23 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
         >
           <div>
             <div className="text-xs uppercase font-bold tracking-wider text-blue-600 mb-1">
-              Round Complete
+              {isAr ? 'نهاية الجولة' : 'Round Complete'}
             </div>
             <h2 className="text-2xl font-extrabold text-gray-900">
-              {gameState.impostersWon ? '😈 The Imposters Won!' : '🎉 Civilians Win!'}
+              {gameState.impostersWon
+                ? (isAr ? '😈 الجواسيس انتصروا!' : '😈 The Imposters Won!')
+                : (isAr ? '🎉 المدنيين انتصروا!' : '🎉 Civilians Win!')}
             </h2>
           </div>
 
           <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl text-center">
             <span className="text-xs uppercase text-gray-500 font-bold block mb-1">
-              Secret Word Was
+              {isAr ? 'الكلمة السرية كانت' : 'Secret Word Was'}
             </span>
             <span className="text-2xl font-extrabold text-blue-600 tracking-wider">
-              {gameState.revealedWord || secretWord}
+              {isAr
+                ? ((gameState as any).revealedWordAr || (gameState as any).secretWordAr || gameState.revealedWord || secretWord)
+                : (gameState.revealedWord || secretWord)}
             </span>
           </div>
 
@@ -521,8 +602,8 @@ export const ImposterGameView: React.FC<ImposterGameViewProps> = ({
               }}
               className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 mt-2"
             >
-              <span>Next Round</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>{isAr ? 'الجولة القادمة' : 'Next Round'}</span>
+              <ArrowRight className={`w-4 h-4 ${isAr ? 'rotate-180' : ''}`} />
             </button>
           )}
         </motion.div>

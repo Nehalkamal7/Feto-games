@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import { QrCode, Copy, Check, EyeOff, X, Smartphone } from 'lucide-react';
 import { sound } from '@/lib/sound';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface RoomLobbyQRCodeProps {
   roomCode: string;
@@ -12,6 +13,8 @@ interface RoomLobbyQRCodeProps {
 }
 
 export function RoomLobbyQRCode({ roomCode, isStreamerMode = false }: RoomLobbyQRCodeProps) {
+  const { language } = useLanguage();
+  const isAr = language === 'ar';
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [revealedInStreamerMode, setRevealedInStreamerMode] = useState(false);
@@ -38,10 +41,10 @@ export function RoomLobbyQRCode({ roomCode, isStreamerMode = false }: RoomLobbyQ
             setIsOpen(true);
           }}
           className="h-9 sm:h-10 px-3 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-gray-800 text-xs font-semibold inline-flex items-center gap-1.5 transition-all shadow-xs"
-          title="Open Scannable Party QR Code"
+          title={isAr ? 'فتح رمز QR للانضمام السريع' : 'Open Scannable Party QR Code'}
         >
           <QrCode className="w-4 h-4 text-gray-700 shrink-0" />
-          <span className="hidden sm:inline">Scan QR</span>
+          <span className="hidden sm:inline">{isAr ? 'رمز QR' : 'Scan QR'}</span>
         </button>
       </div>
 
@@ -57,8 +60,8 @@ export function RoomLobbyQRCode({ roomCode, isStreamerMode = false }: RoomLobbyQ
             >
               <button
                 onClick={() => setIsOpen(false)}
-                className="absolute top-4 right-4 w-8 h-8 inline-flex items-center justify-center shrink-0 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-                title="Close"
+                className="absolute top-4 right-4 rtl:right-auto rtl:left-4 w-8 h-8 inline-flex items-center justify-center shrink-0 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                title={isAr ? 'إغلاق' : 'Close'}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -66,11 +69,13 @@ export function RoomLobbyQRCode({ roomCode, isStreamerMode = false }: RoomLobbyQ
               <div className="flex items-center justify-center gap-2 mb-1.5">
                 <Smartphone className="w-5 h-5 text-blue-600" />
                 <h3 className="text-lg font-bold text-gray-900">
-                  Scan To Join
+                  {isAr ? 'امسح الرمز للانضمام' : 'Scan To Join'}
                 </h3>
               </div>
               <p className="text-xs text-gray-500 mb-5">
-                Point phone camera at this QR code to jump straight into the room
+                {isAr
+                  ? 'وجّه كاميرا هاتفك نحو الرمز للانضمام مباشرة إلى الغرفة'
+                  : 'Point phone camera at this QR code to jump straight into the room'}
               </p>
 
               {/* QR Code Frame */}
@@ -79,13 +84,13 @@ export function RoomLobbyQRCode({ roomCode, isStreamerMode = false }: RoomLobbyQ
                   <div className="absolute inset-0 bg-white rounded-2xl flex flex-col items-center justify-center p-4 text-center">
                     <EyeOff className="w-8 h-8 text-amber-500 mb-2" />
                     <span className="text-xs font-bold text-gray-800 uppercase">
-                      Streamer Mode Hidden
+                      {isAr ? 'وضع البث (مخفي)' : 'Streamer Mode Hidden'}
                     </span>
                     <button
                       onClick={() => setRevealedInStreamerMode(true)}
                       className="mt-3 px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-800 text-xs font-semibold"
                     >
-                      Click To Reveal QR
+                      {isAr ? 'إظهار الرمز' : 'Click To Reveal QR'}
                     </button>
                   </div>
                 ) : (
@@ -102,7 +107,7 @@ export function RoomLobbyQRCode({ roomCode, isStreamerMode = false }: RoomLobbyQ
 
               {/* Join Link Copy Box */}
               <div className="mt-5 flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl p-1.5 shadow-xs">
-                <span className="flex-1 text-xs font-mono text-gray-700 truncate pl-2">
+                <span className="flex-1 text-xs font-mono text-gray-700 truncate pl-2 rtl:pl-0 rtl:pr-2 force-ltr">
                   {joinUrl}
                 </span>
                 <button
@@ -114,7 +119,7 @@ export function RoomLobbyQRCode({ roomCode, isStreamerMode = false }: RoomLobbyQ
                   ) : (
                     <Copy className="w-3.5 h-3.5" />
                   )}
-                  <span>{copied ? 'Copied' : 'Copy'}</span>
+                  <span>{copied ? (isAr ? 'تم النسخ!' : 'Copied') : (isAr ? 'نسخ' : 'Copy')}</span>
                 </button>
               </div>
             </motion.div>

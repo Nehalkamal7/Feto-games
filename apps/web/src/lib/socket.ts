@@ -418,6 +418,85 @@ export async function socketRematch(nextGameMode?: GameMode): Promise<void> {
   if (!json.success) throw new Error(json.error?.message || 'Failed to rematch');
 }
 
+export async function socketEndRound(code?: string): Promise<any> {
+  const roomCode = code ? cleanRoomCode(code) : getActiveRoomCode();
+  const playerId = getSavedPlayerId(roomCode);
+  if (!roomCode || !playerId) return;
+
+  const res = await fetch('/api/game/action', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      roomCode,
+      playerId,
+      actionType: 'END_ROUND'
+    })
+  });
+
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error?.message || 'Failed to end round');
+  return json;
+}
+
+export async function socketNextRound(code?: string): Promise<any> {
+  const roomCode = code ? cleanRoomCode(code) : getActiveRoomCode();
+  const playerId = getSavedPlayerId(roomCode);
+  if (!roomCode || !playerId) return;
+
+  const res = await fetch('/api/game/action', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      roomCode,
+      playerId,
+      actionType: 'NEXT_ROUND'
+    })
+  });
+
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error?.message || 'Failed to advance to next round');
+  return json;
+}
+
+export async function socketBackToLobby(resetScores = false, code?: string): Promise<any> {
+  const roomCode = code ? cleanRoomCode(code) : getActiveRoomCode();
+  const playerId = getSavedPlayerId(roomCode);
+  if (!roomCode || !playerId) return;
+
+  const res = await fetch('/api/game/action', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      roomCode,
+      playerId,
+      actionType: 'BACK_TO_LOBBY',
+      payload: { resetScores }
+    })
+  });
+
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error?.message || 'Failed to return to lobby');
+  return json;
+}
+
+export async function socketPhaseTimeout(code?: string): Promise<any> {
+  const roomCode = code ? cleanRoomCode(code) : getActiveRoomCode();
+  const playerId = getSavedPlayerId(roomCode) || getPersistentPlayerId();
+  if (!roomCode || !playerId) return;
+
+  const res = await fetch('/api/game/action', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      roomCode,
+      playerId,
+      actionType: 'PHASE_TIMEOUT'
+    })
+  });
+
+  return await res.json();
+}
+
 export async function socketSendReaction(emoji: string): Promise<void> {
   const roomCode = getActiveRoomCode();
   const playerId = getSavedPlayerId(roomCode);

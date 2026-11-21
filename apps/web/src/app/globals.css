@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&family=Cairo:wght@400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,6 +7,7 @@
 :root {
   --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-arabic: 'Cairo', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   --font-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
   
@@ -69,6 +70,31 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   color: var(--ink-primary);
   letter-spacing: -0.025em;
   font-weight: 700;
+}
+
+/* RTL Typography & Alignment */
+html[dir="rtl"] body {
+  font-family: var(--font-arabic);
+}
+
+html[dir="rtl"] h1,
+html[dir="rtl"] h2,
+html[dir="rtl"] h3,
+html[dir="rtl"] h4,
+html[dir="rtl"] h5,
+html[dir="rtl"] h6,
+html[dir="rtl"] .font-heading {
+  font-family: var(--font-arabic);
+  letter-spacing: 0;
+}
+
+/* Room code and timers strictly LTR regardless of page direction */
+.force-ltr,
+[data-room-code],
+.font-mono,
+.font-mono-code {
+  direction: ltr !important;
+  unicode-bidi: isolate;
 }
 
 /* Safe Area Inset Utility Classes */

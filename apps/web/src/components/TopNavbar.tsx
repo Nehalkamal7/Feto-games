@@ -5,7 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Info, Gamepad2, Trophy } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { SoundToggle } from './SoundToggle';
+import { LanguageToggle } from './LanguageToggle';
 import { sound } from '@/lib/sound';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface TopNavbarProps {
   onlinePlayersCount: number;
@@ -23,6 +25,7 @@ export function TopNavbar({
   onOpenDecks: _onOpenDecks
 }: TopNavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { t } = useLanguage();
 
   return (
     <nav className="w-full bg-white/90 backdrop-blur-md rounded-2xl px-4 sm:px-6 py-3 mb-6 sm:mb-8 border border-gray-200/80 shadow-sm relative z-30">
@@ -41,7 +44,7 @@ export function TopNavbar({
             }}
             className="px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-700 hover:text-gray-900 hover:bg-gray-100/70 transition-all"
           >
-            Home
+            {t('nav.home')}
           </button>
 
           <button
@@ -52,7 +55,7 @@ export function TopNavbar({
             className="px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-700 hover:text-blue-600 hover:bg-blue-50/70 transition-all flex items-center gap-1.5"
           >
             <Gamepad2 className="w-4 h-4 text-blue-600" />
-            <span>Party Games</span>
+            <span>{t('nav.games')}</span>
           </button>
 
           <button
@@ -63,7 +66,7 @@ export function TopNavbar({
             className="px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-700 hover:text-amber-600 hover:bg-amber-50/70 transition-all flex items-center gap-1.5"
           >
             <Trophy className="w-4 h-4 text-amber-500" />
-            <span>Leaderboard</span>
+            <span>{t('nav.leaderboard')}</span>
           </button>
 
           <button
@@ -74,12 +77,12 @@ export function TopNavbar({
             className="px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-700 hover:text-gray-900 hover:bg-gray-100/70 transition-all flex items-center gap-1.5"
           >
             <Info className="w-4 h-4 text-gray-500" />
-            <span>About</span>
+            <span>{t('nav.about')}</span>
           </button>
         </div>
 
-        {/* RIGHT: LIVE PLAYERS BADGE & SOUND CONTROLS */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        {/* RIGHT: LIVE PLAYERS BADGE, SOUND CONTROLS & LANGUAGE TOGGLE */}
+        <div className="flex items-center gap-2 sm:gap-2.5">
           {/* Clean Live Players Pill */}
           <div className="px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/80 flex items-center gap-2">
             <span className="relative flex h-2 w-2">
@@ -88,10 +91,11 @@ export function TopNavbar({
             </span>
             <div className="text-xs font-medium text-emerald-800 flex items-center gap-1">
               <span className="font-bold">{onlinePlayersCount}</span>
-              <span className="hidden sm:inline text-emerald-600">online</span>
+              <span className="hidden sm:inline text-emerald-600">{t('common.online')}</span>
             </div>
           </div>
 
+          <LanguageToggle />
           <SoundToggle />
 
           {/* Mobile Menu Toggle Button */}
@@ -127,9 +131,9 @@ export function TopNavbar({
                 setMobileMenuOpen(false);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="w-full text-start px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
-              Home
+              {t('nav.home')}
             </button>
             <button
               onClick={() => {
@@ -137,10 +141,10 @@ export function TopNavbar({
                 setMobileMenuOpen(false);
                 onScrollToGames();
               }}
-              className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2"
+              className="w-full text-start px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2"
             >
               <Gamepad2 className="w-4 h-4 text-blue-600" />
-              <span>Party Games</span>
+              <span>{t('nav.games')}</span>
             </button>
             <button
               onClick={() => {
@@ -148,10 +152,10 @@ export function TopNavbar({
                 setMobileMenuOpen(false);
                 onOpenLeaderboard();
               }}
-              className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-amber-50 hover:text-amber-600 flex items-center gap-2"
+              className="w-full text-start px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-amber-50 hover:text-amber-600 flex items-center gap-2"
             >
               <Trophy className="w-4 h-4 text-amber-500" />
-              <span>Leaderboard</span>
+              <span>{t('nav.leaderboard')}</span>
             </button>
             <button
               onClick={() => {
@@ -159,10 +163,10 @@ export function TopNavbar({
                 setMobileMenuOpen(false);
                 onOpenAbout();
               }}
-              className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+              className="w-full text-start px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2"
             >
               <Info className="w-4 h-4 text-gray-500" />
-              <span>About FETO GAMES</span>
+              <span>{t('nav.about')}</span>
             </button>
           </motion.div>
         )}

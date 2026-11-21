@@ -3,480 +3,720 @@
     "id": "mlt_01",
     "category": "Survival & Chaos",
     "prompt": "Who is most likely to survive a zombie apocalypse entirely on luck?",
-    "penaltyDare": "Do your best aggressive zombie impression toward the camera for 10 seconds!"
+    "penaltyDare": "Do your best aggressive zombie impression toward the camera for 10 seconds!",
+    "categoryAr": "نجاة ومواقف صعبة",
+    "promptAr": "مين أكتر واحد فينا ممكن يعيش في هجوم زومبي بالبركة والصدفة البحتة؟",
+    "penaltyDareAr": "اعمل صوت زومبي مفترس للكاميرا لمدة 10 ثواني بأعلى طاقة!"
   },
   {
     "id": "mlt_02",
     "category": "Everyday Habits",
     "prompt": "Who is most likely to order takeout 3 times in a single day?",
-    "penaltyDare": "Confess the weirdest food combination you secretly love!"
+    "penaltyDare": "Confess the weirdest food combination you secretly love!",
+    "categoryAr": "عادات يومية",
+    "promptAr": "مين أكتر واحد ممكن يطلب دليفري أكل 3 مرات في نفس اليوم من غير تأنيب ضمير؟",
+    "penaltyDareAr": "اعترف بأغرب ميكس أكل بتعشقه وبتاكله في السر!"
   },
   {
     "id": "mlt_03",
     "category": "Digital Disasters",
     "prompt": "Who is most likely to accidentally send a voice note rant to the exact person they were talking about?",
-    "penaltyDare": "Read your last sent text message out loud with zero context!"
+    "penaltyDare": "Read your last sent text message out loud with zero context!",
+    "categoryAr": "كوارث السوشيال ميديا",
+    "promptAr": "مين أكتر واحد ممكن يبعت فويس نوت بيهزق حد لنفس الشخص بالغلط؟",
+    "penaltyDareAr": "اقرأ آخر رسالة بعتها على واتساب بصوت عالي بدون أي تبرير!"
   },
   {
     "id": "mlt_04",
     "category": "Money & Fame",
     "prompt": "Who is most likely to become a crypto millionaire and lose it all on meme coins in 48 hours?",
-    "penaltyDare": "Pitch a fake $10,000 product to the lobby with intense sales energy!"
+    "penaltyDare": "Pitch a fake $10,000 product to the lobby with intense sales energy!",
+    "categoryAr": "فلوس وشهرة",
+    "promptAr": "مين أكتر واحد ممكن يعمل ثروة في الكريبتو ويضيعها كلها في عملات ميمز خلال 48 ساعة؟",
+    "penaltyDareAr": "اعمل إعلان تسويقي حماسي لمنتج خيالي تافه بـ 10,000 دولار!"
   },
   {
     "id": "mlt_05",
     "category": "Social Clumsiness",
     "prompt": "Who is most likely to wave back enthusiastically at someone who was waving at the person behind them?",
-    "penaltyDare": "Do a 10-second dramatic reenactment of being caught waving at a stranger."
+    "penaltyDare": "Do a 10-second dramatic reenactment of being caught waving at a stranger.",
+    "categoryAr": "إحراج ومواقف محرجة",
+    "promptAr": "مين أكتر واحد بيشاور بحماس لحد في الشارع ويكتشف إنه كان بيشاور للي وراه؟",
+    "penaltyDareAr": "مثل مشهد الإحراج ده قدام الروم كأنك بتشاور لواحد متعرفوش!"
   },
   {
     "id": "mlt_06",
     "category": "Late Night Secrets",
     "prompt": "Who is most likely to still be scrolling TikTok or Reels at 4:30 AM on a Tuesday?",
-    "penaltyDare": "Drop and give the room 5 rapid push-ups or 10 frantic jumping jacks!"
+    "penaltyDare": "Drop and give the room 5 rapid push-ups or 10 frantic jumping jacks!",
+    "categoryAr": "أسرار نص الليل",
+    "promptAr": "مين أكتر واحد فينا still be scrolling TikTok or Reels at 4:30 AM on a Tuesday?؟",
+    "penaltyDareAr": "عقاب الجولة: Drop and give the room 5 rapid push-ups or 10 frantic jumping jacks!"
   },
   {
     "id": "mlt_07",
     "category": "Travel & Wanderlust",
     "prompt": "Who is most likely to get lost inside an IKEA warehouse and end up taking a nap on a showroom sofa?",
-    "penaltyDare": "Act like a Swedish furniture designer naming random objects in the room."
+    "penaltyDare": "Act like a Swedish furniture designer naming random objects in the room.",
+    "categoryAr": "سفر ومغامرات",
+    "promptAr": "مين أكتر واحد فينا get lost inside an IKEA warehouse and end up taking a nap on a showroom sofa?؟",
+    "penaltyDareAr": "عقاب الجولة: Act like a Swedish furniture designer naming random objects in the room."
   },
   {
     "id": "mlt_08",
     "category": "Drama & Gossip",
     "prompt": "Who is most likely to start a dramatic reality TV argument over who ate the last slice of pizza?",
-    "penaltyDare": "Deliver a 15-second Oscar-worthy dramatic crying monologue!"
+    "penaltyDare": "Deliver a 15-second Oscar-worthy dramatic crying monologue!",
+    "categoryAr": "دراما ونميمة",
+    "promptAr": "مين أكتر واحد فينا start a dramatic reality TV argument over who ate the last slice of pizza?؟",
+    "penaltyDareAr": "عقاب الجولة: Deliver a 15-second Oscar-worthy dramatic crying monologue!"
   },
   {
     "id": "mlt_09",
     "category": "Gaming & Tech",
     "prompt": "Who is most likely to rage-quit a game, punch their desk, and instantly log back in 10 seconds later?",
-    "penaltyDare": "Make the loudest 8-bit arcade explosion noise you can muster!"
+    "penaltyDare": "Make the loudest 8-bit arcade explosion noise you can muster!",
+    "categoryAr": "جيمينج وتكنولوجيا",
+    "promptAr": "مين أكتر واحد فينا rage-quit a game, punch their desk, and instantly log back in 10 seconds later?؟",
+    "penaltyDareAr": "عقاب الجولة: Make the loudest 8-bit arcade explosion noise you can muster!"
   },
   {
     "id": "mlt_10",
     "category": "Party Spirit",
     "prompt": "Who is most likely to fall asleep with their shoes still on at someone else's house?",
-    "penaltyDare": "Balance an object on your head for 20 seconds without letting it fall."
+    "penaltyDare": "Balance an object on your head for 20 seconds without letting it fall.",
+    "categoryAr": "أجواء الحفلة",
+    "promptAr": "مين أكتر واحد فينا fall asleep with their shoes still on at someone else's house?؟",
+    "penaltyDareAr": "عقاب الجولة: Balance an object on your head for 20 seconds without letting it fall."
   },
   {
     "id": "mlt_11",
     "category": "Dating & Romance",
     "prompt": "Who is most likely to fall head-over-heels in love with someone after a 30-second grocery store eye contact?",
-    "penaltyDare": "Serenade the host of the room with an improvised love ballad."
+    "penaltyDare": "Serenade the host of the room with an improvised love ballad.",
+    "categoryAr": "حب وكراشات",
+    "promptAr": "مين أكتر واحد فينا fall head-over-heels in love with someone after a 30-second grocery store eye contact?؟",
+    "penaltyDareAr": "عقاب الجولة: Serenade the host of the room with an improvised love ballad."
   },
   {
     "id": "mlt_12",
     "category": "Career & Work",
     "prompt": "Who is most likely to join a high-stakes Zoom meeting with their camera accidentally pointing at their ceiling fan while in pajamas?",
-    "penaltyDare": "Deliver a formal corporate status update using exclusively slang words."
+    "penaltyDare": "Deliver a formal corporate status update using exclusively slang words.",
+    "categoryAr": "شغل ومذاكرة",
+    "promptAr": "مين أكتر واحد فينا join a high-stakes Zoom meeting with their camera accidentally pointing at their ceiling fan while in pajamas?؟",
+    "penaltyDareAr": "عقاب الجولة: Deliver a formal corporate status update using exclusively slang words."
   },
   {
     "id": "mlt_13",
     "category": "Spooky & Paranormal",
     "prompt": "Who is most likely to believe their house is genuinely haunted because of a creaky wooden floorboard?",
-    "penaltyDare": "Tell a 15-second ghost story in an eerie whisper."
+    "penaltyDare": "Tell a 15-second ghost story in an eerie whisper.",
+    "categoryAr": "رعب وخوارق",
+    "promptAr": "مين أكتر واحد فينا believe their house is genuinely haunted because of a creaky wooden floorboard?؟",
+    "penaltyDareAr": "عقاب الجولة: Tell a 15-second ghost story in an eerie whisper."
   },
   {
     "id": "mlt_14",
     "category": "Fashion & Style",
     "prompt": "Who is most likely to buy an outrageous neon outfit just to wear it once for a photo and never touch it again?",
-    "penaltyDare": "Strike 3 runway model poses consecutively with maximum intensity."
+    "penaltyDare": "Strike 3 runway model poses consecutively with maximum intensity.",
+    "categoryAr": "أناقة وموضة",
+    "promptAr": "مين أكتر واحد فينا buy an outrageous neon outfit just to wear it once for a photo and never touch it again?؟",
+    "penaltyDareAr": "عقاب الجولة: Strike 3 runway model poses consecutively with maximum intensity."
   },
   {
     "id": "mlt_15",
     "category": "Fitness & Health",
     "prompt": "Who is most likely to buy an expensive gym membership on January 1st and stop going by January 5th?",
-    "penaltyDare": "Flex your muscles aggressively and narrate your workout routine."
+    "penaltyDare": "Flex your muscles aggressively and narrate your workout routine.",
+    "categoryAr": "جيم وصحة",
+    "promptAr": "مين أكتر واحد فينا buy an expensive gym membership on January 1st and stop going by January 5th?؟",
+    "penaltyDareAr": "عقاب الجولة: Flex your muscles aggressively and narrate your workout routine."
   },
   {
     "id": "mlt_16",
     "category": "Wild & Chaotic",
     "prompt": "Who is most likely to adopt 4 stray cats in a single weekend because they looked lonely?",
-    "penaltyDare": "Meow aggressively whenever anyone speaks until the next round."
+    "penaltyDare": "Meow aggressively whenever anyone speaks until the next round.",
+    "categoryAr": "جنون وضحك",
+    "promptAr": "مين أكتر واحد فينا adopt 4 stray cats in a single weekend because they looked lonely?؟",
+    "penaltyDareAr": "عقاب الجولة: Meow aggressively whenever anyone speaks until the next round."
   },
   {
     "id": "mlt_17",
     "category": "Everyday Habits",
     "prompt": "Who is most likely to forget where they parked their car in a 2-story mall parking garage?",
-    "penaltyDare": "Make car alarm beep noises with panic expressions for 8 seconds."
+    "penaltyDare": "Make car alarm beep noises with panic expressions for 8 seconds.",
+    "categoryAr": "عادات يومية",
+    "promptAr": "مين أكتر واحد فينا forget where they parked their car in a 2-story mall parking garage?؟",
+    "penaltyDareAr": "عقاب الجولة: Make car alarm beep noises with panic expressions for 8 seconds."
   },
   {
     "id": "mlt_18",
     "category": "Digital Disasters",
     "prompt": "Who is most likely to have 4,000+ unread emails and 75 open browser tabs right now?",
-    "penaltyDare": "Read the title of the weirdest tab you opened this week!"
+    "penaltyDare": "Read the title of the weirdest tab you opened this week!",
+    "categoryAr": "كوارث السوشيال ميديا",
+    "promptAr": "مين أكتر واحد فينا have 4,000+ unread emails and 75 open browser tabs right now?؟",
+    "penaltyDareAr": "عقاب الجولة: Read the title of the weirdest tab you opened this week!"
   },
   {
     "id": "mlt_19",
     "category": "Money & Fame",
     "prompt": "Who is most likely to accidentally become famous on TikTok for falling over in public?",
-    "penaltyDare": "Slow-motion replay your most clumsy moment right now."
+    "penaltyDare": "Slow-motion replay your most clumsy moment right now.",
+    "categoryAr": "فلوس وشهرة",
+    "promptAr": "مين أكتر واحد فينا accidentally become famous on TikTok for falling over in public?؟",
+    "penaltyDareAr": "عقاب الجولة: Slow-motion replay your most clumsy moment right now."
   },
   {
     "id": "mlt_20",
     "category": "Social Clumsiness",
     "prompt": "Who is most likely to laugh uncontrollably at the absolute most inappropriate serious moment?",
-    "penaltyDare": "Stare directly into the screen for 15 seconds without blinking or smiling."
+    "penaltyDare": "Stare directly into the screen for 15 seconds without blinking or smiling.",
+    "categoryAr": "إحراج ومواقف محرجة",
+    "promptAr": "مين أكتر واحد فينا laugh uncontrollably at the absolute most inappropriate serious moment?؟",
+    "penaltyDareAr": "عقاب الجولة: Stare directly into the screen for 15 seconds without blinking or smiling."
   },
   {
     "id": "mlt_21",
     "category": "Food & Feasts",
     "prompt": "Who is most likely to eat cold leftover pizza for breakfast while standing in front of the open fridge?",
-    "penaltyDare": "Describe your dream gourmet midnight snack in vivid sensory detail."
+    "penaltyDare": "Describe your dream gourmet midnight snack in vivid sensory detail.",
+    "categoryAr": "Food & Feasts",
+    "promptAr": "مين أكتر واحد فينا eat cold leftover pizza for breakfast while standing in front of the open fridge?؟",
+    "penaltyDareAr": "عقاب الجولة: Describe your dream gourmet midnight snack in vivid sensory detail."
   },
   {
     "id": "mlt_22",
     "category": "Survival & Chaos",
     "prompt": "Who is most likely to push a 'DO NOT PUSH' big red button within 3 seconds of seeing it?",
-    "penaltyDare": "Make a high-pitched siren noise and spin around in your chair."
+    "penaltyDare": "Make a high-pitched siren noise and spin around in your chair.",
+    "categoryAr": "نجاة ومواقف صعبة",
+    "promptAr": "مين أكتر واحد فينا push a 'DO NOT PUSH' big red button within 3 seconds of seeing it?؟",
+    "penaltyDareAr": "عقاب الجولة: Make a high-pitched siren noise and spin around in your chair."
   },
   {
     "id": "mlt_23",
     "category": "Dating & Romance",
     "prompt": "Who is most likely to stalk an ex-crush's profile all the way back to their 2014 beach photos?",
-    "penaltyDare": "Compliment every single player in the room with one genuine hype word."
+    "penaltyDare": "Compliment every single player in the room with one genuine hype word.",
+    "categoryAr": "حب وكراشات",
+    "promptAr": "مين أكتر واحد فينا stalk an ex-crush's profile all the way back to their 2014 beach photos?؟",
+    "penaltyDareAr": "عقاب الجولة: Compliment every single player in the room with one genuine hype word."
   },
   {
     "id": "mlt_24",
     "category": "Gaming & Tech",
     "prompt": "Who is most likely to blame server latency or keyboard drift for missing an easy shot?",
-    "penaltyDare": "Rant for 10 seconds about how 'the game lagged' in dramatic esports fashion."
+    "penaltyDare": "Rant for 10 seconds about how 'the game lagged' in dramatic esports fashion.",
+    "categoryAr": "جيمينج وتكنولوجيا",
+    "promptAr": "مين أكتر واحد فينا blame server latency or keyboard drift for missing an easy shot?؟",
+    "penaltyDareAr": "عقاب الجولة: Rant for 10 seconds about how 'the game lagged' in dramatic esports fashion."
   },
   {
     "id": "mlt_25",
     "category": "Everyday Habits",
     "prompt": "Who is most likely to leave the house with their phone battery at 4% and no charging cable?",
-    "penaltyDare": "Improvise a dramatic eulogy for a dying phone battery."
+    "penaltyDare": "Improvise a dramatic eulogy for a dying phone battery.",
+    "categoryAr": "عادات يومية",
+    "promptAr": "مين أكتر واحد فينا leave the house with their phone battery at 4% and no charging cable?؟",
+    "penaltyDareAr": "عقاب الجولة: Improvise a dramatic eulogy for a dying phone battery."
   },
   {
     "id": "mlt_26",
     "category": "Career & Work",
     "prompt": "Who is most likely to quit their job on the spot to start an artisanal sourdough bakery?",
-    "penaltyDare": "Act like a French baker critiquing the posture of other players."
+    "penaltyDare": "Act like a French baker critiquing the posture of other players.",
+    "categoryAr": "شغل ومذاكرة",
+    "promptAr": "مين أكتر واحد فينا quit their job on the spot to start an artisanal sourdough bakery?؟",
+    "penaltyDareAr": "عقاب الجولة: Act like a French baker critiquing the posture of other players."
   },
   {
     "id": "mlt_27",
     "category": "Wild & Chaotic",
     "prompt": "Who is most likely to accidentally start a dance circle at a casual family dinner?",
-    "penaltyDare": "Do a 10-second robotic victory dance with pure robotic emotion."
+    "penaltyDare": "Do a 10-second robotic victory dance with pure robotic emotion.",
+    "categoryAr": "جنون وضحك",
+    "promptAr": "مين أكتر واحد فينا accidentally start a dance circle at a casual family dinner?؟",
+    "penaltyDareAr": "عقاب الجولة: Do a 10-second robotic victory dance with pure robotic emotion."
   },
   {
     "id": "mlt_28",
     "category": "Spooky & Paranormal",
     "prompt": "Who is most likely to try communicating with aliens using a flashlight on their roof?",
-    "penaltyDare": "Transmit an alien greeting using weird vocal clicks and buzzes."
+    "penaltyDare": "Transmit an alien greeting using weird vocal clicks and buzzes.",
+    "categoryAr": "رعب وخوارق",
+    "promptAr": "مين أكتر واحد فينا try communicating with aliens using a flashlight on their roof?؟",
+    "penaltyDareAr": "عقاب الجولة: Transmit an alien greeting using weird vocal clicks and buzzes."
   },
   {
     "id": "mlt_29",
     "category": "Drama & Gossip",
     "prompt": "Who is most likely to reply 'k' or 'thumbs up' to a 4-paragraph heartfelt message?",
-    "penaltyDare": "Explain why the thumbs-up emoji is the ultimate weapon of chaos."
+    "penaltyDare": "Explain why the thumbs-up emoji is the ultimate weapon of chaos.",
+    "categoryAr": "دراما ونميمة",
+    "promptAr": "مين أكتر واحد فينا reply 'k' or 'thumbs up' to a 4-paragraph heartfelt message?؟",
+    "penaltyDareAr": "عقاب الجولة: Explain why the thumbs-up emoji is the ultimate weapon of chaos."
   },
   {
     "id": "mlt_30",
     "category": "Party Spirit",
     "prompt": "Who is most likely to steal the DJ aux cord at a party and play a 10-minute anime intro?",
-    "penaltyDare": "Sing the guitar solo of your favorite rock anthem with your mouth."
+    "penaltyDare": "Sing the guitar solo of your favorite rock anthem with your mouth.",
+    "categoryAr": "أجواء الحفلة",
+    "promptAr": "مين أكتر واحد فينا steal the DJ aux cord at a party and play a 10-minute anime intro?؟",
+    "penaltyDareAr": "عقاب الجولة: Sing the guitar solo of your favorite rock anthem with your mouth."
   },
   {
     "id": "mlt_31",
     "category": "Everyday Habits",
     "prompt": "Who is most likely to set 12 consecutive alarms 5 minutes apart and still wake up 30 minutes late?",
-    "penaltyDare": "Imitate your morning alarm sound with full vocal commitment."
+    "penaltyDare": "Imitate your morning alarm sound with full vocal commitment.",
+    "categoryAr": "عادات يومية",
+    "promptAr": "مين أكتر واحد فينا set 12 consecutive alarms 5 minutes apart and still wake up 30 minutes late?؟",
+    "penaltyDareAr": "عقاب الجولة: Imitate your morning alarm sound with full vocal commitment."
   },
   {
     "id": "mlt_32",
     "category": "Money & Fame",
     "prompt": "Who is most likely to buy something completely useless just because it had a 50% off sticker?",
-    "penaltyDare": "Show the camera the most random object within arm's reach and praise it."
+    "penaltyDare": "Show the camera the most random object within arm's reach and praise it.",
+    "categoryAr": "فلوس وشهرة",
+    "promptAr": "مين أكتر واحد فينا buy something completely useless just because it had a 50% off sticker?؟",
+    "penaltyDareAr": "عقاب الجولة: Show the camera the most random object within arm's reach and praise it."
   },
   {
     "id": "mlt_33",
     "category": "Digital Disasters",
     "prompt": "Who is most likely to get catfished by an obvious AI bot named 'Jennifer_Crypto99'?",
-    "penaltyDare": "Do an AI voice assistant response to a simple question."
+    "penaltyDare": "Do an AI voice assistant response to a simple question.",
+    "categoryAr": "كوارث السوشيال ميديا",
+    "promptAr": "مين أكتر واحد فينا get catfished by an obvious AI bot named 'Jennifer_Crypto99'?؟",
+    "penaltyDareAr": "عقاب الجولة: Do an AI voice assistant response to a simple question."
   },
   {
     "id": "mlt_34",
     "category": "Social Clumsiness",
     "prompt": "Who is most likely to trip on a flat, completely smooth floor with nobody around?",
-    "penaltyDare": "Bow gracefully as if you just landed an Olympic gymnastics dismount."
+    "penaltyDare": "Bow gracefully as if you just landed an Olympic gymnastics dismount.",
+    "categoryAr": "إحراج ومواقف محرجة",
+    "promptAr": "مين أكتر واحد فينا trip on a flat, completely smooth floor with nobody around?؟",
+    "penaltyDareAr": "عقاب الجولة: Bow gracefully as if you just landed an Olympic gymnastics dismount."
   },
   {
     "id": "mlt_35",
     "category": "Food & Feasts",
     "prompt": "Who is most likely to order the spiciest item on the menu and immediately regret every life decision?",
-    "penaltyDare": "Puff your cheeks and pretend your tongue is currently on fire for 8 seconds."
+    "penaltyDare": "Puff your cheeks and pretend your tongue is currently on fire for 8 seconds.",
+    "categoryAr": "Food & Feasts",
+    "promptAr": "مين أكتر واحد فينا order the spiciest item on the menu and immediately regret every life decision?؟",
+    "penaltyDareAr": "عقاب الجولة: Puff your cheeks and pretend your tongue is currently on fire for 8 seconds."
   },
   {
     "id": "mlt_36",
     "category": "Survival & Chaos",
     "prompt": "Who is most likely to accidentally set off a fire alarm while attempting to make simple buttered toast?",
-    "penaltyDare": "Flap your arms like you are dispersing smoke from an imaginary toaster."
+    "penaltyDare": "Flap your arms like you are dispersing smoke from an imaginary toaster.",
+    "categoryAr": "نجاة ومواقف صعبة",
+    "promptAr": "مين أكتر واحد فينا accidentally set off a fire alarm while attempting to make simple buttered toast?؟",
+    "penaltyDareAr": "عقاب الجولة: Flap your arms like you are dispersing smoke from an imaginary toaster."
   },
   {
     "id": "mlt_37",
     "category": "Dating & Romance",
     "prompt": "Who is most likely to plan their future wedding venue after going on a second date?",
-    "penaltyDare": "Propose marriage to a random item on your desk with deep passion."
+    "penaltyDare": "Propose marriage to a random item on your desk with deep passion.",
+    "categoryAr": "حب وكراشات",
+    "promptAr": "مين أكتر واحد فينا plan their future wedding venue after going on a second date?؟",
+    "penaltyDareAr": "عقاب الجولة: Propose marriage to a random item on your desk with deep passion."
   },
   {
     "id": "mlt_38",
     "category": "Gaming & Tech",
     "prompt": "Who is most likely to spend 3 hours customizing their video game character's nose and eyebrows?",
-    "penaltyDare": "Make 3 different absurd facial expressions like character presets."
+    "penaltyDare": "Make 3 different absurd facial expressions like character presets.",
+    "categoryAr": "جيمينج وتكنولوجيا",
+    "promptAr": "مين أكتر واحد فينا spend 3 hours customizing their video game character's nose and eyebrows?؟",
+    "penaltyDareAr": "عقاب الجولة: Make 3 different absurd facial expressions like character presets."
   },
   {
     "id": "mlt_39",
     "category": "Wild & Chaotic",
     "prompt": "Who is most likely to show up to a black-tie event wearing gaming crocs in sport mode?",
-    "penaltyDare": "Defend gaming crocs as peak high-fashion for 15 seconds."
+    "penaltyDare": "Defend gaming crocs as peak high-fashion for 15 seconds.",
+    "categoryAr": "جنون وضحك",
+    "promptAr": "مين أكتر واحد فينا show up to a black-tie event wearing gaming crocs in sport mode?؟",
+    "penaltyDareAr": "عقاب الجولة: Defend gaming crocs as peak high-fashion for 15 seconds."
   },
   {
     "id": "mlt_40",
     "category": "Everyday Habits",
     "prompt": "Who is most likely to sing at the top of their lungs in the shower thinking nobody else can hear them?",
-    "penaltyDare": "Hit the highest falsetto note you can physically produce right now!"
+    "penaltyDare": "Hit the highest falsetto note you can physically produce right now!",
+    "categoryAr": "عادات يومية",
+    "promptAr": "مين أكتر واحد فينا sing at the top of their lungs in the shower thinking nobody else can hear them?؟",
+    "penaltyDareAr": "عقاب الجولة: Hit the highest falsetto note you can physically produce right now!"
   },
   {
     "id": "mlt_41",
     "category": "Career & Work",
     "prompt": "Who is most likely to become CEO of a shady company and get exposed on a 6-part Netflix documentary?",
-    "penaltyDare": "Deliver a fake press conference apology statement to the lobby."
+    "penaltyDare": "Deliver a fake press conference apology statement to the lobby.",
+    "categoryAr": "شغل ومذاكرة",
+    "promptAr": "مين أكتر واحد فينا become CEO of a shady company and get exposed on a 6-part Netflix documentary?؟",
+    "penaltyDareAr": "عقاب الجولة: Deliver a fake press conference apology statement to the lobby."
   },
   {
     "id": "mlt_42",
     "category": "Drama & Gossip",
     "prompt": "Who is most likely to say 'I hate drama' right before dropping the juiciest gossip of the month?",
-    "penaltyDare": "Spill a completely fake scandalous secret about yourself with a straight face."
+    "penaltyDare": "Spill a completely fake scandalous secret about yourself with a straight face.",
+    "categoryAr": "دراما ونميمة",
+    "promptAr": "مين أكتر واحد فينا say 'I hate drama' right before dropping the juiciest gossip of the month?؟",
+    "penaltyDareAr": "عقاب الجولة: Spill a completely fake scandalous secret about yourself with a straight face."
   },
   {
     "id": "mlt_43",
     "category": "Travel & Wanderlust",
     "prompt": "Who is most likely to board the wrong flight at the airport because they had noise-canceling headphones on?",
-    "penaltyDare": "Act like a panicked airline captain announcing turbulence."
+    "penaltyDare": "Act like a panicked airline captain announcing turbulence.",
+    "categoryAr": "سفر ومغامرات",
+    "promptAr": "مين أكتر واحد فينا board the wrong flight at the airport because they had noise-canceling headphones on?؟",
+    "penaltyDareAr": "عقاب الجولة: Act like a panicked airline captain announcing turbulence."
   },
   {
     "id": "mlt_44",
     "category": "Spooky & Paranormal",
     "prompt": "Who is most likely to check behind the shower curtain for murderers every time they use the bathroom?",
-    "penaltyDare": "Do a classic horror movie scream at low volume."
+    "penaltyDare": "Do a classic horror movie scream at low volume.",
+    "categoryAr": "رعب وخوارق",
+    "promptAr": "مين أكتر واحد فينا check behind the shower curtain for murderers every time they use the bathroom?؟",
+    "penaltyDareAr": "عقاب الجولة: Do a classic horror movie scream at low volume."
   },
   {
     "id": "mlt_45",
     "category": "Party Spirit",
     "prompt": "Who is most likely to organize a 15-person karaoke night and hog the microphone for 80% of the time?",
-    "penaltyDare": "Rap the first verse of the Fresh Prince of Bel-Air or any song you know."
+    "penaltyDare": "Rap the first verse of the Fresh Prince of Bel-Air or any song you know.",
+    "categoryAr": "أجواء الحفلة",
+    "promptAr": "مين أكتر واحد فينا organize a 15-person karaoke night and hog the microphone for 80% of the time?؟",
+    "penaltyDareAr": "عقاب الجولة: Rap the first verse of the Fresh Prince of Bel-Air or any song you know."
   },
   {
     "id": "mlt_46",
     "category": "Social Clumsiness",
     "prompt": "Who is most likely to say 'You too!' when the movie theater usher says 'Enjoy the movie'?",
-    "penaltyDare": "Apologize profusely to an imaginary movie theater usher."
+    "penaltyDare": "Apologize profusely to an imaginary movie theater usher.",
+    "categoryAr": "إحراج ومواقف محرجة",
+    "promptAr": "مين أكتر واحد فينا say 'You too!' when the movie theater usher says 'Enjoy the movie'?؟",
+    "penaltyDareAr": "عقاب الجولة: Apologize profusely to an imaginary movie theater usher."
   },
   {
     "id": "mlt_47",
     "category": "Fitness & Health",
     "prompt": "Who is most likely to drink a green detox smoothie and gag after the first single sip?",
-    "penaltyDare": "Take a big gulp of water like it's an extreme toxic potion."
+    "penaltyDare": "Take a big gulp of water like it's an extreme toxic potion.",
+    "categoryAr": "جيم وصحة",
+    "promptAr": "مين أكتر واحد فينا drink a green detox smoothie and gag after the first single sip?؟",
+    "penaltyDareAr": "عقاب الجولة: Take a big gulp of water like it's an extreme toxic potion."
   },
   {
     "id": "mlt_48",
     "category": "Money & Fame",
     "prompt": "Who is most likely to tip 40% because they were too intimidated to look at the card machine screen?",
-    "penaltyDare": "Thank everyone in the room as if they just gave you a million dollars."
+    "penaltyDare": "Thank everyone in the room as if they just gave you a million dollars.",
+    "categoryAr": "فلوس وشهرة",
+    "promptAr": "مين أكتر واحد فينا tip 40% because they were too intimidated to look at the card machine screen?؟",
+    "penaltyDareAr": "عقاب الجولة: Thank everyone in the room as if they just gave you a million dollars."
   },
   {
     "id": "mlt_49",
     "category": "Digital Disasters",
     "prompt": "Who is most likely to accidentally like a photo from 6 years ago while deep-stalking someone on Instagram?",
-    "penaltyDare": "Freeze completely like a statue for 12 seconds."
+    "penaltyDare": "Freeze completely like a statue for 12 seconds.",
+    "categoryAr": "كوارث السوشيال ميديا",
+    "promptAr": "مين أكتر واحد فينا accidentally like a photo from 6 years ago while deep-stalking someone on Instagram?؟",
+    "penaltyDareAr": "عقاب الجولة: Freeze completely like a statue for 12 seconds."
   },
   {
     "id": "mlt_50",
     "category": "Food & Feasts",
     "prompt": "Who is most likely to finish everyone else's leftover fries at the table without asking?",
-    "penaltyDare": "Plead for imaginary french fries like a Victorian street orphan."
+    "penaltyDare": "Plead for imaginary french fries like a Victorian street orphan.",
+    "categoryAr": "Food & Feasts",
+    "promptAr": "مين أكتر واحد فينا finish everyone else's leftover fries at the table without asking?؟",
+    "penaltyDareAr": "عقاب الجولة: Plead for imaginary french fries like a Victorian street orphan."
   },
   {
     "id": "mlt_51",
     "category": "Wild & Chaotic",
     "prompt": "Who is most likely to get banned from a laser tag arena for taking combat rolls way too seriously?",
-    "penaltyDare": "Do a tactical combat roll or military salute to the lobby."
+    "penaltyDare": "Do a tactical combat roll or military salute to the lobby.",
+    "categoryAr": "جنون وضحك",
+    "promptAr": "مين أكتر واحد فينا get banned from a laser tag arena for taking combat rolls way too seriously?؟",
+    "penaltyDareAr": "عقاب الجولة: Do a tactical combat roll or military salute to the lobby."
   },
   {
     "id": "mlt_52",
     "category": "Everyday Habits",
     "prompt": "Who is most likely to put their car keys in the refrigerator and spend an hour looking everywhere for them?",
-    "penaltyDare": "Name 5 cold items in a fridge in 4 seconds flat!"
+    "penaltyDare": "Name 5 cold items in a fridge in 4 seconds flat!",
+    "categoryAr": "عادات يومية",
+    "promptAr": "مين أكتر واحد فينا put their car keys in the refrigerator and spend an hour looking everywhere for them?؟",
+    "penaltyDareAr": "عقاب الجولة: Name 5 cold items in a fridge in 4 seconds flat!"
   },
   {
     "id": "mlt_53",
     "category": "Dating & Romance",
     "prompt": "Who is most likely to accidentally send 'Love you' to their DoorDash delivery driver?",
-    "penaltyDare": "Express heartfelt eternal gratitude to your favorite delivery meal."
+    "penaltyDare": "Express heartfelt eternal gratitude to your favorite delivery meal.",
+    "categoryAr": "حب وكراشات",
+    "promptAr": "مين أكتر واحد فينا accidentally send 'Love you' to their DoorDash delivery driver?؟",
+    "penaltyDareAr": "عقاب الجولة: Express heartfelt eternal gratitude to your favorite delivery meal."
   },
   {
     "id": "mlt_54",
     "category": "Gaming & Tech",
     "prompt": "Who is most likely to buy a $300 gaming chair thinking it will instantly double their aim accuracy?",
-    "penaltyDare": "Sit back like a tournament esports champion and adjust invisible glasses."
+    "penaltyDare": "Sit back like a tournament esports champion and adjust invisible glasses.",
+    "categoryAr": "جيمينج وتكنولوجيا",
+    "promptAr": "مين أكتر واحد فينا buy a $300 gaming chair thinking it will instantly double their aim accuracy?؟",
+    "penaltyDareAr": "عقاب الجولة: Sit back like a tournament esports champion and adjust invisible glasses."
   },
   {
     "id": "mlt_55",
     "category": "Survival & Chaos",
     "prompt": "Who is most likely to pack 5 pairs of shoes for an overnight 24-hour weekend trip?",
-    "penaltyDare": "Inspect your current footwear and give it a fashion rating out of 10."
+    "penaltyDare": "Inspect your current footwear and give it a fashion rating out of 10.",
+    "categoryAr": "نجاة ومواقف صعبة",
+    "promptAr": "مين أكتر واحد فينا pack 5 pairs of shoes for an overnight 24-hour weekend trip?؟",
+    "penaltyDareAr": "عقاب الجولة: Inspect your current footwear and give it a fashion rating out of 10."
   },
   {
     "id": "mlt_56",
     "category": "Career & Work",
     "prompt": "Who is most likely to accidentally share their personal Discord screen during an executive work presentation?",
-    "penaltyDare": "Rapidly clear your throat 5 times like a nervous junior analyst."
+    "penaltyDare": "Rapidly clear your throat 5 times like a nervous junior analyst.",
+    "categoryAr": "شغل ومذاكرة",
+    "promptAr": "مين أكتر واحد فينا accidentally share their personal Discord screen during an executive work presentation?؟",
+    "penaltyDareAr": "عقاب الجولة: Rapidly clear your throat 5 times like a nervous junior analyst."
   },
   {
     "id": "mlt_57",
     "category": "Social Clumsiness",
     "prompt": "Who is most likely to forget someone's name 2 seconds after being introduced to them?",
-    "penaltyDare": "Invent a ridiculous nickname for the player with the highest score."
+    "penaltyDare": "Invent a ridiculous nickname for the player with the highest score.",
+    "categoryAr": "إحراج ومواقف محرجة",
+    "promptAr": "مين أكتر واحد فينا forget someone's name 2 seconds after being introduced to them?؟",
+    "penaltyDareAr": "عقاب الجولة: Invent a ridiculous nickname for the player with the highest score."
   },
   {
     "id": "mlt_58",
     "category": "Party Spirit",
     "prompt": "Who is most likely to bring a board game with an 80-page rulebook to a casual house party?",
-    "penaltyDare": "Explain an absurd imaginary board game rule with full seriousness."
+    "penaltyDare": "Explain an absurd imaginary board game rule with full seriousness.",
+    "categoryAr": "أجواء الحفلة",
+    "promptAr": "مين أكتر واحد فينا bring a board game with an 80-page rulebook to a casual house party?؟",
+    "penaltyDareAr": "عقاب الجولة: Explain an absurd imaginary board game rule with full seriousness."
   },
   {
     "id": "mlt_59",
     "category": "Everyday Habits",
     "prompt": "Who is most likely to read a recipe online, ignore all measurements, and wonder why the cake looks like a brick?",
-    "penaltyDare": "Act like a master chef tasting a disastrous soup."
+    "penaltyDare": "Act like a master chef tasting a disastrous soup.",
+    "categoryAr": "عادات يومية",
+    "promptAr": "مين أكتر واحد فينا read a recipe online, ignore all measurements, and wonder why the cake looks like a brick?؟",
+    "penaltyDareAr": "عقاب الجولة: Act like a master chef tasting a disastrous soup."
   },
   {
     "id": "mlt_60",
     "category": "Wild & Chaotic",
     "prompt": "Who is most likely to jump into a hotel pool fully clothed at 2 AM on vacation?",
-    "penaltyDare": "Make swimming stroke motions with your arms for 10 seconds."
+    "penaltyDare": "Make swimming stroke motions with your arms for 10 seconds.",
+    "categoryAr": "جنون وضحك",
+    "promptAr": "مين أكتر واحد فينا jump into a hotel pool fully clothed at 2 AM on vacation?؟",
+    "penaltyDareAr": "عقاب الجولة: Make swimming stroke motions with your arms for 10 seconds."
   },
   {
     "id": "mlt_61",
     "category": "Money & Fame",
     "prompt": "Who is most likely to invest their savings in a theme park for guinea pigs?",
-    "penaltyDare": "Squeak like a guinea pig 4 times in rapid succession."
+    "penaltyDare": "Squeak like a guinea pig 4 times in rapid succession.",
+    "categoryAr": "فلوس وشهرة",
+    "promptAr": "مين أكتر واحد فينا invest their savings in a theme park for guinea pigs?؟",
+    "penaltyDareAr": "عقاب الجولة: Squeak like a guinea pig 4 times in rapid succession."
   },
   {
     "id": "mlt_62",
     "category": "Dating & Romance",
     "prompt": "Who is most likely to bring their pet on a first date as a certified vibe checker?",
-    "penaltyDare": "Introduce your hand as your emotional support animal."
+    "penaltyDare": "Introduce your hand as your emotional support animal.",
+    "categoryAr": "حب وكراشات",
+    "promptAr": "مين أكتر واحد فينا bring their pet on a first date as a certified vibe checker?؟",
+    "penaltyDareAr": "عقاب الجولة: Introduce your hand as your emotional support animal."
   },
   {
     "id": "mlt_63",
     "category": "Digital Disasters",
     "prompt": "Who is most likely to accidentally voice-call someone at 3 AM while trying to delete their contact?",
-    "penaltyDare": "Whisper an apology to the screen as if someone answered at 3 AM."
+    "penaltyDare": "Whisper an apology to the screen as if someone answered at 3 AM.",
+    "categoryAr": "كوارث السوشيال ميديا",
+    "promptAr": "مين أكتر واحد فينا accidentally voice-call someone at 3 AM while trying to delete their contact?؟",
+    "penaltyDareAr": "عقاب الجولة: Whisper an apology to the screen as if someone answered at 3 AM."
   },
   {
     "id": "mlt_64",
     "category": "Survival & Chaos",
     "prompt": "Who is most likely to trigger a neighborhood-wide Wi-Fi outage by unplugging the main router?",
-    "penaltyDare": "Pretend you are an ancient dial-up modem connecting to the internet."
+    "penaltyDare": "Pretend you are an ancient dial-up modem connecting to the internet.",
+    "categoryAr": "نجاة ومواقف صعبة",
+    "promptAr": "مين أكتر واحد فينا trigger a neighborhood-wide Wi-Fi outage by unplugging the main router?؟",
+    "penaltyDareAr": "عقاب الجولة: Pretend you are an ancient dial-up modem connecting to the internet."
   },
   {
     "id": "mlt_65",
     "category": "Esports Legend",
     "prompt": "Who is most likely to claim they 'let you win' every time they lose a 1v1 match?",
-    "penaltyDare": "Bow to the lobby and declare everyone else is a gaming prodigy."
+    "penaltyDare": "Bow to the lobby and declare everyone else is a gaming prodigy.",
+    "categoryAr": "Esports Legend",
+    "promptAr": "مين أكتر واحد فينا claim they 'let you win' every time they lose a 1v1 match?؟",
+    "penaltyDareAr": "عقاب الجولة: Bow to the lobby and declare everyone else is a gaming prodigy."
   },
   {
     "id": "mlt_66",
     "category": "Party Spirit",
     "prompt": "Who is most likely to start a group dance circle with absolute confidence but zero rhythm?",
-    "penaltyDare": "Do the robot dance silently for 15 seconds."
+    "penaltyDare": "Do the robot dance silently for 15 seconds.",
+    "categoryAr": "أجواء الحفلة",
+    "promptAr": "مين أكتر واحد فينا start a group dance circle with absolute confidence but zero rhythm?؟",
+    "penaltyDareAr": "عقاب الجولة: Do the robot dance silently for 15 seconds."
   },
   {
     "id": "mlt_67",
     "category": "Daily Quirks",
     "prompt": "Who is most likely to buy gym gear just to wear it while binge-watching anime in bed?",
-    "penaltyDare": "Give a 10-second fitness motivational coach speech."
+    "penaltyDare": "Give a 10-second fitness motivational coach speech.",
+    "categoryAr": "Daily Quirks",
+    "promptAr": "مين أكتر واحد فينا buy gym gear just to wear it while binge-watching anime in bed?؟",
+    "penaltyDareAr": "عقاب الجولة: Give a 10-second fitness motivational coach speech."
   },
   {
     "id": "mlt_68",
     "category": "Digital Disasters",
     "prompt": "Who is most likely to type a whole paragraph in CAPS because they didn't realize Caps Lock was on?",
-    "penaltyDare": "Read the last text you sent in an aggressive movie trailer voice."
+    "penaltyDare": "Read the last text you sent in an aggressive movie trailer voice.",
+    "categoryAr": "كوارث السوشيال ميديا",
+    "promptAr": "مين أكتر واحد فينا type a whole paragraph in CAPS because they didn't realize Caps Lock was on?؟",
+    "penaltyDareAr": "عقاب الجولة: Read the last text you sent in an aggressive movie trailer voice."
   },
   {
     "id": "mlt_69",
     "category": "Food Craze",
     "prompt": "Who is most likely to order extra fries 'for the table' and then proceed to eat 90% of them?",
-    "penaltyDare": "Describe your ideal burger using only whisper sounds."
+    "penaltyDare": "Describe your ideal burger using only whisper sounds.",
+    "categoryAr": "Food Craze",
+    "promptAr": "مين أكتر واحد فينا order extra fries 'for the table' and then proceed to eat 90% of them?؟",
+    "penaltyDareAr": "عقاب الجولة: Describe your ideal burger using only whisper sounds."
   },
   {
     "id": "mlt_70",
     "category": "Dating & Romance",
     "prompt": "Who is most likely to rehearse a 5-minute phone conversation 10 times in front of the mirror first?",
-    "penaltyDare": "Pretend you are answering a phone call from an angry pizza chef."
+    "penaltyDare": "Pretend you are answering a phone call from an angry pizza chef.",
+    "categoryAr": "حب وكراشات",
+    "promptAr": "مين أكتر واحد فينا rehearse a 5-minute phone conversation 10 times in front of the mirror first?؟",
+    "penaltyDareAr": "عقاب الجولة: Pretend you are answering a phone call from an angry pizza chef."
   },
   {
     "id": "mlt_71",
     "category": "Career & Work",
     "prompt": "Who is most likely to nod along in a meeting for 45 minutes having zero idea what the topic is?",
-    "penaltyDare": "Use the words 'synergy', 'pivot', and 'bandwidth' in a single business pitch."
+    "penaltyDare": "Use the words 'synergy', 'pivot', and 'bandwidth' in a single business pitch.",
+    "categoryAr": "شغل ومذاكرة",
+    "promptAr": "مين أكتر واحد فينا nod along in a meeting for 45 minutes having zero idea what the topic is?؟",
+    "penaltyDareAr": "عقاب الجولة: Use the words 'synergy', 'pivot', and 'bandwidth' in a single business pitch."
   },
   {
     "id": "mlt_72",
     "category": "Survival & Chaos",
     "prompt": "Who is most likely to get locked out of their own apartment while taking out the trash in pajamas?",
-    "penaltyDare": "Beg an imaginary neighbor to lend you their spare key."
+    "penaltyDare": "Beg an imaginary neighbor to lend you their spare key.",
+    "categoryAr": "نجاة ومواقف صعبة",
+    "promptAr": "مين أكتر واحد فينا get locked out of their own apartment while taking out the trash in pajamas?؟",
+    "penaltyDareAr": "عقاب الجولة: Beg an imaginary neighbor to lend you their spare key."
   },
   {
     "id": "mlt_73",
     "category": "Esports Legend",
     "prompt": "Who is most likely to rage-quit a game, uninstall it, and then reinstall it 20 minutes later?",
-    "penaltyDare": "Give a heartfelt apology to your gaming chair."
+    "penaltyDare": "Give a heartfelt apology to your gaming chair.",
+    "categoryAr": "Esports Legend",
+    "promptAr": "مين أكتر واحد فينا rage-quit a game, uninstall it, and then reinstall it 20 minutes later?؟",
+    "penaltyDareAr": "عقاب الجولة: Give a heartfelt apology to your gaming chair."
   },
   {
     "id": "mlt_74",
     "category": "Social Media",
     "prompt": "Who is most likely to take 47 selfies, post none of them, and then complain about their lighting?",
-    "penaltyDare": "Strike 3 dramatic fashion model poses back-to-back."
+    "penaltyDare": "Strike 3 dramatic fashion model poses back-to-back.",
+    "categoryAr": "Social Media",
+    "promptAr": "مين أكتر واحد فينا take 47 selfies, post none of them, and then complain about their lighting?؟",
+    "penaltyDareAr": "عقاب الجولة: Strike 3 dramatic fashion model poses back-to-back."
   },
   {
     "id": "mlt_75",
     "category": "Mystery & Spook",
     "prompt": "Who is most likely to believe their room is haunted just because the wind blew a curtain?",
-    "penaltyDare": "Make a spooky ghost sound into your microphone."
+    "penaltyDare": "Make a spooky ghost sound into your microphone.",
+    "categoryAr": "Mystery & Spook",
+    "promptAr": "مين أكتر واحد فينا believe their room is haunted just because the wind blew a curtain?؟",
+    "penaltyDareAr": "عقاب الجولة: Make a spooky ghost sound into your microphone."
   },
   {
     "id": "mlt_76",
     "category": "Food Craze",
     "prompt": "Who is most likely to put hot sauce on cereal just to see what happens?",
-    "penaltyDare": "Pretend you just took a bite of the spiciest pepper in existence."
+    "penaltyDare": "Pretend you just took a bite of the spiciest pepper in existence.",
+    "categoryAr": "Food Craze",
+    "promptAr": "مين أكتر واحد فينا put hot sauce on cereal just to see what happens?؟",
+    "penaltyDareAr": "عقاب الجولة: Pretend you just took a bite of the spiciest pepper in existence."
   },
   {
     "id": "mlt_77",
     "category": "Daily Quirks",
     "prompt": "Who is most likely to start a sentence with 'No offense' right before dropping an atomic roast?",
-    "penaltyDare": "Compliment every single person in the room with an absurd compliment."
+    "penaltyDare": "Compliment every single person in the room with an absurd compliment.",
+    "categoryAr": "Daily Quirks",
+    "promptAr": "مين أكتر واحد فينا start a sentence with 'No offense' right before dropping an atomic roast?؟",
+    "penaltyDareAr": "عقاب الجولة: Compliment every single person in the room with an absurd compliment."
   },
   {
     "id": "mlt_78",
     "category": "Party Spirit",
     "prompt": "Who is most likely to disappear from a party without saying goodbye to anyone (the classic Irish exit)?",
-    "penaltyDare": "Wave dramatically in slow motion for 10 seconds."
+    "penaltyDare": "Wave dramatically in slow motion for 10 seconds.",
+    "categoryAr": "أجواء الحفلة",
+    "promptAr": "مين أكتر واحد فينا disappear from a party without saying goodbye to anyone (the classic Irish exit)?؟",
+    "penaltyDareAr": "عقاب الجولة: Wave dramatically in slow motion for 10 seconds."
   },
   {
     "id": "mlt_79",
     "category": "Travel & Wanderlust",
     "prompt": "Who is most likely to pack three full suitcases for a weekend getaway?",
-    "penaltyDare": "Act like you are struggling to lift a 200-pound bag onto an overhead bin."
+    "penaltyDare": "Act like you are struggling to lift a 200-pound bag onto an overhead bin.",
+    "categoryAr": "سفر ومغامرات",
+    "promptAr": "مين أكتر واحد فينا pack three full suitcases for a weekend getaway?؟",
+    "penaltyDareAr": "عقاب الجولة: Act like you are struggling to lift a 200-pound bag onto an overhead bin."
   },
   {
     "id": "mlt_80",
     "category": "Esports Legend",
     "prompt": "Who is most likely to say 'GG ez' after being carried to victory with 0 kills?",
-    "penaltyDare": "Shout 'LET ME COOK!' like a tournament caster."
+    "penaltyDare": "Shout 'LET ME COOK!' like a tournament caster.",
+    "categoryAr": "Esports Legend",
+    "promptAr": "مين أكتر واحد فينا say 'GG ez' after being carried to victory with 0 kills?؟",
+    "penaltyDareAr": "عقاب الجولة: Shout 'LET ME COOK!' like a tournament caster."
   }
 ]

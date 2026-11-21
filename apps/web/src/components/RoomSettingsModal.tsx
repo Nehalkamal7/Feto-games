@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { PublicRoomState, VibeMode } from '@feto-games/shared-types';
 import { sound } from '@/lib/sound';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export interface RoomSettingsModalProps {
   isOpen: boolean;
@@ -39,6 +40,9 @@ export function RoomSettingsModal({
   isHost,
   onSave
 }: RoomSettingsModalProps) {
+  const { language } = useLanguage();
+  const isArabic = language === 'ar';
+
   const [roomName, setRoomName] = useState(room.roomName || `Room ${room.code}`);
   const [maxPlayers, setMaxPlayers] = useState(room.config.maxPlayers || 15);
   const [roundTimer, setRoundTimer] = useState(room.config.roundDurationSeconds || 30);
@@ -101,13 +105,15 @@ export function RoomSettingsModal({
               </div>
               <div>
                 <h2 className="text-base font-bold text-gray-900 tracking-tight flex items-center gap-2">
-                  <span>Room Settings</span>
-                  <span className="font-mono text-xs px-2 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 font-bold">
+                  <span>{isArabic ? 'إعدادات الغرفة' : 'Room Settings'}</span>
+                  <span className="font-mono text-xs px-2 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 font-bold force-ltr">
                     {room.code}
                   </span>
                 </h2>
                 <p className="text-xs text-gray-500">
-                  {isHost ? 'Live adjustments instantly synced to all screens' : 'View match rules set by the host'}
+                  {isHost
+                    ? (isArabic ? 'التعديلات بتظهر فوراً على شاشات كل اللاعبين' : 'Live adjustments instantly synced to all screens')
+                    : (isArabic ? 'عرض قواعد الجولة المحددة من المضيف' : 'View match rules set by the host')}
                 </p>
               </div>
             </div>
@@ -128,7 +134,7 @@ export function RoomSettingsModal({
             {/* 1. Room Name */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
-                Room Name
+                {isArabic ? 'اسم الغرفة' : 'Room Name'}
               </label>
               <input
                 type="text"
@@ -136,7 +142,7 @@ export function RoomSettingsModal({
                 value={roomName}
                 onChange={(e) => setRoomName(e.target.value)}
                 maxLength={30}
-                placeholder="Friday Night Party Hub"
+                placeholder={isArabic ? 'سهرة صحاب رايقة' : 'Friday Night Party Hub'}
                 className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-blue-500 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-gray-900 outline-none transition-colors disabled:opacity-60"
               />
             </div>
@@ -145,13 +151,13 @@ export function RoomSettingsModal({
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5 flex items-center gap-1.5">
                 <Flame className="w-3.5 h-3.5 text-amber-500" />
-                <span>Vibe Mode</span>
+                <span>{isArabic ? 'مود القعدة' : 'Vibe Mode'}</span>
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { id: 'chill', label: 'Chill & Funny', icon: '😄' },
-                  { id: 'chaotic', label: 'Silly & Chaotic', icon: '⚡' },
-                  { id: 'sip_edition', label: 'Sip Edition 🥤', icon: '🥤' }
+                  { id: 'chill', label: isArabic ? 'رايق وضحك' : 'Chill & Funny', icon: '😄' },
+                  { id: 'chaotic', label: isArabic ? 'جنون وحماس' : 'Silly & Chaotic', icon: '⚡' },
+                  { id: 'sip_edition', label: isArabic ? 'رشفات 🥤' : 'Sip Edition 🥤', icon: '🥤' }
                 ].map((v) => {
                   const isSelected = vibeMode === v.id;
                   return (
@@ -163,7 +169,7 @@ export function RoomSettingsModal({
                         sound.playClick();
                         setVibeMode(v.id as VibeMode);
                       }}
-                      className={`p-2.5 rounded-xl border text-left flex flex-col justify-between transition-all min-h-[56px] ${
+                      className={`p-2.5 rounded-xl border text-left rtl:text-right flex flex-col justify-between transition-all min-h-[56px] ${
                         isSelected
                           ? 'border-blue-500 bg-blue-50 text-blue-900 ring-2 ring-blue-500/20'
                           : 'border-gray-200 bg-white text-gray-800 hover:bg-gray-50'
@@ -183,7 +189,7 @@ export function RoomSettingsModal({
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5 flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5 text-blue-600" />
-                  <span>Timer (Seconds)</span>
+                  <span>{isArabic ? 'وقت الجولة (ثواني)' : 'Timer (Seconds)'}</span>
                 </label>
                 <div className="grid grid-cols-4 gap-1">
                   {[15, 30, 45, 60].map((sec) => (
@@ -211,7 +217,7 @@ export function RoomSettingsModal({
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5 flex items-center gap-1.5">
                   <RotateCcw className="w-3.5 h-3.5 text-amber-500" />
-                  <span>Rounds per Game</span>
+                  <span>{isArabic ? 'جولات اللعبة' : 'Rounds per Game'}</span>
                 </label>
                 <div className="grid grid-cols-4 gap-1">
                   {[1, 2, 3, 5].map((r) => (
@@ -241,10 +247,10 @@ export function RoomSettingsModal({
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 flex items-center gap-1.5">
                   <Users className="w-3.5 h-3.5 text-gray-600" />
-                  <span>Player Limit (2–15)</span>
+                  <span>{isArabic ? 'أقصى عدد لاعبين (2–15)' : 'Player Limit (2–15)'}</span>
                 </label>
                 <span className="font-mono text-xs text-blue-600 font-bold">
-                  {maxPlayers} Players Max
+                  {maxPlayers} {isArabic ? 'لاعب كحد أقصى' : 'Players Max'}
                 </span>
               </div>
               <div className="grid grid-cols-5 gap-1.5">
@@ -280,12 +286,14 @@ export function RoomSettingsModal({
                   )}
                   <div>
                     <div className="text-xs font-semibold text-gray-900">
-                      {isPrivate ? 'Private Room (PIN / Direct Link Only)' : 'Public Room (Visible in Directory)'}
+                      {isPrivate
+                        ? (isArabic ? 'غرفة خاصة (برمز PIN أو رابط فقط)' : 'Private Room (PIN / Direct Link Only)')
+                        : (isArabic ? 'غرفة عامة (ظاهرة في الدليل العام)' : 'Public Room (Visible in Directory)')}
                     </div>
                     <div className="text-[11px] text-gray-500 font-normal">
                       {isPrivate
-                        ? 'Players require 4-digit PIN to enter'
-                        : 'Open to quick matching players'}
+                        ? (isArabic ? 'يحتاج اللاعبون رمز PIN للدخول' : 'Players require 4-digit PIN to enter')
+                        : (isArabic ? 'مفتوحة للجميع عبر اللعب السريع' : 'Open to quick matching players')}
                     </div>
                   </div>
                 </div>
@@ -303,7 +311,9 @@ export function RoomSettingsModal({
                         : 'bg-blue-50 text-blue-800 border-blue-200'
                     }`}
                   >
-                    {isPrivate ? 'Make Public' : 'Make Private'}
+                    {isPrivate
+                      ? (isArabic ? 'اجعلها عامة' : 'Make Public')
+                      : (isArabic ? 'اجعلها خاصة' : 'Make Private')}
                   </button>
                 )}
               </div>
@@ -311,14 +321,14 @@ export function RoomSettingsModal({
               {isPrivate && isHost && (
                 <div className="pt-2 border-t border-gray-200">
                   <label className="block text-xs font-medium text-gray-600 mb-1">
-                    Optional 4-Digit Entry PIN
+                    {isArabic ? 'رمز PIN اختياري (أرقام فقط)' : 'Optional 4-Digit Entry PIN'}
                   </label>
                   <input
                     type="text"
                     maxLength={6}
                     value={pin}
                     onChange={(e) => setPin(e.target.value.replace(/[^0-9]/g, ''))}
-                    placeholder="Leave empty for no PIN"
+                    placeholder={isArabic ? 'اتركه فارغاً للدخول المباشر' : 'Leave empty for no PIN'}
                     className="w-full bg-white border border-gray-200 focus:border-blue-500 rounded-xl px-3 py-1.5 text-xs font-mono font-bold text-gray-900 outline-none"
                   />
                 </div>
@@ -336,7 +346,7 @@ export function RoomSettingsModal({
                   }}
                   className="px-4 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs font-semibold transition-all"
                 >
-                  Cancel
+                  {isArabic ? 'إلغاء' : 'Cancel'}
                 </button>
                 <button
                   type="submit"
@@ -344,11 +354,11 @@ export function RoomSettingsModal({
                   className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-all disabled:opacity-50"
                 >
                   {isSaving ? (
-                    <span>Saving...</span>
+                    <span>{isArabic ? 'جاري الحفظ...' : 'Saving...'}</span>
                   ) : (
                     <>
                       <Check className="w-4 h-4" />
-                      <span>Save & Sync</span>
+                      <span>{isArabic ? 'حفظ وتطبيق' : 'Save & Sync'}</span>
                     </>
                   )}
                 </button>
@@ -356,7 +366,7 @@ export function RoomSettingsModal({
             ) : (
               <div className="text-center py-1">
                 <p className="text-xs text-gray-400 italic font-medium">
-                  Only the room host can modify these settings.
+                  {isArabic ? 'المضيف فقط هو من يستطيع تعديل هذه الإعدادات.' : 'Only the room host can modify these settings.'}
                 </p>
               </div>
             )}

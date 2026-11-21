@@ -1,0 +1,562 @@
+[
+  {
+    "id": "hp_01",
+    "category": "Things you find in a messy gamer's bedroom",
+    "goofyConsequence": "Recite an apology to your laundry pile with deep sincerity!",
+    "categoryAr": "حاجات تلاقيها في أوضة واحد جيمر مش متروقة",
+    "goofyConsequenceAr": "اعتذر لكومة الهدوم المرمية على الكرسي باعتذار درامي مؤثر!"
+  },
+  {
+    "id": "hp_02",
+    "category": "Excuses for being 2 hours late to a party",
+    "goofyConsequence": "Do 5 frantic star jumps while yelling 'I am fashionably late!'",
+    "categoryAr": "أعذار للتأخير ساعتين عن الخروجة أو الميعاد",
+    "goofyConsequenceAr": "اعمل 5 قفزات فراشة وأنت بتصرخ: أنا جاي على سنجة عشرة!"
+  },
+  {
+    "id": "hp_03",
+    "category": "Terrible names for a pet goldfish",
+    "goofyConsequence": "Take 2 sips of your drink and puff your cheeks like a fish for 8 seconds!",
+    "categoryAr": "أسماء كارثية ومضحكة لسمكة زينة في البيت",
+    "goofyConsequenceAr": "خد بقين من مشروبك وانفخ خدودك زي السمكة لمدة 8 ثواني!"
+  },
+  {
+    "id": "hp_04",
+    "category": "Red flags on a dating profile",
+    "goofyConsequence": "Deliver a cheesy 1980s pickup line directly to the camera!",
+    "categoryAr": "حاجات ليها علاقة بـ: Red flags on a dating profile",
+    "goofyConsequenceAr": "العقاب: Deliver a cheesy 1980s pickup line directly to the camera!"
+  },
+  {
+    "id": "hp_05",
+    "category": "Things you shouldn't say in a job interview",
+    "goofyConsequence": "Plead for your imaginary job with dramatic hand clasping!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you shouldn't say in a job interview",
+    "goofyConsequenceAr": "العقاب: Plead for your imaginary job with dramatic hand clasping!"
+  },
+  {
+    "id": "hp_06",
+    "category": "Foods that smell terrible but taste amazing",
+    "goofyConsequence": "Pinch your nose and speak in a funny voice until the next round!",
+    "categoryAr": "حاجات ليها علاقة بـ: Foods that smell terrible but taste amazing",
+    "goofyConsequenceAr": "العقاب: Pinch your nose and speak in a funny voice until the next round!"
+  },
+  {
+    "id": "hp_07",
+    "category": "Things people pretend to understand but don't",
+    "goofyConsequence": "Nod vigorously and pretend you understand quantum physics!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things people pretend to understand but don't",
+    "goofyConsequenceAr": "العقاب: Nod vigorously and pretend you understand quantum physics!"
+  },
+  {
+    "id": "hp_08",
+    "category": "Reasons to call in sick to work on a Monday",
+    "goofyConsequence": "Fake 3 violent coughs into your elbow like a dramatic soap opera patient!",
+    "categoryAr": "حاجات ليها علاقة بـ: Reasons to call in sick to work on a Monday",
+    "goofyConsequenceAr": "العقاب: Fake 3 violent coughs into your elbow like a dramatic soap opera patient!"
+  },
+  {
+    "id": "hp_09",
+    "category": "Things you find in the glove compartment of a car",
+    "goofyConsequence": "Honk like an angry taxi driver 4 times!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you find in the glove compartment of a car",
+    "goofyConsequenceAr": "العقاب: Honk like an angry taxi driver 4 times!"
+  },
+  {
+    "id": "hp_10",
+    "category": "Awkward places to run into your ex",
+    "goofyConsequence": "Act like you are hiding behind an imaginary lamppost!",
+    "categoryAr": "حاجات ليها علاقة بـ: Awkward places to run into your ex",
+    "goofyConsequenceAr": "العقاب: Act like you are hiding behind an imaginary lamppost!"
+  },
+  {
+    "id": "hp_11",
+    "category": "Things you shouldn't shout in an airport",
+    "goofyConsequence": "Whisper your deepest secret at low volume!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you shouldn't shout in an airport",
+    "goofyConsequenceAr": "العقاب: Whisper your deepest secret at low volume!"
+  },
+  {
+    "id": "hp_12",
+    "category": "Terrible pizza toppings that should be illegal",
+    "goofyConsequence": "Gag dramatically at the thought of warm pineapple!",
+    "categoryAr": "حاجات ليها علاقة بـ: Terrible pizza toppings that should be illegal",
+    "goofyConsequenceAr": "العقاب: Gag dramatically at the thought of warm pineapple!"
+  },
+  {
+    "id": "hp_13",
+    "category": "Superpowers that sound cool but are actually useless",
+    "goofyConsequence": "Strike your best superhero pose and freeze for 10 seconds!",
+    "categoryAr": "حاجات ليها علاقة بـ: Superpowers that sound cool but are actually useless",
+    "goofyConsequenceAr": "العقاب: Strike your best superhero pose and freeze for 10 seconds!"
+  },
+  {
+    "id": "hp_14",
+    "category": "Things people lie about on first dates",
+    "goofyConsequence": "Confess the most ridiculous white lie you told this year!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things people lie about on first dates",
+    "goofyConsequenceAr": "العقاب: Confess the most ridiculous white lie you told this year!"
+  },
+  {
+    "id": "hp_15",
+    "category": "Things you only do when completely alone at home",
+    "goofyConsequence": "Do a 5-second victory strut in your room!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you only do when completely alone at home",
+    "goofyConsequenceAr": "العقاب: Do a 5-second victory strut in your room!"
+  },
+  {
+    "id": "hp_16",
+    "category": "Items you pack for vacation and never touch",
+    "goofyConsequence": "Take a sip! 🥤",
+    "categoryAr": "حاجات ليها علاقة بـ: Items you pack for vacation and never touch",
+    "goofyConsequenceAr": "العقاب: Take a sip! 🥤"
+  },
+  {
+    "id": "hp_17",
+    "category": "Things that instantly ruin your morning mood",
+    "goofyConsequence": "Let out a long, theatrical Monday-morning groan!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things that instantly ruin your morning mood",
+    "goofyConsequenceAr": "العقاب: Let out a long, theatrical Monday-morning groan!"
+  },
+  {
+    "id": "hp_18",
+    "category": "Names you would never give to your child",
+    "goofyConsequence": "Name the player to your right with a goofy medieval title!",
+    "categoryAr": "حاجات ليها علاقة بـ: Names you would never give to your child",
+    "goofyConsequenceAr": "العقاب: Name the player to your right with a goofy medieval title!"
+  },
+  {
+    "id": "hp_19",
+    "category": "Things you shouldn't say at a wedding",
+    "goofyConsequence": "Raise an imaginary glass and propose a disastrous toast!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you shouldn't say at a wedding",
+    "goofyConsequenceAr": "العقاب: Raise an imaginary glass and propose a disastrous toast!"
+  },
+  {
+    "id": "hp_20",
+    "category": "Things that cost way too much money for what they are",
+    "goofyConsequence": "Complain about inflation like an 80-year-old grandfather!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things that cost way too much money for what they are",
+    "goofyConsequenceAr": "العقاب: Complain about inflation like an 80-year-old grandfather!"
+  },
+  {
+    "id": "hp_21",
+    "category": "Reasons your Wi-Fi suddenly stopped working",
+    "goofyConsequence": "Make robotic buffering sounds for 8 seconds!",
+    "categoryAr": "حاجات ليها علاقة بـ: Reasons your Wi-Fi suddenly stopped working",
+    "goofyConsequenceAr": "العقاب: Make robotic buffering sounds for 8 seconds!"
+  },
+  {
+    "id": "hp_22",
+    "category": "Items that always get lost in the sofa cushions",
+    "goofyConsequence": "Dig into your pocket and present the first item you touch!",
+    "categoryAr": "حاجات ليها علاقة بـ: Items that always get lost in the sofa cushions",
+    "goofyConsequenceAr": "العقاب: Dig into your pocket and present the first item you touch!"
+  },
+  {
+    "id": "hp_23",
+    "category": "Things you wouldn't want to find in your hotel room",
+    "goofyConsequence": "Inspect your keyboard with disgust like an undercover health inspector!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you wouldn't want to find in your hotel room",
+    "goofyConsequenceAr": "العقاب: Inspect your keyboard with disgust like an undercover health inspector!"
+  },
+  {
+    "id": "hp_24",
+    "category": "Words people mispronounce constantly",
+    "goofyConsequence": "Pronounce 'Worcestershire sauce' 3 times fast!",
+    "categoryAr": "حاجات ليها علاقة بـ: Words people mispronounce constantly",
+    "goofyConsequenceAr": "العقاب: Pronounce 'Worcestershire sauce' 3 times fast!"
+  },
+  {
+    "id": "hp_25",
+    "category": "Bad advice to give someone learning to drive",
+    "goofyConsequence": "Make screeching tire braking noises with panic hands!",
+    "categoryAr": "حاجات ليها علاقة بـ: Bad advice to give someone learning to drive",
+    "goofyConsequenceAr": "العقاب: Make screeching tire braking noises with panic hands!"
+  },
+  {
+    "id": "hp_26",
+    "category": "Things you can say about a car, but not your partner",
+    "goofyConsequence": "Give your drink 2 friendly sips! 🥤",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you can say about a car, but not your partner",
+    "goofyConsequenceAr": "العقاب: Give your drink 2 friendly sips! 🥤"
+  },
+  {
+    "id": "hp_27",
+    "category": "Hobbies that scream 'I have too much free time'",
+    "goofyConsequence": "Pretend you are carefully painting a grain of rice!",
+    "categoryAr": "حاجات ليها علاقة بـ: Hobbies that scream 'I have too much free time'",
+    "goofyConsequenceAr": "العقاب: Pretend you are carefully painting a grain of rice!"
+  },
+  {
+    "id": "hp_28",
+    "category": "Things you shouldn't Google at 3 AM",
+    "goofyConsequence": "Cover your eyes in horror for 6 seconds!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you shouldn't Google at 3 AM",
+    "goofyConsequenceAr": "العقاب: Cover your eyes in horror for 6 seconds!"
+  },
+  {
+    "id": "hp_29",
+    "category": "Terrible gifts to receive on your birthday",
+    "goofyConsequence": "Force a fake enthusiastic 'Thank you so much!' smile!",
+    "categoryAr": "حاجات ليها علاقة بـ: Terrible gifts to receive on your birthday",
+    "goofyConsequenceAr": "العقاب: Force a fake enthusiastic 'Thank you so much!' smile!"
+  },
+  {
+    "id": "hp_30",
+    "category": "Things you find inside a refrigerator that expired months ago",
+    "goofyConsequence": "Waft imaginary spoiled milk smells away with your hand!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you find inside a refrigerator that expired months ago",
+    "goofyConsequenceAr": "العقاب: Waft imaginary spoiled milk smells away with your hand!"
+  },
+  {
+    "id": "hp_31",
+    "category": "Reasons a first date ended after 15 minutes",
+    "goofyConsequence": "Check your invisible watch and shout 'Oh no, my curfew!'",
+    "categoryAr": "حاجات ليها علاقة بـ: Reasons a first date ended after 15 minutes",
+    "goofyConsequenceAr": "العقاب: Check your invisible watch and shout 'Oh no, my curfew!'"
+  },
+  {
+    "id": "hp_32",
+    "category": "Things you shouldn't bring to a camping trip",
+    "goofyConsequence": "Swat imaginary mosquitoes around your ears for 10 seconds!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you shouldn't bring to a camping trip",
+    "goofyConsequenceAr": "العقاب: Swat imaginary mosquitoes around your ears for 10 seconds!"
+  },
+  {
+    "id": "hp_33",
+    "category": "Jobs that a golden retriever could probably do",
+    "goofyConsequence": "Pant and give your screen a friendly high-five paw!",
+    "categoryAr": "حاجات ليها علاقة بـ: Jobs that a golden retriever could probably do",
+    "goofyConsequenceAr": "العقاب: Pant and give your screen a friendly high-five paw!"
+  },
+  {
+    "id": "hp_34",
+    "category": "Things you shouldn't say to a police officer who pulled you over",
+    "goofyConsequence": "Put your hands up and say 'I swear the speed limit was optional!'",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you shouldn't say to a police officer who pulled you over",
+    "goofyConsequenceAr": "العقاب: Put your hands up and say 'I swear the speed limit was optional!'"
+  },
+  {
+    "id": "hp_35",
+    "category": "Weird places to fall asleep by accident",
+    "goofyConsequence": "Snore loudly for 5 seconds and wake up startled!",
+    "categoryAr": "حاجات ليها علاقة بـ: Weird places to fall asleep by accident",
+    "goofyConsequenceAr": "العقاب: Snore loudly for 5 seconds and wake up startled!"
+  },
+  {
+    "id": "hp_36",
+    "category": "Things you find in a magician's basement",
+    "goofyConsequence": "Pull an invisible rabbit out of your shirt with a flourish!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you find in a magician's basement",
+    "goofyConsequenceAr": "العقاب: Pull an invisible rabbit out of your shirt with a flourish!"
+  },
+  {
+    "id": "hp_37",
+    "category": "Things you shouldn't say to your barber while getting a haircut",
+    "goofyConsequence": "Touch your hair and sigh with existential disappointment!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you shouldn't say to your barber while getting a haircut",
+    "goofyConsequenceAr": "العقاب: Touch your hair and sigh with existential disappointment!"
+  },
+  {
+    "id": "hp_38",
+    "category": "Things people buy during an existential midlife crisis",
+    "goofyConsequence": "Rev an imaginary sports car engine with your mouth!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things people buy during an existential midlife crisis",
+    "goofyConsequenceAr": "العقاب: Rev an imaginary sports car engine with your mouth!"
+  },
+  {
+    "id": "hp_39",
+    "category": "Things you can say at Thanksgiving dinner and during an esports match",
+    "goofyConsequence": "Shout 'LET HIM COOK!' with full esports hype!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you can say at Thanksgiving dinner and during an esports match",
+    "goofyConsequenceAr": "العقاب: Shout 'LET HIM COOK!' with full esports hype!"
+  },
+  {
+    "id": "hp_40",
+    "category": "Terrible slogans for an airline company",
+    "goofyConsequence": "Do the airline emergency oxygen mask tutorial demonstration!",
+    "categoryAr": "حاجات ليها علاقة بـ: Terrible slogans for an airline company",
+    "goofyConsequenceAr": "العقاب: Do the airline emergency oxygen mask tutorial demonstration!"
+  },
+  {
+    "id": "hp_41",
+    "category": "Things that happen in every single horror movie",
+    "goofyConsequence": "Say 'Hello? Is anyone there?' into the darkness!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things that happen in every single horror movie",
+    "goofyConsequenceAr": "العقاب: Say 'Hello? Is anyone there?' into the darkness!"
+  },
+  {
+    "id": "hp_42",
+    "category": "Things people brag about that nobody actually cares about",
+    "goofyConsequence": "Flex an imaginary gold watch and brag about your crypto wallet!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things people brag about that nobody actually cares about",
+    "goofyConsequenceAr": "العقاب: Flex an imaginary gold watch and brag about your crypto wallet!"
+  },
+  {
+    "id": "hp_43",
+    "category": "Things you shouldn't do in an elevator full of strangers",
+    "goofyConsequence": "Stare directly into the camera with wide unblinking eyes!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you shouldn't do in an elevator full of strangers",
+    "goofyConsequenceAr": "العقاب: Stare directly into the camera with wide unblinking eyes!"
+  },
+  {
+    "id": "hp_44",
+    "category": "Reasons you lost a 1v1 in a video game",
+    "goofyConsequence": "Blame your mouse, your chair, and your neighbor's microwave!",
+    "categoryAr": "حاجات ليها علاقة بـ: Reasons you lost a 1v1 in a video game",
+    "goofyConsequenceAr": "العقاب: Blame your mouse, your chair, and your neighbor's microwave!"
+  },
+  {
+    "id": "hp_45",
+    "category": "Things that smell surprisingly good",
+    "goofyConsequence": "Take a deep dramatic sniff of the air and sigh in satisfaction!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things that smell surprisingly good",
+    "goofyConsequenceAr": "العقاب: Take a deep dramatic sniff of the air and sigh in satisfaction!"
+  },
+  {
+    "id": "hp_46",
+    "category": "Things you shouldn't say during a massage",
+    "goofyConsequence": "Make a goofy relaxed groan of relief!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you shouldn't say during a massage",
+    "goofyConsequenceAr": "العقاب: Make a goofy relaxed groan of relief!"
+  },
+  {
+    "id": "hp_47",
+    "category": "Things you find in a wizard's pocket",
+    "goofyConsequence": "Cast an imaginary spell on the lobby with wand motions!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you find in a wizard's pocket",
+    "goofyConsequenceAr": "العقاب: Cast an imaginary spell on the lobby with wand motions!"
+  },
+  {
+    "id": "hp_48",
+    "category": "Things that make people instantly look uncool",
+    "goofyConsequence": "Trip over your own feet while walking in place!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things that make people instantly look uncool",
+    "goofyConsequenceAr": "العقاب: Trip over your own feet while walking in place!"
+  },
+  {
+    "id": "hp_49",
+    "category": "Reasons you stayed up until 5 AM on a school/work night",
+    "goofyConsequence": "Take 2 sips! 🥤",
+    "categoryAr": "حاجات ليها علاقة بـ: Reasons you stayed up until 5 AM on a school/work night",
+    "goofyConsequenceAr": "العقاب: Take 2 sips! 🥤"
+  },
+  {
+    "id": "hp_50",
+    "category": "Things you shouldn't say when meeting someone's newborn baby",
+    "goofyConsequence": "Tilt your head and make funny baby cooing sounds!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you shouldn't say when meeting someone's newborn baby",
+    "goofyConsequenceAr": "العقاب: Tilt your head and make funny baby cooing sounds!"
+  },
+  {
+    "id": "hp_51",
+    "category": "Things you wouldn't want falling out of your backpack in class",
+    "goofyConsequence": "Scramble frantically on your desk picking up imaginary secrets!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you wouldn't want falling out of your backpack in class",
+    "goofyConsequenceAr": "العقاب: Scramble frantically on your desk picking up imaginary secrets!"
+  },
+  {
+    "id": "hp_52",
+    "category": "Things people do to look busy when the boss walks past",
+    "goofyConsequence": "Type aggressively on your keyboard while frowning with immense focus!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things people do to look busy when the boss walks past",
+    "goofyConsequenceAr": "العقاب: Type aggressively on your keyboard while frowning with immense focus!"
+  },
+  {
+    "id": "hp_53",
+    "category": "Things you can say to your dog but not your significant other",
+    "goofyConsequence": "Whistle and say 'Who's a good boy?!'",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you can say to your dog but not your significant other",
+    "goofyConsequenceAr": "العقاب: Whistle and say 'Who's a good boy?!'"
+  },
+  {
+    "id": "hp_54",
+    "category": "Things that cause family feuds during Monopoly",
+    "goofyConsequence": "Flip an imaginary board and storm away for 3 seconds!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things that cause family feuds during Monopoly",
+    "goofyConsequenceAr": "العقاب: Flip an imaginary board and storm away for 3 seconds!"
+  },
+  {
+    "id": "hp_55",
+    "category": "Things you find in a pirate's treasure chest",
+    "goofyConsequence": "Laugh like a greedy buccaneer: 'YOHOHO AND A BOTTLE OF SODA!'",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you find in a pirate's treasure chest",
+    "goofyConsequenceAr": "العقاب: Laugh like a greedy buccaneer: 'YOHOHO AND A BOTTLE OF SODA!'"
+  },
+  {
+    "id": "hp_56",
+    "category": "Things you shouldn't wear to a formal funeral",
+    "goofyConsequence": "Adjust an imaginary neon tie and apologize!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you shouldn't wear to a formal funeral",
+    "goofyConsequenceAr": "العقاب: Adjust an imaginary neon tie and apologize!"
+  },
+  {
+    "id": "hp_57",
+    "category": "Reasons an alien would choose NOT to invade Earth",
+    "goofyConsequence": "Facepalm and shake your head at humanity!",
+    "categoryAr": "حاجات ليها علاقة بـ: Reasons an alien would choose NOT to invade Earth",
+    "goofyConsequenceAr": "العقاب: Facepalm and shake your head at humanity!"
+  },
+  {
+    "id": "hp_58",
+    "category": "Things people say when trying to sound smart",
+    "goofyConsequence": "Push imaginary glasses up your nose and say 'Technically speaking...'",
+    "categoryAr": "حاجات ليها علاقة بـ: Things people say when trying to sound smart",
+    "goofyConsequenceAr": "العقاب: Push imaginary glasses up your nose and say 'Technically speaking...'"
+  },
+  {
+    "id": "hp_59",
+    "category": "Things you find in a haunted attic",
+    "goofyConsequence": "Creak like a rusty door hinge with your voice!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you find in a haunted attic",
+    "goofyConsequenceAr": "العقاب: Creak like a rusty door hinge with your voice!"
+  },
+  {
+    "id": "hp_60",
+    "category": "Things you shouldn't text your mother",
+    "goofyConsequence": "Say 'I love you mom' with sincere terror!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you shouldn't text your mother",
+    "goofyConsequenceAr": "العقاب: Say 'I love you mom' with sincere terror!"
+  },
+  {
+    "id": "hp_61",
+    "category": "Things you can buy at a gas station at 3 AM",
+    "goofyConsequence": "Munch an imaginary dried beef stick noisily!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you can buy at a gas station at 3 AM",
+    "goofyConsequenceAr": "العقاب: Munch an imaginary dried beef stick noisily!"
+  },
+  {
+    "id": "hp_62",
+    "category": "Reasons someone became a supervillain",
+    "goofyConsequence": "Do an evil maniacal laugh that echoes in your room!",
+    "categoryAr": "حاجات ليها علاقة بـ: Reasons someone became a supervillain",
+    "goofyConsequenceAr": "العقاب: Do an evil maniacal laugh that echoes in your room!"
+  },
+  {
+    "id": "hp_63",
+    "category": "Things you shouldn't do during a silent yoga class",
+    "goofyConsequence": "Exhale the loudest sigh of relief possible!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you shouldn't do during a silent yoga class",
+    "goofyConsequenceAr": "العقاب: Exhale the loudest sigh of relief possible!"
+  },
+  {
+    "id": "hp_64",
+    "category": "Things that happen when you microwave metal",
+    "goofyConsequence": "Zap and crackle like lightning for 6 seconds!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things that happen when you microwave metal",
+    "goofyConsequenceAr": "العقاب: Zap and crackle like lightning for 6 seconds!"
+  },
+  {
+    "id": "hp_65",
+    "category": "Things you shouldn't say right before this bomb explodes",
+    "goofyConsequence": "Hold your head in your hands and scream 'THE BOOOOMB!'",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you shouldn't say right before this bomb explodes",
+    "goofyConsequenceAr": "العقاب: Hold your head in your hands and scream 'THE BOOOOMB!'"
+  },
+  {
+    "id": "hp_66",
+    "category": "Excuses for being 2 hours late to your own birthday party",
+    "goofyConsequence": "Sing Happy Birthday to yourself in an apologetic whisper!",
+    "categoryAr": "حاجات ليها علاقة بـ: Excuses for being 2 hours late to your own birthday party",
+    "goofyConsequenceAr": "العقاب: Sing Happy Birthday to yourself in an apologetic whisper!"
+  },
+  {
+    "id": "hp_67",
+    "category": "Things found under a teenager's bed",
+    "goofyConsequence": "Shiver in horror as if seeing a monster under your bed!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things found under a teenager's bed",
+    "goofyConsequenceAr": "العقاب: Shiver in horror as if seeing a monster under your bed!"
+  },
+  {
+    "id": "hp_68",
+    "category": "Famous superhero catchphrases or powers",
+    "goofyConsequence": "Pose like Superman flying into a brick wall!",
+    "categoryAr": "حاجات ليها علاقة بـ: Famous superhero catchphrases or powers",
+    "goofyConsequenceAr": "العقاب: Pose like Superman flying into a brick wall!"
+  },
+  {
+    "id": "hp_69",
+    "category": "Things you find inside a chaotic handbag or backpack",
+    "goofyConsequence": "Dig frantically inside your pockets like you lost your wallet!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you find inside a chaotic handbag or backpack",
+    "goofyConsequenceAr": "العقاب: Dig frantically inside your pockets like you lost your wallet!"
+  },
+  {
+    "id": "hp_70",
+    "category": "Breakfast cereals with cartoon mascots",
+    "goofyConsequence": "Roar like Tony the Tiger saying 'THEY'RE GRRREAT!'",
+    "categoryAr": "حاجات ليها علاقة بـ: Breakfast cereals with cartoon mascots",
+    "goofyConsequenceAr": "العقاب: Roar like Tony the Tiger saying 'THEY'RE GRRREAT!'"
+  },
+  {
+    "id": "hp_71",
+    "category": "Things people yell when they stub their little toe",
+    "goofyConsequence": "Hop on one foot while clutching your toe in silent agony!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things people yell when they stub their little toe",
+    "goofyConsequenceAr": "العقاب: Hop on one foot while clutching your toe in silent agony!"
+  },
+  {
+    "id": "hp_72",
+    "category": "Fast-food chain menu items you order after midnight",
+    "goofyConsequence": "Pretend you are placing an order at a loud drive-thru speaker!",
+    "categoryAr": "حاجات ليها علاقة بـ: Fast-food chain menu items you order after midnight",
+    "goofyConsequenceAr": "العقاب: Pretend you are placing an order at a loud drive-thru speaker!"
+  },
+  {
+    "id": "hp_73",
+    "category": "Unusual pets you shouldn't keep in an apartment",
+    "goofyConsequence": "Make the sound of an upset llama into your microphone!",
+    "categoryAr": "حاجات ليها علاقة بـ: Unusual pets you shouldn't keep in an apartment",
+    "goofyConsequenceAr": "العقاب: Make the sound of an upset llama into your microphone!"
+  },
+  {
+    "id": "hp_74",
+    "category": "Things you shouldn't bring on a first date",
+    "goofyConsequence": "Look at the camera and say 'So... do you believe in aliens?'",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you shouldn't bring on a first date",
+    "goofyConsequenceAr": "العقاب: Look at the camera and say 'So... do you believe in aliens?'"
+  },
+  {
+    "id": "hp_75",
+    "category": "Words gamers scream when their ping reaches 999ms",
+    "goofyConsequence": "Freeze in place for 5 seconds pretending to lag intensely!",
+    "categoryAr": "حاجات ليها علاقة بـ: Words gamers scream when their ping reaches 999ms",
+    "goofyConsequenceAr": "العقاب: Freeze in place for 5 seconds pretending to lag intensely!"
+  },
+  {
+    "id": "hp_76",
+    "category": "Ice cream flavors you would never want to eat",
+    "goofyConsequence": "Gag melodramatically like you just licked dirty gym socks!",
+    "categoryAr": "حاجات ليها علاقة بـ: Ice cream flavors you would never want to eat",
+    "goofyConsequenceAr": "العقاب: Gag melodramatically like you just licked dirty gym socks!"
+  },
+  {
+    "id": "hp_77",
+    "category": "Things found inside an abandoned spaceship",
+    "goofyConsequence": "Whisper: 'Houston, we have an explosive problem!' into the mic!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things found inside an abandoned spaceship",
+    "goofyConsequenceAr": "العقاب: Whisper: 'Houston, we have an explosive problem!' into the mic!"
+  },
+  {
+    "id": "hp_78",
+    "category": "Excuses used to avoid going to the gym",
+    "goofyConsequence": "Do 3 half-hearted jumping jacks while complaining loudly!",
+    "categoryAr": "حاجات ليها علاقة بـ: Excuses used to avoid going to the gym",
+    "goofyConsequenceAr": "العقاب: Do 3 half-hearted jumping jacks while complaining loudly!"
+  },
+  {
+    "id": "hp_79",
+    "category": "Things that make a car look instantly suspicious",
+    "goofyConsequence": "Make a squealing tire peeling-out noise!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things that make a car look instantly suspicious",
+    "goofyConsequenceAr": "العقاب: Make a squealing tire peeling-out noise!"
+  },
+  {
+    "id": "hp_80",
+    "category": "Things you wouldn't want to hear from your pilot over the speaker",
+    "goofyConsequence": "Salute the room with dignity like a captain going down with the ship!",
+    "categoryAr": "حاجات ليها علاقة بـ: Things you wouldn't want to hear from your pilot over the speaker",
+    "goofyConsequenceAr": "العقاب: Salute the room with dignity like a captain going down with the ship!"
+  }
+]

@@ -6,6 +6,7 @@ import { GameMode } from '@feto-games/shared-types';
 import { ArrowRight, HelpCircle } from 'lucide-react';
 import { GameIcon } from './GameIcon';
 import { sound } from '@/lib/sound';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface PopularGamesGridProps {
   onSelectGame: (gameMode: GameMode) => void;
@@ -15,20 +16,30 @@ interface PopularGamesGridProps {
 interface GameCardMeta {
   id: GameMode;
   title: string;
+  titleAr: string;
   category: string;
+  categoryAr: string;
   players: string;
+  playersAr: string;
   tagline: string;
+  taglineAr: string;
   renderArtwork: () => React.ReactNode;
 }
 
 export function PopularGamesGrid({ onSelectGame, onOpenRules }: PopularGamesGridProps) {
+  const { isArabic } = useLanguage();
+
   const games: GameCardMeta[] = [
     {
       id: 'who_is_imposter',
       title: 'Who Is Imposter?',
+      titleAr: 'مين الجاسوس؟',
       category: 'Social Deduction',
+      categoryAr: 'ألعاب الشك',
       players: '3-15 Players',
+      playersAr: '3-15 لاعب',
       tagline: 'Bluff, share subtle clues, and identify the hidden imposter!',
+      taglineAr: 'اكتشف الجاسوس المتخفي واكشف كلمته السرية قبل ما يفوز!',
       renderArtwork: () => (
         <div className="relative w-full h-28 flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-b from-red-50 to-orange-50/40">
           <svg viewBox="0 0 120 120" className="w-20 h-20">
@@ -52,9 +63,13 @@ export function PopularGamesGrid({ onSelectGame, onOpenRules }: PopularGamesGrid
     {
       id: 'draw_and_guess',
       title: 'Draw & Guess',
+      titleAr: 'ارسم وخمّن',
       category: 'Drawing & Trivia',
+      categoryAr: 'رسم وتخمين',
       players: '2-15 Players',
+      playersAr: '2-15 لاعب',
       tagline: 'Take turns drawing in real-time while players race to guess.',
+      taglineAr: 'ارسم الكلمة السرية في الوقت الفعلي والكل بيتسابق يخمن صح!',
       renderArtwork: () => (
         <div className="relative w-full h-28 flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-b from-blue-50 to-indigo-50/40">
           <svg viewBox="0 0 120 120" className="w-20 h-20">
@@ -72,9 +87,13 @@ export function PopularGamesGrid({ onSelectGame, onOpenRules }: PopularGamesGrid
     {
       id: 'quiz_battle',
       title: 'Quiz Battle',
+      titleAr: 'تحدي المعلومات',
       category: 'Speed Trivia',
+      categoryAr: 'معلومات سريعة',
       players: '2-15 Players',
+      playersAr: '2-15 لاعب',
       tagline: '15-second lightning rounds with instant score reveals.',
+      taglineAr: 'جولات سريعة في 15 ثانية وإظهار فوري للنقاط والترتيب.',
       renderArtwork: () => (
         <div className="relative w-full h-28 flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-b from-purple-50 to-pink-50/40">
           <svg viewBox="0 0 120 120" className="w-20 h-20">
@@ -91,9 +110,13 @@ export function PopularGamesGrid({ onSelectGame, onOpenRules }: PopularGamesGrid
     {
       id: 'word_battle',
       title: 'Word Battle',
+      titleAr: 'حرب الكلمات',
       category: 'Word Race',
+      categoryAr: 'سباق كلمات',
       players: '2-15 Players',
+      playersAr: '2-15 لاعب',
       tagline: 'Claim unique words matching category and starting letter.',
+      taglineAr: 'سباق أسرع كلمات تبدأ بالحرف المطلوب وتناسب الفئة.',
       renderArtwork: () => (
         <div className="relative w-full h-28 flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-b from-amber-50 to-orange-50/40">
           <svg viewBox="0 0 120 120" className="w-20 h-20">
@@ -112,9 +135,13 @@ export function PopularGamesGrid({ onSelectGame, onOpenRules }: PopularGamesGrid
     {
       id: 'truth_or_dare',
       title: 'Truth or Dare',
+      titleAr: 'صراحة ولا جرأة',
       category: 'Party Questions',
+      categoryAr: 'بارتي وتحديات',
       players: '2-15 Players',
+      playersAr: '2-15 لاعب',
       tagline: 'Draw cards, complete dares, or skip by taking a sip.',
+      taglineAr: 'روليت اختيار وتصويت جماعي على تنفيذ الجرأة أو الصراحة!',
       renderArtwork: () => (
         <div className="relative w-full h-28 flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-b from-rose-50 to-pink-50/40">
           <svg viewBox="0 0 120 120" className="w-20 h-20">
@@ -129,9 +156,13 @@ export function PopularGamesGrid({ onSelectGame, onOpenRules }: PopularGamesGrid
     {
       id: 'never_have_i_ever',
       title: 'Never Have I Ever',
+      titleAr: 'عمري ما عملت...',
       category: 'Confessions',
+      categoryAr: 'أسرار واعترافات',
       players: '2-15 Players',
+      playersAr: '2-15 لاعب',
       tagline: 'Reveal guilty secrets and see live group confession stats.',
+      taglineAr: 'اعترافات حقيقية بدون فلاتر ونقاط براءة بتنقص مع كل فضيحة!',
       renderArtwork: () => (
         <div className="relative w-full h-28 flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-b from-emerald-50 to-teal-50/40">
           <svg viewBox="0 0 120 120" className="w-20 h-20">
@@ -151,9 +182,13 @@ export function PopularGamesGrid({ onSelectGame, onOpenRules }: PopularGamesGrid
     {
       id: 'most_likely_to',
       title: 'Most Likely To...',
+      titleAr: 'مين أكتر واحد فينا...',
       category: 'Roast & Votes',
+      categoryAr: 'تصويت وتريقة',
       players: '2-15 Players',
+      playersAr: '2-15 لاعب',
       tagline: 'Vote on friends for crazy scenarios with instant vote bars.',
+      taglineAr: 'تصويت فوري على أكتر شخص يعمل مصيبة وعقاب مضحك للأغلبية.',
       renderArtwork: () => (
         <div className="relative w-full h-28 flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-b from-amber-50 to-yellow-50/40">
           <svg viewBox="0 0 120 120" className="w-20 h-20">
@@ -169,9 +204,13 @@ export function PopularGamesGrid({ onSelectGame, onOpenRules }: PopularGamesGrid
     {
       id: 'sip_or_spill',
       title: 'Sip or Spill 🥤',
+      titleAr: 'جاوب ولا اشرب 🥤',
       category: 'Party Dilemmas',
+      categoryAr: 'اعترافات وشرب',
       players: '2-15 Players',
+      playersAr: '2-15 لاعب',
       tagline: 'Answer funny dilemmas live or take a sip to skip.',
+      taglineAr: 'جاوب على السؤال المحرج بصراحة تامة أو خد رشفة من مشروبك!',
       renderArtwork: () => (
         <div className="relative w-full h-28 flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-b from-cyan-50 to-blue-50/40">
           <svg viewBox="0 0 120 120" className="w-20 h-20">
@@ -185,9 +224,13 @@ export function PopularGamesGrid({ onSelectGame, onOpenRules }: PopularGamesGrid
     {
       id: 'silly_roulette',
       title: 'Silly Roulette',
+      titleAr: 'عجلة الجنون',
       category: 'Spin the Chaos',
+      categoryAr: 'تحديات مضحكة',
       players: '2-15 Players',
+      playersAr: '2-15 لاعب',
       tagline: 'Spin the wheel to select a random player for funny party dares.',
+      taglineAr: 'لف العجلة ونفذ التحدي الصوتي أو الحركي قدام الكل!',
       renderArtwork: () => (
         <div className="relative w-full h-28 flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-b from-indigo-50 to-purple-50/40">
           <svg viewBox="0 0 120 120" className="w-20 h-20">
@@ -203,9 +246,13 @@ export function PopularGamesGrid({ onSelectGame, onOpenRules }: PopularGamesGrid
     {
       id: 'hot_potato',
       title: 'Hot Potato',
+      titleAr: 'القنبلة الموقوتة',
       category: 'Speed Reflexes',
+      categoryAr: 'سرعة وتوتر',
       players: '2-15 Players',
+      playersAr: '2-15 لاعب',
       tagline: 'Type an answer and pass the ticking bomb before it detonates!',
+      taglineAr: 'اكتب كلمة تطابق الفئة ومرر القنبلة بسرعة قبل ما تنفجر في وشك!',
       renderArtwork: () => (
         <div className="relative w-full h-28 flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-b from-orange-50 to-red-50/40">
           <svg viewBox="0 0 120 120" className="w-20 h-20">
@@ -228,16 +275,16 @@ export function PopularGamesGrid({ onSelectGame, onOpenRules }: PopularGamesGrid
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-blue-600" />
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
-              Popular Party Games
+              {isArabic ? 'الألعاب الأكثر لعباً' : 'Popular Party Games'}
             </h2>
           </div>
           <p className="text-xs sm:text-sm text-gray-500 font-medium mt-0.5">
-            Choose a game mode to instantly create a room for up to 15 friends
+            {isArabic ? 'اختر أي لعبة لإنشاء غرفة فورية ودعوة حتى 15 من أصحابك' : 'Choose a game mode to instantly create a room for up to 15 friends'}
           </p>
         </div>
 
         <div className="text-xs font-semibold text-blue-700 px-3 py-1 rounded-full bg-blue-50 border border-blue-200">
-          10 Multiplayer Modes
+          {isArabic ? '10 ألعاب جماعية' : '10 Multiplayer Modes'}
         </div>
       </div>
 
@@ -260,10 +307,10 @@ export function PopularGamesGrid({ onSelectGame, onOpenRules }: PopularGamesGrid
               {/* TOP BADGE: PLAYER COUNT & CATEGORY */}
               <div className="flex items-center justify-between gap-1 mb-2 relative z-10">
                 <span className="text-[11px] font-semibold uppercase text-gray-500 tracking-wider truncate">
-                  {g.category}
+                  {isArabic ? g.categoryAr : g.category}
                 </span>
                 <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 flex-shrink-0">
-                  {g.players}
+                  {isArabic ? g.playersAr : g.players}
                 </span>
               </div>
 
@@ -278,11 +325,11 @@ export function PopularGamesGrid({ onSelectGame, onOpenRules }: PopularGamesGrid
                   <div className="flex items-center gap-1.5 mb-1">
                     <GameIcon gameMode={g.id} size="xs" />
                     <h3 className="font-bold text-xs sm:text-sm text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1">
-                      {g.title}
+                      {isArabic ? g.titleAr : g.title}
                     </h3>
                   </div>
                   <p className="text-[11px] text-gray-500 font-normal leading-snug line-clamp-2">
-                    {g.tagline}
+                    {isArabic ? g.taglineAr : g.tagline}
                   </p>
                 </div>
 
@@ -298,12 +345,12 @@ export function PopularGamesGrid({ onSelectGame, onOpenRules }: PopularGamesGrid
                     className="text-xs font-medium text-gray-500 hover:text-gray-900 flex items-center gap-1 py-1 px-1 transition-colors"
                   >
                     <HelpCircle className="w-3.5 h-3.5 text-blue-500" />
-                    <span>Rules</span>
+                    <span>{isArabic ? 'القواعد' : 'Rules'}</span>
                   </button>
 
                   <div className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors">
-                    <span>Play</span>
-                    <ArrowRight className="w-3 h-3 text-white" />
+                    <span>{isArabic ? 'العب' : 'Play'}</span>
+                    <ArrowRight className={`w-3 h-3 text-white ${isArabic ? 'rotate-180' : ''}`} />
                   </div>
                 </div>
               </div>

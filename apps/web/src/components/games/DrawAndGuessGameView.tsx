@@ -16,17 +16,24 @@ import {
   Trash2,
   Send,
   CheckCircle2,
-  Palette
+  Palette,
+  Clock,
+  ArrowRight
 } from 'lucide-react';
 import { sound } from '@/lib/sound';
 import { getSocket } from '@/lib/socket';
 import { useVisualViewport } from '@/hooks/useVisualViewport';
+import { useGameTimer } from '@/hooks/useGameTimer';
+
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface DrawAndGuessGameViewProps {
   gameState: DrawAndGuessPublicState;
   currentPlayer: PlayerSummary;
   players: PlayerSummary[];
   roomCode: string;
+  onAction?: (actionType: string, payload?: any) => Promise<any>;
+  isHost?: boolean;
 }
 
 const PALETTE_COLORS = [
@@ -44,10 +51,26 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
   gameState,
   currentPlayer,
   players,
-  roomCode: _roomCode
+  roomCode: _roomCode,
+  onAction,
+  isHost
 }) => {
   const socket = getSocket();
+  const { language } = useLanguage();
+  const isAr = language === 'ar';
   const { isKeyboardOpen, scaleFactor } = useVisualViewport();
+
+  const timer = useGameTimer({
+    phaseEndsAt: (gameState as any)?.phaseEndsAt,
+    roomCode: _roomCode,
+    phase: gameState.phase,
+    round: (gameState as any)?.currentRound || 1,
+    onTimeout: () => {
+      if (onAction) {
+        onAction('PHASE_TIMEOUT');
+      }
+    }
+  });
 
   // Canvas Refs & State
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -268,6 +291,9 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
   // Submit word choice (Drawer)
   const handleSelectWord = (word: string) => {
     sound.playClick();
+    if (onAction) {
+      onAction('SELECT_WORD', { word });
+    }
     socket.emit('draw:select_word', { word }, (res: any) => {
       if (res && res.success) {
         sound.playReady();
@@ -283,6 +309,9 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
     const text = chatInput.trim();
     setChatInput('');
 
+    if (onAction) {
+      onAction('GUESS_WORD', { guess: text });
+    }
     socket.emit('chat:send', { message: text });
   };
 
@@ -304,10 +333,13 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
           <NeonAvatarDisplay avatarId={gameState.currentDrawerAvatar} size="sm" showGlow={false} />
           <div>
             <div className="text-xs uppercase text-gray-500 font-semibold">
-              {isDrawer ? 'You Are Drawing!' : `${gameState.currentDrawerUsername} is Drawing`}
+              {isDrawer
+                ? (isAr ? 'أنت ترسم الآن!' : 'You Are Drawing!')
+                : (isAr ? `${gameState.currentDrawerUsername} يرسم الآن` : `${gameState.currentDrawerUsername} is Drawing`)}
             </div>
             <div className="text-xs text-blue-600 font-medium">
-              Category: {gameState.category || 'General'}
+              {isAr ? 'الفئة: ' : 'Category: '}
+              {isAr ? (gameState.categoryAr || gameState.category || 'عام') : (gameState.category || 'General')}
             </div>
           </div>
         </div>
@@ -317,16 +349,22 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
           {isDrawer || hasGuessed || gameState.phase === 'round_result' ? (
             <div>
               <span className="text-[11px] uppercase text-gray-500 font-semibold block">
-                {isDrawer ? 'Your Secret Word' : 'Secret Word'}
+                {isDrawer
+                  ? (isAr ? 'كلمتك السرية' : 'Your Secret Word')
+                  : (isAr ? 'الكلمة السرية' : 'Secret Word')}
               </span>
               <div className="text-xl sm:text-2xl font-bold text-blue-600 tracking-wide">
-                {gameState.secretWord || '???'}
+                {isAr
+                  ? (gameState.secretWordAr ? `${gameState.secretWordAr} (${gameState.secretWord})` : gameState.secretWord || '???')
+                  : (gameState.secretWord || '???')}
               </div>
             </div>
           ) : (
             <div>
               <span className="text-[11px] uppercase text-gray-500 font-semibold block">
-                Secret Word ({gameState.wordLength} Letters)
+                {isAr
+                  ? `الكلمة السرية (${gameState.wordLength} أحرف)`
+                  : `Secret Word (${gameState.wordLength} Letters)`}
               </span>
               <div className="text-xl sm:text-2xl font-bold text-gray-800 tracking-[0.25em]">
                 {gameState.wordMask || '_ _ _'}
@@ -335,16 +373,30 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
           )}
         </div>
 
-        {/* Round Solved Badge */}
+        {/* Round Solved Badge & Live Timer */}
         <div className="flex items-center gap-2">
+          {timer.remainingSeconds > 0 && gameState.phase !== 'round_result' && (
+            <div
+              className={`px-2.5 py-1 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 force-ltr ${
+                timer.isUrgent
+                  ? 'bg-rose-50 text-rose-600 border border-rose-200 animate-pulse'
+                  : 'bg-gray-100 text-gray-700'
+              }`}
+            >
+              <Clock className="w-3.5 h-3.5" />
+              <span>{timer.formatted}</span>
+            </div>
+          )}
           {hasGuessed && (
             <span className="px-2.5 py-1 bg-emerald-50 border border-emerald-200 rounded-full text-emerald-700 text-xs font-semibold flex items-center gap-1">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Guessed!</span>
+              <span>{isAr ? 'تم التخمين!' : 'Guessed!'}</span>
             </span>
           )}
           <div className="px-2.5 py-1 bg-gray-50 rounded-xl border border-gray-200 text-xs font-medium text-gray-700">
-            {gameState.correctGuessers.length} / {Math.max(1, players.length - 1)} Solved
+            {isAr
+              ? `${gameState.correctGuessers.length} / ${Math.max(1, players.length - 1)} عرفوا الكلمة`
+              : `${gameState.correctGuessers.length} / ${Math.max(1, players.length - 1)} Solved`}
           </div>
         </div>
       </div>
@@ -369,7 +421,7 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
             {/* Non-drawer Spectating Tag */}
             {!isDrawer && (
               <div className="absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-full text-xs text-gray-700 font-medium shadow-xs pointer-events-none">
-                Watching Live
+                {isAr ? 'مشاهدة مباشرة 👁️' : 'Watching Live'}
               </div>
             )}
           </div>
@@ -444,7 +496,7 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
                       ? 'bg-amber-50 border-amber-300 text-amber-800'
                       : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
                   }`}
-                  title="Eraser"
+                  title={isAr ? 'ممحاة' : 'Eraser'}
                   aria-label="Eraser"
                 >
                   <Eraser className="w-4 h-4" />
@@ -455,7 +507,7 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
                   type="button"
                   onClick={handleUndoButton}
                   className="w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center shrink-0 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition-all shadow-xs"
-                  title="Undo Stroke"
+                  title={isAr ? 'تراجع' : 'Undo Stroke'}
                   aria-label="Undo"
                 >
                   <RotateCcw className="w-4 h-4" />
@@ -466,7 +518,7 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
                   type="button"
                   onClick={handleClearButton}
                   className="w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center shrink-0 rounded-xl border border-red-200 bg-white hover:bg-red-50 text-red-600 transition-all shadow-xs"
-                  title="Clear Canvas"
+                  title={isAr ? 'مسح اللوحة' : 'Clear Canvas'}
                   aria-label="Clear Canvas"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -480,9 +532,11 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
         <div className="lg:col-span-4 bg-white rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between border border-gray-200 shadow-sm h-[320px] sm:h-[400px] lg:h-[450px]">
           <div className="flex items-center justify-between pb-2.5 border-b border-gray-100 mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-gray-600">
-              Live Guesses
+              {isAr ? 'تخمينات اللاعبين' : 'Live Guesses'}
             </span>
-            <span className="text-xs text-blue-600 font-semibold">Auto-checked</span>
+            <span className="text-xs text-blue-600 font-semibold">
+              {isAr ? 'فحص تلقائي' : 'Auto-checked'}
+            </span>
           </div>
 
           {/* Scrollable messages container */}
@@ -492,7 +546,7 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
           >
             {chatMessages.length === 0 ? (
               <div className="text-center py-10 text-gray-400">
-                <span>Start guessing the drawing!</span>
+                <span>{isAr ? 'ابدأ بتخمين الرسمة واكتب هنا!' : 'Start guessing the drawing!'}</span>
               </div>
             ) : (
               chatMessages.map((msg) => (
@@ -525,10 +579,10 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
               onChange={(e) => setChatInput(e.target.value)}
               placeholder={
                 isDrawer
-                  ? 'Chat with players...'
+                  ? (isAr ? 'دردش مع اللاعبين...' : 'Chat with players...')
                   : hasGuessed
-                  ? 'You already guessed correctly!'
-                  : 'Type your guess...'
+                  ? (isAr ? 'خمّنت الكلمة بنجاح! 🎉' : 'You already guessed correctly!')
+                  : (isAr ? 'اكتب تخمينك هنا...' : 'Type your guess...')
               }
               disabled={isDrawer || hasGuessed}
               className="flex-1 h-11 bg-gray-50 border border-gray-200 focus:bg-white focus:border-blue-500 rounded-xl px-3.5 text-gray-900 text-xs sm:text-sm outline-none transition-colors"
@@ -539,7 +593,7 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
               className="h-11 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs flex items-center justify-center transition-colors disabled:opacity-50"
               aria-label="Send guess"
             >
-              <Send className="w-4 h-4" />
+              <Send className={`w-4 h-4 ${isAr ? 'rotate-180' : ''}`} />
             </button>
           </form>
         </div>
@@ -561,27 +615,36 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
 
               <div>
                 <span className="text-xs font-semibold uppercase tracking-wider text-blue-600">
-                  Your Turn to Draw
+                  {isAr ? 'دورك في الرسم' : 'Your Turn to Draw'}
                 </span>
-                <h3 className="text-xl font-bold text-gray-900 mt-0.5">Choose a Word</h3>
+                <h3 className="text-xl font-bold text-gray-900 mt-0.5">
+                  {isAr ? 'اختر كلمة لترسمها' : 'Choose a Word'}
+                </h3>
                 <p className="text-xs text-gray-500">
-                  Pick one of the 3 words below to draw for the room:
+                  {isAr
+                    ? 'اختر واحدة من الكلمات الثلاث لترسمها لباقي اللاعبين:'
+                    : 'Pick one of the 3 words below to draw for the room:'}
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-2.5 pt-2">
-                {gameState.wordChoices.map((w, idx) => (
-                  <button
-                    key={w}
-                    onClick={() => handleSelectWord(w)}
-                    className="h-12 px-4 bg-gray-50 hover:bg-blue-50 hover:border-blue-300 border border-gray-200 rounded-xl text-gray-900 font-semibold text-base transition-all flex items-center justify-between group shadow-xs"
-                  >
-                    <span>{w}</span>
-                    <span className="text-xs text-gray-500 group-hover:text-blue-600 font-medium uppercase">
-                      {idx === 0 ? 'Easy' : idx === 1 ? 'Medium' : 'Hard'}
-                    </span>
-                  </button>
-                ))}
+                {gameState.wordChoices.map((w, idx) => {
+                  const arChoice = gameState.wordChoicesAr && gameState.wordChoicesAr[idx];
+                  return (
+                    <button
+                      key={w}
+                      onClick={() => handleSelectWord(w)}
+                      className="h-12 px-4 bg-gray-50 hover:bg-blue-50 hover:border-blue-300 border border-gray-200 rounded-xl text-gray-900 font-semibold text-base transition-all flex items-center justify-between group shadow-xs"
+                    >
+                      <span>{isAr && arChoice ? `${arChoice} (${w})` : w}</span>
+                      <span className="text-xs text-gray-500 group-hover:text-blue-600 font-medium uppercase">
+                        {isAr
+                          ? (idx === 0 ? 'سهل' : idx === 1 ? 'متوسط' : 'صعب')
+                          : (idx === 0 ? 'Easy' : idx === 1 ? 'Medium' : 'Hard')}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </motion.div>
           </div>
@@ -595,13 +658,34 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
           animate={{ opacity: 1, scale: 1 }}
           className="bg-white p-5 sm:p-6 rounded-2xl border border-gray-200 shadow-sm text-center space-y-2"
         >
-          <span className="text-xs uppercase font-semibold text-gray-500">Round Over! The Word Was:</span>
+          <span className="text-xs uppercase font-semibold text-gray-500">
+            {isAr ? 'انتهت الجولة! الكلمة كانت:' : 'Round Over! The Word Was:'}
+          </span>
           <div className="text-2xl sm:text-3xl font-bold text-blue-600">
-            {gameState.secretWord}
+            {isAr && gameState.secretWordAr ? `${gameState.secretWordAr} (${gameState.secretWord})` : gameState.secretWord}
           </div>
           <p className="text-xs text-gray-500">
-            {gameState.correctGuessers.length} players guessed correctly!
+            {isAr
+              ? `${gameState.correctGuessers.length} لاعبين خمّنوا الكلمة صح!`
+              : `${gameState.correctGuessers.length} players guessed correctly!`}
           </p>
+
+          {isHost && (
+            <button
+              onClick={() => {
+                sound.playClick();
+                if (onAction) {
+                  onAction('NEXT_ROUND', {});
+                } else {
+                  socket.emit('lobby:advance-round');
+                }
+              }}
+              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 mt-3"
+            >
+              <span>{isAr ? 'الجولة القادمة' : 'Next Round'}</span>
+              <ArrowRight className={`w-4 h-4 ${isAr ? 'rotate-180' : ''}`} />
+            </button>
+          )}
         </motion.div>
       )}
     </div>

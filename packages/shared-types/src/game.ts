@@ -75,7 +75,9 @@ export type ImposterRole = 'civilian' | 'imposter';
 export interface PrivateRolePayload {
   role: ImposterRole;
   category: string;
+  categoryAr?: string;
   secretWord?: string; // STRICTLY excluded for imposters
+  secretWordAr?: string;
   imposterCount: number;
   teammateNames?: string[]; // Names of fellow imposters if > 1
 }
@@ -101,6 +103,7 @@ export interface ImposterPublicState {
   totalRounds?: number;
   phaseEndsAt?: number;
   category: string;
+  categoryAr?: string;
   currentTurnPlayerId?: string;
   currentTurnUsername?: string;
   turnOrder: string[]; // array of playerIds
@@ -113,6 +116,7 @@ export interface ImposterPublicState {
   suddenDeathPlayerUsername?: string;
   suddenDeathEndsAt?: number;
   revealedWord?: string; // Only populated at round_result
+  revealedWordAr?: string;
   impostersWon?: boolean;
   imposterList?: { id: string; username: string; role: ImposterRole }[];
   roundScoreUpdates?: PlayerScoreUpdate[];
@@ -150,8 +154,11 @@ export interface DrawAndGuessPublicState {
   wordLength: number;
   wordMask: string; // e.g. "_ _ _ _ _"
   category: string;
+  categoryAr?: string;
   secretWord?: string; // Only sent to drawer during drawing, and everyone at round_result
+  secretWordAr?: string;
   wordChoices?: string[]; // Sent privately to drawer during word_selection
+  wordChoicesAr?: string[];
   correctGuessers: string[]; // List of playerIds who already guessed
   phaseEndsAt: number;
   roundScoreUpdates?: PlayerScoreUpdate[];
@@ -164,18 +171,24 @@ export interface DrawAndGuessPublicState {
 export interface QuizQuestionItem {
   id: string;
   question: string;
+  questionAr?: string;
   category: string;
+  categoryAr?: string;
   difficulty: 'easy' | 'medium' | 'hard';
   options: [string, string, string, string];
+  optionsAr?: [string, string, string, string];
   correctIndex: number; // Server-authoritative only
 }
 
 export interface QuizPublicQuestion {
   id: string;
   question: string;
+  questionAr?: string;
   category: string;
+  categoryAr?: string;
   difficulty: 'easy' | 'medium' | 'hard';
   options: [string, string, string, string];
+  optionsAr?: [string, string, string, string];
   phaseEndsAt: number;
   durationSeconds: number;
 }
@@ -209,7 +222,9 @@ export interface WordBattlePublicState {
   round: number;
   totalRounds: number;
   category: string;
+  categoryAr?: string;
   startingLetter: string;
+  startingLetterAr?: string;
   claimedWords: string[];
   recentSubmissions: WordBattleSubmission[];
   scores: Record<string, number>;
@@ -236,6 +251,7 @@ export interface TruthOrDareItem {
   type: 'truth' | 'dare';
   intensity: TodIntensityMode;
   prompt: string;
+  promptAr?: string;
 }
 
 export interface TruthOrDarePublicState {
@@ -248,6 +264,7 @@ export interface TruthOrDarePublicState {
   intensity: TodIntensityMode;
   chosenType?: 'truth' | 'dare';
   currentPrompt?: string;
+  currentPromptAr?: string;
   votes: Record<string, 'completed' | 'refused'>;
   voteTallies: { completed: number; refused: number };
   scores: Record<string, number>;
@@ -262,7 +279,9 @@ export interface TruthOrDarePublicState {
 export interface NeverHaveIEverItem {
   id: string;
   statement: string;
+  statementAr?: string;
   category: string;
+  categoryAr?: string;
 }
 
 export type NhiePhase = 'statement' | 'reveal' | 'round_results' | 'game_over';
@@ -272,7 +291,9 @@ export interface NeverHaveIEverPublicState {
   round: number;
   totalRounds: number;
   statement: string;
+  statementAr?: string;
   category: string;
+  categoryAr?: string;
   innocencePoints: Record<string, number>;
   roundChoices: Record<string, 'have' | 'havenot'>;
   stats?: {
@@ -294,8 +315,11 @@ export type MostLikelyToPhase = 'voting' | 'reveal' | 'penalty' | 'round_results
 export interface MostLikelyToPromptItem {
   id: string;
   prompt: string;
+  promptAr?: string;
   category: string;
+  categoryAr?: string;
   penaltyDare: string;
+  penaltyDareAr?: string;
 }
 
 export interface MostLikelyToPublicState {
@@ -303,14 +327,18 @@ export interface MostLikelyToPublicState {
   round: number;
   totalRounds: number;
   prompt: string;
+  promptAr?: string;
   category: string;
+  categoryAr?: string;
   penaltyDare: string;
+  penaltyDareAr?: string;
   votes: Record<string, string>; // voterId -> targetPlayerId
   voteTallies: Record<string, number>; // targetPlayerId -> count
   votedOutPlayerId?: string;
   votedOutUsername?: string;
   votedOutAvatar?: NeonAvatarId;
   roastMessage?: string;
+  roastMessageAr?: string;
   phaseEndsAt: number;
   remainingSeconds: number;
 }
@@ -324,7 +352,9 @@ export type SipOrSpillPhase = 'dilemma' | 'answer_or_sip' | 'reaction' | 'round_
 export interface SipOrSpillItem {
   id: string;
   dilemma: string;
+  dilemmaAr?: string;
   question: string;
+  questionAr?: string;
   spicyLevel: 1 | 2 | 3;
 }
 
@@ -336,7 +366,9 @@ export interface SipOrSpillPublicState {
   targetUsername: string;
   targetAvatar: NeonAvatarId;
   dilemma: string;
+  dilemmaAr?: string;
   question: string;
+  questionAr?: string;
   spicyLevel: number;
   chosenAction?: 'spill' | 'sip';
   confessionText?: string;
@@ -354,7 +386,9 @@ export type SillyRoulettePhase = 'spinning' | 'challenge' | 'voting' | 'round_re
 export interface SillyChallengeItem {
   id: string;
   title: string;
+  titleAr?: string;
   challenge: string;
+  challengeAr?: string;
   category: 'physical' | 'vocal' | 'acting' | 'absurd';
   timeSeconds: number;
 }
@@ -367,7 +401,9 @@ export interface SillyRoulettePublicState {
   targetUsername: string;
   targetAvatar: NeonAvatarId;
   challengeTitle: string;
+  challengeTitleAr?: string;
   challengeText: string;
+  challengeTextAr?: string;
   challengeCategory: string;
   targetAngle: number; // Synchronized roulette rotation angle
   isSpinning: boolean;
@@ -386,7 +422,9 @@ export type HotPotatoPhase = 'bomb_ticking' | 'exploded' | 'penalty_round' | 'ro
 export interface HotPotatoCategoryItem {
   id: string;
   category: string;
+  categoryAr?: string;
   goofyConsequence: string;
+  goofyConsequenceAr?: string;
 }
 
 export interface HotPotatoPublicState {
@@ -397,7 +435,9 @@ export interface HotPotatoPublicState {
   activeHolderUsername: string;
   activeHolderAvatar: NeonAvatarId;
   category: string;
+  categoryAr?: string;
   goofyConsequence: string;
+  goofyConsequenceAr?: string;
   passCount: number;
   recentWords: string[];
   bombTimerRemainingMs: number; // Dynamic fuse timer

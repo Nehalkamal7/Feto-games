@@ -4,559 +4,719 @@
     "title": "Nature Documentary Host",
     "challenge": "Narrate everything you and other players do like David Attenborough until the next round begins!",
     "category": "vocal",
-    "timeSeconds": 30
+    "timeSeconds": 30,
+    "titleAr": "مذيع ناشيونال جيوغرافيك",
+    "challengeAr": "علق بصوت وثائقي درامي جاد على كل حركة بيعملها اللاعبين لحد ما الجولة تخلص!"
   },
   {
     "id": "src_02",
     "title": "The $1,000 Pencil Pitch",
     "challenge": "Pick up a pen, pencil, or spoon nearby and pitch it to the room like a frantic $1,000 luxury infomercial product!",
     "category": "acting",
-    "timeSeconds": 30
+    "timeSeconds": 30,
+    "titleAr": "بياع الأقلام المليونير",
+    "challengeAr": "امسك أي قلم أو معلقة جنبك واعمل إعلان تلفزيوني مقنع إنها بتتباع بـ 1000 دولار!"
   },
   {
     "id": "src_03",
     "title": "The Poker Face Gauntlet",
     "challenge": "Keep an absolute deadpan poker face for 25 seconds while every other player makes weird sounds and faces to break you!",
     "category": "absurd",
-    "timeSeconds": 25
+    "timeSeconds": 25,
+    "titleAr": "تحدي الوش الخشب",
+    "challengeAr": "اثبت بوش جامد وبدون أي ابتسامة لمدة 25 ثانية والكل بيحاول يضحكك بكل الطرق!"
   },
   {
     "id": "src_04",
     "title": "Dramatic Opera Order",
     "challenge": "Sing your favorite fast-food order in maximum theatrical opera vibrato!",
     "category": "vocal",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: Dramatic Opera Order",
+    "challengeAr": "التحدي: Sing your favorite fast-food order in maximum theatrical opera vibrato!"
   },
   {
     "id": "src_05",
     "title": "Air Guitar Solo Master",
     "challenge": "Drop to your knees and deliver an epic 15-second air guitar rock solo with intense headbanging!",
     "category": "physical",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: Air Guitar Solo Master",
+    "challengeAr": "التحدي: Drop to your knees and deliver an epic 15-second air guitar rock solo with intense headbanging!"
   },
   {
     "id": "src_06",
     "title": "The Robot Waiter",
     "challenge": "Act like a malfunctioning robot taking beverage orders from 2 players of your choice!",
     "category": "acting",
-    "timeSeconds": 25
+    "timeSeconds": 25,
+    "titleAr": "تحدي: The Robot Waiter",
+    "challengeAr": "التحدي: Act like a malfunctioning robot taking beverage orders from 2 players of your choice!"
   },
   {
     "id": "src_07",
     "title": "Slow Motion Replay",
     "challenge": "Do everything in ultra-slow motion for the next 20 seconds, including speech!",
     "category": "physical",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: Slow Motion Replay",
+    "challengeAr": "التحدي: Do everything in ultra-slow motion for the next 20 seconds, including speech!"
   },
   {
     "id": "src_08",
     "title": "The Sarcastic Butler",
     "challenge": "Address the player with the lowest score as 'Your Royal Highness' and offer them imaginary champagne with witty sarcasm!",
     "category": "acting",
-    "timeSeconds": 25
+    "timeSeconds": 25,
+    "titleAr": "تحدي: The Sarcastic Butler",
+    "challengeAr": "التحدي: Address the player with the lowest score as 'Your Royal Highness' and offer them imaginary champagne with witty sarcasm!"
   },
   {
     "id": "src_09",
     "title": "Tongue Twister Sprint",
     "challenge": "Repeat 'Toy boat, toy boy, toy boat' 5 times as fast as humanly possible without messing up!",
     "category": "vocal",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: Tongue Twister Sprint",
+    "challengeAr": "التحدي: Repeat 'Toy boat, toy boy, toy boat' 5 times as fast as humanly possible without messing up!"
   },
   {
     "id": "src_10",
     "title": "The Mime Trapped in a Box",
     "challenge": "Pretend you are trapped inside an invisible glass cube and struggle against the walls for 15 seconds!",
     "category": "physical",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: The Mime Trapped in a Box",
+    "challengeAr": "التحدي: Pretend you are trapped inside an invisible glass cube and struggle against the walls for 15 seconds!"
   },
   {
     "id": "src_11",
     "title": "Pirate Captain Command",
     "challenge": "Deliver an inspirational battle speech to your pirate crew in your gruffest pirate accent!",
     "category": "vocal",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: Pirate Captain Command",
+    "challengeAr": "التحدي: Deliver an inspirational battle speech to your pirate crew in your gruffest pirate accent!"
   },
   {
     "id": "src_12",
     "title": "Action Movie Stuntman",
     "challenge": "Pretend you just took a laser blast to the shoulder and deliver a melodramatic dying gasp monologue!",
     "category": "acting",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: Action Movie Stuntman",
+    "challengeAr": "التحدي: Pretend you just took a laser blast to the shoulder and deliver a melodramatic dying gasp monologue!"
   },
   {
     "id": "src_13",
     "title": "Chicken Dance Tribute",
     "challenge": "Flap your elbows and do the chicken dance vigorously for 12 seconds with full facial dedication!",
     "category": "physical",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: Chicken Dance Tribute",
+    "challengeAr": "التحدي: Flap your elbows and do the chicken dance vigorously for 12 seconds with full facial dedication!"
   },
   {
     "id": "src_14",
     "title": "Sports Commentator Blitz",
     "challenge": "Rapid-fire commentate on someone's breathing or blinking like it is the World Cup final!",
     "category": "vocal",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: Sports Commentator Blitz",
+    "challengeAr": "التحدي: Rapid-fire commentate on someone's breathing or blinking like it is the World Cup final!"
   },
   {
     "id": "src_15",
     "title": "The Secret Spy",
     "challenge": "Whisper all your responses like you are a secret agent reporting to headquarters through an invisible earpiece!",
     "category": "acting",
-    "timeSeconds": 25
+    "timeSeconds": 25,
+    "titleAr": "تحدي: The Secret Spy",
+    "challengeAr": "التحدي: Whisper all your responses like you are a secret agent reporting to headquarters through an invisible earpiece!"
   },
   {
     "id": "src_16",
     "title": "Animal Orchestra",
     "challenge": "Make 4 different animal noises in under 6 seconds (e.g. dolphin, goat, rooster, donkey)!",
     "category": "vocal",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: Animal Orchestra",
+    "challengeAr": "التحدي: Make 4 different animal noises in under 6 seconds (e.g. dolphin, goat, rooster, donkey)!"
   },
   {
     "id": "src_17",
     "title": "Statue of Liberty Freeze",
     "challenge": "Hold an intense heroic pose with one arm high in the air without moving a muscle for 20 seconds!",
     "category": "physical",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: Statue of Liberty Freeze",
+    "challengeAr": "التحدي: Hold an intense heroic pose with one arm high in the air without moving a muscle for 20 seconds!"
   },
   {
     "id": "src_18",
     "title": "The Confused Time Traveler",
     "challenge": "Act like a time traveler from 1450 who just discovered the internet and a computer screen!",
     "category": "acting",
-    "timeSeconds": 25
+    "timeSeconds": 25,
+    "titleAr": "تحدي: The Confused Time Traveler",
+    "challengeAr": "التحدي: Act like a time traveler from 1450 who just discovered the internet and a computer screen!"
   },
   {
     "id": "src_19",
     "title": "Whistle Maestro",
     "challenge": "Whistle the theme song to a popular movie or cartoon until another player guesses it correctly!",
     "category": "vocal",
-    "timeSeconds": 25
+    "timeSeconds": 25,
+    "titleAr": "تحدي: Whistle Maestro",
+    "challengeAr": "التحدي: Whistle the theme song to a popular movie or cartoon until another player guesses it correctly!"
   },
   {
     "id": "src_20",
     "title": "The High-Fashion Model",
     "challenge": "Treat your desk as a runway: strike 4 fierce editorial fashion poses directly into the camera!",
     "category": "physical",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: The High-Fashion Model",
+    "challengeAr": "التحدي: Treat your desk as a runway: strike 4 fierce editorial fashion poses directly into the camera!"
   },
   {
     "id": "src_21",
     "title": "Vampire Awakening",
     "challenge": "Act like Dracula waking up at dusk and demanding a fresh glass of orange juice with dramatic cape flair!",
     "category": "acting",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: Vampire Awakening",
+    "challengeAr": "التحدي: Act like Dracula waking up at dusk and demanding a fresh glass of orange juice with dramatic cape flair!"
   },
   {
     "id": "src_22",
     "title": "Question-Only Curse",
     "challenge": "You can ONLY speak in questions for the next 45 seconds! Any statement is a failure!",
     "category": "absurd",
-    "timeSeconds": 45
+    "timeSeconds": 45,
+    "titleAr": "تحدي: Question-Only Curse",
+    "challengeAr": "التحدي: You can ONLY speak in questions for the next 45 seconds! Any statement is a failure!"
   },
   {
     "id": "src_23",
     "title": "Aggressive Cheerleader",
     "challenge": "Spell out FETO GAMES with cheerleader arm snaps and high energy jumps!",
     "category": "physical",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: Aggressive Cheerleader",
+    "challengeAr": "التحدي: Spell out FETO GAMES with cheerleader arm snaps and high energy jumps!"
   },
   {
     "id": "src_24",
     "title": "The T-Rex Challenge",
     "challenge": "Tuck your elbows to your sides like tiny T-Rex arms and try to pick up your phone or drink!",
     "category": "physical",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: The T-Rex Challenge",
+    "challengeAr": "التحدي: Tuck your elbows to your sides like tiny T-Rex arms and try to pick up your phone or drink!"
   },
   {
     "id": "src_25",
     "title": "Undercover Alien",
     "challenge": "Explain human hugs to your alien overlords in a cold mechanical report!",
     "category": "vocal",
-    "timeSeconds": 25
+    "timeSeconds": 25,
+    "titleAr": "تحدي: Undercover Alien",
+    "challengeAr": "التحدي: Explain human hugs to your alien overlords in a cold mechanical report!"
   },
   {
     "id": "src_26",
     "title": "The Master Chef Critique",
     "challenge": "Gordon Ramsay-style roast an imaginary undercooked dish prepared by the room host!",
     "category": "acting",
-    "timeSeconds": 25
+    "timeSeconds": 25,
+    "titleAr": "تحدي: The Master Chef Critique",
+    "challengeAr": "التحدي: Gordon Ramsay-style roast an imaginary undercooked dish prepared by the room host!"
   },
   {
     "id": "src_27",
     "title": "The Speed Alphabet",
     "challenge": "Recite the English alphabet backwards from Z to A in under 15 seconds!",
     "category": "vocal",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: The Speed Alphabet",
+    "challengeAr": "التحدي: Recite the English alphabet backwards from Z to A in under 15 seconds!"
   },
   {
     "id": "src_28",
     "title": "Disco Fever",
     "challenge": "Do the classic Saturday Night Fever finger-point disco dance for 15 seconds without laughing!",
     "category": "physical",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: Disco Fever",
+    "challengeAr": "التحدي: Do the classic Saturday Night Fever finger-point disco dance for 15 seconds without laughing!"
   },
   {
     "id": "src_29",
     "title": "The Evil Villain Monologue",
     "challenge": "Spin in your chair, stroke an imaginary cat, and deliver your master plan to steal the world's chocolate supply!",
     "category": "acting",
-    "timeSeconds": 25
+    "timeSeconds": 25,
+    "titleAr": "تحدي: The Evil Villain Monologue",
+    "challengeAr": "التحدي: Spin in your chair, stroke an imaginary cat, and deliver your master plan to steal the world's chocolate supply!"
   },
   {
     "id": "src_30",
     "title": "Beatbox Debut",
     "challenge": "Drop a 12-second freestyle beatbox rhythm with bass drums and snare clicks!",
     "category": "vocal",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: Beatbox Debut",
+    "challengeAr": "التحدي: Drop a 12-second freestyle beatbox rhythm with bass drums and snare clicks!"
   },
   {
     "id": "src_31",
     "title": "The Hypnotist",
     "challenge": "Try to hypnotize the player with the highest score into believing they are a slice of sourdough bread!",
     "category": "absurd",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: The Hypnotist",
+    "challengeAr": "التحدي: Try to hypnotize the player with the highest score into believing they are a slice of sourdough bread!"
   },
   {
     "id": "src_32",
     "title": "Helicopter Whir",
     "challenge": "Spin around 5 times quickly and try to walk in a perfectly straight line for 3 steps!",
     "category": "physical",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: Helicopter Whir",
+    "challengeAr": "التحدي: Spin around 5 times quickly and try to walk in a perfectly straight line for 3 steps!"
   },
   {
     "id": "src_33",
     "title": "The Broken GPS",
     "challenge": "Give another player directions to the bathroom like a glitching GPS navigator recalculating routes!",
     "category": "acting",
-    "timeSeconds": 25
+    "timeSeconds": 25,
+    "titleAr": "تحدي: The Broken GPS",
+    "challengeAr": "التحدي: Give another player directions to the bathroom like a glitching GPS navigator recalculating routes!"
   },
   {
     "id": "src_34",
     "title": "Shakespearean Gamer",
     "challenge": "Quote a gaming triumph or rage-quit in pure Elizabethan Shakespearean verse (e.g. 'Alas, poor ping!')!",
     "category": "vocal",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: Shakespearean Gamer",
+    "challengeAr": "التحدي: Quote a gaming triumph or rage-quit in pure Elizabethan Shakespearean verse (e.g. 'Alas, poor ping!')!"
   },
   {
     "id": "src_35",
     "title": "Finger Ballet",
     "challenge": "Perform an intricate miniature ballet routine on your desk using only two fingers as dancers!",
     "category": "absurd",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: Finger Ballet",
+    "challengeAr": "التحدي: Perform an intricate miniature ballet routine on your desk using only two fingers as dancers!"
   },
   {
     "id": "src_36",
     "title": "The Screaming Goat",
     "challenge": "Impersonate the viral screaming goat video at 70% volume!",
     "category": "vocal",
-    "timeSeconds": 10
+    "timeSeconds": 10,
+    "titleAr": "تحدي: The Screaming Goat",
+    "challengeAr": "التحدي: Impersonate the viral screaming goat video at 70% volume!"
   },
   {
     "id": "src_37",
     "title": "Olympic Synchronized Swimmer",
     "challenge": "Do a routine of synchronized swimmer hand gestures with a dramatic frozen smile!",
     "category": "physical",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: Olympic Synchronized Swimmer",
+    "challengeAr": "التحدي: Do a routine of synchronized swimmer hand gestures with a dramatic frozen smile!"
   },
   {
     "id": "src_38",
     "title": "The Auctioneer Sprint",
     "challenge": "Speak like a 100-words-per-minute fast-talking cattle auctioneer selling a mystery box!",
     "category": "vocal",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: The Auctioneer Sprint",
+    "challengeAr": "التحدي: Speak like a 100-words-per-minute fast-talking cattle auctioneer selling a mystery box!"
   },
   {
     "id": "src_39",
     "title": "The Silent Film Star",
     "challenge": "Communicate that you are starving using only dramatic facial expressions and wild hand gestures, zero sound!",
     "category": "acting",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: The Silent Film Star",
+    "challengeAr": "التحدي: Communicate that you are starving using only dramatic facial expressions and wild hand gestures, zero sound!"
   },
   {
     "id": "src_40",
     "title": "Balancing Act",
     "challenge": "Balance a pen or pencil horizontally on your upper lip for 15 seconds straight!",
     "category": "physical",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: Balancing Act",
+    "challengeAr": "التحدي: Balance a pen or pencil horizontally on your upper lip for 15 seconds straight!"
   },
   {
     "id": "src_41",
     "title": "The Wrestling Promo",
     "challenge": "Cut a high-octane 90s WWE wrestling promo against the player ranked #1 on the leaderboard!",
     "category": "acting",
-    "timeSeconds": 25
+    "timeSeconds": 25,
+    "titleAr": "تحدي: The Wrestling Promo",
+    "challengeAr": "التحدي: Cut a high-octane 90s WWE wrestling promo against the player ranked #1 on the leaderboard!"
   },
   {
     "id": "src_42",
     "title": "Baby Talk Translate",
     "challenge": "Translate a complex philosophical quote or daily news item using exclusively toddler words!",
     "category": "absurd",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: Baby Talk Translate",
+    "challengeAr": "التحدي: Translate a complex philosophical quote or daily news item using exclusively toddler words!"
   },
   {
     "id": "src_43",
     "title": "The Cat Cleanse",
     "challenge": "Pretend to lick your hand like a paw and smooth down your hair like a grooming housecat!",
     "category": "physical",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: The Cat Cleanse",
+    "challengeAr": "التحدي: Pretend to lick your hand like a paw and smooth down your hair like a grooming housecat!"
   },
   {
     "id": "src_44",
     "title": "Movie Trailer Voiceover",
     "challenge": "Say 'In a world where party games turn deadly...' in the lowest, raspiest movie trailer voice you have!",
     "category": "vocal",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: Movie Trailer Voiceover",
+    "challengeAr": "التحدي: Say 'In a world where party games turn deadly...' in the lowest, raspiest movie trailer voice you have!"
   },
   {
     "id": "src_45",
     "title": "The Fitness Guru",
     "challenge": "Lead the room through 3 ridiculous made-up yoga poses (e.g. 'The Wobbly Flamingo')!",
     "category": "physical",
-    "timeSeconds": 25
+    "timeSeconds": 25,
+    "titleAr": "تحدي: The Fitness Guru",
+    "challengeAr": "التحدي: Lead the room through 3 ridiculous made-up yoga poses (e.g. 'The Wobbly Flamingo')!"
   },
   {
     "id": "src_46",
     "title": "The Detective Interrogation",
     "challenge": "Interrogate a random player like a grizzled 1940s film noir detective asking who ate your donut!",
     "category": "acting",
-    "timeSeconds": 25
+    "timeSeconds": 25,
+    "titleAr": "تحدي: The Detective Interrogation",
+    "challengeAr": "التحدي: Interrogate a random player like a grizzled 1940s film noir detective asking who ate your donut!"
   },
   {
     "id": "src_47",
     "title": "The Dial-Up Modem",
     "challenge": "Vocalize the screeching dial-up tones of a 1998 56k internet modem for 10 seconds!",
     "category": "vocal",
-    "timeSeconds": 12
+    "timeSeconds": 12,
+    "titleAr": "تحدي: The Dial-Up Modem",
+    "challengeAr": "التحدي: Vocalize the screeching dial-up tones of a 1998 56k internet modem for 10 seconds!"
   },
   {
     "id": "src_48",
     "title": "The Karate Chop Master",
     "challenge": "Deliver 6 swift karate chops into the air with authentic martial arts kiais ('HI-YAH!')!",
     "category": "physical",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: The Karate Chop Master",
+    "challengeAr": "التحدي: Deliver 6 swift karate chops into the air with authentic martial arts kiais ('HI-YAH!')!"
   },
   {
     "id": "src_49",
     "title": "The Weather Forecaster",
     "challenge": "Report tomorrow's weather forecast for the room: predict heavy rain of snacks and high winds of drama!",
     "category": "acting",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: The Weather Forecaster",
+    "challengeAr": "التحدي: Report tomorrow's weather forecast for the room: predict heavy rain of snacks and high winds of drama!"
   },
   {
     "id": "src_50",
     "title": "Vocal Sound Effects",
     "challenge": "Make laser blaster, ricochet, and spaceship swoosh sounds non-stop for 12 seconds!",
     "category": "vocal",
-    "timeSeconds": 12
+    "timeSeconds": 12,
+    "titleAr": "تحدي: Vocal Sound Effects",
+    "challengeAr": "التحدي: Make laser blaster, ricochet, and spaceship swoosh sounds non-stop for 12 seconds!"
   },
   {
     "id": "src_51",
     "title": "The Staring Contest",
     "challenge": "Challenge the player across from you to a staring duel: first person to blink or smile takes a sip!",
     "category": "absurd",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: The Staring Contest",
+    "challengeAr": "التحدي: Challenge the player across from you to a staring duel: first person to blink or smile takes a sip!"
   },
   {
     "id": "src_52",
     "title": "The Royalty Walk",
     "challenge": "Walk across your room with imaginary heavy crown posture and wave gracefully to your loyal subjects!",
     "category": "physical",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: The Royalty Walk",
+    "challengeAr": "التحدي: Walk across your room with imaginary heavy crown posture and wave gracefully to your loyal subjects!"
   },
   {
     "id": "src_53",
     "title": "The Opera Tragedy",
     "challenge": "Sing about dropping your ice cream cone on the ground with tragic operatic tears!",
     "category": "vocal",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: The Opera Tragedy",
+    "challengeAr": "التحدي: Sing about dropping your ice cream cone on the ground with tragic operatic tears!"
   },
   {
     "id": "src_54",
     "title": "The Sleepwalker",
     "challenge": "Pretend you are fast asleep sleepwalking into the kitchen hunting for midnight shredded cheese!",
     "category": "acting",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: The Sleepwalker",
+    "challengeAr": "التحدي: Pretend you are fast asleep sleepwalking into the kitchen hunting for midnight shredded cheese!"
   },
   {
     "id": "src_55",
     "title": "Rapid Rhyme Challenge",
     "challenge": "Give 5 words that rhyme with 'CAT' in 4 seconds without repeating!",
     "category": "vocal",
-    "timeSeconds": 10
+    "timeSeconds": 10,
+    "titleAr": "تحدي: Rapid Rhyme Challenge",
+    "challengeAr": "التحدي: Give 5 words that rhyme with 'CAT' in 4 seconds without repeating!"
   },
   {
     "id": "src_56",
     "title": "The Bodyguard",
     "challenge": "Stand up, cross your arms, put on sunglasses if nearby, and guard your computer screen menacingly!",
     "category": "physical",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: The Bodyguard",
+    "challengeAr": "التحدي: Stand up, cross your arms, put on sunglasses if nearby, and guard your computer screen menacingly!"
   },
   {
     "id": "src_57",
     "title": "The Excited Puppy",
     "challenge": "Pant happily, tilt your head sideways, and act like a golden retriever seeing its human return home!",
     "category": "acting",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: The Excited Puppy",
+    "challengeAr": "التحدي: Pant happily, tilt your head sideways, and act like a golden retriever seeing its human return home!"
   },
   {
     "id": "src_58",
     "title": "Alien Translation",
     "challenge": "Translate this phrase into an alien language: 'FETO GAMES is the ultimate party hub!'",
     "category": "vocal",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: Alien Translation",
+    "challengeAr": "التحدي: Translate this phrase into an alien language: 'FETO GAMES is the ultimate party hub!'"
   },
   {
     "id": "src_59",
     "title": "The Flailing Inflatable Man",
     "challenge": "Imitate an inflatable tube dancer outside a car dealership for 12 seconds!",
     "category": "physical",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: The Flailing Inflatable Man",
+    "challengeAr": "التحدي: Imitate an inflatable tube dancer outside a car dealership for 12 seconds!"
   },
   {
     "id": "src_60",
     "title": "The Secret Message",
     "challenge": "Blink a secret message in Morse code with your eyes while looking intently at the camera!",
     "category": "absurd",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: The Secret Message",
+    "challengeAr": "التحدي: Blink a secret message in Morse code with your eyes while looking intently at the camera!"
   },
   {
     "id": "src_61",
     "title": "The High Pitch Scream",
     "challenge": "Do a 2-second horror movie screech like you just saw a tiny harmless moth!",
     "category": "vocal",
-    "timeSeconds": 8
+    "timeSeconds": 8,
+    "titleAr": "تحدي: The High Pitch Scream",
+    "challengeAr": "التحدي: Do a 2-second horror movie screech like you just saw a tiny harmless moth!"
   },
   {
     "id": "src_62",
     "title": "The Slow Clap",
     "challenge": "Start a single, excruciatingly slow sarcastic clap and build it into a crescendo!",
     "category": "acting",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: The Slow Clap",
+    "challengeAr": "التحدي: Start a single, excruciatingly slow sarcastic clap and build it into a crescendo!"
   },
   {
     "id": "src_63",
     "title": "The Invisible Lasso",
     "challenge": "Swing an invisible lasso overhead and rope in the current party leader!",
     "category": "physical",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: The Invisible Lasso",
+    "challengeAr": "التحدي: Swing an invisible lasso overhead and rope in the current party leader!"
   },
   {
     "id": "src_64",
     "title": "The Game Show Host",
     "challenge": "Introduce the next mini-game round like a glittery 1970s game show host with wild hand gestures!",
     "category": "acting",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: The Game Show Host",
+    "challengeAr": "التحدي: Introduce the next mini-game round like a glittery 1970s game show host with wild hand gestures!"
   },
   {
     "id": "src_65",
     "title": "The Grand Finale Bow",
     "challenge": "Take a lavish 3-part theatrical bow and blow kisses to your adoring audience!",
     "category": "physical",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: The Grand Finale Bow",
+    "challengeAr": "التحدي: Take a lavish 3-part theatrical bow and blow kisses to your adoring audience!"
   },
   {
     "id": "src_66",
     "title": "The Nature Documentary",
     "challenge": "Narrate what every player is doing on their screens like Sir David Attenborough observing rare jungle beasts!",
     "category": "vocal",
-    "timeSeconds": 25
+    "timeSeconds": 25,
+    "titleAr": "تحدي: The Nature Documentary",
+    "challengeAr": "التحدي: Narrate what every player is doing on their screens like Sir David Attenborough observing rare jungle beasts!"
   },
   {
     "id": "src_67",
     "title": "The Auctioneer Speedrun",
     "challenge": "Try to sell an ordinary pen to the room talking as fast as an Olympic auctioneer for 15 seconds!",
     "category": "vocal",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: The Auctioneer Speedrun",
+    "challengeAr": "التحدي: Try to sell an ordinary pen to the room talking as fast as an Olympic auctioneer for 15 seconds!"
   },
   {
     "id": "src_68",
     "title": "The Stone Cold Statue",
     "challenge": "Freeze completely without blinking or smiling while the entire room makes weird noises at you!",
     "category": "physical",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: The Stone Cold Statue",
+    "challengeAr": "التحدي: Freeze completely without blinking or smiling while the entire room makes weird noises at you!"
   },
   {
     "id": "src_69",
     "title": "The Infomercial Overachiever",
     "challenge": "Pretend you are showing an infomercial problem: struggle comically trying to open an imaginary bottle of water!",
     "category": "acting",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: The Infomercial Overachiever",
+    "challengeAr": "التحدي: Pretend you are showing an infomercial problem: struggle comically trying to open an imaginary bottle of water!"
   },
   {
     "id": "src_70",
     "title": "The Microwave Countdown",
     "challenge": "Make the humming noise of a microwave oven, count down from 5, and do the loud 'BEEP BEEP BEEP' finish!",
     "category": "vocal",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: The Microwave Countdown",
+    "challengeAr": "التحدي: Make the humming noise of a microwave oven, count down from 5, and do the loud 'BEEP BEEP BEEP' finish!"
   },
   {
     "id": "src_71",
     "title": "The Pirate Declaration",
     "challenge": "Demand that the entire lobby address you as Captain Barnacle and speak in pirate slang until next round!",
     "category": "vocal",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: The Pirate Declaration",
+    "challengeAr": "التحدي: Demand that the entire lobby address you as Captain Barnacle and speak in pirate slang until next round!"
   },
   {
     "id": "src_72",
     "title": "The Secret Agent Mission",
     "challenge": "Pretend you have an earpiece and report back to HQ that the target has been spotted in the lobby!",
     "category": "acting",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: The Secret Agent Mission",
+    "challengeAr": "التحدي: Pretend you have an earpiece and report back to HQ that the target has been spotted in the lobby!"
   },
   {
     "id": "src_73",
     "title": "The Air Guitar Solo",
     "challenge": "Unleash a face-melting 15-second electric air guitar solo with maximum rockstar facial expressions!",
     "category": "physical",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: The Air Guitar Solo",
+    "challengeAr": "التحدي: Unleash a face-melting 15-second electric air guitar solo with maximum rockstar facial expressions!"
   },
   {
     "id": "src_74",
     "title": "The French Chef",
     "challenge": "Kiss your fingers and passionately describe a gourmet bowl of instant ramen in an exaggerated French accent!",
     "category": "vocal",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: The French Chef",
+    "challengeAr": "التحدي: Kiss your fingers and passionately describe a gourmet bowl of instant ramen in an exaggerated French accent!"
   },
   {
     "id": "src_75",
     "title": "The Dramatic Slow-Motion Run",
     "challenge": "Pretend you are running through a field of flowers in slow motion toward the host of the room!",
     "category": "acting",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: The Dramatic Slow-Motion Run",
+    "challengeAr": "التحدي: Pretend you are running through a field of flowers in slow motion toward the host of the room!"
   },
   {
     "id": "src_76",
     "title": "The Mumble Rap Sensation",
     "challenge": "Drop a 15-second freestyle rap using only syllables that sound like 'skrrrt', 'yeet', and 'boba'!",
     "category": "vocal",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: The Mumble Rap Sensation",
+    "challengeAr": "التحدي: Drop a 15-second freestyle rap using only syllables that sound like 'skrrrt', 'yeet', and 'boba'!"
   },
   {
     "id": "src_77",
     "title": "The Weather Forecaster",
     "challenge": "Give a live weather forecast reporting 100% chance of neon cyber lightning storms over the room!",
     "category": "acting",
-    "timeSeconds": 20
+    "timeSeconds": 20,
+    "titleAr": "تحدي: The Weather Forecaster",
+    "challengeAr": "التحدي: Give a live weather forecast reporting 100% chance of neon cyber lightning storms over the room!"
   },
   {
     "id": "src_78",
     "title": "The Penguin Waddle",
     "challenge": "Tuck your arms in like penguin flippers and do a 10-second waddle in place!",
     "category": "physical",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: The Penguin Waddle",
+    "challengeAr": "التحدي: Tuck your arms in like penguin flippers and do a 10-second waddle in place!"
   },
   {
     "id": "src_79",
     "title": "The Soap Opera Betrayal",
     "challenge": "Gasp loudly, clutch your chest, and scream: 'How could you do this to me after all these years?!'",
     "category": "acting",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: The Soap Opera Betrayal",
+    "challengeAr": "التحدي: Gasp loudly, clutch your chest, and scream: 'How could you do this to me after all these years?!'"
   },
   {
     "id": "src_80",
     "title": "The Cyberpunk AI Reboot",
     "challenge": "Pretend your system crashed: buzz, glitch your head, and declare 'SYSTEM 404: REBOOTING HUMAN PROTOCOLS'!",
     "category": "vocal",
-    "timeSeconds": 15
+    "timeSeconds": 15,
+    "titleAr": "تحدي: The Cyberpunk AI Reboot",
+    "challengeAr": "التحدي: Pretend your system crashed: buzz, glitch your head, and declare 'SYSTEM 404: REBOOTING HUMAN PROTOCOLS'!"
   }
 ]

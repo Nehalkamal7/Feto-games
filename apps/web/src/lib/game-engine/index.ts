@@ -97,12 +97,16 @@ export function initGameSession(room: RoomState, allowSolo = false): GameEngineR
 
 // --- 1. Who Is The Imposter ---
 function initImposterGame(room: RoomState, players: any[]): GameEngineResult {
-  const wordItem = imposterWords[Math.floor(Math.random() * imposterWords.length)] || {
+  const wordItem = (imposterWords[Math.floor(Math.random() * imposterWords.length)] || {
     category: 'Professions',
-    word: 'Firefighter'
-  };
+    categoryAr: 'مهن ووظائف',
+    word: 'Firefighter',
+    wordAr: 'رجل إطفاء'
+  }) as any;
   const category = wordItem.category || 'General';
+  const categoryAr = wordItem.categoryAr || 'عام';
   const secretWord = (wordItem.word || 'FIREFIGHTER').toUpperCase();
+  const secretWordAr = (wordItem.wordAr || wordItem.word || 'رجل إطفاء').toUpperCase();
 
   // If solo dev mode (1 player), allow civilian role with secret word so all phases can be tested
   const imposterCount = players.length >= 12 ? 3 : players.length >= 7 ? 2 : players.length >= 2 ? 1 : 0;
@@ -123,7 +127,9 @@ function initImposterGame(room: RoomState, players: any[]): GameEngineResult {
         : 'Give subtle clues about the secret word without making it obvious.',
       isImposter: isImp,
       category,
+      categoryAr,
       secretWord: isImp ? undefined : secretWord,
+      secretWordAr: isImp ? undefined : secretWordAr,
       team: isImp ? 'imposters' : 'civilians',
       imposterCount
     };
@@ -131,7 +137,9 @@ function initImposterGame(room: RoomState, players: any[]): GameEngineResult {
 
   room.gameData = {
     category,
+    categoryAr,
     secretWord,
+    secretWordAr,
     imposterIds: Array.from(imposterIds),
     imposterId: Array.from(imposterIds)[0] || null,
     privateRoles,
@@ -151,6 +159,7 @@ function initImposterGame(room: RoomState, players: any[]): GameEngineResult {
     round: room.currentRound,
     totalRounds: room.config.totalRounds,
     category,
+    categoryAr,
     currentTurnPlayerId: turnOrder[0],
     currentTurnUsername: room.players[turnOrder[0]]?.username,
     turnOrder,
@@ -168,13 +177,18 @@ function initImposterGame(room: RoomState, players: any[]): GameEngineResult {
 // --- 2. Draw & Guess ---
 function initDrawAndGuessGame(room: RoomState, players: any[]): GameEngineResult {
   const drawer = players[Math.floor(Math.random() * players.length)];
-  const wordItem = drawWords[Math.floor(Math.random() * drawWords.length)] || {
+  const wordItem = (drawWords[Math.floor(Math.random() * drawWords.length)] || {
     category: 'Objects',
+    categoryAr: 'أدوات',
     word: 'Castle',
+    wordAr: 'قلعة',
     difficulty: 'easy'
-  };
+  }) as any;
 
   const secretWord = (wordItem.word || 'CASTLE').toUpperCase();
+  const secretWordAr = (wordItem.wordAr || wordItem.word || 'قلعة').toUpperCase();
+  const category = wordItem.category || 'Objects';
+  const categoryAr = wordItem.categoryAr || 'أدوات';
   const duration = room.config.roundDurationSeconds || 45;
   const phaseEndsAt = Date.now() + duration * 1000;
 
@@ -185,6 +199,7 @@ function initDrawAndGuessGame(room: RoomState, players: any[]): GameEngineResult
       roleTitle: 'DRAWER',
       roleDescription: 'Draw the secret word on the canvas! Do not write letters or numbers.',
       secretWord,
+      secretWordAr,
       isDrawer: true
     }
   };
@@ -192,7 +207,9 @@ function initDrawAndGuessGame(room: RoomState, players: any[]): GameEngineResult
   room.gameData = {
     drawerId: drawer.id,
     secretWord,
-    category: wordItem.category,
+    secretWordAr,
+    category,
+    categoryAr,
     correctGuessers: [],
     privateRoles,
     phase: 'drawing',
@@ -206,7 +223,8 @@ function initDrawAndGuessGame(room: RoomState, players: any[]): GameEngineResult
     currentDrawerAvatar: drawer.avatar,
     wordLength: secretWord.length,
     wordMask: secretWord.replace(/[a-zA-Z]/g, '_ '),
-    category: wordItem.category,
+    category,
+    categoryAr,
     correctGuessers: [],
     phaseEndsAt
   };
@@ -218,14 +236,17 @@ function initDrawAndGuessGame(room: RoomState, players: any[]): GameEngineResult
 function initQuizBattleGame(room: RoomState, players: any[]): GameEngineResult {
   const totalQuestions = room.config.totalRounds || 5;
   const shuffledQuestions = [...quizQuestions].sort(() => 0.5 - Math.random()).slice(0, totalQuestions);
-  const currentQ = shuffledQuestions[0] || {
+  const currentQ = (shuffledQuestions[0] || {
     id: 'q1',
     question: 'What is the speed of light in vacuum?',
+    questionAr: 'ما هي سرعة الضوء التقريبية في الفراغ؟',
     category: 'Science',
+    categoryAr: 'علوم وطبيعة',
     difficulty: 'medium',
     options: ['300,000 km/s', '150,000 km/s', '1,000,000 km/s', '50,000 km/s'],
+    optionsAr: ['300,000 كم/ث', '150,000 كم/ث', '1,000,000 كم/ث', '50,000 كم/ث'],
     correctIndex: 0
-  };
+  }) as any;
 
   const duration = room.config.roundDurationSeconds || 20;
   const phaseEndsAt = Date.now() + duration * 1000;
@@ -247,9 +268,12 @@ function initQuizBattleGame(room: RoomState, players: any[]): GameEngineResult {
     currentQuestion: {
       id: currentQ.id,
       question: currentQ.question,
+      questionAr: currentQ.questionAr,
       category: currentQ.category,
+      categoryAr: currentQ.categoryAr,
       difficulty: currentQ.difficulty as any,
       options: currentQ.options as [string, string, string, string],
+      optionsAr: currentQ.optionsAr as [string, string, string, string],
       phaseEndsAt,
       durationSeconds: duration
     },
@@ -262,20 +286,28 @@ function initQuizBattleGame(room: RoomState, players: any[]): GameEngineResult {
 
 // --- 4. Word Battle ---
 function initWordBattleGame(room: RoomState, players: any[]): GameEngineResult {
-  const catItem = wordBattleCategories[Math.floor(Math.random() * wordBattleCategories.length)] || {
+  const catItem = (wordBattleCategories[Math.floor(Math.random() * wordBattleCategories.length)] || {
     category: 'Animals',
-    validWords: ['tiger', 'turtle', 'toucan', 'tarantula']
-  };
+    categoryAr: 'حيوانات',
+    letter: 'A',
+    letterAr: 'أ',
+    validWords: ['tiger', 'turtle', 'toucan', 'tarantula'],
+    validWordsAr: ['نمر', 'سلحفاة', 'طاووس']
+  }) as any;
 
   const letters = 'ABCDEFGHIJKLMNOPRSTW'.split('');
-  const startingLetter = letters[Math.floor(Math.random() * letters.length)];
+  const startingLetter = catItem.letter || letters[Math.floor(Math.random() * letters.length)];
+  const startingLetterAr = catItem.letterAr || 'أ';
   const duration = 25;
   const phaseEndsAt = Date.now() + duration * 1000;
 
   room.gameData = {
     category: catItem.category,
+    categoryAr: catItem.categoryAr,
     startingLetter,
+    startingLetterAr,
     validWords: catItem.validWords || [],
+    validWordsAr: catItem.validWordsAr || [],
     claimedWords: [],
     submissions: [],
     playerWordCounts: {},
@@ -291,7 +323,9 @@ function initWordBattleGame(room: RoomState, players: any[]): GameEngineResult {
     round: room.currentRound,
     totalRounds: room.config.totalRounds,
     category: catItem.category,
+    categoryAr: catItem.categoryAr,
     startingLetter,
+    startingLetterAr,
     claimedWords: [],
     recentSubmissions: [],
     scores,
@@ -314,6 +348,7 @@ function initTruthOrDareGame(room: RoomState, players: any[]): GameEngineResult 
     intensity: room.config.vibeMode === 'chaotic' ? 'wild' : 'party',
     chosenType: undefined,
     currentPrompt: undefined,
+    currentPromptAr: undefined,
     votes: {},
     phase: 'roulette',
     phaseEndsAt
@@ -342,10 +377,12 @@ function initTruthOrDareGame(room: RoomState, players: any[]): GameEngineResult 
 
 // --- 6. Never Have I Ever ---
 function initNeverHaveIEverGame(room: RoomState, players: any[]): GameEngineResult {
-  const item = neverHaveIEverStatements[Math.floor(Math.random() * neverHaveIEverStatements.length)] || {
+  const item = (neverHaveIEverStatements[Math.floor(Math.random() * neverHaveIEverStatements.length)] || {
     statement: 'Never have I ever ghosted someone after a first date',
-    category: 'Dating & Romance'
-  };
+    statementAr: 'عمري ما عملت جوستينج لحد بعد أول خروجة',
+    category: 'Dating & Romance',
+    categoryAr: 'حب وكراشات'
+  }) as any;
 
   const duration = 20;
   const phaseEndsAt = Date.now() + duration * 1000;
@@ -357,7 +394,9 @@ function initNeverHaveIEverGame(room: RoomState, players: any[]): GameEngineResu
 
   room.gameData = {
     statement: item.statement,
+    statementAr: item.statementAr || item.statement,
     category: item.category,
+    categoryAr: item.categoryAr || item.category,
     roundChoices: {},
     innocencePoints: innocence,
     phase: 'statement',
@@ -369,7 +408,9 @@ function initNeverHaveIEverGame(room: RoomState, players: any[]): GameEngineResu
     round: room.currentRound,
     totalRounds: room.config.totalRounds,
     statement: item.statement,
+    statementAr: item.statementAr || item.statement,
     category: item.category,
+    categoryAr: item.categoryAr || item.category,
     innocencePoints: innocence,
     roundChoices: {},
     phaseEndsAt,
@@ -389,16 +430,22 @@ function initMostLikelyToGame(room: RoomState, players: any[]): GameEngineResult
     chosenItem = {
       id: card.id,
       prompt: card.prompt,
+      promptAr: (card as any).promptAr || card.prompt,
       category: 'Community Custom Deck',
-      penaltyDare: 'Take 2 sips and strike a glorious winner pose! 🥤'
+      categoryAr: 'كروت المجتمع المخصصة',
+      penaltyDare: 'Take 2 sips and strike a glorious winner pose! 🥤',
+      penaltyDareAr: 'خد بقين عصير واعمل حركة نصر أسطورية! 🥤'
     };
   } else {
-    chosenItem = mostLikelyToPrompts[Math.floor(Math.random() * mostLikelyToPrompts.length)] || {
+    chosenItem = (mostLikelyToPrompts[Math.floor(Math.random() * mostLikelyToPrompts.length)] || {
       id: 'mlt_default',
       category: 'Survival & Chaos',
+      categoryAr: 'نجاة ومواقف صعبة',
       prompt: 'Who is most likely to survive a zombie apocalypse entirely on luck?',
-      penaltyDare: 'Do your best aggressive zombie impression toward the camera for 10 seconds!'
-    };
+      promptAr: 'مين أكتر واحد فينا ممكن يعيش في هجوم زومبي بالبركة والصدفة البحتة؟',
+      penaltyDare: 'Do your best aggressive zombie impression toward the camera for 10 seconds!',
+      penaltyDareAr: 'اعمل صوت زومبي مفترس للكاميرا لمدة 10 ثواني بأعلى طاقة!'
+    }) as any;
   }
 
   const duration = 24;
@@ -406,8 +453,11 @@ function initMostLikelyToGame(room: RoomState, players: any[]): GameEngineResult
 
   room.gameData = {
     prompt: chosenItem.prompt,
+    promptAr: chosenItem.promptAr || chosenItem.prompt,
     category: chosenItem.category,
+    categoryAr: chosenItem.categoryAr || chosenItem.category,
     penaltyDare: chosenItem.penaltyDare,
+    penaltyDareAr: chosenItem.penaltyDareAr || chosenItem.penaltyDare,
     votes: {},
     voteTallies: {},
     votedOutPlayerId: null,
@@ -420,8 +470,11 @@ function initMostLikelyToGame(room: RoomState, players: any[]): GameEngineResult
     round: room.currentRound,
     totalRounds: room.config.totalRounds,
     prompt: chosenItem.prompt,
+    promptAr: chosenItem.promptAr || chosenItem.prompt,
     category: chosenItem.category,
+    categoryAr: chosenItem.categoryAr || chosenItem.category,
     penaltyDare: chosenItem.penaltyDare,
+    penaltyDareAr: chosenItem.penaltyDareAr || chosenItem.penaltyDare,
     votes: {},
     voteTallies: {},
     phaseEndsAt,
@@ -434,12 +487,14 @@ function initMostLikelyToGame(room: RoomState, players: any[]): GameEngineResult
 // --- 8. Sip or Spill ---
 function initSipOrSpillGame(room: RoomState, players: any[]): GameEngineResult {
   const target = players[Math.floor(Math.random() * players.length)];
-  const item = sipOrSpillPrompts[Math.floor(Math.random() * sipOrSpillPrompts.length)] || {
+  const item = (sipOrSpillPrompts[Math.floor(Math.random() * sipOrSpillPrompts.length)] || {
     id: 'sos_default',
     dilemma: 'Confess your most embarrassing crush from your school days OR take 2 sips! 🥤',
+    dilemmaAr: 'اعترف بأكتر كراش محرج ومضحك في أيام المدرسة أو خد 2 رشفات! 🥤',
     question: 'Who was your most cringe-worthy childhood or teen celebrity crush?',
+    questionAr: 'مين كان الكراش الطفولي اللي مكسوف تفتكره دلوقتي؟',
     spicyLevel: 1
-  };
+  }) as any;
 
   const duration = 25;
   const phaseEndsAt = Date.now() + duration * 1000;
@@ -447,7 +502,9 @@ function initSipOrSpillGame(room: RoomState, players: any[]): GameEngineResult {
   room.gameData = {
     targetPlayerId: target.id,
     dilemma: item.dilemma,
+    dilemmaAr: item.dilemmaAr || item.dilemma,
     question: item.question,
+    questionAr: item.questionAr || item.question,
     spicyLevel: item.spicyLevel,
     chosenAction: null,
     confessionText: null,
@@ -464,7 +521,9 @@ function initSipOrSpillGame(room: RoomState, players: any[]): GameEngineResult {
     targetUsername: target.username,
     targetAvatar: target.avatar,
     dilemma: item.dilemma,
+    dilemmaAr: item.dilemmaAr || item.dilemma,
     question: item.question,
+    questionAr: item.questionAr || item.question,
     spicyLevel: item.spicyLevel,
     reactions: {},
     phaseEndsAt,
@@ -477,13 +536,15 @@ function initSipOrSpillGame(room: RoomState, players: any[]): GameEngineResult {
 // --- 9. Silly Roulette (Spin the Chaos) ---
 function initSillyRouletteGame(room: RoomState, players: any[]): GameEngineResult {
   const target = players[Math.floor(Math.random() * players.length)];
-  const challenge = sillyRouletteChallenges[Math.floor(Math.random() * sillyRouletteChallenges.length)] || {
+  const challenge = (sillyRouletteChallenges[Math.floor(Math.random() * sillyRouletteChallenges.length)] || {
     id: 'src_default',
     title: 'Nature Documentary Host',
+    titleAr: 'مذيع ناشيونال جيوغرافيك',
     challenge: 'Narrate everything you and other players do like David Attenborough until the next round begins!',
+    challengeAr: 'علق بصوت وثائقي درامي جاد على كل حركة بيعملها اللاعبين لحد ما الجولة تخلص!',
     category: 'vocal',
     timeSeconds: 30
-  };
+  }) as any;
 
   // Generate target spin rotation: 5 full spins (1800 deg) + player target slice
   const targetAngle = 1800 + Math.floor(Math.random() * 360);
@@ -493,7 +554,9 @@ function initSillyRouletteGame(room: RoomState, players: any[]): GameEngineResul
   room.gameData = {
     targetPlayerId: target.id,
     challengeTitle: challenge.title,
+    challengeTitleAr: challenge.titleAr || challenge.title,
     challengeText: challenge.challenge,
+    challengeTextAr: challenge.challengeAr || challenge.challenge,
     challengeCategory: challenge.category,
     targetAngle,
     isSpinning: true,
@@ -511,7 +574,9 @@ function initSillyRouletteGame(room: RoomState, players: any[]): GameEngineResul
     targetUsername: target.username,
     targetAvatar: target.avatar,
     challengeTitle: challenge.title,
+    challengeTitleAr: challenge.titleAr || challenge.title,
     challengeText: challenge.challenge,
+    challengeTextAr: challenge.challengeAr || challenge.challenge,
     challengeCategory: challenge.category,
     targetAngle,
     isSpinning: true,
@@ -526,11 +591,13 @@ function initSillyRouletteGame(room: RoomState, players: any[]): GameEngineResul
 
 // --- 10. Hot Potato (Bomb Pass) ---
 function initHotPotatoGame(room: RoomState, players: any[]): GameEngineResult {
-  const categoryItem = hotPotatoCategories[Math.floor(Math.random() * hotPotatoCategories.length)] || {
+  const categoryItem = (hotPotatoCategories[Math.floor(Math.random() * hotPotatoCategories.length)] || {
     id: 'hp_default',
     category: "Things you find in a messy gamer's bedroom",
-    goofyConsequence: 'Recite an apology to your laundry pile with deep sincerity!'
-  };
+    categoryAr: 'حاجات تلاقيها في أوضة واحد جيمر مش متروقة',
+    goofyConsequence: 'Recite an apology to your laundry pile with deep sincerity!',
+    goofyConsequenceAr: 'اعتذر لكومة الهدوم المرمية على الكرسي باعتذار درامي مؤثر!'
+  }) as any;
 
   const initialHolder = players[Math.floor(Math.random() * players.length)];
   const duration = 8; // 8 seconds urgent ticking bomb
@@ -539,7 +606,9 @@ function initHotPotatoGame(room: RoomState, players: any[]): GameEngineResult {
   room.gameData = {
     activeHolderId: initialHolder.id,
     category: categoryItem.category,
+    categoryAr: categoryItem.categoryAr || categoryItem.category,
     goofyConsequence: categoryItem.goofyConsequence,
+    goofyConsequenceAr: categoryItem.goofyConsequenceAr || categoryItem.goofyConsequence,
     passCount: 0,
     recentWords: [],
     bombTimerRemainingMs: duration * 1000,
@@ -556,7 +625,9 @@ function initHotPotatoGame(room: RoomState, players: any[]): GameEngineResult {
     activeHolderUsername: initialHolder.username,
     activeHolderAvatar: initialHolder.avatar,
     category: categoryItem.category,
+    categoryAr: categoryItem.categoryAr || categoryItem.category,
     goofyConsequence: categoryItem.goofyConsequence,
+    goofyConsequenceAr: categoryItem.goofyConsequenceAr || categoryItem.goofyConsequence,
     passCount: 0,
     recentWords: [],
     bombTimerRemainingMs: duration * 1000,
@@ -751,7 +822,8 @@ export function handleGameAction(
       if (mode !== 'who_is_imposter' || !g.suddenDeathActive) break;
       const guess = (payload?.guessedWord || '').toLowerCase().trim();
       const secret = (g.secretWord || '').toLowerCase().trim();
-      const isCorrect = guess === secret;
+      const secretAr = (g.secretWordAr || '').toLowerCase().trim();
+      const isCorrect = guess === secret || (Boolean(secretAr) && guess === secretAr);
 
       if (isCorrect) {
         player.score = (player.score || 0) + 150;
@@ -759,6 +831,7 @@ export function handleGameAction(
       g.suddenDeathActive = false;
       g.phase = 'round_result';
       g.revealedWord = g.secretWord;
+      g.revealedWordAr = g.secretWordAr;
       g.impostersWon = isCorrect;
 
       return { updatedRoom: room, publicState: getPublicGameState(room) };
@@ -771,7 +844,8 @@ export function handleGameAction(
 
       const guess = (payload?.message || '').toLowerCase().trim();
       const secret = (g.secretWord || '').toLowerCase().trim();
-      const isCorrect = guess === secret;
+      const secretAr = (g.secretWordAr || '').toLowerCase().trim();
+      const isCorrect = guess === secret || (Boolean(secretAr) && guess === secretAr);
 
       if (isCorrect && !g.correctGuessers?.includes(playerId)) {
         if (!g.correctGuessers) g.correctGuessers = [];
@@ -905,6 +979,7 @@ export function handleGameAction(
       };
 
       g.currentPrompt = chosen.prompt;
+      g.currentPromptAr = (chosen as any).promptAr || chosen.prompt;
       g.phase = 'performing';
       g.phaseEndsAt = Date.now() + 45000;
       return { updatedRoom: room, publicState: getPublicGameState(room) };
@@ -1159,6 +1234,73 @@ function advanceOrGameOver(room: RoomState): GameEngineResult {
 // 3. PHASE RESOLUTION (WHEN SERVER TIMER HITS 0)
 // ========================================================
 
+export function endRoundNow(room: RoomState): GameEngineResult {
+  const mode = room.config.gameMode;
+  const g = room.gameData || {};
+  if (!room.sipsCount) room.sipsCount = {};
+
+  switch (mode) {
+    case 'who_is_imposter': {
+      resolveImposterVotes(room);
+      g.suddenDeathActive = false;
+      g.phase = 'round_result';
+      g.revealedWord = g.secretWord;
+      g.phaseEndsAt = Date.now() + 60000;
+      break;
+    }
+    case 'draw_and_guess': {
+      g.phase = 'round_result';
+      g.revealedWord = g.secretWord;
+      g.phaseEndsAt = Date.now() + 60000;
+      break;
+    }
+    case 'quiz_battle': {
+      g.phase = 'reveal';
+      g.phaseEndsAt = Date.now() + 60000;
+      break;
+    }
+    case 'word_battle': {
+      g.phase = 'round_results';
+      g.phaseEndsAt = Date.now() + 60000;
+      break;
+    }
+    case 'truth_or_dare': {
+      g.phase = 'round_results';
+      g.phaseEndsAt = Date.now() + 60000;
+      break;
+    }
+    case 'never_have_i_ever': {
+      g.phase = 'reveal';
+      g.phaseEndsAt = Date.now() + 60000;
+      break;
+    }
+    case 'most_likely_to': {
+      resolveMostLikelyToVotes(room);
+      g.phase = 'reveal';
+      g.phaseEndsAt = Date.now() + 60000;
+      break;
+    }
+    case 'sip_or_spill': {
+      g.phase = 'round_results';
+      g.phaseEndsAt = Date.now() + 60000;
+      break;
+    }
+    case 'silly_roulette': {
+      g.phase = 'round_results';
+      g.phaseEndsAt = Date.now() + 60000;
+      break;
+    }
+    case 'hot_potato': {
+      g.explodedPlayerId = g.activeHolderId;
+      g.phase = 'exploded';
+      g.phaseEndsAt = Date.now() + 60000;
+      break;
+    }
+  }
+
+  return { updatedRoom: room, publicState: getPublicGameState(room) };
+}
+
 export function resolveGamePhase(room: RoomState): GameEngineResult {
   const mode = room.config.gameMode;
   const g = room.gameData || {};
@@ -1167,14 +1309,35 @@ export function resolveGamePhase(room: RoomState): GameEngineResult {
   switch (mode) {
     case 'who_is_imposter': {
       if (g.phase === 'clue_giving') {
-        g.phase = 'voting';
-        g.phaseEndsAt = Date.now() + 30000;
+        const turnOrder = g.turnOrder || [];
+        const currentTurnIdx = g.currentTurnIndex || 0;
+        const currentTurnId = turnOrder[currentTurnIdx];
+        if (currentTurnId && !g.clues?.[currentTurnId]) {
+          if (!g.clues) g.clues = {};
+          const p = room.players[currentTurnId];
+          g.clues[currentTurnId] = {
+            playerId: currentTurnId,
+            username: p?.username || 'Player',
+            avatar: p?.avatar || 'cyber_cat',
+            clue: '... (Time Expired)',
+            submittedAt: Date.now()
+          };
+        }
+        g.currentTurnIndex = currentTurnIdx + 1;
+        if (g.currentTurnIndex >= turnOrder.length) {
+          g.phase = 'voting';
+          g.phaseEndsAt = Date.now() + 30000;
+        } else {
+          g.phaseEndsAt = Date.now() + 25000;
+        }
       } else if (g.phase === 'voting') {
         resolveImposterVotes(room);
       } else if (g.phase === 'imposter_sudden_death') {
         g.suddenDeathActive = false;
         g.phase = 'round_result';
         g.revealedWord = g.secretWord;
+        g.impostersWon = false;
+        g.phaseEndsAt = Date.now() + 60000;
       } else if (g.phase === 'round_result') {
         if (room.currentRound >= room.config.totalRounds) {
           return advanceOrGameOver(room);
@@ -1189,7 +1352,8 @@ export function resolveGamePhase(room: RoomState): GameEngineResult {
     case 'draw_and_guess': {
       if (g.phase === 'drawing') {
         g.phase = 'round_result';
-        g.phaseEndsAt = Date.now() + 6000;
+        g.revealedWord = g.secretWord;
+        g.phaseEndsAt = Date.now() + 8000;
       } else if (g.phase === 'round_result') {
         if (room.currentRound >= room.config.totalRounds) {
           return advanceOrGameOver(room);
@@ -1224,7 +1388,7 @@ export function resolveGamePhase(room: RoomState): GameEngineResult {
     case 'word_battle': {
       if (g.phase === 'word_racing') {
         g.phase = 'round_results';
-        g.phaseEndsAt = Date.now() + 6000;
+        g.phaseEndsAt = Date.now() + 8000;
       } else if (g.phase === 'round_results') {
         if (room.currentRound >= room.config.totalRounds) {
           return advanceOrGameOver(room);
@@ -1240,12 +1404,31 @@ export function resolveGamePhase(room: RoomState): GameEngineResult {
       if (g.phase === 'roulette') {
         g.phase = 'decision';
         g.phaseEndsAt = Date.now() + 20000;
-      } else if (g.phase === 'decision' || g.phase === 'performing') {
+      } else if (g.phase === 'decision') {
+        g.chosenType = 'dare';
+        const matching = truthOrDarePrompts.filter((p: any) => p.type === 'dare');
+        const chosen = matching[Math.floor(Math.random() * matching.length)] || {
+          prompt: 'Do 10 jumping jacks live for the room!'
+        };
+        g.currentPrompt = chosen.prompt;
+        g.phase = 'performing';
+        g.phaseEndsAt = Date.now() + 30000;
+      } else if (g.phase === 'performing') {
         g.phase = 'voting';
-        g.phaseEndsAt = Date.now() + 20000;
+        g.phaseEndsAt = Date.now() + 15000;
       } else if (g.phase === 'voting') {
+        const completedCount = Object.values(g.votes || {}).filter((v) => v === 'completed').length;
+        const activeCount = Object.values(room.players).filter((p) => p.connectionStatus === 'connected').length - 1;
+        if (completedCount >= Math.ceil(activeCount / 2)) {
+          const target = room.players[g.targetPlayerId];
+          if (target) target.score = (target.score || 0) + (g.chosenType === 'dare' ? 160 : 110);
+        } else {
+          if (room.config.vibeMode === 'sip_edition' && g.targetPlayerId) {
+            room.sipsCount[g.targetPlayerId] = (room.sipsCount[g.targetPlayerId] || 0) + 2;
+          }
+        }
         g.phase = 'round_results';
-        g.phaseEndsAt = Date.now() + 6000;
+        g.phaseEndsAt = Date.now() + 8000;
       } else if (g.phase === 'round_results') {
         if (room.currentRound >= room.config.totalRounds) {
           return advanceOrGameOver(room);
@@ -1259,8 +1442,15 @@ export function resolveGamePhase(room: RoomState): GameEngineResult {
 
     case 'never_have_i_ever': {
       if (g.phase === 'statement') {
+        if (!g.roundChoices) g.roundChoices = {};
+        for (const p of Object.values(room.players)) {
+          if (!g.roundChoices[p.id]) {
+            g.roundChoices[p.id] = 'havenot';
+            p.score = (p.score || 0) + 50;
+          }
+        }
         g.phase = 'reveal';
-        g.phaseEndsAt = Date.now() + 7000;
+        g.phaseEndsAt = Date.now() + 8000;
       } else if (g.phase === 'reveal') {
         if (room.currentRound >= room.config.totalRounds) {
           return advanceOrGameOver(room);
@@ -1275,12 +1465,9 @@ export function resolveGamePhase(room: RoomState): GameEngineResult {
     case 'most_likely_to': {
       if (g.phase === 'voting') {
         resolveMostLikelyToVotes(room);
-      } else if (g.phase === 'reveal') {
-        g.phase = 'penalty';
-        g.phaseEndsAt = Date.now() + 18000;
-      } else if (g.phase === 'penalty') {
+      } else if (g.phase === 'reveal' || g.phase === 'penalty') {
         g.phase = 'round_results';
-        g.phaseEndsAt = Date.now() + 6000;
+        g.phaseEndsAt = Date.now() + 8000;
       } else if (g.phase === 'round_results') {
         if (room.currentRound >= room.config.totalRounds) {
           return advanceOrGameOver(room);
@@ -1294,7 +1481,6 @@ export function resolveGamePhase(room: RoomState): GameEngineResult {
 
     case 'sip_or_spill': {
       if (g.phase === 'dilemma') {
-        // Auto sip if target didn't answer in time!
         if (g.targetPlayerId && !g.chosenAction) {
           g.chosenAction = 'sip';
           room.sipsCount[g.targetPlayerId] = (room.sipsCount[g.targetPlayerId] || 0) + (g.spicyLevel || 2);
@@ -1303,7 +1489,7 @@ export function resolveGamePhase(room: RoomState): GameEngineResult {
         g.phaseEndsAt = Date.now() + 8000;
       } else if (g.phase === 'reaction') {
         g.phase = 'round_results';
-        g.phaseEndsAt = Date.now() + 6000;
+        g.phaseEndsAt = Date.now() + 8000;
       } else if (g.phase === 'round_results') {
         if (room.currentRound >= room.config.totalRounds) {
           return advanceOrGameOver(room);
@@ -1325,7 +1511,7 @@ export function resolveGamePhase(room: RoomState): GameEngineResult {
         g.phaseEndsAt = Date.now() + 15000;
       } else if (g.phase === 'voting') {
         g.phase = 'round_results';
-        g.phaseEndsAt = Date.now() + 6000;
+        g.phaseEndsAt = Date.now() + 8000;
       } else if (g.phase === 'round_results') {
         if (room.currentRound >= room.config.totalRounds) {
           return advanceOrGameOver(room);
@@ -1339,12 +1525,15 @@ export function resolveGamePhase(room: RoomState): GameEngineResult {
 
     case 'hot_potato': {
       if (g.phase === 'bomb_ticking') {
-        // BOMB EXPLODED in active holder's hands!
         g.explodedPlayerId = g.activeHolderId;
         g.phase = 'exploded';
-        g.phaseEndsAt = Date.now() + 12000;
+        g.phaseEndsAt = Date.now() + 10000;
 
-        // Penalty in Sip Edition
+        const victim = room.players[g.activeHolderId];
+        if (victim) {
+          victim.score = Math.max(0, (victim.score || 0) - 50);
+        }
+
         if (room.config.vibeMode === 'sip_edition' && g.activeHolderId) {
           room.sipsCount[g.activeHolderId] = (room.sipsCount[g.activeHolderId] || 0) + 3;
         }
@@ -1363,7 +1552,7 @@ export function resolveGamePhase(room: RoomState): GameEngineResult {
         };
       } else if (g.phase === 'exploded') {
         g.phase = 'round_results';
-        g.phaseEndsAt = Date.now() + 6000;
+        g.phaseEndsAt = Date.now() + 8000;
       } else if (g.phase === 'round_results') {
         if (room.currentRound >= room.config.totalRounds) {
           return advanceOrGameOver(room);
@@ -1483,6 +1672,7 @@ export function getPublicGameState(room: RoomState): any {
         round: room.currentRound,
         totalRounds: room.config.totalRounds,
         category: g.category || 'General',
+        categoryAr: g.categoryAr,
         currentTurnPlayerId: currentTurnId,
         currentTurnUsername: room.players[currentTurnId]?.username,
         turnOrder,
@@ -1495,6 +1685,7 @@ export function getPublicGameState(room: RoomState): any {
         suddenDeathPlayerUsername: room.players[g.suddenDeathPlayerId]?.username,
         suddenDeathEndsAt: g.suddenDeathEndsAt,
         revealedWord: g.phase === 'round_result' ? g.secretWord : undefined,
+        revealedWordAr: g.phase === 'round_result' ? g.secretWordAr : undefined,
         impostersWon: g.impostersWon,
         phaseEndsAt: g.phaseEndsAt
       };
@@ -1512,7 +1703,9 @@ export function getPublicGameState(room: RoomState): any {
         wordLength: secret.length,
         wordMask: g.phase === 'round_result' ? secret : secret.replace(/[a-zA-Z]/g, '_ '),
         category: g.category || 'Objects',
+        categoryAr: g.categoryAr,
         secretWord: g.phase === 'round_result' ? secret : undefined,
+        secretWordAr: g.phase === 'round_result' ? g.secretWordAr : undefined,
         correctGuessers: g.correctGuessers || [],
         phaseEndsAt: g.phaseEndsAt
       };
@@ -1529,9 +1722,12 @@ export function getPublicGameState(room: RoomState): any {
           ? {
               id: q.id,
               question: q.question,
+              questionAr: q.questionAr,
               category: q.category,
+              categoryAr: q.categoryAr,
               difficulty: q.difficulty,
               options: q.options,
+              optionsAr: q.optionsAr,
               phaseEndsAt: g.phaseEndsAt,
               durationSeconds: room.config.roundDurationSeconds || 20
             }
@@ -1552,7 +1748,9 @@ export function getPublicGameState(room: RoomState): any {
         round: room.currentRound,
         totalRounds: room.config.totalRounds,
         category: g.category || 'General',
+        categoryAr: g.categoryAr,
         startingLetter: g.startingLetter || 'A',
+        startingLetterAr: g.startingLetterAr,
         claimedWords: g.claimedWords || [],
         recentSubmissions: g.submissions || [],
         scores,
@@ -1583,6 +1781,7 @@ export function getPublicGameState(room: RoomState): any {
         intensity: g.intensity || 'party',
         chosenType: g.chosenType,
         currentPrompt: g.currentPrompt,
+        currentPromptAr: g.currentPromptAr,
         votes,
         voteTallies: { completed, refused },
         scores,
@@ -1604,7 +1803,9 @@ export function getPublicGameState(room: RoomState): any {
         round: room.currentRound,
         totalRounds: room.config.totalRounds,
         statement: g.statement || '',
+        statementAr: g.statementAr,
         category: g.category || 'General',
+        categoryAr: g.categoryAr,
         innocencePoints: g.innocencePoints || {},
         roundChoices: choices,
         stats:
@@ -1631,8 +1832,11 @@ export function getPublicGameState(room: RoomState): any {
         round: room.currentRound,
         totalRounds: room.config.totalRounds,
         prompt: g.prompt || '',
+        promptAr: g.promptAr,
         category: g.category || 'Party Debate',
+        categoryAr: g.categoryAr,
         penaltyDare: g.penaltyDare || 'Take 2 sips! 🥤',
+        penaltyDareAr: g.penaltyDareAr,
         votes: g.votes || {},
         voteTallies: g.voteTallies || {},
         votedOutPlayerId: g.votedOutPlayerId || undefined,
@@ -1657,7 +1861,9 @@ export function getPublicGameState(room: RoomState): any {
         targetUsername: target?.username || '',
         targetAvatar: target?.avatar || 'cyber_cat',
         dilemma: g.dilemma || '',
+        dilemmaAr: g.dilemmaAr,
         question: g.question || '',
+        questionAr: g.questionAr,
         spicyLevel: g.spicyLevel || 1,
         chosenAction: g.chosenAction,
         confessionText: g.confessionText,
@@ -1680,7 +1886,9 @@ export function getPublicGameState(room: RoomState): any {
         targetUsername: target?.username || '',
         targetAvatar: target?.avatar || 'cyber_cat',
         challengeTitle: g.challengeTitle || 'Absurd Challenge',
+        challengeTitleAr: g.challengeTitleAr,
         challengeText: g.challengeText || 'Entertain the room!',
+        challengeTextAr: g.challengeTextAr,
         challengeCategory: g.challengeCategory || 'absurd',
         targetAngle: g.targetAngle || 1800,
         isSpinning: Boolean(g.isSpinning),
@@ -1705,7 +1913,9 @@ export function getPublicGameState(room: RoomState): any {
         activeHolderUsername: holder?.username || 'Player',
         activeHolderAvatar: holder?.avatar || 'cyber_cat',
         category: g.category || 'Rapid Fire',
+        categoryAr: g.categoryAr,
         goofyConsequence: g.goofyConsequence || 'Take a sip! 🥤',
+        goofyConsequenceAr: g.goofyConsequenceAr,
         passCount: g.passCount || 0,
         recentWords: g.recentWords || [],
         bombTimerRemainingMs: Math.max(0, (g.phaseEndsAt || 0) - Date.now()),

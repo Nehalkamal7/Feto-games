@@ -25,7 +25,9 @@ import {
   Sliders,
   ChevronDown,
   Wine,
-  PlusCircle
+  PlusCircle,
+  RotateCcw,
+  ArrowRight
 } from 'lucide-react';
 import {
   GameMode,
@@ -44,6 +46,8 @@ import { BrandLogo } from '@/components/BrandLogo';
 import { NeonAvatarDisplay } from '@/components/NeonAvatarDisplay';
 import { GamePodiumView } from '@/components/GamePodiumView';
 import { SoundToggle } from '@/components/SoundToggle';
+import { LanguageToggle } from '@/components/LanguageToggle';
+import { useLanguage } from '@/hooks/useLanguage';
 import { RoomLobbyQRCode } from '@/components/RoomLobbyQRCode';
 import { RoomSettingsModal } from '@/components/RoomSettingsModal';
 import { GamePlaylistQueue } from '@/components/GamePlaylistQueue';
@@ -58,14 +62,19 @@ import { MostLikelyToGameView } from '@/components/games/MostLikelyToGameView';
 import { SipOrSpillGameView } from '@/components/games/SipOrSpillGameView';
 import { SillyRouletteGameView } from '@/components/games/SillyRouletteGameView';
 import { HotPotatoGameView } from '@/components/games/HotPotatoGameView';
+import { useGameTimer } from '@/hooks/useGameTimer';
 import {
   cleanRoomCode,
   clearReconnectSession,
   getReconnectToken,
   getSocket,
+  socketBackToLobby,
+  socketEndRound,
   socketJoinRoom,
   socketKickPlayer,
   socketLeaveRoom,
+  socketNextRound,
+  socketPhaseTimeout,
   socketReconnectRoom,
   socketSelectGames,
   socketSelectTeam,
@@ -79,6 +88,8 @@ export default function RoomPage() {
   const params = useParams();
   const router = useRouter();
   const roomCode = cleanRoomCode((params?.code as string) || '');
+  const { language, t } = useLanguage();
+  const isArabic = language === 'ar';
 
   // Room & Player State
   const [room, setRoom] = useState<PublicRoomState | null>(null);
@@ -180,6 +191,79 @@ export default function RoomPage() {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 4000);
   }, []);
+
+  // Host In-Game & Match Controls
+  const [isActionPending, setIsActionPending] = useState(false);
+  const [showBackToLobbyModal, setShowBackToLobbyModal] = useState(false);
+  const [resetScoresOnLobbyReturn, setResetScoresOnLobbyReturn] = useState(false);
+
+  // Authoritative match countdown timer (calculated from phaseEndsAt - Date.now())
+  const phaseEndsAt = gameStateSync?.state?.phaseEndsAt;
+  const gameTimer = useGameTimer({
+    phaseEndsAt,
+    enabled: room?.status === 'playing' || room?.status === 'in_game',
+    roomCode,
+    autoTriggerTimeout: true
+  });
+
+  const isRoundResultsPhase =
+    gameStateSync?.state?.phase === 'round_result' ||
+    gameStateSync?.state?.phase === 'round_results' ||
+    gameStateSync?.state?.phase === 'reveal' ||
+    gameStateSync?.state?.phase === 'exploded';
+
+  const isFinalRound = (room?.currentRound || 1) >= (room?.config?.totalRounds || 5);
+  const isMultiPlaylistNext =
+    Array.isArray(room?.selectedGames) &&
+    room.selectedGames.length > 1 &&
+    typeof room.currentGameIndex === 'number' &&
+    room.currentGameIndex + 1 < room.selectedGames.length;
+
+  const nextRoundLabel = isFinalRound
+    ? isMultiPlaylistNext
+      ? 'Next Game ➔'
+      : 'Finish Match 🏆'
+    : 'Next Round ➔';
+
+  const handleEndRoundNow = async () => {
+    if (!currentPlayer?.isHost || isActionPending) return;
+    setIsActionPending(true);
+    sound.playClick();
+    try {
+      await socketEndRound(roomCode);
+    } catch (err: any) {
+      showToast(err.message || 'Failed to end round');
+    } finally {
+      setIsActionPending(false);
+    }
+  };
+
+  const handleNextRound = async () => {
+    if (!currentPlayer?.isHost || isActionPending) return;
+    setIsActionPending(true);
+    sound.playClick();
+    try {
+      await socketNextRound(roomCode);
+    } catch (err: any) {
+      showToast(err.message || 'Failed to advance round');
+    } finally {
+      setIsActionPending(false);
+    }
+  };
+
+  const handleConfirmBackToLobby = async (resetScores: boolean) => {
+    if (!currentPlayer?.isHost || isActionPending) return;
+    setIsActionPending(true);
+    setShowBackToLobbyModal(false);
+    sound.playClick();
+    try {
+      await socketBackToLobby(resetScores, roomCode);
+    } catch (err: any) {
+      showToast(err.message || 'Failed to return to lobby');
+    } finally {
+      setIsActionPending(false);
+    }
+  };
 
   // Custom Deck Submission & Sip Edition Controls
   const [showCustomCardModal, setShowCustomCardModal] = useState(false);
@@ -419,10 +503,26 @@ export default function RoomPage() {
 
     const handleRoomUpdated = (updatedRoom: PublicRoomState) => {
       setRoom(updatedRoom);
+      if (updatedRoom.status === 'lobby') {
+        setGameStateSync(null);
+        setCurrentPhase(null);
+        setTimerState(null);
+        setCountdown(null);
+      }
       if (currentPlayer) {
         const me = updatedRoom.players.find((p) => p.id === currentPlayer.id);
         if (me) setCurrentPlayer(me);
       }
+    };
+
+    const handleLobbyReturned = (data: { room?: PublicRoomState }) => {
+      if (data?.room) {
+        setRoom(data.room);
+      }
+      setGameStateSync(null);
+      setCurrentPhase(null);
+      setTimerState(null);
+      setCountdown(null);
     };
 
     const handleCountdownTick = (data: { count: number }) => {
@@ -500,6 +600,7 @@ export default function RoomPage() {
     socket.on('room_state', handleRoomState);
     socket.on('joined_room', handleJoined);
     socket.on('room_updated', handleRoomUpdated);
+    socket.on('game:lobby_returned', handleLobbyReturned);
     socket.on('countdown_tick', handleCountdownTick);
     socket.on('timer_tick', handleTimerTick);
     socket.on('phase_change', handlePhaseChange);
@@ -513,6 +614,7 @@ export default function RoomPage() {
       socket.off('room_state', handleRoomState);
       socket.off('joined_room', handleJoined);
       socket.off('room_updated', handleRoomUpdated);
+      socket.off('game:lobby_returned', handleLobbyReturned);
       socket.off('countdown_tick', handleCountdownTick);
       socket.off('timer_tick', handleTimerTick);
       socket.off('phase_change', handlePhaseChange);
@@ -737,29 +839,86 @@ export default function RoomPage() {
       {room.status === 'in_game' || room.status === 'playing' || room.status === 'countdown' ? (
         /* IN-GAME ACTIVE SCREEN - COMPACT MOBILE OPTIMIZED (NEVER CLIPS) */
         <div className="flex-1 flex flex-col items-center justify-start py-2 relative z-10 w-full max-w-md mx-auto px-2 sm:px-4 overflow-x-hidden min-h-[600px]">
-          {/* COMPACT TOP NAVBAR: BRAND LOGO LEFT, ROOM CODE + ROUND + SOUND + LEAVE RIGHT */}
-          <div className="w-full bg-white rounded-2xl px-3 py-2 sm:px-4 sm:py-2.5 mb-4 flex items-center justify-between gap-2 border border-gray-200 shadow-sm shrink-0">
+          {/* COMPACT TOP NAVBAR: BRAND LOGO LEFT, ROOM CODE + ROUND + TIMER + SOUND + LEAVE RIGHT */}
+          <div className="w-full bg-white rounded-2xl px-3 py-2 sm:px-4 sm:py-2.5 mb-2.5 flex items-center justify-between gap-2 border border-gray-200 shadow-sm shrink-0">
             <div className="flex items-center gap-2 min-w-0">
               <BrandLogo size="nav" showSubtitle={false} />
             </div>
 
             <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-              <div className="px-2 py-0.5 rounded-lg bg-gray-100 border border-gray-200 text-[11px] sm:text-xs font-bold text-gray-700 font-mono">
+              {phaseEndsAt && (
+                <div
+                  className={`px-2 py-0.5 rounded-lg border text-[11px] sm:text-xs font-bold font-mono transition-colors flex items-center gap-1 force-ltr ${
+                    gameTimer.isUrgent
+                      ? 'bg-rose-50 border-rose-200 text-rose-700 animate-pulse'
+                      : 'bg-gray-100 border-gray-200 text-gray-700'
+                  }`}
+                  title={isArabic ? 'الوقت المتبقي للجولة' : 'Remaining Phase Time'}
+                >
+                  <Clock className="w-3 h-3 text-gray-500" />
+                  <span>{gameTimer.formatted}</span>
+                </div>
+              )}
+              <div className="px-2 py-0.5 rounded-lg bg-gray-100 border border-gray-200 text-[11px] sm:text-xs font-bold text-gray-700 font-mono force-ltr" data-room-code="true">
                 {roomCode}
               </div>
-              <div className="px-2 py-0.5 rounded-lg bg-blue-50 border border-blue-200 text-[11px] sm:text-xs font-bold text-blue-700 whitespace-nowrap">
+              <div className="px-2 py-0.5 rounded-lg bg-blue-50 border border-blue-200 text-[11px] sm:text-xs font-bold text-blue-700 whitespace-nowrap force-ltr">
                 {room.currentRound}/{room.config.totalRounds}
               </div>
+              <LanguageToggle />
               <SoundToggle />
               <button
                 onClick={handleLeaveRoom}
                 className="p-1.5 sm:p-2 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 transition-all"
-                title="Leave Room"
+                title={isArabic ? 'مغادرة الغرفة' : 'Leave Room'}
               >
-                <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4 rtl:rotate-180" />
               </button>
             </div>
           </div>
+
+          {/* HOST IN-GAME CONTROL BAR */}
+          {isHost && (
+            <div className="w-full bg-white rounded-2xl px-3 py-2 mb-3 border border-gray-200 shadow-xs flex items-center justify-between gap-2 shrink-0">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                <Crown className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
+                <span className="hidden sm:inline">{isArabic ? 'تحكم المضيف' : 'Host Controls'}</span>
+              </div>
+
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                {isRoundResultsPhase ? (
+                  <button
+                    onClick={handleNextRound}
+                    disabled={isActionPending}
+                    className="h-8 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-all disabled:opacity-50"
+                  >
+                    <span>{isArabic ? 'الجولة التالية' : nextRoundLabel}</span>
+                    <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleEndRoundNow}
+                    disabled={isActionPending}
+                    className="h-8 px-2.5 sm:px-3 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 text-xs font-semibold flex items-center gap-1.5 transition-all disabled:opacity-50"
+                    title={isArabic ? 'إنهاء الجولة الآن وإظهار النتائج' : 'End Round Now & Reveal Results'}
+                  >
+                    <RotateCcw className="w-3.5 h-3.5 text-amber-600" />
+                    <span>{isArabic ? 'إنهاء الجولة' : 'End Round Now'}</span>
+                  </button>
+                )}
+
+                <button
+                  onClick={() => setShowBackToLobbyModal(true)}
+                  disabled={isActionPending}
+                  className="h-8 px-2.5 sm:px-3 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 text-xs font-semibold flex items-center gap-1.5 transition-all disabled:opacity-50"
+                  title={isArabic ? 'إعادة كل اللاعبين للوبي' : 'Return all players to lobby'}
+                >
+                  <Users className="w-3.5 h-3.5 text-blue-600" />
+                  <span>{isArabic ? 'العودة للوبي' : 'Back to Lobby'}</span>
+                </button>
+              </div>
+            </div>
+          )}
 
           {countdown !== null && countdown > 0 ? (
             <motion.div
@@ -770,9 +929,9 @@ export default function RoomPage() {
             >
               <div className="text-xs uppercase tracking-widest text-gray-500 font-bold mb-4 flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-blue-600 animate-spin" />
-                <span>Match Starting In</span>
+                <span>{isArabic ? 'المباراة تبدأ خلال' : 'Match Starting In'}</span>
               </div>
-              <div className="text-9xl md:text-[11rem] font-extrabold text-blue-600 font-display">
+              <div className="text-9xl md:text-[11rem] font-extrabold text-blue-600 font-display force-ltr">
                 {countdown}
               </div>
             </motion.div>
@@ -819,6 +978,8 @@ export default function RoomPage() {
               currentPlayer={currentPlayer}
               players={room.players}
               roomCode={roomCode}
+              onAction={handleGameAction}
+              isHost={Boolean(isHost)}
             />
           ) : room.config.gameMode === 'quiz_battle' ? (
             <QuizBattleGameView
@@ -833,6 +994,8 @@ export default function RoomPage() {
               currentPlayer={currentPlayer}
               players={room.players}
               roomCode={roomCode}
+              onAction={handleGameAction}
+              isHost={Boolean(isHost)}
             />
           ) : room.config.gameMode === 'truth_or_dare' ? (
             <TruthOrDareGameView
@@ -840,6 +1003,8 @@ export default function RoomPage() {
               currentPlayer={currentPlayer}
               players={room.players}
               roomCode={roomCode}
+              onAction={handleGameAction}
+              isHost={Boolean(isHost)}
             />
           ) : room.config.gameMode === 'never_have_i_ever' ? (
             <NeverHaveIEverGameView
@@ -847,6 +1012,8 @@ export default function RoomPage() {
               currentPlayer={currentPlayer}
               players={room.players}
               roomCode={roomCode}
+              onAction={handleGameAction}
+              isHost={Boolean(isHost)}
             />
           ) : room.config.gameMode === 'most_likely_to' ? (
             <MostLikelyToGameView
@@ -855,6 +1022,7 @@ export default function RoomPage() {
               currentPlayerId={currentPlayer.id}
               isHost={Boolean(isHost)}
               vibeMode={room.config.vibeMode}
+              roomCode={roomCode}
               onAction={handleGameAction}
             />
           ) : room.config.gameMode === 'sip_or_spill' ? (
@@ -864,6 +1032,7 @@ export default function RoomPage() {
               currentPlayerId={currentPlayer.id}
               isHost={Boolean(isHost)}
               vibeMode={room.config.vibeMode}
+              roomCode={roomCode}
               onAction={handleGameAction}
             />
           ) : room.config.gameMode === 'silly_roulette' ? (
@@ -873,6 +1042,7 @@ export default function RoomPage() {
               currentPlayerId={currentPlayer.id}
               isHost={Boolean(isHost)}
               vibeMode={room.config.vibeMode}
+              roomCode={roomCode}
               onAction={handleGameAction}
             />
           ) : room.config.gameMode === 'hot_potato' ? (
@@ -904,11 +1074,13 @@ export default function RoomPage() {
                 <BrandLogo size="nav" showSubtitle={false} />
                 <span className="text-gray-300 font-bold hidden sm:inline">|</span>
                 <div className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold uppercase tracking-wider">
-                  Lobby
+                  {isArabic ? 'اللوبي' : 'Lobby'}
                 </div>
               </div>
 
               <div className="flex items-center gap-2 sm:gap-3">
+                <LanguageToggle />
+
                 {/* Streamer Mode Toggle */}
                 <button
                   onClick={() => {
@@ -916,8 +1088,8 @@ export default function RoomPage() {
                     setIsStreamerMode(!isStreamerMode);
                     showToast(
                       isStreamerMode
-                        ? 'Streamer Mode Disabled (Code Visible)'
-                        : 'Streamer Mode Active (Code Hidden for Streaming)'
+                        ? (isArabic ? 'تم إلغاء مود البث (الكود ظاهر)' : 'Streamer Mode Disabled (Code Visible)')
+                        : (isArabic ? 'تم تفعيل مود البث (الكود مخفي)' : 'Streamer Mode Active (Code Hidden for Streaming)')
                     );
                   }}
                   className={`h-9 px-3 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-all border ${
@@ -925,16 +1097,16 @@ export default function RoomPage() {
                       ? 'bg-blue-50 border-blue-200 text-blue-700'
                       : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
                   }`}
-                  title="Toggle Streamer Mode"
+                  title={isArabic ? 'تبديل مود البث' : 'Toggle Streamer Mode'}
                 >
                   {isStreamerMode ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                  <span className="hidden sm:inline">Streamer Mode</span>
+                  <span className="hidden sm:inline">{isArabic ? 'مود البث' : 'Streamer Mode'}</span>
                 </button>
 
                 <div className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200">
                   <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="hidden sm:inline">Waiting for Players...</span>
-                  <span className="font-mono font-bold">({activePlayers.length}/15)</span>
+                  <span className="hidden sm:inline">{isArabic ? 'في انتظار اللاعبين...' : 'Waiting for Players...'}</span>
+                  <span className="font-mono font-bold force-ltr">({activePlayers.length}/15)</span>
                 </div>
               </div>
             </div>
@@ -945,14 +1117,14 @@ export default function RoomPage() {
                 {/* Room Code Display */}
                 <div className="flex items-center gap-2">
                   <span className="text-xs uppercase font-semibold tracking-wider text-gray-500">
-                    Room:
+                    {isArabic ? 'كود الروم:' : 'Room:'}
                   </span>
                   <button
                     onClick={handleCopyCode}
                     className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 hover:bg-gray-100 rounded-xl transition-all"
-                    title="Click to copy Room Code"
+                    title={isArabic ? 'اضغط لنسخ كود الروم' : 'Click to copy Room Code'}
                   >
-                    <span className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-wider font-mono">
+                    <span className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-wider font-mono force-ltr" data-room-code="true">
                       {isStreamerMode ? '••••' : roomCode}
                     </span>
                     {copiedCode ? (
@@ -967,7 +1139,7 @@ export default function RoomPage() {
                 <div className="px-3 py-1.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-700 text-xs font-semibold flex items-center gap-1.5">
                   <Users className="w-3.5 h-3.5 text-blue-600" />
                   <span>
-                    Players: <strong className="text-gray-900 font-bold">{activePlayers.length}</strong> / 15
+                    {isArabic ? 'اللاعبين:' : 'Players:'} <strong className="text-gray-900 font-bold force-ltr">{activePlayers.length}</strong> / 15
                   </span>
                 </div>
 
@@ -975,7 +1147,7 @@ export default function RoomPage() {
                 {room.config.hasPin && (
                   <div className="px-2.5 py-1 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-1">
                     <Lock className="w-3 h-3 text-rose-600" />
-                    <span>PIN Protected</span>
+                    <span>{isArabic ? 'محمي بـ PIN' : 'PIN Protected'}</span>
                   </div>
                 )}
               </div>
@@ -989,21 +1161,21 @@ export default function RoomPage() {
                     setShowSettingsModal(true);
                   }}
                   className="h-10 px-3 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 text-xs font-semibold inline-flex items-center justify-center shrink-0 gap-1.5 transition-all shadow-sm"
-                  title="Room Settings"
+                  title={isArabic ? 'إعدادات الغرفة' : 'Room Settings'}
                 >
                   <Settings className="w-4 h-4 text-gray-500" />
-                  <span>Settings</span>
+                  <span>{isArabic ? 'الإعدادات' : 'Settings'}</span>
                 </button>
 
                 {room.config.vibeMode === 'sip_edition' && (
                   <button
                     onClick={handleQuickTakeSip}
                     className="h-10 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 text-xs font-semibold inline-flex items-center justify-center shrink-0 gap-1.5 transition-all"
-                    title="Take a drink & log it"
+                    title={isArabic ? 'خد رشفة وسجلها' : 'Take a drink & log it'}
                   >
                     <Wine className="w-4 h-4 text-rose-600" />
-                    <span>Take Sip! 🥤</span>
-                    <span className="font-mono text-xs font-bold text-rose-700">
+                    <span>{isArabic ? 'خد رشفة! 🥤' : 'Take Sip! 🥤'}</span>
+                    <span className="font-mono text-xs font-bold text-rose-700 force-ltr">
                       ({room.sipsCount?.[currentPlayer?.id || ''] || 0})
                     </span>
                   </button>
@@ -1015,10 +1187,10 @@ export default function RoomPage() {
                     setShowCustomCardModal(true);
                   }}
                   className="h-10 px-3 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 text-xs font-semibold inline-flex items-center justify-center shrink-0 gap-1.5 transition-all shadow-sm"
-                  title="Submit Custom Card"
+                  title={isArabic ? 'إضافة كارت مخصص' : 'Submit Custom Card'}
                 >
                   <PlusCircle className="w-4 h-4 text-blue-600" />
-                  <span className="hidden sm:inline">Custom Card</span>
+                  <span className="hidden sm:inline">{isArabic ? 'كارت مخصص' : 'Custom Card'}</span>
                 </button>
 
                 <RoomLobbyQRCode roomCode={roomCode} isStreamerMode={isStreamerMode} />
@@ -1034,15 +1206,15 @@ export default function RoomPage() {
                   ) : (
                     <Share2 className="w-4 h-4 text-white" />
                   )}
-                  <span>{copiedLink ? 'Copied!' : 'Invite'}</span>
+                  <span>{copiedLink ? (isArabic ? 'تم النسخ!' : 'Copied!') : (isArabic ? 'دعوة' : 'Invite')}</span>
                 </button>
 
                 <button
                   onClick={handleLeaveRoom}
                   className="w-10 h-10 inline-flex items-center justify-center shrink-0 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 shadow-sm transition-all"
-                  title="Leave Room"
+                  title={isArabic ? 'مغادرة الغرفة' : 'Leave Room'}
                 >
-                  <LogOut className="w-4 h-4" />
+                  <LogOut className="w-4 h-4 rtl:rotate-180" />
                 </button>
               </div>
             </div>
@@ -1166,12 +1338,13 @@ export default function RoomPage() {
                 <div className="flex items-center justify-between mb-3 px-1">
                   <span className="text-xs font-bold uppercase tracking-wider text-gray-700 flex items-center gap-1.5">
                     <Users className="w-4 h-4 text-blue-600" />
-                    <span>Lobby Slots</span>
+                    <span>{isArabic ? 'خانات اللوبي' : 'Lobby Slots'}</span>
                   </span>
                   <div className="flex items-center gap-2">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 border border-emerald-200 text-emerald-700">
                       <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                      {activePlayers.filter((p) => p.isReady).length} of {activePlayers.length} Ready
+                      <span className="force-ltr">{activePlayers.filter((p) => p.isReady).length} / {activePlayers.length}</span>
+                      <span>{isArabic ? 'جاهز' : 'Ready'}</span>
                     </span>
                   </div>
                 </div>
@@ -1204,16 +1377,16 @@ export default function RoomPage() {
                             {isDisconnected ? (
                               <div className="w-full py-0.5 px-1 bg-rose-50 border border-rose-200 rounded-lg text-rose-700 text-[10px] font-bold flex items-center justify-center gap-1">
                                 <Clock className="w-2.5 h-2.5 text-rose-600" />
-                                <span>{remainingGrace}s</span>
+                                <span className="force-ltr">{remainingGrace}s</span>
                               </div>
                             ) : player.isReady ? (
                               <div className="w-full py-0.5 px-1 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-[10px] font-bold flex items-center justify-center gap-1">
                                 <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                                <span>Ready</span>
+                                <span>{isArabic ? 'جاهز' : 'Ready'}</span>
                               </div>
                             ) : (
                               <div className="w-full py-0.5 px-1 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 text-[10px] font-medium">
-                                Not Ready
+                                {isArabic ? 'مش جاهز' : 'Not Ready'}
                               </div>
                             )}
                           </div>
@@ -1223,7 +1396,7 @@ export default function RoomPage() {
                             {player.isHost && (
                               <div
                                 className="absolute -top-2 -right-2 z-10 p-1 bg-amber-400 rounded-full shadow-sm"
-                                title="Room Host"
+                                title={isArabic ? 'مضيف الروم' : 'Room Host'}
                               >
                                 <Crown className="w-3 h-3 text-white fill-white" />
                               </div>
@@ -1242,7 +1415,7 @@ export default function RoomPage() {
                             <div className="font-bold text-xs text-gray-900 truncate px-0.5">
                               {player.username}
                               {player.id === currentPlayer?.id && (
-                                <span className="ml-1 text-[10px] text-blue-600 font-semibold">(You)</span>
+                                <span className="ml-1 text-[10px] text-blue-600 font-semibold">{isArabic ? '(أنت)' : '(You)'}</span>
                               )}
                             </div>
 
@@ -1271,9 +1444,9 @@ export default function RoomPage() {
                                 setKickTarget(player);
                               }}
                               className="mt-1 text-[10px] text-rose-600 hover:text-rose-700 font-semibold py-0.5 px-2 rounded-lg hover:bg-rose-50 transition-all"
-                              title={`Kick ${player.username}`}
+                              title={isArabic ? `طرد ${player.username}` : `Kick ${player.username}`}
                             >
-                              Kick
+                              {isArabic ? 'طرد' : 'Kick'}
                             </button>
                           ) : (
                             <div className="h-3" />
@@ -1288,11 +1461,11 @@ export default function RoomPage() {
                         key={`slot-${index}`}
                         className="rounded-2xl border border-dashed border-gray-200 bg-white/60 flex flex-col items-center justify-center p-2.5 text-center text-gray-400 select-none min-h-[145px] sm:min-h-[160px]"
                       >
-                        <div className="w-8 h-8 rounded-full border border-dashed border-gray-300 flex items-center justify-center mb-1 text-gray-400 text-xs">
+                        <div className="w-8 h-8 rounded-full border border-dashed border-gray-300 flex items-center justify-center mb-1 text-gray-400 text-xs force-ltr">
                           {slotNum}
                         </div>
                         <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">
-                          Open Slot
+                          {isArabic ? 'خانة فاضية' : 'Open Slot'}
                         </span>
                       </div>
                     );
@@ -1606,13 +1779,13 @@ export default function RoomPage() {
               )}
               <div>
                 <div className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">
-                  Playing as
+                  {isArabic ? 'بتلعب بـ' : 'Playing as'}
                 </div>
                 <div className="text-sm sm:text-base font-bold text-gray-900 flex items-center gap-2">
                   <span>{currentPlayer?.username}</span>
                   {isHost && (
                     <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-bold rounded-full">
-                      Host
+                      {isArabic ? 'المضيف' : 'Host'}
                     </span>
                   )}
                 </div>
@@ -1633,12 +1806,12 @@ export default function RoomPage() {
                 {currentPlayer?.isReady ? (
                   <>
                     <CheckCircle2 className="w-4 h-4 text-white" />
-                    <span>Ready ✓ (Tap to unready)</span>
+                    <span>{isArabic ? 'جاهز ✓ (اضغط للإلغاء)' : 'Ready ✓ (Tap to unready)'}</span>
                   </>
                 ) : (
                   <>
                     <Zap className="w-4 h-4 text-amber-500" />
-                    <span>Ready</span>
+                    <span>{isArabic ? 'أنا جاهز ⚡' : 'Ready'}</span>
                   </>
                 )}
               </button>
@@ -1652,10 +1825,10 @@ export default function RoomPage() {
                       type="button"
                       onClick={() => handleStartGame(true)}
                       className="w-full sm:w-auto h-12 px-5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white shadow-sm"
-                      title="Force start match with currently connected players"
+                      title={isArabic ? 'بدء إجباري باللاعبين المتصلين حالياً' : 'Force start match with currently connected players'}
                     >
                       <Zap className="w-4 h-4 fill-current" />
-                      <span>Force Start</span>
+                      <span>{isArabic ? 'بدء إجباري' : 'Force Start'}</span>
                     </button>
                   )}
 
@@ -1667,10 +1840,10 @@ export default function RoomPage() {
                       !allReady
                         ? activePlayers.length < minRequired
                           ? isSoloDevMode
-                            ? 'At least 1 player required'
-                            : 'At least 2 players required'
-                          : 'All players must click Ready (or use Force Start)'
-                        : 'Launch Match'
+                            ? (isArabic ? 'مطلوب لاعب واحد على الأقل' : 'At least 1 player required')
+                            : (isArabic ? 'مطلوب لاعبين على الأقل' : 'At least 2 players required')
+                          : (isArabic ? 'لازم كل اللاعبين يضغطوا جاهز (أو استخدم بدء إجباري)' : 'All players must click Ready (or use Force Start)')
+                        : (isArabic ? 'ابدأ الجولة' : 'Launch Match')
                     }
                     className={`w-full sm:w-auto min-w-[200px] h-12 px-8 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-sm ${
                       allReady
@@ -1679,8 +1852,8 @@ export default function RoomPage() {
                     }`}
                     id="btn-start-game"
                   >
-                    <Play className="w-4 h-4 fill-current" />
-                    <span>Start Game</span>
+                    <Play className="w-4 h-4 fill-current rtl:rotate-180" />
+                    <span>{isArabic ? 'ابدأ اللعبة' : 'Start Game'}</span>
                   </button>
                 </>
               )}
@@ -1722,8 +1895,13 @@ export default function RoomPage() {
               exit={{ opacity: 0, scale: 0.95 }}
               className="w-full max-w-md bg-white rounded-2xl p-6 sm:p-7 border border-gray-200 shadow-xl"
             >
-              <h3 className="text-xl font-bold text-gray-900 mb-1">Join Room {roomCode}</h3>
-              <p className="text-xs text-gray-500 mb-5 font-medium">Choose your avatar and nickname to enter.</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-1">
+                {isArabic ? `انضم للروم ` : 'Join Room '}
+                <span className="force-ltr font-mono">{roomCode}</span>
+              </h3>
+              <p className="text-xs text-gray-500 mb-5 font-medium">
+                {isArabic ? 'اختر شخصيتك واسمك المستعار للدخول.' : 'Choose your avatar and nickname to enter.'}
+              </p>
 
               {errorMessage && (
                 <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2 font-medium">
@@ -1735,13 +1913,13 @@ export default function RoomPage() {
               <form onSubmit={handleModalJoin} className="space-y-4">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
-                    Your Nickname
+                    {isArabic ? 'اسمك المستعار' : 'Your Nickname'}
                   </label>
                   <input
                     type="text"
                     value={joinUsername}
                     onChange={(e) => setJoinUsername(e.target.value.slice(0, 18))}
-                    placeholder="Enter nickname..."
+                    placeholder={isArabic ? 'اكتب اسمك هنا...' : 'Enter nickname...'}
                     required
                     className="w-full h-11 bg-gray-50 border border-gray-200 focus:border-blue-600 rounded-xl px-4 text-gray-900 font-medium text-sm outline-none"
                   />
@@ -1749,7 +1927,7 @@ export default function RoomPage() {
 
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
-                    Pick Avatar
+                    {isArabic ? 'اختر الشخصية' : 'Pick Avatar'}
                   </label>
                   <div className="grid grid-cols-4 gap-2">
                     {(Object.keys(NEON_AVATARS) as NeonAvatarId[]).map((key) => (
@@ -1774,7 +1952,7 @@ export default function RoomPage() {
 
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
-                    Room PIN (If private)
+                    {isArabic ? 'رمز PIN (لو الروم خاص)' : 'Room PIN (If private)'}
                   </label>
                   <input
                     type="password"
@@ -1782,7 +1960,7 @@ export default function RoomPage() {
                     value={joinPin}
                     onChange={(e) => setJoinPin(e.target.value.replace(/\D/g, ''))}
                     placeholder="••••"
-                    className="w-full h-11 bg-gray-50 border border-gray-200 focus:border-blue-600 rounded-xl px-4 text-center text-lg tracking-widest text-gray-900 font-bold outline-none"
+                    className="w-full h-11 bg-gray-50 border border-gray-200 focus:border-blue-600 rounded-xl px-4 text-center text-lg tracking-widest text-gray-900 font-bold outline-none force-ltr"
                   />
                 </div>
 
@@ -1790,7 +1968,7 @@ export default function RoomPage() {
                   type="submit"
                   className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm shadow-sm mt-2 transition-all"
                 >
-                  Enter Waiting Lobby
+                  {isArabic ? 'ادخل اللوبي' : 'Enter Waiting Lobby'}
                 </button>
               </form>
             </motion.div>
@@ -1811,22 +1989,26 @@ export default function RoomPage() {
               <div className="w-12 h-12 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center mx-auto text-rose-600">
                 <UserX className="w-6 h-6" />
               </div>
-              <h4 className="text-lg font-bold text-gray-900">Kick {kickTarget.username}?</h4>
+              <h4 className="text-lg font-bold text-gray-900">
+                {isArabic ? `طرد ${kickTarget.username}؟` : `Kick ${kickTarget.username}?`}
+              </h4>
               <p className="text-xs text-gray-500 font-medium">
-                Are you sure you want to remove this player from the room?
+                {isArabic
+                  ? 'هل أنت متأكد من رغبتك في إزالة هذا اللاعب من الغرفة؟'
+                  : 'Are you sure you want to remove this player from the room?'}
               </p>
               <div className="flex gap-2 pt-1">
                 <button
                   onClick={() => setKickTarget(null)}
                   className="flex-1 h-10 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 font-bold text-xs"
                 >
-                  Cancel
+                  {isArabic ? 'إلغاء' : 'Cancel'}
                 </button>
                 <button
                   onClick={handleConfirmKick}
                   className="flex-1 h-10 bg-rose-600 hover:bg-rose-700 rounded-xl text-white font-bold text-xs shadow-sm"
                 >
-                  Yes, Kick
+                  {isArabic ? 'نعم، اطرده' : 'Yes, Kick'}
                 </button>
               </div>
             </motion.div>
@@ -1923,6 +2105,72 @@ export default function RoomPage() {
                   <span>{isSubmittingCard ? 'Adding Card...' : 'Add to Match Rotation'}</span>
                 </button>
               </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* BACK TO LOBBY CONFIRMATION MODAL */}
+      <AnimatePresence>
+        {showBackToLobbyModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-sm bg-white rounded-2xl p-6 border border-gray-200 shadow-xl"
+            >
+              <h3 className="text-lg font-bold text-gray-900 mb-1">
+                {isArabic ? 'العودة للوبي بنفس الروم؟' : 'Return Crew to Lobby?'}
+              </h3>
+              <p className="text-xs text-gray-500 mb-4">
+                {isArabic ? (
+                  <>
+                    كل اللاعبين هيفضلوا في روم <strong className="force-ltr font-mono">{roomCode}</strong> ونرجع سوا لاختيار لعبة تانية.
+                  </>
+                ) : (
+                  <>
+                    All connected players will stay in Room <strong>{roomCode}</strong> and return together to pick another game.
+                  </>
+                )}
+              </p>
+
+              <div className="mb-4 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-gray-800">
+                  <input
+                    type="checkbox"
+                    checked={resetScoresOnLobbyReturn}
+                    onChange={(e) => setResetScoresOnLobbyReturn(e.target.checked)}
+                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                  />
+                  <span>{isArabic ? 'تصفير نقاط كل اللاعبين للبدء من جديد' : 'Reset All Player Scores to 0'}</span>
+                </label>
+                <p className="text-[11px] text-gray-500 mt-1 ml-6 rtl:mr-6 rtl:ml-0">
+                  {resetScoresOnLobbyReturn
+                    ? (isArabic ? 'سيتم مسح جميع النقاط لبدء ماتش جديد تماماً.' : 'Scores will be cleared for a brand-new match.')
+                    : (isArabic ? 'سيحتفظ اللاعبون بنقاطهم السابقة في هذه الجلسة.' : 'Players keep their accumulated scores from this session.')}
+                </p>
+              </div>
+
+              <div className="flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowBackToLobbyModal(false)}
+                  disabled={isActionPending}
+                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-gray-700 hover:bg-gray-100 transition-all"
+                >
+                  {isArabic ? 'إلغاء' : 'Cancel'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleConfirmBackToLobby(resetScoresOnLobbyReturn)}
+                  disabled={isActionPending}
+                  className="px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-xs transition-all flex items-center gap-1.5"
+                >
+                  <Users className="w-4 h-4" />
+                  <span>{isActionPending ? (isArabic ? 'جاري العودة...' : 'Returning...') : (isArabic ? 'العودة للوبي' : 'Back to Lobby')}</span>
+                </button>
+              </div>
             </motion.div>
           </div>
         )}

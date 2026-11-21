@@ -1,0 +1,737 @@
+[
+  {
+    "word": "Sun",
+    "category": "Nature",
+    "difficulty": "easy",
+    "categoryAr": "طبيعة ومناظر",
+    "wordAr": "شمس"
+  },
+  {
+    "word": "Tree",
+    "category": "Nature",
+    "difficulty": "easy",
+    "categoryAr": "طبيعة ومناظر",
+    "wordAr": "شجرة"
+  },
+  {
+    "word": "Apple",
+    "category": "Food",
+    "difficulty": "easy",
+    "categoryAr": "أكلات ومشروبات",
+    "wordAr": "تفاحة"
+  },
+  {
+    "word": "Car",
+    "category": "Vehicles",
+    "difficulty": "easy",
+    "categoryAr": "عربيات ومركبات",
+    "wordAr": "عربية"
+  },
+  {
+    "word": "Fish",
+    "category": "Animals",
+    "difficulty": "easy",
+    "categoryAr": "حيوانات",
+    "wordAr": "Fish"
+  },
+  {
+    "word": "House",
+    "category": "Architecture",
+    "difficulty": "easy",
+    "categoryAr": "Architecture",
+    "wordAr": "House"
+  },
+  {
+    "word": "Cloud",
+    "category": "Weather",
+    "difficulty": "easy",
+    "categoryAr": "Weather",
+    "wordAr": "Cloud"
+  },
+  {
+    "word": "Moon",
+    "category": "Space",
+    "difficulty": "easy",
+    "categoryAr": "فضاء وكواكب",
+    "wordAr": "Moon"
+  },
+  {
+    "word": "Star",
+    "category": "Space",
+    "difficulty": "easy",
+    "categoryAr": "فضاء وكواكب",
+    "wordAr": "Star"
+  },
+  {
+    "word": "Cat",
+    "category": "Animals",
+    "difficulty": "easy",
+    "categoryAr": "حيوانات",
+    "wordAr": "قطة"
+  },
+  {
+    "word": "Dog",
+    "category": "Animals",
+    "difficulty": "easy",
+    "categoryAr": "حيوانات",
+    "wordAr": "كلب"
+  },
+  {
+    "word": "Ball",
+    "category": "Toys",
+    "difficulty": "easy",
+    "categoryAr": "Toys",
+    "wordAr": "Ball"
+  },
+  {
+    "word": "Book",
+    "category": "Objects",
+    "difficulty": "easy",
+    "categoryAr": "أشياء وأدوات",
+    "wordAr": "Book"
+  },
+  {
+    "word": "Clock",
+    "category": "Objects",
+    "difficulty": "easy",
+    "categoryAr": "أشياء وأدوات",
+    "wordAr": "ساعة حائط"
+  },
+  {
+    "word": "Cup",
+    "category": "Kitchen",
+    "difficulty": "easy",
+    "categoryAr": "Kitchen",
+    "wordAr": "Cup"
+  },
+  {
+    "word": "Door",
+    "category": "House",
+    "difficulty": "easy",
+    "categoryAr": "House",
+    "wordAr": "Door"
+  },
+  {
+    "word": "Eye",
+    "category": "Body",
+    "difficulty": "easy",
+    "categoryAr": "Body",
+    "wordAr": "Eye"
+  },
+  {
+    "word": "Flower",
+    "category": "Nature",
+    "difficulty": "easy",
+    "categoryAr": "طبيعة ومناظر",
+    "wordAr": "Flower"
+  },
+  {
+    "word": "Hat",
+    "category": "Clothes",
+    "difficulty": "easy",
+    "categoryAr": "Clothes",
+    "wordAr": "Hat"
+  },
+  {
+    "word": "Key",
+    "category": "Objects",
+    "difficulty": "easy",
+    "categoryAr": "أشياء وأدوات",
+    "wordAr": "مفتاح"
+  },
+  {
+    "word": "Leaf",
+    "category": "Nature",
+    "difficulty": "easy",
+    "categoryAr": "طبيعة ومناظر",
+    "wordAr": "Leaf"
+  },
+  {
+    "word": "Pencil",
+    "category": "Stationery",
+    "difficulty": "easy",
+    "categoryAr": "Stationery",
+    "wordAr": "Pencil"
+  },
+  {
+    "word": "Ring",
+    "category": "Jewelry",
+    "difficulty": "easy",
+    "categoryAr": "Jewelry",
+    "wordAr": "Ring"
+  },
+  {
+    "word": "Smile",
+    "category": "Emotions",
+    "difficulty": "easy",
+    "categoryAr": "Emotions",
+    "wordAr": "Smile"
+  },
+  {
+    "word": "Shoe",
+    "category": "Clothes",
+    "difficulty": "easy",
+    "categoryAr": "Clothes",
+    "wordAr": "Shoe"
+  },
+  {
+    "word": "Snake",
+    "category": "Animals",
+    "difficulty": "easy",
+    "categoryAr": "حيوانات",
+    "wordAr": "Snake"
+  },
+  {
+    "word": "Water",
+    "category": "Nature",
+    "difficulty": "easy",
+    "categoryAr": "طبيعة ومناظر",
+    "wordAr": "Water"
+  },
+  {
+    "word": "Bridge",
+    "category": "Places",
+    "difficulty": "easy",
+    "categoryAr": "أماكن ومعالم",
+    "wordAr": "Bridge"
+  },
+  {
+    "word": "Chair",
+    "category": "Furniture",
+    "difficulty": "easy",
+    "categoryAr": "Furniture",
+    "wordAr": "Chair"
+  },
+  {
+    "word": "Heart",
+    "category": "Symbols",
+    "difficulty": "easy",
+    "categoryAr": "Symbols",
+    "wordAr": "Heart"
+  },
+  {
+    "word": "Bicycle",
+    "category": "Vehicles",
+    "difficulty": "medium",
+    "categoryAr": "عربيات ومركبات",
+    "wordAr": "عجلة بسكلتة"
+  },
+  {
+    "word": "Camera",
+    "category": "Electronics",
+    "difficulty": "medium",
+    "categoryAr": "Electronics",
+    "wordAr": "Camera"
+  },
+  {
+    "word": "Guitar",
+    "category": "Music",
+    "difficulty": "medium",
+    "categoryAr": "مزيكا وأغاني",
+    "wordAr": "جيتار"
+  },
+  {
+    "word": "Laptop",
+    "category": "Technology",
+    "difficulty": "medium",
+    "categoryAr": "تكنولوجيا واختراعات",
+    "wordAr": "لابتوب"
+  },
+  {
+    "word": "Rocket",
+    "category": "Space",
+    "difficulty": "medium",
+    "categoryAr": "فضاء وكواكب",
+    "wordAr": "صاروخ فضاء"
+  },
+  {
+    "word": "Spider",
+    "category": "Animals",
+    "difficulty": "medium",
+    "categoryAr": "حيوانات",
+    "wordAr": "Spider"
+  },
+  {
+    "word": "Turtle",
+    "category": "Animals",
+    "difficulty": "medium",
+    "categoryAr": "حيوانات",
+    "wordAr": "Turtle"
+  },
+  {
+    "word": "Volcano",
+    "category": "Nature",
+    "difficulty": "medium",
+    "categoryAr": "طبيعة ومناظر",
+    "wordAr": "Volcano"
+  },
+  {
+    "word": "Castle",
+    "category": "Buildings",
+    "difficulty": "medium",
+    "categoryAr": "مباني وعمارة",
+    "wordAr": "قلعة"
+  },
+  {
+    "word": "Anchor",
+    "category": "Nautical",
+    "difficulty": "medium",
+    "categoryAr": "Nautical",
+    "wordAr": "Anchor"
+  },
+  {
+    "word": "Balloon",
+    "category": "Party",
+    "difficulty": "medium",
+    "categoryAr": "Party",
+    "wordAr": "Balloon"
+  },
+  {
+    "word": "Candle",
+    "category": "Objects",
+    "difficulty": "medium",
+    "categoryAr": "أشياء وأدوات",
+    "wordAr": "شمعة"
+  },
+  {
+    "word": "Dragon",
+    "category": "Fantasy",
+    "difficulty": "medium",
+    "categoryAr": "Fantasy",
+    "wordAr": "Dragon"
+  },
+  {
+    "word": "Ghost",
+    "category": "Spooky",
+    "difficulty": "medium",
+    "categoryAr": "Spooky",
+    "wordAr": "Ghost"
+  },
+  {
+    "word": "Helmet",
+    "category": "Gear",
+    "difficulty": "medium",
+    "categoryAr": "Gear",
+    "wordAr": "Helmet"
+  },
+  {
+    "word": "Island",
+    "category": "Geography",
+    "difficulty": "medium",
+    "categoryAr": "جغرافيا ومدن",
+    "wordAr": "Island"
+  },
+  {
+    "word": "Jellyfish",
+    "category": "Ocean",
+    "difficulty": "medium",
+    "categoryAr": "Ocean",
+    "wordAr": "Jellyfish"
+  },
+  {
+    "word": "Knight",
+    "category": "History",
+    "difficulty": "medium",
+    "categoryAr": "تاريخ وحضارات",
+    "wordAr": "Knight"
+  },
+  {
+    "word": "Lighthouse",
+    "category": "Architecture",
+    "difficulty": "medium",
+    "categoryAr": "Architecture",
+    "wordAr": "Lighthouse"
+  },
+  {
+    "word": "Magnet",
+    "category": "Science",
+    "difficulty": "medium",
+    "categoryAr": "علوم وطبيعة",
+    "wordAr": "Magnet"
+  },
+  {
+    "word": "Ninja",
+    "category": "Characters",
+    "difficulty": "medium",
+    "categoryAr": "Characters",
+    "wordAr": "Ninja"
+  },
+  {
+    "word": "Owl",
+    "category": "Birds",
+    "difficulty": "medium",
+    "categoryAr": "Birds",
+    "wordAr": "بومة"
+  },
+  {
+    "word": "Pirate",
+    "category": "Characters",
+    "difficulty": "medium",
+    "categoryAr": "Characters",
+    "wordAr": "Pirate"
+  },
+  {
+    "word": "Rainbow",
+    "category": "Weather",
+    "difficulty": "medium",
+    "categoryAr": "Weather",
+    "wordAr": "Rainbow"
+  },
+  {
+    "word": "Robot",
+    "category": "Sci-Fi",
+    "difficulty": "medium",
+    "categoryAr": "Sci-Fi",
+    "wordAr": "روبوت"
+  },
+  {
+    "word": "Sailboat",
+    "category": "Vehicles",
+    "difficulty": "medium",
+    "categoryAr": "عربيات ومركبات",
+    "wordAr": "Sailboat"
+  },
+  {
+    "word": "Teapot",
+    "category": "Kitchen",
+    "difficulty": "medium",
+    "categoryAr": "Kitchen",
+    "wordAr": "Teapot"
+  },
+  {
+    "word": "Umbrella",
+    "category": "Weather",
+    "difficulty": "medium",
+    "categoryAr": "Weather",
+    "wordAr": "شمسية"
+  },
+  {
+    "word": "Violin",
+    "category": "Music",
+    "difficulty": "medium",
+    "categoryAr": "مزيكا وأغاني",
+    "wordAr": "كمانجة"
+  },
+  {
+    "word": "Windmill",
+    "category": "Buildings",
+    "difficulty": "medium",
+    "categoryAr": "مباني وعمارة",
+    "wordAr": "Windmill"
+  },
+  {
+    "word": "Alien",
+    "category": "Sci-Fi",
+    "difficulty": "medium",
+    "categoryAr": "Sci-Fi",
+    "wordAr": "Alien"
+  },
+  {
+    "word": "Campfire",
+    "category": "Outdoors",
+    "difficulty": "medium",
+    "categoryAr": "Outdoors",
+    "wordAr": "Campfire"
+  },
+  {
+    "word": "Diamond",
+    "category": "Valuables",
+    "difficulty": "medium",
+    "categoryAr": "Valuables",
+    "wordAr": "ألماظ"
+  },
+  {
+    "word": "Firework",
+    "category": "Celebration",
+    "difficulty": "medium",
+    "categoryAr": "Celebration",
+    "wordAr": "Firework"
+  },
+  {
+    "word": "Giraffe",
+    "category": "Animals",
+    "difficulty": "medium",
+    "categoryAr": "حيوانات",
+    "wordAr": "زرافة"
+  },
+  {
+    "word": "Astronaut",
+    "category": "Space",
+    "difficulty": "hard",
+    "categoryAr": "فضاء وكواكب",
+    "wordAr": "رائد فضاء"
+  },
+  {
+    "word": "Black Hole",
+    "category": "Space",
+    "difficulty": "hard",
+    "categoryAr": "فضاء وكواكب",
+    "wordAr": "ثقب أسود"
+  },
+  {
+    "word": "Chameleon",
+    "category": "Animals",
+    "difficulty": "hard",
+    "categoryAr": "حيوانات",
+    "wordAr": "حرباء"
+  },
+  {
+    "word": "Dinosaur",
+    "category": "History",
+    "difficulty": "hard",
+    "categoryAr": "تاريخ وحضارات",
+    "wordAr": "Dinosaur"
+  },
+  {
+    "word": "Electricity",
+    "category": "Science",
+    "difficulty": "hard",
+    "categoryAr": "علوم وطبيعة",
+    "wordAr": "Electricity"
+  },
+  {
+    "word": "Frankenstein",
+    "category": "Monsters",
+    "difficulty": "hard",
+    "categoryAr": "Monsters",
+    "wordAr": "Frankenstein"
+  },
+  {
+    "word": "Gravity",
+    "category": "Physics",
+    "difficulty": "hard",
+    "categoryAr": "Physics",
+    "wordAr": "Gravity"
+  },
+  {
+    "word": "Helicopter",
+    "category": "Aviation",
+    "difficulty": "hard",
+    "categoryAr": "Aviation",
+    "wordAr": "هليكوبتر"
+  },
+  {
+    "word": "Internet",
+    "category": "Technology",
+    "difficulty": "hard",
+    "categoryAr": "تكنولوجيا واختراعات",
+    "wordAr": "Internet"
+  },
+  {
+    "word": "Kaleidoscope",
+    "category": "Art",
+    "difficulty": "hard",
+    "categoryAr": "Art",
+    "wordAr": "Kaleidoscope"
+  },
+  {
+    "word": "Labyrinth",
+    "category": "Puzzles",
+    "difficulty": "hard",
+    "categoryAr": "Puzzles",
+    "wordAr": "Labyrinth"
+  },
+  {
+    "word": "Microscope",
+    "category": "Laboratory",
+    "difficulty": "hard",
+    "categoryAr": "Laboratory",
+    "wordAr": "Microscope"
+  },
+  {
+    "word": "Nightmare",
+    "category": "Abstract",
+    "difficulty": "hard",
+    "categoryAr": "Abstract",
+    "wordAr": "Nightmare"
+  },
+  {
+    "word": "Origami",
+    "category": "Crafts",
+    "difficulty": "hard",
+    "categoryAr": "Crafts",
+    "wordAr": "Origami"
+  },
+  {
+    "word": "Pyramid",
+    "category": "History",
+    "difficulty": "hard",
+    "categoryAr": "تاريخ وحضارات",
+    "wordAr": "Pyramid"
+  },
+  {
+    "word": "Quarantine",
+    "category": "Concepts",
+    "difficulty": "hard",
+    "categoryAr": "Concepts",
+    "wordAr": "Quarantine"
+  },
+  {
+    "word": "Rollercoaster",
+    "category": "Amusement",
+    "difficulty": "hard",
+    "categoryAr": "Amusement",
+    "wordAr": "Rollercoaster"
+  },
+  {
+    "word": "Submarine",
+    "category": "Nautical",
+    "difficulty": "hard",
+    "categoryAr": "Nautical",
+    "wordAr": "غواصة"
+  },
+  {
+    "word": "Time Machine",
+    "category": "Sci-Fi",
+    "difficulty": "hard",
+    "categoryAr": "Sci-Fi",
+    "wordAr": "Time Machine"
+  },
+  {
+    "word": "Unicorn",
+    "category": "Mythology",
+    "difficulty": "hard",
+    "categoryAr": "Mythology",
+    "wordAr": "Unicorn"
+  },
+  {
+    "word": "Virtual Reality",
+    "category": "Gaming",
+    "difficulty": "hard",
+    "categoryAr": "ألعاب وجيمينج",
+    "wordAr": "نظارة واقع افتراضي"
+  },
+  {
+    "word": "Waterfall",
+    "category": "Landscapes",
+    "difficulty": "hard",
+    "categoryAr": "Landscapes",
+    "wordAr": "Waterfall"
+  },
+  {
+    "word": "Xylophone",
+    "category": "Music",
+    "difficulty": "hard",
+    "categoryAr": "مزيكا وأغاني",
+    "wordAr": "Xylophone"
+  },
+  {
+    "word": "Yacht",
+    "category": "Luxury",
+    "difficulty": "hard",
+    "categoryAr": "Luxury",
+    "wordAr": "Yacht"
+  },
+  {
+    "word": "Zeppelin",
+    "category": "Aviation",
+    "difficulty": "hard",
+    "categoryAr": "Aviation",
+    "wordAr": "Zeppelin"
+  },
+  {
+    "word": "Archaeologist",
+    "category": "Professions",
+    "difficulty": "hard",
+    "categoryAr": "مهن ووظائف",
+    "wordAr": "Archaeologist"
+  },
+  {
+    "word": "Boomerang",
+    "category": "Weapons",
+    "difficulty": "hard",
+    "categoryAr": "Weapons",
+    "wordAr": "Boomerang"
+  },
+  {
+    "word": "Centaur",
+    "category": "Mythology",
+    "difficulty": "hard",
+    "categoryAr": "Mythology",
+    "wordAr": "Centaur"
+  },
+  {
+    "word": "Disguise",
+    "category": "Concepts",
+    "difficulty": "hard",
+    "categoryAr": "Concepts",
+    "wordAr": "Disguise"
+  },
+  {
+    "word": "Eclipse",
+    "category": "Astronomy",
+    "difficulty": "hard",
+    "categoryAr": "Astronomy",
+    "wordAr": "Eclipse"
+  },
+  {
+    "word": "Fossil",
+    "category": "Archaeology",
+    "difficulty": "hard",
+    "categoryAr": "Archaeology",
+    "wordAr": "Fossil"
+  },
+  {
+    "word": "Glacier",
+    "category": "Nature",
+    "difficulty": "hard",
+    "categoryAr": "طبيعة ومناظر",
+    "wordAr": "Glacier"
+  },
+  {
+    "word": "Hologram",
+    "category": "Sci-Fi",
+    "difficulty": "hard",
+    "categoryAr": "Sci-Fi",
+    "wordAr": "Hologram"
+  },
+  {
+    "word": "Inception",
+    "category": "Concepts",
+    "difficulty": "hard",
+    "categoryAr": "Concepts",
+    "wordAr": "Inception"
+  },
+  {
+    "word": "Jukebox",
+    "category": "Retro",
+    "difficulty": "hard",
+    "categoryAr": "Retro",
+    "wordAr": "Jukebox"
+  },
+  {
+    "word": "King Kong",
+    "category": "Cinema",
+    "difficulty": "hard",
+    "categoryAr": "Cinema",
+    "wordAr": "King Kong"
+  },
+  {
+    "word": "Loch Ness Monster",
+    "category": "Cryptids",
+    "difficulty": "hard",
+    "categoryAr": "Cryptids",
+    "wordAr": "Loch Ness Monster"
+  },
+  {
+    "word": "Meteor Shower",
+    "category": "Astronomy",
+    "difficulty": "hard",
+    "categoryAr": "Astronomy",
+    "wordAr": "Meteor Shower"
+  },
+  {
+    "word": "Nebula",
+    "category": "Cosmos",
+    "difficulty": "hard",
+    "categoryAr": "Cosmos",
+    "wordAr": "سديم"
+  },
+  {
+    "word": "Oasis",
+    "category": "Desert",
+    "difficulty": "hard",
+    "categoryAr": "Desert",
+    "wordAr": "Oasis"
+  }
+]
