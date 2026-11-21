@@ -1,16 +1,43 @@
 import Ably from 'ably';
 
-const apiKey = process.env.ABLY_API_KEY;
-
 // Server-side Ably REST client (singleton)
 let ablyRestInstance: Ably.Rest | null = null;
+let ablyInitFailed = false;
+
+/**
+ * Checks whether ABLY_API_KEY is present and looks like a real Ably key (`appId.keyId:secret`),
+ * ignoring common placeholder values from .env.example.
+ */
+export const isAblyConfigured = (): boolean => {
+  const key = (process.env.ABLY_API_KEY || '').trim();
+  if (!key) return false;
+  const lower = key.toLowerCase();
+  if (
+    lower.includes('your-ably') ||
+    lower.includes('your_ably') ||
+    lower.includes('placeholder') ||
+    lower.includes('changeme') ||
+    lower.includes('example')
+  ) {
+    return false;
+  }
+  const colonIdx = key.indexOf(':');
+  const dotIdx = key.indexOf('.');
+  return dotIdx > 0 && colonIdx > dotIdx + 1 && colonIdx < key.length - 1;
+};
 
 export const getAblyRest = (): Ably.Rest | null => {
-  if (!apiKey) {
+  if (ablyInitFailed || !isAblyConfigured()) {
     return null;
   }
   if (!ablyRestInstance) {
-    ablyRestInstance = new Ably.Rest({ key: apiKey });
+    try {
+      ablyRestInstance = new Ably.Rest({ key: (process.env.ABLY_API_KEY || '').trim() });
+    } catch (err: any) {
+      ablyInitFailed = true;
+      console.warn('⚠️ [Ably] Invalid ABLY_API_KEY — falling back to local mode:', err?.message || err);
+      return null;
+    }
   }
   return ablyRestInstance;
 };

@@ -146,7 +146,10 @@ const getMemoryStore = (): MemoryRedisStore => {
 };
 
 const isUpstashConfigured = Boolean(
-  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+  process.env.UPSTASH_REDIS_REST_URL &&
+  process.env.UPSTASH_REDIS_REST_TOKEN &&
+  !process.env.UPSTASH_REDIS_REST_URL.includes('your-upstash') &&
+  !process.env.UPSTASH_REDIS_REST_TOKEN.includes('your-upstash')
 );
 
 /**
@@ -470,11 +473,12 @@ export function sanitizeRoomState(room: RoomState): PublicRoomState {
 
   return {
     code: room.code,
+    roomName: room.roomName || room.config.roomName || `Room ${room.code}`,
     hostId: room.hostId,
     status: room.status,
     phase: room.phase || room.gameData?.phase,
     config: {
-      roomName: room.config.roomName || `Room ${room.code}`,
+      roomName: room.roomName || room.config.roomName || `Room ${room.code}`,
       maxPlayers: room.config.maxPlayers,
       isPrivate: room.config.isPrivate,
       hasPin: room.config.hasPin,
@@ -486,7 +490,8 @@ export function sanitizeRoomState(room: RoomState): PublicRoomState {
       vibeMode: room.config.vibeMode || 'chill',
       customDeckId: room.config.customDeckId,
       allowSpectators: room.config.allowSpectators,
-      isTeamMode: room.config.isTeamMode
+      isTeamMode: room.config.isTeamMode,
+      ...((room.config as any).isSoloDevMode !== undefined ? { isSoloDevMode: Boolean((room.config as any).isSoloDevMode) } : {})
     },
     selectedGames: room.selectedGames || room.config.selectedGames || [room.config.gameMode],
     currentGameIndex: room.currentGameIndex ?? room.config.currentGameIndex ?? 0,

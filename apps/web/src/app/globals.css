@@ -106,6 +106,10 @@ html[dir="rtl"] .font-heading {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+.pb-safe {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+}
+
 .safe-left {
   padding-left: env(safe-area-inset-left, 0px);
 }

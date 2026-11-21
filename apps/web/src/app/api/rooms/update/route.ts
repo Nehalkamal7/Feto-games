@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getRoomState, normalizeRoomCode, sanitizeRoomState, saveRoomState } from '@/lib/redis';
+import { addPublicRoomDirectory, getRoomState, normalizeRoomCode, sanitizeRoomState, saveRoomState } from '@/lib/redis';
 import { publishToRoom } from '@/lib/ably-server';
 import { GameMode, PlayerTeam } from '@feto-games/shared-types';
 
@@ -40,6 +40,33 @@ export async function POST(req: NextRequest) {
         { success: false, error: { message: 'Cannot modify settings while a game is active.' } },
         { status: 400 }
       );
+    }
+
+    // 0. Room Name & Visibility / PIN
+    if (settings.roomName !== undefined) {
+      const cleanedName = String(settings.roomName).trim().slice(0, 30);
+      room.roomName = cleanedName || `Room ${room.code}`;
+      room.config.roomName = room.roomName;
+    }
+
+    if (settings.isPrivate !== undefined) {
+      const nextPrivate = Boolean(settings.isPrivate);
+      room.config.isPrivate = nextPrivate;
+      if (!nextPrivate) {
+        room.config.hasPin = false;
+        room.config.pinHash = undefined;
+      }
+    }
+
+    if (settings.pin !== undefined) {
+      const cleanedPin = settings.pin ? String(settings.pin).replace(/[^0-9]/g, '').slice(0, 6) : '';
+      if (room.config.isPrivate && cleanedPin.length >= 4) {
+        room.config.hasPin = true;
+        room.config.pinHash = cleanedPin;
+      } else if (cleanedPin.length === 0 && settings.clearPin) {
+        room.config.hasPin = false;
+        room.config.pinHash = undefined;
+      }
     }
 
     // 1. Game Mode / Selected Game
@@ -101,6 +128,28 @@ export async function POST(req: NextRequest) {
     room.lastActivityAt = Date.now();
     await saveRoomState(room, 7200);
 
+    // Sync public room directory if public & still in lobby
+    if (!room.config.isPrivate && room.status === 'lobby') {
+      const activePlayers = Object.values(room.players || {}).filter(
+        (p) => p.connectionStatus !== 'disconnected'
+      );
+      if (activePlayers.length > 0 && activePlayers.length < room.config.maxPlayers) {
+        const host = room.players[room.hostId] || activePlayers[0];
+        await addPublicRoomDirectory({
+          code: room.code,
+          hostUsername: host?.username || 'Host',
+          hostAvatar: host?.avatar || 'cyber_cat',
+          playerCount: activePlayers.length,
+          maxPlayers: room.config.maxPlayers,
+          status: 'lobby',
+          gameMode: room.config.gameMode,
+          hasPin: Boolean(room.config.hasPin),
+          isTeamMode: Boolean(room.config.isTeamMode),
+          createdAt: room.createdAt
+        });
+      }
+    }
+
     const publicRoom = sanitizeRoomState(room);
 
     // Broadcast live to all connected players over Ably channel
@@ -112,6 +161,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      room: publicRoom,
       data: {
         room: publicRoom,
         config: publicRoom.config

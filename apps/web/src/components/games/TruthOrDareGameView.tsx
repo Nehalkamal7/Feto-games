@@ -108,7 +108,7 @@ export const TruthOrDareGameView: React.FC<TruthOrDareGameViewProps> = ({
               </span>
               <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold capitalize">
                 {isAr
-                  ? (String(gameState.intensity) === 'spicy' ? 'وضع حامي 🔥' : String(gameState.intensity) === 'silly' ? 'وضع مجنون 🤪' : 'وضع كلاسيك')
+                  ? (gameState.intensity === 'wild' ? 'وضع حامي 🔥' : gameState.intensity === 'party' ? 'وضع حفلة 🎉' : 'وضع رايق')
                   : `${gameState.intensity} Mode`}
               </span>
             </div>

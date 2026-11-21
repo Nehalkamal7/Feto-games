@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { NeonAvatarId, NEON_AVATARS } from '@feto-games/shared-types';
 import { NeonAvatarDisplay } from './NeonAvatarDisplay';
 import { Dices, Edit3, Check, Sparkles, Star, Zap } from 'lucide-react';
-import { PINNED_NICKNAMES, rollDynamicNicknames } from '@/lib/nicknames';
+import { CREATIVE_NICKNAMES_POOL, PINNED_NICKNAMES, rollDynamicNicknames } from '@/lib/nicknames';
 import { sound } from '@/lib/sound';
 import { useLanguage } from '@/hooks/useLanguage';
 
@@ -29,9 +29,13 @@ export function PlayerProfileBar({
   const [isOpen, setIsOpen] = useState(false);
   const [tempName, setTempName] = useState(username);
   const [dynamicChips, setDynamicChips] = useState<string[]>(() =>
-    rollDynamicNicknames([], 4)
+    CREATIVE_NICKNAMES_POOL.slice(0, 4)
   );
   const [isRolling, setIsRolling] = useState(false);
+
+  useEffect(() => {
+    setDynamicChips(rollDynamicNicknames([], 4));
+  }, []);
 
   const handleOpen = () => {
     sound.playClick();

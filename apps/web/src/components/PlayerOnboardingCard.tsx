@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Dices, Sparkles, Star, Zap, Check, ChevronDown, User, X } from 'lucide-react';
 import { NeonAvatarDisplay } from './NeonAvatarDisplay';
 import { NeonAvatarId, NEON_AVATARS } from '@feto-games/shared-types';
-import { PINNED_NICKNAMES, rollDynamicNicknames } from '@/lib/nicknames';
+import { CREATIVE_NICKNAMES_POOL, PINNED_NICKNAMES, rollDynamicNicknames } from '@/lib/nicknames';
 import { sound } from '@/lib/sound';
 import { useLanguage } from '@/hooks/useLanguage';
 
@@ -28,20 +28,17 @@ export function PlayerOnboardingCard({
 }: PlayerOnboardingCardProps) {
   const { isArabic, t } = useLanguage();
 
-  // 4 dynamic rolled nicknames (initialized with 4 random names from the pool)
+  // Deterministic initial slice for SSR hydration safety; randomized client-side after mount
   const [dynamicNicknames, setDynamicNicknames] = useState<string[]>(() =>
-    rollDynamicNicknames([], 4)
+    CREATIVE_NICKNAMES_POOL.slice(0, 4)
   );
 
   const [isRolling, setIsRolling] = useState(false);
   const [showAvatarDrawer, setShowAvatarDrawer] = useState(showAvatarPickerInline);
 
-  // Keep dynamic nicknames populated on initial mount if empty
   useEffect(() => {
-    if (dynamicNicknames.length < 4) {
-      setDynamicNicknames(rollDynamicNicknames([], 4));
-    }
-  }, [dynamicNicknames.length]);
+    setDynamicNicknames(rollDynamicNicknames([], 4));
+  }, []);
 
   // Roll fresh dynamic nicknames (never touches the 4 pinned ones)
   const handleRoll = () => {

@@ -10,9 +10,10 @@ import { useLanguage } from '@/hooks/useLanguage';
 interface RoomLobbyQRCodeProps {
   roomCode: string;
   isStreamerMode?: boolean;
+  compact?: boolean;
 }
 
-export function RoomLobbyQRCode({ roomCode, isStreamerMode = false }: RoomLobbyQRCodeProps) {
+export function RoomLobbyQRCode({ roomCode, isStreamerMode = false, compact = false }: RoomLobbyQRCodeProps) {
   const { language } = useLanguage();
   const isAr = language === 'ar';
   const [isOpen, setIsOpen] = useState(false);
@@ -33,20 +34,24 @@ export function RoomLobbyQRCode({ roomCode, isStreamerMode = false }: RoomLobbyQ
 
   return (
     <>
-      {/* Compact Lobby Pill Trigger */}
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => {
-            sound.playClick();
-            setIsOpen(true);
-          }}
-          className="h-9 sm:h-10 px-3 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-gray-800 text-xs font-semibold inline-flex items-center gap-1.5 transition-all shadow-xs"
-          title={isAr ? 'فتح رمز QR للانضمام السريع' : 'Open Scannable Party QR Code'}
-        >
-          <QrCode className="w-4 h-4 text-gray-700 shrink-0" />
-          <span className="hidden sm:inline">{isAr ? 'رمز QR' : 'Scan QR'}</span>
-        </button>
-      </div>
+      {/* Compact Lobby Trigger */}
+      <button
+        type="button"
+        onClick={() => {
+          sound.playClick();
+          setIsOpen(true);
+        }}
+        className={
+          compact
+            ? 'w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 inline-flex items-center justify-center shrink-0 transition-colors active:scale-95'
+            : 'h-9 sm:h-10 px-3 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-gray-800 text-xs font-semibold inline-flex items-center gap-1.5 transition-all shadow-xs shrink-0'
+        }
+        title={isAr ? 'رمز QR للانضمام السريع' : 'Show QR Code'}
+        aria-label={isAr ? 'رمز QR للانضمام السريع' : 'Show QR Code'}
+      >
+        <QrCode className="w-4 h-4 text-gray-700 shrink-0" />
+        {!compact && <span className="hidden sm:inline">{isAr ? 'رمز QR' : 'Scan QR'}</span>}
+      </button>
 
       {/* Expandable Scannable QR Modal */}
       <AnimatePresence>

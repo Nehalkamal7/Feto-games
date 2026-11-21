@@ -281,6 +281,10 @@ export async function socketSetReady(dto: SetReadyDTO): Promise<void> {
 
   const json = await res.json();
   if (!json.success) throw new Error(json.error?.message || 'Failed to toggle ready');
+  const updatedRoom = json.room || json.data?.room;
+  if (updatedRoom) {
+    getSocket().dispatch('room_updated', updatedRoom);
+  }
 }
 
 export async function socketUpdateSettings(dto: UpdateRoomSettingsDTO | any): Promise<void> {
@@ -300,6 +304,10 @@ export async function socketUpdateSettings(dto: UpdateRoomSettingsDTO | any): Pr
 
   const json = await res.json();
   if (!json.success) throw new Error(json.error?.message || 'Failed to update settings');
+  const updatedRoom = json.room || json.data?.room;
+  if (updatedRoom) {
+    getSocket().dispatch('room_updated', updatedRoom);
+  }
 }
 
 export async function socketKickPlayer(dto: KickPlayerDTO): Promise<void> {
@@ -321,6 +329,10 @@ export async function socketKickPlayer(dto: KickPlayerDTO): Promise<void> {
 
   const json = await res.json();
   if (!json.success) throw new Error(json.error?.message || 'Failed to kick player');
+  const updatedRoom = json.room || json.data?.room;
+  if (updatedRoom) {
+    getSocket().dispatch('room_updated', updatedRoom);
+  }
 }
 
 export async function socketStartGame(isSoloDevMode = false, force = false): Promise<any> {
@@ -365,6 +377,10 @@ export async function socketSelectGames(selectedGames: GameMode[]): Promise<void
 
   const json = await res.json();
   if (!json.success) throw new Error(json.error?.message || 'Failed to update playlist');
+  const updatedRoom = json.room || json.data?.room;
+  if (updatedRoom) {
+    getSocket().dispatch('room_updated', updatedRoom);
+  }
 }
 
 export async function socketLeaveRoom(): Promise<void> {
@@ -396,6 +412,10 @@ export async function socketSelectTeam(team?: PlayerTeam): Promise<void> {
 
   const json = await res.json();
   if (!json.success) throw new Error(json.error?.message || 'Failed to select team');
+  const updatedRoom = json.room || json.data?.room;
+  if (updatedRoom) {
+    getSocket().dispatch('room_updated', updatedRoom);
+  }
 }
 
 export async function socketRematch(nextGameMode?: GameMode): Promise<void> {

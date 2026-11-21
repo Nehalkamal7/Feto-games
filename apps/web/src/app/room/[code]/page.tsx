@@ -13,21 +13,18 @@ import {
   LogOut,
   Settings,
   UserX,
-  Share2,
   AlertTriangle,
   Lock,
-  Eye,
-  EyeOff,
   Zap,
   Sparkles,
   Users,
   Shield,
-  Sliders,
-  ChevronDown,
   Wine,
   PlusCircle,
   RotateCcw,
-  ArrowRight
+  ArrowRight,
+  Link2,
+  X
 } from 'lucide-react';
 import {
   GameMode,
@@ -49,7 +46,7 @@ import { SoundToggle } from '@/components/SoundToggle';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { useLanguage } from '@/hooks/useLanguage';
 import { RoomLobbyQRCode } from '@/components/RoomLobbyQRCode';
-import { RoomSettingsModal } from '@/components/RoomSettingsModal';
+import { RoomSettingsModal, RoomSettingsPayload } from '@/components/RoomSettingsModal';
 import { GamePlaylistQueue } from '@/components/GamePlaylistQueue';
 import { SabotageDrawer, SabotageType } from '@/components/SabotageDrawer';
 import { ImposterGameView } from '@/components/games/ImposterGameView';
@@ -693,19 +690,14 @@ export default function RoomPage() {
     showToast(`Player ${kickTarget.username} removed.`);
   };
 
-  const handleSaveSettings = async (newSettings: {
-    roomName: string;
-    maxPlayers: number;
-    roundDurationSeconds: number;
-    totalRounds: number;
-    vibeMode: any;
-    isPrivate: boolean;
-    pin?: string;
-  }): Promise<void> => {
+  const handleSaveSettings = async (newSettings: RoomSettingsPayload): Promise<void> => {
     sound.playClick();
+    if (newSettings.isSoloDevMode !== undefined) {
+      setIsSoloDevMode(Boolean(newSettings.isSoloDevMode));
+    }
     await socketUpdateSettings(newSettings);
     setShowSettingsModal(false);
-    showToast('Match settings updated!');
+    showToast(isArabic ? 'تم تحديث إعدادات الغرفة!' : 'Room settings updated!');
   };
 
   const handleUpdatePlaylist = (games: GameMode[]) => {
@@ -776,7 +768,7 @@ export default function RoomPage() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-[#F9FAFB] text-gray-900 flex flex-col justify-between max-w-7xl mx-auto px-3 sm:px-6 py-3 sm:py-5 relative safe-top safe-bottom overflow-x-hidden overflow-y-auto">
+    <div className="min-h-[100dvh] bg-[#F9FAFB] text-[#111827] flex flex-col w-full relative safe-top overflow-x-hidden">
       {/* Toast Notification Banner */}
       <AnimatePresence>
         {toastMessage && (
@@ -1065,801 +1057,390 @@ export default function RoomPage() {
         /* ANIMATED PODIUM & REMATCH SCREEN */
         <GamePodiumView room={room} currentPlayer={currentPlayer} />
       ) : (
-        /* WAITING LOBBY (15-PLAYER MODERN LAYOUT) */
-        <div className="flex-1 flex flex-col justify-between py-1 sm:py-2 relative z-10 w-full">
-          <div>
-            {/* 1. TOP HEADER */}
-            <div className="bg-white rounded-2xl px-4 sm:px-6 py-3 sm:py-3.5 mb-4 flex items-center justify-between border border-gray-200 shadow-sm">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <BrandLogo size="nav" showSubtitle={false} />
-                <span className="text-gray-300 font-bold hidden sm:inline">|</span>
-                <div className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold uppercase tracking-wider">
-                  {isArabic ? 'اللوبي' : 'Lobby'}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 sm:gap-3">
-                <LanguageToggle />
-
-                {/* Streamer Mode Toggle */}
+        /* WAITING LOBBY — PLAYER-FIRST MINIMALIST LAYOUT */
+        <>
+          <div className="w-full max-w-4xl mx-auto px-3 sm:px-6 pt-3 sm:pt-5 pb-28 flex-1 flex flex-col gap-5 relative z-10">
+            {/* 1. COMPACT TOP HEADER (NO INLINE SETTINGS CLUTTER) */}
+            <header className="bg-white rounded-2xl border border-gray-200 px-3 sm:px-4 py-2.5 flex items-center justify-between gap-2 shadow-xs">
+              {/* Left/Start: Room Code Badge + Copy Link Icon + QR Icon */}
+              <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
                 <button
-                  onClick={() => {
-                    sound.playClick();
-                    setIsStreamerMode(!isStreamerMode);
-                    showToast(
-                      isStreamerMode
-                        ? (isArabic ? 'تم إلغاء مود البث (الكود ظاهر)' : 'Streamer Mode Disabled (Code Visible)')
-                        : (isArabic ? 'تم تفعيل مود البث (الكود مخفي)' : 'Streamer Mode Active (Code Hidden for Streaming)')
-                    );
-                  }}
-                  className={`h-9 px-3 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-all border ${
-                    isStreamerMode
-                      ? 'bg-blue-50 border-blue-200 text-blue-700'
-                      : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
-                  }`}
-                  title={isArabic ? 'تبديل مود البث' : 'Toggle Streamer Mode'}
+                  type="button"
+                  onClick={handleCopyCode}
+                  className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-xl bg-[#F9FAFB] hover:bg-gray-100 border border-gray-200 inline-flex items-center gap-1.5 transition-colors shrink-0 active:scale-95"
+                  title={isArabic ? 'اضغط لنسخ كود الغرفة' : 'Tap to copy room code'}
                 >
-                  {isStreamerMode ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                  <span className="hidden sm:inline">{isArabic ? 'مود البث' : 'Streamer Mode'}</span>
+                  {room.config.hasPin && (
+                    <Lock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                  )}
+                  <span
+                    dir="ltr"
+                    data-room-code="true"
+                    className="font-mono font-extrabold text-sm sm:text-base tracking-wider text-[#111827] force-ltr"
+                  >
+                    {isStreamerMode ? '••••••' : roomCode}
+                  </span>
+                  {copiedCode ? (
+                    <Check className="w-3.5 h-3.5 text-[#10B981] shrink-0" />
+                  ) : (
+                    <Copy className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                  )}
                 </button>
 
-                <div className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="hidden sm:inline">{isArabic ? 'في انتظار اللاعبين...' : 'Waiting for Players...'}</span>
-                  <span className="font-mono font-bold force-ltr">({activePlayers.length}/15)</span>
-                </div>
-              </div>
-            </div>
+                <button
+                  type="button"
+                  onClick={handleCopyInviteLink}
+                  className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl border inline-flex items-center justify-center shrink-0 transition-colors active:scale-95 ${
+                    copiedLink
+                      ? 'bg-emerald-50 border-emerald-200 text-[#10B981]'
+                      : 'bg-white hover:bg-gray-50 border-gray-200 text-gray-700'
+                  }`}
+                  title={isArabic ? 'نسخ رابط الدعوة' : 'Copy Invite Link'}
+                  aria-label={isArabic ? 'نسخ رابط الدعوة' : 'Copy Invite Link'}
+                >
+                  {copiedLink ? (
+                    <Check className="w-4 h-4 shrink-0" />
+                  ) : (
+                    <Link2 className="w-4 h-4 shrink-0" />
+                  )}
+                </button>
 
-            {/* 2. ROOM CODE BAR & ACTION CONTROLS */}
-            <div className="bg-white rounded-2xl p-4 sm:p-5 mb-5 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 border border-gray-200 shadow-sm">
-              <div className="flex flex-wrap items-center gap-3 sm:gap-4 w-full sm:w-auto">
-                {/* Room Code Display */}
-                <div className="flex items-center gap-2">
-                  <span className="text-xs uppercase font-semibold tracking-wider text-gray-500">
-                    {isArabic ? 'كود الروم:' : 'Room:'}
-                  </span>
-                  <button
-                    onClick={handleCopyCode}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 hover:bg-gray-100 rounded-xl transition-all"
-                    title={isArabic ? 'اضغط لنسخ كود الروم' : 'Click to copy Room Code'}
-                  >
-                    <span className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-wider font-mono force-ltr" data-room-code="true">
-                      {isStreamerMode ? '••••' : roomCode}
-                    </span>
-                    {copiedCode ? (
-                      <Check className="w-4 h-4 text-emerald-600" />
-                    ) : (
-                      <Copy className="w-4 h-4 text-gray-500" />
-                    )}
-                  </button>
-                </div>
-
-                {/* Players Counter */}
-                <div className="px-3 py-1.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-700 text-xs font-semibold flex items-center gap-1.5">
-                  <Users className="w-3.5 h-3.5 text-blue-600" />
-                  <span>
-                    {isArabic ? 'اللاعبين:' : 'Players:'} <strong className="text-gray-900 font-bold force-ltr">{activePlayers.length}</strong> / 15
-                  </span>
-                </div>
-
-                {/* PIN Protected indicator */}
-                {room.config.hasPin && (
-                  <div className="px-2.5 py-1 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-1">
-                    <Lock className="w-3 h-3 text-rose-600" />
-                    <span>{isArabic ? 'محمي بـ PIN' : 'PIN Protected'}</span>
-                  </div>
-                )}
+                <RoomLobbyQRCode roomCode={roomCode} isStreamerMode={isStreamerMode} compact />
               </div>
 
-              {/* Action Controls */}
-              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
+              {/* Right/End: Language Toggle + Settings Button + Leave Button */}
+              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <LanguageToggle
+                  showIcon={false}
+                  className="!h-9 sm:!h-10 !px-2.5 !rounded-xl !shadow-none"
+                />
+
                 <button
                   type="button"
                   onClick={() => {
                     sound.playClick();
                     setShowSettingsModal(true);
                   }}
-                  className="h-10 px-3 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 text-xs font-semibold inline-flex items-center justify-center shrink-0 gap-1.5 transition-all shadow-sm"
+                  className="h-9 sm:h-10 px-2.5 sm:px-3.5 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-[#111827] text-xs font-semibold inline-flex items-center justify-center gap-1.5 shrink-0 transition-colors whitespace-nowrap active:scale-95"
                   title={isArabic ? 'إعدادات الغرفة' : 'Room Settings'}
+                  aria-label={isArabic ? 'إعدادات الغرفة' : 'Room Settings'}
                 >
-                  <Settings className="w-4 h-4 text-gray-500" />
-                  <span>{isArabic ? 'الإعدادات' : 'Settings'}</span>
-                </button>
-
-                {room.config.vibeMode === 'sip_edition' && (
-                  <button
-                    onClick={handleQuickTakeSip}
-                    className="h-10 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 text-xs font-semibold inline-flex items-center justify-center shrink-0 gap-1.5 transition-all"
-                    title={isArabic ? 'خد رشفة وسجلها' : 'Take a drink & log it'}
-                  >
-                    <Wine className="w-4 h-4 text-rose-600" />
-                    <span>{isArabic ? 'خد رشفة! 🥤' : 'Take Sip! 🥤'}</span>
-                    <span className="font-mono text-xs font-bold text-rose-700 force-ltr">
-                      ({room.sipsCount?.[currentPlayer?.id || ''] || 0})
-                    </span>
-                  </button>
-                )}
-
-                <button
-                  onClick={() => {
-                    sound.playClick();
-                    setShowCustomCardModal(true);
-                  }}
-                  className="h-10 px-3 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 text-xs font-semibold inline-flex items-center justify-center shrink-0 gap-1.5 transition-all shadow-sm"
-                  title={isArabic ? 'إضافة كارت مخصص' : 'Submit Custom Card'}
-                >
-                  <PlusCircle className="w-4 h-4 text-blue-600" />
-                  <span className="hidden sm:inline">{isArabic ? 'كارت مخصص' : 'Custom Card'}</span>
-                </button>
-
-                <RoomLobbyQRCode roomCode={roomCode} isStreamerMode={isStreamerMode} />
-
-                <SoundToggle />
-
-                <button
-                  onClick={handleCopyInviteLink}
-                  className="h-10 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold inline-flex items-center justify-center shrink-0 gap-1.5 shadow-sm transition-all"
-                >
-                  {copiedLink ? (
-                    <Check className="w-4 h-4 text-white" />
-                  ) : (
-                    <Share2 className="w-4 h-4 text-white" />
-                  )}
-                  <span>{copiedLink ? (isArabic ? 'تم النسخ!' : 'Copied!') : (isArabic ? 'دعوة' : 'Invite')}</span>
+                  <Settings className="w-4 h-4 text-gray-600 shrink-0" />
+                  <span className="hidden min-[360px]:inline">
+                    {isArabic ? 'الإعدادات' : 'Settings'}
+                  </span>
                 </button>
 
                 <button
+                  type="button"
                   onClick={handleLeaveRoom}
-                  className="w-10 h-10 inline-flex items-center justify-center shrink-0 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 shadow-sm transition-all"
+                  className="w-9 h-9 sm:w-auto sm:h-10 sm:px-3 rounded-xl bg-white hover:bg-rose-50 border border-gray-200 hover:border-rose-200 text-gray-600 hover:text-rose-600 text-xs font-semibold inline-flex items-center justify-center gap-1.5 shrink-0 transition-colors whitespace-nowrap active:scale-95"
                   title={isArabic ? 'مغادرة الغرفة' : 'Leave Room'}
+                  aria-label={isArabic ? 'مغادرة الغرفة' : 'Leave Room'}
                 >
-                  <LogOut className="w-4 h-4 rtl:rotate-180" />
+                  <LogOut className="w-4 h-4 rtl:rotate-180 shrink-0" />
+                  <span className="hidden sm:inline">{isArabic ? 'مغادرة' : 'Leave'}</span>
                 </button>
               </div>
-            </div>
+            </header>
 
-            {/* MULTI-GAME PLAYLIST SELECTION */}
-            <div className="mb-5">
-              <GamePlaylistQueue
-                selectedGames={
-                  room.selectedGames ||
-                  room.config.selectedGames || [room.config.gameMode || 'who_is_imposter']
-                }
-                currentGameIndex={room.currentGameIndex || 0}
-                isHost={Boolean(isHost)}
-                onUpdatePlaylist={handleUpdatePlaylist}
-              />
-            </div>
-
-            {/* TEAM SQUAD SELECTOR (IF TEAM MODE ENABLED) */}
-            {room.config.isTeamMode && (
-              <div className="mb-5 p-4 rounded-2xl bg-white border border-gray-200 shadow-sm">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3">
-                  <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-gray-900">
-                    <Shield className="w-4 h-4 text-blue-600" />
-                    <span>Teams Mode Active — Blue vs Red Squad</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500 font-medium">
-                      Your Team:{' '}
-                      <strong className={currentPlayer?.team === 'red' ? 'text-rose-600 font-bold' : 'text-blue-600 font-bold'}>
-                        {currentPlayer?.team === 'red' ? 'Team Red' : 'Team Blue'}
-                      </strong>
+            {/* 2. PLAYERS ROSTER AT THE VERY TOP (HERO PRIORITY) */}
+            <section className="space-y-3">
+              {/* Players Header Bar */}
+              <div className="flex items-center justify-between gap-3 px-0.5">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Users className="w-4 h-4 text-[#2563EB] shrink-0" />
+                  <h1 className="text-base sm:text-lg font-bold text-[#111827] tracking-tight truncate flex items-center gap-1.5">
+                    <span>{isArabic ? 'اللاعبون' : 'Players'}</span>
+                    <span className="font-mono text-sm sm:text-base font-bold text-gray-500 tabular-nums force-ltr">
+                      ({activePlayers.length}/{maxPlayers})
                     </span>
+                  </h1>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  {room.config.vibeMode === 'sip_edition' && (
                     <button
                       type="button"
-                      onClick={() => {
-                        sound.playClick();
-                        const targetTeam = currentPlayer?.team === 'blue' ? 'red' : 'blue';
-                        socketSelectTeam(targetTeam as PlayerTeam);
-                      }}
-                      className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-xl text-xs font-semibold text-gray-700 transition-all"
+                      onClick={handleQuickTakeSip}
+                      className="h-8 px-2.5 rounded-full bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 text-xs font-semibold inline-flex items-center gap-1 transition-colors whitespace-nowrap"
+                      title={isArabic ? 'تسجيل رشفة' : 'Log a sip'}
                     >
-                      Switch Team ⇄
+                      <Wine className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                      <span className="tabular-nums force-ltr">
+                        {room.sipsCount?.[currentPlayer?.id || ''] || 0}
+                      </span>
                     </button>
-                  </div>
-                </div>
+                  )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {/* Team A (Blue) */}
-                  <div className="p-3.5 rounded-xl border border-blue-200 bg-blue-50/50 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <span className="w-2.5 h-2.5 rounded-full bg-blue-600" />
-                          <span className="font-bold text-xs uppercase tracking-wider text-blue-800">
-                            Team Blue
-                          </span>
-                        </div>
-                        <span className="text-xs font-mono font-bold text-blue-700">
-                          {activePlayers.filter((p) => p.team !== 'red').length} Players
-                        </span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 min-h-[32px] items-center py-1">
-                        {activePlayers
-                          .filter((p) => p.team !== 'red')
-                          .map((p) => (
-                            <span
-                              key={p.id}
-                              className="px-2 py-0.5 rounded-lg bg-white border border-blue-200 text-xs font-medium text-blue-900 flex items-center gap-1"
-                            >
-                              <span>{NEON_AVATARS[p.avatar]?.emoji || '👾'}</span>
-                              <span>{p.username}</span>
-                              {p.id === currentPlayer?.id && (
-                                <span className="text-[10px] text-blue-600 font-bold">(You)</span>
-                              )}
-                            </span>
-                          ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Team B (Red) */}
-                  <div className="p-3.5 rounded-xl border border-rose-200 bg-rose-50/50 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <span className="w-2.5 h-2.5 rounded-full bg-rose-600" />
-                          <span className="font-bold text-xs uppercase tracking-wider text-rose-800">
-                            Team Red
-                          </span>
-                        </div>
-                        <span className="text-xs font-mono font-bold text-rose-700">
-                          {activePlayers.filter((p) => p.team === 'red').length} Players
-                        </span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 min-h-[32px] items-center py-1">
-                        {activePlayers
-                          .filter((p) => p.team === 'red')
-                          .map((p) => (
-                            <span
-                              key={p.id}
-                              className="px-2 py-0.5 rounded-lg bg-white border border-rose-200 text-xs font-medium text-rose-900 flex items-center gap-1"
-                            >
-                              <span>{NEON_AVATARS[p.avatar]?.emoji || '👾'}</span>
-                              <span>{p.username}</span>
-                              {p.id === currentPlayer?.id && (
-                                <span className="text-[10px] text-rose-600 font-bold">(You)</span>
-                              )}
-                            </span>
-                          ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* 3. MAIN AREA: LEFT = 15-SLOT GRID | RIGHT = SETTINGS SIDEBAR */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-6 items-start">
-              {/* LEFT: 15-SLOT PLAYER GRID */}
-              <div className="lg:col-span-8 flex flex-col">
-                <div className="flex items-center justify-between mb-3 px-1">
-                  <span className="text-xs font-bold uppercase tracking-wider text-gray-700 flex items-center gap-1.5">
-                    <Users className="w-4 h-4 text-blue-600" />
-                    <span>{isArabic ? 'خانات اللوبي' : 'Lobby Slots'}</span>
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 border border-emerald-200 text-emerald-700">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                      <span className="force-ltr">{activePlayers.filter((p) => p.isReady).length} / {activePlayers.length}</span>
-                      <span>{isArabic ? 'جاهز' : 'Ready'}</span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 border border-emerald-200 text-emerald-700 whitespace-nowrap tabular-nums">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981] shrink-0" />
+                    <span>
+                      {isArabic
+                        ? `${activePlayers.filter((p) => p.isReady).length} جاهز`
+                        : `${activePlayers.filter((p) => p.isReady).length} Ready`}
                     </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                  {Array.from({ length: 15 }).map((_, index) => {
-                    const player = activePlayers[index];
-                    const slotNum = index + 1;
-
-                    if (player) {
-                      const isDisconnected = player.connectionStatus === 'disconnected_grace';
-                      const remainingGrace = graceCountdowns[player.id] ?? 45;
-
-                      return (
-                        <motion.div
-                          key={player.id}
-                          layout
-                          initial={{ scale: 0.9, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          className={`relative bg-white rounded-2xl p-3 flex flex-col items-center justify-between text-center transition-all min-h-[145px] sm:min-h-[160px] border shadow-sm ${
-                            player.isReady
-                              ? 'border-emerald-200 ring-2 ring-emerald-500/20'
-                              : isDisconnected
-                              ? 'border-rose-300 bg-rose-50/50'
-                              : 'border-gray-200'
-                          }`}
-                        >
-                          {/* TOP PILL BADGE */}
-                          <div className="w-full mb-1">
-                            {isDisconnected ? (
-                              <div className="w-full py-0.5 px-1 bg-rose-50 border border-rose-200 rounded-lg text-rose-700 text-[10px] font-bold flex items-center justify-center gap-1">
-                                <Clock className="w-2.5 h-2.5 text-rose-600" />
-                                <span className="force-ltr">{remainingGrace}s</span>
-                              </div>
-                            ) : player.isReady ? (
-                              <div className="w-full py-0.5 px-1 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-[10px] font-bold flex items-center justify-center gap-1">
-                                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                                <span>{isArabic ? 'جاهز' : 'Ready'}</span>
-                              </div>
-                            ) : (
-                              <div className="w-full py-0.5 px-1 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 text-[10px] font-medium">
-                                {isArabic ? 'مش جاهز' : 'Not Ready'}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* AVATAR FRAME */}
-                          <div className="relative my-1">
-                            {player.isHost && (
-                              <div
-                                className="absolute -top-2 -right-2 z-10 p-1 bg-amber-400 rounded-full shadow-sm"
-                                title={isArabic ? 'مضيف الروم' : 'Room Host'}
-                              >
-                                <Crown className="w-3 h-3 text-white fill-white" />
-                              </div>
-                            )}
-
-                            <NeonAvatarDisplay
-                              avatarId={player.avatar}
-                              size="sm"
-                              showGlow={false}
-                              isReady={player.isReady}
-                            />
-                          </div>
-
-                          {/* USERNAME */}
-                          <div className="w-full truncate mt-1">
-                            <div className="font-bold text-xs text-gray-900 truncate px-0.5">
-                              {player.username}
-                              {player.id === currentPlayer?.id && (
-                                <span className="ml-1 text-[10px] text-blue-600 font-semibold">{isArabic ? '(أنت)' : '(You)'}</span>
-                              )}
-                            </div>
-
-                            {room.config.isTeamMode && player.team && (
-                              <div
-                                className={`mt-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase inline-block ${
-                                  player.team === 'red'
-                                    ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                                    : 'bg-blue-50 text-blue-700 border border-blue-200'
-                                }`}
-                              >
-                                {player.team}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Host Kick Option */}
-                          {isHost &&
-                          player.id !== currentPlayer?.id &&
-                          player.id !== room.hostId &&
-                          !player.isHost ? (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setKickTarget(player);
-                              }}
-                              className="mt-1 text-[10px] text-rose-600 hover:text-rose-700 font-semibold py-0.5 px-2 rounded-lg hover:bg-rose-50 transition-all"
-                              title={isArabic ? `طرد ${player.username}` : `Kick ${player.username}`}
-                            >
-                              {isArabic ? 'طرد' : 'Kick'}
-                            </button>
-                          ) : (
-                            <div className="h-3" />
-                          )}
-                        </motion.div>
-                      );
-                    }
-
-                    // EMPTY SLOT PLACEHOLDER
-                    return (
-                      <div
-                        key={`slot-${index}`}
-                        className="rounded-2xl border border-dashed border-gray-200 bg-white/60 flex flex-col items-center justify-center p-2.5 text-center text-gray-400 select-none min-h-[145px] sm:min-h-[160px]"
-                      >
-                        <div className="w-8 h-8 rounded-full border border-dashed border-gray-300 flex items-center justify-center mb-1 text-gray-400 text-xs force-ltr">
-                          {slotNum}
-                        </div>
-                        <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">
-                          {isArabic ? 'خانة فاضية' : 'Open Slot'}
-                        </span>
-                      </div>
-                    );
-                  })}
+                  </span>
                 </div>
               </div>
 
-              {/* RIGHT SIDEBAR: GAME SETTINGS PANEL */}
-              <div className="lg:col-span-4 bg-white rounded-2xl p-4 sm:p-5 border border-gray-200 shadow-sm flex flex-col justify-between">
-                <div>
-                  {/* Panel Header */}
-                  <div className="flex items-center justify-between pb-3 mb-4 border-b border-gray-100">
-                    <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-xl bg-blue-50 text-blue-600">
-                        <Sliders className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <h3 className="text-xs sm:text-sm font-bold text-gray-900 uppercase tracking-wider">
-                          Game Settings
-                        </h3>
-                        <p className="text-[10px] text-gray-500 font-medium">
-                          {isHost
-                            ? 'Host controls & match configuration'
-                            : 'Match settings locked by host'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+              {/* Responsive 2-Col Mobile / 3-Col Desktop Player Cards Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-3">
+                {activePlayers.map((player) => {
+                  const isDisconnected = player.connectionStatus === 'disconnected_grace';
+                  const remainingGrace = graceCountdowns[player.id] ?? 45;
+                  const isMe = player.id === currentPlayer?.id;
+                  const canKick =
+                    isHost &&
+                    player.id !== currentPlayer?.id &&
+                    player.id !== room.hostId &&
+                    !player.isHost;
 
-                  {/* Settings Controls */}
-                  <div className="space-y-4">
-                    {/* 1. 10-GAME SELECTOR */}
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <label className="text-xs font-semibold uppercase tracking-wider text-gray-700">
-                          Selected Game
-                        </label>
-                        <span className="text-[11px] text-blue-600 font-bold uppercase">
-                          {room.config.gameMode?.replace(/_/g, ' ')}
-                        </span>
-                      </div>
-
-                      {/* Visual Interactive Cards */}
-                      <div className="grid grid-cols-2 gap-1.5 max-h-48 overflow-y-auto pr-1 mb-2">
-                        {[
-                          { id: 'who_is_imposter', title: 'Imposter', emoji: '🎭', players: '3-15p' },
-                          { id: 'draw_and_guess', title: 'Draw & Guess', emoji: '🎨', players: '2-15p' },
-                          { id: 'quiz_battle', title: 'Quiz Battle', emoji: '🧠', players: '2-15p' },
-                          { id: 'word_battle', title: 'Word Battle', emoji: '🔤', players: '2-15p' },
-                          { id: 'truth_or_dare', title: 'Truth / Dare', emoji: '🔥', players: '2-15p' },
-                          { id: 'never_have_i_ever', title: 'Never Have I', emoji: '🤫', players: '2-15p' },
-                          { id: 'most_likely_to', title: 'Most Likely', emoji: '👑', players: '2-15p' },
-                          { id: 'sip_or_spill', title: 'Sip or Spill', emoji: '🥤', players: '2-15p' },
-                          { id: 'silly_roulette', title: 'Silly Roulette', emoji: '🎯', players: '2-15p' },
-                          { id: 'hot_potato', title: 'Hot Potato', emoji: '🥔', players: '2-15p' }
-                        ].map((g) => {
-                          const isSelected = room.config.gameMode === g.id;
-                          return (
-                            <button
-                              key={g.id}
-                              type="button"
-                              disabled={!isHost}
-                              onClick={() => {
-                                sound.playClick();
-                                socketUpdateSettings({ gameMode: g.id as GameMode });
-                              }}
-                              className={`p-2 rounded-xl border text-left flex flex-col justify-between transition-all ${
-                                isSelected
-                                  ? 'border-blue-600 bg-blue-50 text-blue-900 shadow-sm'
-                                  : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
-                              } ${!isHost ? 'cursor-default' : 'cursor-pointer'}`}
-                            >
-                              <div className="flex items-center justify-between">
-                                <span className="text-base">{g.emoji}</span>
-                                <span className="text-[10px] font-mono text-gray-400 font-medium">{g.players}</span>
-                              </div>
-                              <span className="text-xs font-semibold truncate mt-1">{g.title}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      {/* Dropdown for Host */}
-                      {isHost && (
-                        <div className="relative">
-                          <select
-                            value={room.config.gameMode}
-                            onChange={(e) => {
-                              sound.playClick();
-                              socketUpdateSettings({ gameMode: e.target.value as GameMode });
-                            }}
-                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold text-gray-900 outline-none cursor-pointer appearance-none hover:bg-white transition-all"
+                  return (
+                    <motion.div
+                      key={player.id}
+                      layout
+                      initial={{ opacity: 0, scale: 0.96 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.16 }}
+                      className={`relative bg-white rounded-2xl p-3 border transition-colors flex items-center gap-2.5 sm:gap-3 min-w-0 ${
+                        isDisconnected
+                          ? 'border-rose-200 bg-rose-50/40'
+                          : player.isReady
+                          ? 'border-emerald-200'
+                          : 'border-gray-200'
+                      }`}
+                    >
+                      {/* Avatar with Host Crown Badge */}
+                      <div className="relative shrink-0">
+                        {player.isHost && (
+                          <div
+                            className="absolute -top-1.5 -right-1.5 rtl:-right-auto rtl:-left-1.5 z-10 w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center shadow-xs ring-2 ring-white"
+                            title={isArabic ? 'مضيف الغرفة' : 'Room Host'}
                           >
-                            <option value="who_is_imposter">🎭 Who Is The Imposter? (3-15p)</option>
-                            <option value="draw_and_guess">🎨 Draw & Guess (2-15p)</option>
-                            <option value="quiz_battle">🧠 Quiz Battle (2-15p)</option>
-                            <option value="word_battle">🔤 Word Battle (2-15p)</option>
-                            <option value="truth_or_dare">🔥 Truth or Dare (2-15p)</option>
-                            <option value="never_have_i_ever">🤫 Never Have I Ever (2-15p)</option>
-                            <option value="most_likely_to">👑 Most Likely To... (2-15p)</option>
-                            <option value="sip_or_spill">🥤 Sip or Spill (2-15p)</option>
-                            <option value="silly_roulette">🎯 Silly Roulette (2-15p)</option>
-                            <option value="hot_potato">🥔 Hot Potato (2-15p)</option>
-                          </select>
-                          <ChevronDown className="w-4 h-4 text-gray-500 absolute right-3 top-2.5 pointer-events-none" />
-                        </div>
-                      )}
-                    </div>
-
-                    {/* 2. MATCH MODE: SOLO VS TEAMS */}
-                    <div className="p-3 rounded-xl bg-gray-50 border border-gray-200">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div className="flex items-center gap-1.5">
-                          <Shield className="w-4 h-4 text-gray-700" />
-                          <span className="text-xs font-bold text-gray-900">Match Mode</span>
-                        </div>
-                        {isHost ? (
-                          <div className="flex items-center bg-white p-0.5 rounded-lg border border-gray-200">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                sound.playClick();
-                                socketUpdateSettings({ isTeamMode: false, mode: 'solo' });
-                              }}
-                              className={`px-3 py-1 rounded-md text-[11px] font-semibold transition-all ${
-                                !room.config.isTeamMode
-                                  ? 'bg-blue-600 text-white shadow-sm'
-                                  : 'text-gray-600 hover:bg-gray-50'
-                              }`}
-                            >
-                              Solo
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                sound.playClick();
-                                socketUpdateSettings({ isTeamMode: true, mode: 'teams' });
-                              }}
-                              className={`px-3 py-1 rounded-md text-[11px] font-semibold transition-all ${
-                                room.config.isTeamMode
-                                  ? 'bg-blue-600 text-white shadow-sm'
-                                  : 'text-gray-600 hover:bg-gray-50'
-                              }`}
-                            >
-                              Teams
-                            </button>
+                            <Crown className="w-3 h-3 text-white fill-white" />
                           </div>
-                        ) : (
-                          <span className="text-xs font-bold text-blue-600 uppercase">
-                            {room.config.isTeamMode ? 'Teams Mode' : 'Solo FFA'}
-                          </span>
                         )}
-                      </div>
-                      <p className="text-[10px] text-gray-500 font-medium">
-                        {room.config.isTeamMode
-                          ? 'Blue Squad vs Red Squad (Team victory)'
-                          : 'Free-For-All (Individual points & leaderboard)'}
-                      </p>
-                    </div>
-
-                    {/* 3. SOLO TEST / DEV MODE TOGGLE (HOST ONLY) */}
-                    {isHost && (
-                      <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Sparkles className="w-4 h-4 text-amber-500" />
-                          <div>
-                            <div className="text-xs font-bold text-gray-900">Solo Test Mode</div>
-                            <div className="text-[10px] text-gray-500 font-medium">Allow 1 player to launch & test any game</div>
-                          </div>
-                        </div>
-                        <input
-                          type="checkbox"
-                          checked={isSoloDevMode}
-                          onChange={(e) => {
-                            sound.playClick();
-                            const next = e.target.checked;
-                            setIsSoloDevMode(next);
-                            socketUpdateSettings({ isSoloDevMode: next });
-                          }}
-                          className="w-4 h-4 accent-blue-600 rounded cursor-pointer"
+                        <NeonAvatarDisplay
+                          avatarId={player.avatar}
+                          size="sm"
+                          showGlow={false}
+                          isReady={player.isReady}
                         />
                       </div>
-                    )}
 
-                    {/* 4. PARTY VIBE MODE */}
-                    <div>
-                      <div className="flex justify-between items-center mb-1">
-                        <label className="text-xs font-semibold uppercase tracking-wider text-gray-700">
-                          Party Vibe Mode
-                        </label>
-                        <span className="text-blue-600 font-bold text-[11px] uppercase">
-                          {room.config.vibeMode?.replace('_', ' ') || 'chill'}
-                        </span>
+                      {/* Name & Crisp Status Indicator */}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1 min-w-0">
+                          <span className="font-bold text-xs sm:text-sm text-[#111827] truncate">
+                            {player.username}
+                          </span>
+                          {isMe && (
+                            <span className="text-[11px] font-semibold text-[#2563EB] shrink-0">
+                              {isArabic ? '(أنت)' : '(You)'}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                          {isDisconnected ? (
+                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-600 tabular-nums">
+                              <Clock className="w-3 h-3 shrink-0" />
+                              <span className="force-ltr">{remainingGrace}s</span>
+                            </span>
+                          ) : player.isReady ? (
+                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#10B981]">
+                              <span>{isArabic ? 'جاهز ✓' : 'Ready ✓'}</span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center text-[11px] font-medium text-gray-400">
+                              {isArabic ? 'بانتظار...' : 'Waiting...'}
+                            </span>
+                          )}
+
+                          {room.config.isTeamMode && player.team && (
+                            <>
+                              <span className="text-gray-300 text-[10px]" aria-hidden="true">·</span>
+                              <span
+                                className={`text-[11px] font-semibold ${
+                                  player.team === 'red' ? 'text-rose-600' : 'text-[#2563EB]'
+                                }`}
+                              >
+                                {player.team === 'red'
+                                  ? (isArabic ? 'أحمر' : 'Red')
+                                  : (isArabic ? 'أزرق' : 'Blue')}
+                              </span>
+                            </>
+                          )}
+                        </div>
                       </div>
-                      {isHost ? (
-                        <div className="grid grid-cols-3 gap-1.5">
-                          {[
-                            { id: 'chill', label: 'Chill' },
-                            { id: 'chaotic', label: 'Chaos' },
-                            { id: 'sip_edition', label: 'Sips 🥤' }
-                          ].map((vibe) => (
-                            <button
-                              key={vibe.id}
-                              type="button"
-                              onClick={() => {
-                                sound.playClick();
-                                socketUpdateSettings({ vibeMode: vibe.id as any });
-                              }}
-                              className={`py-1.5 rounded-xl border text-xs font-semibold transition-all ${
-                                (room.config.vibeMode || 'chill') === vibe.id
-                                  ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                                  : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
-                              }`}
-                            >
-                              {vibe.label}
-                            </button>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="px-3 py-1.5 rounded-xl bg-gray-50 border border-gray-200 text-xs font-semibold text-gray-800 capitalize">
-                          {room.config.vibeMode?.replace('_', ' ') || 'Chill & Funny'}
-                        </div>
+
+                      {/* Subtle Host-Only Kick (×) Button */}
+                      {canKick && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setKickTarget(player);
+                          }}
+                          className="w-7 h-7 rounded-lg text-gray-400 hover:text-rose-600 hover:bg-rose-50 inline-flex items-center justify-center shrink-0 transition-colors self-start"
+                          title={isArabic ? `طرد ${player.username}` : `Kick ${player.username}`}
+                          aria-label={isArabic ? `طرد ${player.username}` : `Kick ${player.username}`}
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
                       )}
-                    </div>
-
-                    {/* 5. ROUNDS SELECTOR */}
-                    <div>
-                      <div className="flex justify-between items-center mb-1">
-                        <label className="text-xs font-semibold uppercase tracking-wider text-gray-700">
-                          Rounds
-                        </label>
-                        <span className="text-gray-900 font-bold text-xs">
-                          {room.config.totalRounds || 5} Rounds
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-4 gap-1.5">
-                        {[3, 5, 7, 10].map((rounds) => (
-                          <button
-                            key={rounds}
-                            type="button"
-                            disabled={!isHost}
-                            onClick={() => {
-                              sound.playClick();
-                              socketUpdateSettings({ totalRounds: rounds });
-                            }}
-                            className={`py-1.5 rounded-xl border text-xs font-semibold transition-all ${
-                              (room.config.totalRounds || 5) === rounds
-                                ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                                : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
-                            }`}
-                          >
-                            {rounds}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* 6. TIMER SELECTOR */}
-                    <div>
-                      <div className="flex justify-between items-center mb-1">
-                        <label className="text-xs font-semibold uppercase tracking-wider text-gray-700">
-                          Timer (Sec / Turn)
-                        </label>
-                        <span className="text-blue-600 font-bold text-xs">
-                          {room.config.roundDurationSeconds || 30}s
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-4 gap-1.5">
-                        {[20, 30, 45, 60].map((sec) => (
-                          <button
-                            key={sec}
-                            type="button"
-                            disabled={!isHost}
-                            onClick={() => {
-                              sound.playClick();
-                              socketUpdateSettings({ roundDurationSeconds: sec });
-                            }}
-                            className={`py-1.5 rounded-xl border text-xs font-semibold transition-all ${
-                              (room.config.roundDurationSeconds || 30) === sec
-                                ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                                : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
-                            }`}
-                          >
-                            {sec}s
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Connected players counter */}
-                <div className="mt-5 pt-3 border-t border-gray-100 flex items-center justify-between text-xs">
-                  <span className="text-gray-500 font-medium">
-                    Connected ({activePlayers.length}/15)
-                  </span>
-                  <span className="text-emerald-600 font-semibold">
-                    {activePlayers.filter((p) => p.isReady).length} Ready
-                  </span>
-                </div>
+                    </motion.div>
+                  );
+                })}
               </div>
-            </div>
+
+              {/* Subtle Invite Prompt when Solo in Room */}
+              {activePlayers.length < 2 && (
+                <div className="bg-white rounded-xl border border-dashed border-gray-200 px-3.5 py-2.5 flex items-center justify-between gap-3">
+                  <p className="text-xs text-gray-500">
+                    {isArabic
+                      ? 'شارك كود الغرفة أو الرابط مع أصحابك للانضمام فوراً'
+                      : 'Share the room code or invite link so friends can join instantly.'}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleCopyInviteLink}
+                    className="text-xs font-semibold text-[#2563EB] hover:text-blue-700 whitespace-nowrap shrink-0"
+                  >
+                    {copiedLink
+                      ? (isArabic ? 'تم النسخ ✓' : 'Copied ✓')
+                      : (isArabic ? 'نسخ الرابط' : 'Copy Link')}
+                  </button>
+                </div>
+              )}
+
+              {/* Compact Team Squad Switcher (Only when Team Mode is enabled in Settings) */}
+              {room.config.isTeamMode && (
+                <div className="bg-white rounded-2xl border border-gray-200 px-3.5 py-2.5 flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-[#111827]">
+                    <Shield className="w-4 h-4 text-[#2563EB] shrink-0" />
+                    <span>{isArabic ? 'وضع الفرق:' : 'Teams:'}</span>
+                    <span className="text-[#2563EB] tabular-nums">
+                      {isArabic ? 'أزرق' : 'Blue'} ({activePlayers.filter((p) => p.team !== 'red').length})
+                    </span>
+                    <span className="text-gray-300" aria-hidden="true">/</span>
+                    <span className="text-rose-600 tabular-nums">
+                      {isArabic ? 'أحمر' : 'Red'} ({activePlayers.filter((p) => p.team === 'red').length})
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      sound.playClick();
+                      const targetTeam = currentPlayer?.team === 'blue' ? 'red' : 'blue';
+                      socketSelectTeam(targetTeam as PlayerTeam);
+                    }}
+                    className="h-8 px-3 rounded-lg bg-[#F9FAFB] hover:bg-gray-100 border border-gray-200 text-xs font-semibold text-[#111827] transition-colors whitespace-nowrap"
+                  >
+                    {isArabic ? 'تبديل الفريق ⇄' : 'Switch Team ⇄'}
+                  </button>
+                </div>
+              )}
+            </section>
+
+            {/* 3. COMPACT GAME SELECTOR / PLAYLIST BELOW PLAYERS */}
+            <GamePlaylistQueue
+              selectedGames={
+                room.selectedGames ||
+                room.config.selectedGames || [room.config.gameMode || 'who_is_imposter']
+              }
+              currentGameIndex={room.currentGameIndex || 0}
+              isHost={Boolean(isHost)}
+              onUpdatePlaylist={handleUpdatePlaylist}
+              onOpenCustomCard={() => setShowCustomCardModal(true)}
+            />
           </div>
 
-          {/* 4. BOTTOM ACTION BAR: READY TOGGLE + HOST START BUTTON */}
-          <div className="bg-white rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 border border-gray-200 sticky bottom-2 z-20 shadow-md safe-bottom">
-            {/* Player Info Preview */}
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-              {currentPlayer && (
-                <NeonAvatarDisplay avatarId={currentPlayer.avatar} size="sm" showGlow={false} />
-              )}
-              <div>
-                <div className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">
-                  {isArabic ? 'بتلعب بـ' : 'Playing as'}
-                </div>
-                <div className="text-sm sm:text-base font-bold text-gray-900 flex items-center gap-2">
-                  <span>{currentPlayer?.username}</span>
-                  {isHost && (
-                    <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-bold rounded-full">
-                      {isArabic ? 'المضيف' : 'Host'}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Action Buttons: Ready Toggle + Host Start / Force Start Buttons */}
-            <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full sm:w-auto justify-end">
-              {/* Ready Status Toggle */}
-              <button
-                onClick={handleToggleReady}
-                className={`w-full sm:w-auto h-12 px-6 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-sm ${
-                  currentPlayer?.isReady
-                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                    : 'bg-white border border-gray-200 hover:bg-gray-50 text-gray-800'
-                }`}
-              >
-                {currentPlayer?.isReady ? (
-                  <>
-                    <CheckCircle2 className="w-4 h-4 text-white" />
-                    <span>{isArabic ? 'جاهز ✓ (اضغط للإلغاء)' : 'Ready ✓ (Tap to unready)'}</span>
-                  </>
-                ) : (
-                  <>
-                    <Zap className="w-4 h-4 text-amber-500" />
-                    <span>{isArabic ? 'أنا جاهز ⚡' : 'Ready'}</span>
-                  </>
-                )}
-              </button>
-
-              {/* Host Controls */}
-              {isHost && (
+          {/* 4. STICKY / FIXED BOTTOM ACTION BAR ("READY" & "START GAME") */}
+          <div className="fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur border-t border-gray-200 px-4 py-3 pb-safe">
+            <div className="max-w-md mx-auto flex items-center gap-3">
+              {isHost ? (
                 <>
-                  {/* Force Start Button */}
-                  {activePlayers.length >= 2 && !allReady && (
-                    <button
-                      type="button"
-                      onClick={() => handleStartGame(true)}
-                      className="w-full sm:w-auto h-12 px-5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white shadow-sm"
-                      title={isArabic ? 'بدء إجباري باللاعبين المتصلين حالياً' : 'Force start match with currently connected players'}
-                    >
-                      <Zap className="w-4 h-4 fill-current" />
-                      <span>{isArabic ? 'بدء إجباري' : 'Force Start'}</span>
-                    </button>
-                  )}
-
-                  {/* Primary Start Game Button */}
+                  {/* Host Ready Toggle */}
                   <button
-                    onClick={() => handleStartGame(false)}
-                    disabled={!allReady}
-                    title={
-                      !allReady
-                        ? activePlayers.length < minRequired
-                          ? isSoloDevMode
-                            ? (isArabic ? 'مطلوب لاعب واحد على الأقل' : 'At least 1 player required')
-                            : (isArabic ? 'مطلوب لاعبين على الأقل' : 'At least 2 players required')
-                          : (isArabic ? 'لازم كل اللاعبين يضغطوا جاهز (أو استخدم بدء إجباري)' : 'All players must click Ready (or use Force Start)')
-                        : (isArabic ? 'ابدأ الجولة' : 'Launch Match')
-                    }
-                    className={`w-full sm:w-auto min-w-[200px] h-12 px-8 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-sm ${
-                      allReady
-                        ? 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'
-                        : 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                    type="button"
+                    onClick={handleToggleReady}
+                    className={`h-12 px-4 sm:px-5 rounded-xl font-bold text-sm flex items-center justify-center gap-1.5 shrink-0 transition-all active:scale-[0.98] whitespace-nowrap ${
+                      currentPlayer?.isReady
+                        ? 'bg-[#10B981] hover:bg-emerald-600 text-white'
+                        : 'bg-gray-100 hover:bg-gray-200 text-[#111827] border border-gray-200'
                     }`}
-                    id="btn-start-game"
                   >
-                    <Play className="w-4 h-4 fill-current rtl:rotate-180" />
-                    <span>{isArabic ? 'ابدأ اللعبة' : 'Start Game'}</span>
+                    {currentPlayer?.isReady ? (
+                      <>
+                        <CheckCircle2 className="w-4 h-4 shrink-0" />
+                        <span>{isArabic ? 'جاهز ✓' : 'Ready ✓'}</span>
+                      </>
+                    ) : (
+                      <span>{isArabic ? 'غير جاهز' : 'Not Ready'}</span>
+                    )}
+                  </button>
+
+                  {/* Host Primary Start Game / Force Start Button */}
+                  <button
+                    type="button"
+                    id="btn-start-game"
+                    onClick={() => handleStartGame(!allReady && activePlayers.length >= 2)}
+                    disabled={!allReady && activePlayers.length < 2}
+                    title={
+                      allReady
+                        ? (isArabic ? 'ابدأ اللعبة' : 'Start Game')
+                        : activePlayers.length >= 2
+                        ? (isArabic ? 'بدء إجباري باللاعبين المتصلين' : 'Force start with connected players')
+                        : (isArabic
+                            ? 'مطلوب لاعبين على الأقل (أو فعّل وضع التجربة في الإعدادات)'
+                            : 'At least 2 players required (or enable Solo Test Mode in Settings)')
+                    }
+                    className={`flex-1 h-12 px-5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] whitespace-nowrap ${
+                      allReady || activePlayers.length >= 2
+                        ? 'bg-[#2563EB] hover:bg-blue-700 text-white shadow-sm cursor-pointer'
+                        : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                    }`}
+                  >
+                    {allReady || activePlayers.length < 2 ? (
+                      <>
+                        <Play className="w-4 h-4 fill-current rtl:rotate-180 shrink-0" />
+                        <span>{isArabic ? 'ابدأ اللعبة' : 'Start Game'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="w-4 h-4 fill-current shrink-0" />
+                        <span>{isArabic ? 'بدء إجباري' : 'Force Start'}</span>
+                      </>
+                    )}
                   </button>
                 </>
+              ) : (
+                /* Non-Host Full-Width Thumb-Friendly Ready Toggle */
+                <button
+                  type="button"
+                  onClick={handleToggleReady}
+                  className={`w-full h-12 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] whitespace-nowrap ${
+                    currentPlayer?.isReady
+                      ? 'bg-[#10B981] hover:bg-emerald-600 text-white shadow-sm'
+                      : 'bg-[#2563EB] hover:bg-blue-700 text-white shadow-sm'
+                  }`}
+                >
+                  {currentPlayer?.isReady ? (
+                    <>
+                      <CheckCircle2 className="w-4 h-4 shrink-0" />
+                      <span>{isArabic ? 'جاهز ✓' : 'Ready ✓'}</span>
+                    </>
+                  ) : (
+                    <span>{isArabic ? 'جاهز للعب' : 'Ready'}</span>
+                  )}
+                </button>
               )}
             </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* 3-SECOND COUNTDOWN OVERLAY */}
@@ -2182,6 +1763,17 @@ export default function RoomPage() {
         onClose={() => setShowSettingsModal(false)}
         room={room}
         isHost={Boolean(isHost)}
+        isStreamerMode={isStreamerMode}
+        onToggleStreamerMode={() => {
+          sound.playClick();
+          const next = !isStreamerMode;
+          setIsStreamerMode(next);
+          showToast(
+            next
+              ? (isArabic ? 'تم تفعيل وضع البث (الكود مخفي)' : 'Streamer Mode Active (Code Hidden)')
+              : (isArabic ? 'تم إظهار كود الغرفة' : 'Room Code Visible')
+          );
+        }}
         onSave={handleSaveSettings}
       />
     </div>

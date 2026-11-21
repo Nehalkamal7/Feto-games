@@ -19,7 +19,7 @@ import { BrandLogo } from '@/components/BrandLogo';
 import { NeonAvatarDisplay } from '@/components/NeonAvatarDisplay';
 import { NeonAvatarId, NEON_AVATARS } from '@feto-games/shared-types';
 import { cleanRoomCode, getReconnectToken, socketJoinRoom } from '@/lib/socket';
-import { PINNED_NICKNAMES, rollDynamicNicknames } from '@/lib/nicknames';
+import { CREATIVE_NICKNAMES_POOL, PINNED_NICKNAMES, rollDynamicNicknames } from '@/lib/nicknames';
 import { sound } from '@/lib/sound';
 
 export default function FastJoinPage() {
@@ -34,11 +34,15 @@ export default function FastJoinPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Dynamic nicknames (4 slots rolled from 50+ pool)
+  // Deterministic initial slice for SSR hydration safety; randomized client-side after mount
   const [dynamicChips, setDynamicChips] = useState<string[]>(() =>
-    rollDynamicNicknames([], 4)
+    CREATIVE_NICKNAMES_POOL.slice(0, 4)
   );
   const [isRolling, setIsRolling] = useState(false);
+
+  useEffect(() => {
+    setDynamicChips(rollDynamicNicknames([], 4));
+  }, []);
 
   // Auto-fill from localStorage or default to pinned
   useEffect(() => {
