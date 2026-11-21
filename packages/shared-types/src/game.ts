@@ -237,7 +237,15 @@ export interface WordBattlePublicState {
 // GAME E: TRUTH OR DARE (Party Roulette & Voting, 2-15 players)
 // ========================================================
 
-export type TodIntensityMode = 'chill' | 'party' | 'wild';
+export type TodIntensityMode =
+  | 'chill'
+  | 'party'
+  | 'wild'
+  | 'silly'
+  | 'spicy'
+  | 'chaotic'
+  | 'sip'
+  | string;
 export type TodPhase =
   | 'roulette'
   | 'decision'
