@@ -6,7 +6,10 @@ import {
   Wine,
   MessageSquare,
   Clock,
-  Send
+  Send,
+  ArrowRight,
+  Sparkles,
+  Check
 } from 'lucide-react';
 import {
   SipOrSpillPublicState,
@@ -31,7 +34,7 @@ export function SipOrSpillGameView({
   players,
   currentPlayerId,
   isHost,
-  vibeMode,
+  vibeMode: _vibeMode,
   onAction
 }: SipOrSpillGameViewProps) {
   const [confessionInput, setConfessionInput] = useState('');
@@ -39,7 +42,7 @@ export function SipOrSpillGameView({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isMyTurn = currentPlayerId === state.targetPlayerId;
-  const targetPlayer = players.find((p) => p.id === state.targetPlayerId);
+  const _targetPlayer = players.find((p) => p.id === state.targetPlayerId);
 
   const handleTakeSip = async () => {
     if (!isMyTurn || isSubmitting) return;
@@ -56,7 +59,7 @@ export function SipOrSpillGameView({
     }
   };
 
-  const handleSpillTruth = async () => {
+  const handleSpillTruth = async (text?: string) => {
     if (!isMyTurn || isSubmitting) return;
     setIsSubmitting(true);
     sound.playClick();
@@ -65,7 +68,7 @@ export function SipOrSpillGameView({
     try {
       await onAction('SOS_ACTION', {
         action: 'spill',
-        confession: confessionInput.trim() || 'Spilled verbally to the room!'
+        confession: text || confessionInput.trim() || 'Answered Live to the room!'
       });
       setShowConfessionModal(false);
     } catch (err) {
@@ -73,12 +76,6 @@ export function SipOrSpillGameView({
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleSendReaction = (emoji: string) => {
-    sound.playReaction();
-    sound.triggerHaptic(20);
-    onAction('SOS_REACT', { emoji });
   };
 
   const handleNextRound = async () => {
@@ -91,83 +88,72 @@ export function SipOrSpillGameView({
   };
 
   return (
-    <div className="flex flex-col h-full w-full max-w-4xl mx-auto px-2 sm:px-4 py-2 select-none">
+    <div className="flex flex-col h-full w-full max-w-md mx-auto px-2 sm:px-4 py-2 overflow-x-hidden select-none">
       {/* 1. TOP HEADER */}
-      <div className="flex items-center justify-between mb-3 px-1">
+      <div className="flex items-center justify-between mb-4 px-1">
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-[#FFFFFF] text-[#010101] border-2 border-[#010101] flex items-center gap-1.5 shadow-[2px_2px_0px_#010101]">
+          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white border border-gray-200 text-gray-800 flex items-center gap-1.5 shadow-sm">
             <GameIcon gameMode="sip_or_spill" size="xs" />
-            Round {state.round} / {state.totalRounds}
+            Round {state.round} of {state.totalRounds}
           </span>
-          <span className="hidden sm:inline-block px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-[#FEC90E] text-[#010101] border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
-            Spicy Level {state.spicyLevel} 🔥
+          <span className="hidden sm:inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">
+            Spicy Level {state.spicyLevel || 1} 🔥
           </span>
         </div>
 
         {/* TIMER */}
         <div
-          className={`flex items-center gap-1.5 px-3 py-1 rounded-full border-2 border-[#010101] text-xs font-black tracking-wider shadow-[2px_2px_0px_#010101] transition-all ${
+          className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold transition-all ${
             state.remainingSeconds <= 5
-              ? 'bg-[#FD3F01] text-white animate-bounce'
-              : 'bg-[#FFFFFF] text-[#0B89FD]'
+              ? 'bg-red-50 text-red-600 border-red-200 animate-pulse'
+              : 'bg-white text-gray-800 border-gray-200 shadow-sm'
           }`}
         >
-          <Clock strokeWidth={2.5} className="w-3.5 h-3.5 shrink-0" />
+          <Clock className={`w-3.5 h-3.5 ${state.remainingSeconds <= 5 ? 'text-red-500' : 'text-blue-600'}`} />
           <span>{state.remainingSeconds}s</span>
         </div>
       </div>
 
       {/* 2. TARGET PLAYER BANNER */}
       <motion.div
-        initial={{ opacity: 0, y: -6 }}
+        initial={{ opacity: 0, y: -4 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-[#FFFFFF] p-3 sm:p-4 rounded-2xl border-2 border-[#010101] shadow-[3px_3px_0px_#010101] flex items-center justify-between mb-3"
+        className="bg-white p-3.5 sm:p-4 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between mb-4"
       >
         <div className="flex items-center gap-3">
           <NeonAvatarDisplay avatarId={state.targetAvatar} size="sm" showGlow={false} />
           <div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#0B89FD] block">
-              In The Hot Seat:
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-blue-600 block">
+              In The Hot Seat
             </span>
-            <span className="text-sm sm:text-base font-black text-[#010101]">
+            <span className="text-sm sm:text-base font-bold text-gray-900">
               {state.targetUsername} {isMyTurn && '(You!)'}
             </span>
           </div>
         </div>
 
-        {/* Reaction Quick Bar for Audience */}
-        {!isMyTurn && (
-          <div className="flex items-center gap-1 sm:gap-1.5">
-            {['🔥', '🥤', '😂', '💀', '😱'].map((emoji) => (
-              <motion.button
-                key={emoji}
-                onClick={() => handleSendReaction(emoji)}
-                whileHover={{ scale: 1.25 }}
-                whileTap={{ scale: 0.85 }}
-                className="w-8 h-8 rounded-full bg-[#FFFFFF] hover:bg-[#FEC90E] border-2 border-[#010101] shadow-[1px_1px_0px_#010101] flex items-center justify-center text-sm font-emoji"
-              >
-                {emoji}
-              </motion.button>
-            ))}
-          </div>
-        )}
+        <div className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
+          {isMyTurn ? 'Your Turn' : 'Listening'}
+        </div>
       </motion.div>
 
       {/* 3. THE DILEMMA CARD */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.96 }}
+        initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-[#FFFFFF] p-5 sm:p-7 rounded-3xl border-2 border-[#010101] text-center relative overflow-hidden mb-4 shadow-[4px_4px_0px_#010101]"
+        className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 text-center relative overflow-hidden mb-5 shadow-sm"
       >
-        <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.25em] text-[#FD3F01] block mb-2">
-          Sip Or Spill Dilemma
+        <span className="text-xs font-semibold uppercase tracking-wider text-rose-600 block mb-2">
+          Dilemma
         </span>
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-[#010101] tracking-tight leading-snug mb-3">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight leading-snug mb-3">
           {state.dilemma}
         </h2>
-        <p className="text-xs sm:text-sm text-[#0B89FD] font-black max-w-lg mx-auto">
-          Deep Dive: {state.question}
-        </p>
+        {state.question && (
+          <p className="text-xs sm:text-sm text-blue-600 font-medium max-w-lg mx-auto bg-blue-50 py-2 px-3 rounded-xl border border-blue-100">
+            {state.question}
+          </p>
+        )}
       </motion.div>
 
       {/* 4. ACTIONS AREA: SPILL OR SIP */}
@@ -175,41 +161,45 @@ export function SipOrSpillGameView({
         <div className="flex-1 flex flex-col justify-center items-center">
           {isMyTurn ? (
             <div className="w-full max-w-lg grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              {/* BUTTON 1: SPILL THE TRUTH */}
+              {/* BUTTON 1: ANSWERED LIVE */}
               <button
-                onClick={() => setShowConfessionModal(true)}
-                className="p-5 rounded-2xl flex flex-col items-center justify-center text-center gap-2 bg-[#0B89FD] hover:bg-[#0977db] text-white border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all"
+                onClick={() => handleSpillTruth('Answered Live to the room!')}
+                className="p-5 rounded-2xl flex flex-col items-center justify-center text-center gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all min-h-[110px]"
               >
-                <MessageSquare strokeWidth={2.5} className="w-8 h-8 text-white shrink-0" />
-                <span className="text-base sm:text-lg font-black uppercase tracking-wider text-white">
-                  Spill The Truth!
-                </span>
-                <span className="text-[11px] font-bold text-white/90">
-                  +150 PTS • Confess to the room
+                <div className="flex items-center gap-2">
+                  <Check className="w-5 h-5 text-white" />
+                  <span className="text-base font-bold uppercase tracking-wider">
+                    Answered Live
+                  </span>
+                </div>
+                <span className="text-xs font-medium text-blue-100">
+                  +150 pts • Confess to the room
                 </span>
               </button>
 
-              {/* BUTTON 2: TAKE A SIP */}
+              {/* BUTTON 2: TAKE A SIP TO SKIP */}
               <button
                 onClick={handleTakeSip}
-                className="p-5 rounded-2xl flex flex-col items-center justify-center text-center gap-2 bg-[#FD3F01] hover:bg-[#e03700] text-white border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all"
+                className="p-5 rounded-2xl flex flex-col items-center justify-center text-center gap-2 bg-rose-500 hover:bg-rose-600 text-white shadow-sm transition-all min-h-[110px]"
               >
-                <Wine strokeWidth={2.5} className="w-8 h-8 text-white shrink-0" />
-                <span className="text-base sm:text-lg font-black uppercase tracking-wider text-white">
-                  Take A Sip! 🥤
-                </span>
-                <span className="text-[11px] font-bold text-white/90">
-                  Take {state.spicyLevel || 2} sips to skip question
+                <div className="flex items-center gap-2">
+                  <Wine className="w-5 h-5 text-white" />
+                  <span className="text-base font-bold uppercase tracking-wider">
+                    Take a Sip 🥤
+                  </span>
+                </div>
+                <span className="text-xs font-medium text-rose-100">
+                  Take a sip to skip question
                 </span>
               </button>
             </div>
           ) : (
-            <div className="text-center py-6 px-4 rounded-2xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[3px_3px_0px_#010101] max-w-md">
-              <span className="text-xs font-black uppercase tracking-widest text-[#0B89FD] block mb-1">
+            <div className="text-center py-6 px-4 rounded-2xl bg-white border border-gray-200 shadow-sm max-w-md">
+              <span className="text-xs font-semibold uppercase tracking-wider text-blue-600 block mb-1">
                 Awaiting Decision
               </span>
-              <p className="text-sm font-bold text-[#010101]">
-                Watching {state.targetUsername} sweat! Will they confess or drink?
+              <p className="text-sm font-medium text-gray-700">
+                Watching {state.targetUsername} make their choice! Will they confess or drink?
               </p>
             </div>
           )}
@@ -221,30 +211,30 @@ export function SipOrSpillGameView({
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="flex-1 flex flex-col items-center justify-center text-center p-6 rounded-3xl bg-[#FFFFFF] border-3 border-[#010101] shadow-[6px_6px_0px_#010101]"
+          className="flex-1 flex flex-col items-center justify-center text-center p-6 sm:p-8 rounded-2xl bg-white border border-gray-200 shadow-sm"
         >
           {state.chosenAction === 'sip' ? (
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-[#FD3F01] border-2 border-[#010101] flex items-center justify-center text-3xl mb-3 shadow-[3px_3px_0px_#010101] animate-bounce">
+              <div className="w-14 h-14 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center text-2xl mb-3">
                 🥤
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black text-[#FD3F01] mb-1">
+              <h3 className="text-2xl font-extrabold text-rose-600 mb-1">
                 {state.targetUsername} Chose To Sip!
               </h3>
-              <p className="text-sm font-bold text-[#010101] mb-4">
-                Poured {state.spicyLevel || 2} sips into the session tally!
+              <p className="text-sm text-gray-600 font-medium mb-4">
+                Took a sip to skip the question.
               </p>
             </div>
           ) : (
             <div className="flex flex-col items-center max-w-lg">
-              <div className="w-16 h-16 rounded-full bg-[#0B89FD] border-2 border-[#010101] flex items-center justify-center text-3xl mb-3 shadow-[3px_3px_0px_#010101]">
-                💬
+              <div className="w-14 h-14 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-2xl mb-3 text-blue-600">
+                <MessageSquare className="w-7 h-7 text-blue-600" />
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black text-[#0B89FD] mb-2">
+              <h3 className="text-2xl font-extrabold text-gray-900 mb-2">
                 {state.targetUsername} Spilled The Truth!
               </h3>
               {state.confessionText && (
-                <div className="p-4 rounded-2xl bg-[#F8F8F8] border-2 border-[#010101] text-sm font-bold text-[#010101] mb-4 italic shadow-[2px_2px_0px_#010101]">
+                <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 text-sm font-medium text-gray-700 mb-4 italic">
                   &ldquo;{state.confessionText}&rdquo;
                 </div>
               )}
@@ -254,51 +244,52 @@ export function SipOrSpillGameView({
           {isHost && (
             <button
               onClick={handleNextRound}
-              className="px-8 py-3 rounded-2xl bg-[#0B89FD] hover:bg-[#0977db] text-white font-black text-sm uppercase tracking-wider border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all mt-2"
+              className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm flex items-center gap-2 shadow-sm transition-all mt-2"
             >
-              Next Round →
+              <span>Next Round</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
           )}
         </motion.div>
       )}
 
-      {/* CONFESSION INPUT MODAL */}
+      {/* CONFESSION INPUT MODAL (IF INVOKED) */}
       <AnimatePresence>
         {showConfessionModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#010101]/80 backdrop-blur-sm p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4">
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="w-full max-w-md p-6 rounded-3xl bg-[#FFFFFF] border-3 border-[#010101] shadow-[8px_8px_0px_#010101] text-center"
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="w-full max-w-md p-6 rounded-2xl bg-white border border-gray-200 shadow-xl text-center"
             >
-              <h3 className="text-xl font-black text-[#010101] uppercase tracking-wide mb-2">
+              <h3 className="text-lg font-bold text-gray-900 mb-1">
                 Spill Your Confession
               </h3>
-              <p className="text-xs text-[#010101]/70 font-semibold mb-4">
-                Type your answer or confess out loud to the crew:
+              <p className="text-xs text-gray-500 mb-4">
+                Type your answer or confess out loud to the room:
               </p>
 
               <textarea
                 value={confessionInput}
                 onChange={(e) => setConfessionInput(e.target.value)}
-                placeholder="Type your spicy confession here..."
+                placeholder="Type your confession here..."
                 rows={3}
-                className="w-full p-3 rounded-xl bg-[#F8F8F8] border-2 border-[#010101] text-[#010101] placeholder-[#010101]/40 text-sm font-bold focus:outline-none focus:border-[#0B89FD] mb-4"
+                className="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 text-sm font-medium focus:outline-none focus:border-blue-500 mb-4"
               />
 
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowConfessionModal(false)}
-                  className="flex-1 py-2.5 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] text-[#010101] font-bold text-xs uppercase shadow-[2px_2px_0px_#010101]"
+                  className="flex-1 h-11 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs"
                 >
                   Cancel
                 </button>
                 <button
-                  onClick={handleSpillTruth}
-                  className="flex-1 py-2.5 rounded-xl bg-[#0B89FD] hover:bg-[#0977db] text-white border-2 border-[#010101] font-black text-xs uppercase flex items-center justify-center gap-1.5 shadow-[2px_2px_0px_#010101]"
+                  onClick={() => handleSpillTruth()}
+                  className="flex-1 h-11 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm"
                 >
-                  <Send strokeWidth={2.5} className="w-3.5 h-3.5 shrink-0" />
+                  <Send className="w-3.5 h-3.5 shrink-0" />
                   <span>Submit</span>
                 </button>
               </div>

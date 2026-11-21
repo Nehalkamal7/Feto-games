@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   NeverHaveIEverPublicState,
   PlayerSummary
@@ -9,13 +9,8 @@ import {
 import { NeonAvatarDisplay } from '../NeonAvatarDisplay';
 import { GameIcon } from '../GameIcon';
 import {
-  Shield,
   Heart,
   Clock,
-  Sparkles,
-  Trophy,
-  AlertCircle,
-  HelpCircle,
   Users
 } from 'lucide-react';
 import { sound } from '@/lib/sound';
@@ -53,148 +48,146 @@ export const NeverHaveIEverGameView: React.FC<NeverHaveIEverGameViewProps> = ({
   const timerPercent = Math.max(0, Math.min(100, (gameState.remainingSeconds / 15) * 100));
 
   return (
-    <div className="w-full max-w-4xl mx-auto flex flex-col gap-6 p-2 md:p-4 select-none">
-      {/* ======================================================== */}
-      {/* HEADER: ROUND, CATEGORY & INNOCENCE METER                */}
-      {/* ======================================================== */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#FFFFFF] p-4 md:p-6 rounded-3xl border-2 border-[#010101] shadow-[4px_4px_0px_#010101]">
+    <div className="w-full max-w-md mx-auto flex flex-col gap-4 px-2 sm:px-4 overflow-x-hidden select-none">
+      {/* HEADER: ROUND, CATEGORY & INNOCENCE METER */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm">
         <div className="flex items-center gap-3">
           <GameIcon gameMode="never_have_i_ever" size="md" showContainer />
           <div>
             <div className="flex items-center gap-2">
-              <span className="px-3 py-1 rounded-full bg-[#FFFFFF] text-[#010101] text-xs font-black uppercase tracking-wider border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
+              <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold">
                 Round {gameState.round} of {gameState.totalRounds}
               </span>
-              <span className="px-3 py-1 rounded-full bg-[#FEC90E] text-[#010101] text-xs font-black uppercase tracking-wider border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
+              <span className="px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-700 text-xs font-medium">
                 {gameState.category}
               </span>
             </div>
-            <h2 className="text-xl md:text-2xl font-black text-[#010101] mt-1">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 mt-1">
               Never Have I Ever
             </h2>
           </div>
         </div>
 
         {/* Current Player Innocence Badge */}
-        <div className="flex items-center gap-3 bg-[#FFFFFF] px-4 py-2 rounded-2xl border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
-          <div className="flex items-center gap-1.5 text-[#FD3F01]">
-            <Heart strokeWidth={2.5} className="w-5 h-5 fill-[#FD3F01] animate-pulse shrink-0" />
-            <span className="text-lg font-black">{myInnocence}</span>
+        <div className="flex items-center gap-2.5 bg-gray-50 px-3.5 py-2 rounded-xl border border-gray-200">
+          <div className="flex items-center gap-1.5 text-rose-500">
+            <Heart strokeWidth={2.5} className="w-4 h-4 fill-rose-500 shrink-0" />
+            <span className="text-base font-bold">{myInnocence}</span>
           </div>
-          <span className="text-xs text-[#010101]/70 font-black uppercase tracking-wider">
+          <span className="text-xs text-gray-500 font-medium">
             Innocence Points
           </span>
         </div>
       </div>
 
-      {/* ======================================================== */}
-      {/* 15-SECOND SYNCHRONIZED TIMER BAR                         */}
-      {/* ======================================================== */}
+      {/* SYNCHRONIZED TIMER BAR */}
       <div className="w-full">
-        <div className="flex justify-between items-center text-xs font-black uppercase text-[#010101] mb-1.5 px-1">
+        <div className="flex justify-between items-center text-xs font-semibold text-gray-600 mb-1.5 px-1">
           <span className="flex items-center gap-1.5">
-            <Clock strokeWidth={2.5} className="w-3.5 h-3.5 text-[#FD3F01] animate-spin shrink-0" />
-            {gameState.phase === 'statement' ? 'Voting Phase' : 'Group Reveal'}
+            <Clock className={`w-3.5 h-3.5 ${gameState.remainingSeconds <= 3 ? 'text-red-500 animate-spin' : 'text-blue-600'}`} />
+            {gameState.phase === 'statement' ? 'Cast Your Confession' : 'Group Reveal'}
           </span>
-          <span>{gameState.remainingSeconds}s Remaining</span>
+          <span className={gameState.remainingSeconds <= 3 ? 'text-red-500 font-bold' : ''}>
+            {gameState.remainingSeconds}s remaining
+          </span>
         </div>
-        <div className="w-full h-3 bg-[#F8F8F8] rounded-full overflow-hidden border-2 border-[#010101]">
+        <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden border border-gray-200">
           <div
-            className="h-full bg-[#0B89FD] transition-all duration-1000 ease-linear"
+            className={`h-full transition-all duration-1000 ease-linear rounded-full ${
+              gameState.remainingSeconds <= 3 ? 'bg-red-500' : 'bg-blue-600'
+            }`}
             style={{ width: `${timerPercent}%` }}
           />
         </div>
       </div>
 
-      {/* ======================================================== */}
-      {/* MAIN STATEMENT CARD                                      */}
-      {/* ======================================================== */}
-      <div className="bg-[#FFFFFF] p-8 md:p-12 rounded-3xl text-center space-y-4 border-2 border-[#010101] shadow-[4px_4px_0px_#010101] relative overflow-hidden">
-        <span className="text-xs font-black uppercase tracking-widest text-[#0B89FD]">
+      {/* MAIN STATEMENT CARD */}
+      <div className="bg-white p-7 sm:p-10 rounded-2xl text-center space-y-3 border border-gray-200 shadow-sm relative overflow-hidden">
+        <span className="text-xs font-semibold tracking-wider uppercase text-blue-600">
           Statement #{gameState.round}
         </span>
-        <h3 className="text-2xl md:text-4xl font-black text-[#010101] leading-relaxed">
+        <h3 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-relaxed max-w-xl mx-auto">
           &ldquo;{gameState.statement}&rdquo;
         </h3>
       </div>
 
-      {/* ======================================================== */}
-      {/* ACTION BUTTONS (STATEMENT PHASE)                         */}
-      {/* ======================================================== */}
+      {/* ACTION BUTTONS (STATEMENT PHASE) */}
       {gameState.phase === 'statement' ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-xl mx-auto w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto w-full">
           <motion.button
-            whileHover={!hasVoted ? { scale: 1.02 } : {}}
+            whileHover={!hasVoted ? { scale: 1.01 } : {}}
             whileTap={!hasVoted ? { scale: 0.98 } : {}}
             disabled={hasVoted}
             onClick={() => handleChoose('have')}
-            className={`min-h-[56px] p-5 sm:p-8 rounded-3xl border-2 border-[#010101] flex flex-col items-center justify-center gap-2 font-black text-xl sm:text-2xl transition-all shadow-[4px_4px_0px_#010101] touch-target ${
+            className={`min-h-[72px] p-4 sm:p-5 rounded-2xl border transition-all flex flex-col items-center justify-center gap-1.5 font-bold ${
               selectedChoice === 'have'
-                ? 'bg-[#FD3F01] text-white active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101]'
+                ? 'bg-rose-500 text-white border-rose-600 shadow-sm'
                 : hasVoted
-                ? 'opacity-40 cursor-not-allowed bg-[#F8F8F8] text-[#010101]'
-                : 'bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white text-[#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101]'
+                ? 'opacity-40 cursor-not-allowed bg-gray-50 border-gray-200 text-gray-400'
+                : 'bg-white hover:bg-rose-50 border-gray-200 hover:border-rose-300 text-gray-900 shadow-sm'
             }`}
           >
-            <span className="text-3xl sm:text-4xl font-emoji">🙋‍♂️</span>
-            <span>I HAVE</span>
-            <span className="text-xs font-bold uppercase tracking-wider opacity-90">
+            <div className="flex items-center gap-2 text-lg">
+              <span>🥤</span>
+              <span>I Have (Take a Sip)</span>
+            </div>
+            <span className={`text-xs font-medium ${selectedChoice === 'have' ? 'text-rose-100' : 'text-gray-500'}`}>
               -1 Innocence Point
             </span>
           </motion.button>
 
           <motion.button
-            whileHover={!hasVoted ? { scale: 1.02 } : {}}
+            whileHover={!hasVoted ? { scale: 1.01 } : {}}
             whileTap={!hasVoted ? { scale: 0.98 } : {}}
             disabled={hasVoted}
             onClick={() => handleChoose('havenot')}
-            className={`min-h-[56px] p-5 sm:p-8 rounded-3xl border-2 border-[#010101] flex flex-col items-center justify-center gap-2 font-black text-xl sm:text-2xl transition-all shadow-[4px_4px_0px_#010101] touch-target ${
+            className={`min-h-[72px] p-4 sm:p-5 rounded-2xl border transition-all flex flex-col items-center justify-center gap-1.5 font-bold ${
               selectedChoice === 'havenot'
-                ? 'bg-[#0B89FD] text-white active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101]'
+                ? 'bg-blue-600 text-white border-blue-700 shadow-sm'
                 : hasVoted
-                ? 'opacity-40 cursor-not-allowed bg-[#F8F8F8] text-[#010101]'
-                : 'bg-[#FFFFFF] hover:bg-[#0B89FD] hover:text-white text-[#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101]'
+                ? 'opacity-40 cursor-not-allowed bg-gray-50 border-gray-200 text-gray-400'
+                : 'bg-white hover:bg-blue-50 border-gray-200 hover:border-blue-300 text-gray-900 shadow-sm'
             }`}
           >
-            <span className="text-3xl sm:text-4xl font-emoji">😇</span>
-            <span>I HAVEN&rsquo;T</span>
-            <span className="text-xs font-bold uppercase tracking-wider opacity-90">
+            <div className="flex items-center gap-2 text-lg">
+              <span>😇</span>
+              <span>Never</span>
+            </div>
+            <span className={`text-xs font-medium ${selectedChoice === 'havenot' ? 'text-blue-100' : 'text-gray-500'}`}>
               Keep Innocence Intact
             </span>
           </motion.button>
         </div>
       ) : (
-        /* ======================================================== */
-        /* GROUP REVEAL & PERCENTAGE STATS                          */
-        /* ======================================================== */
-        <div className="bg-[#FFFFFF] p-6 md:p-8 rounded-3xl border-2 border-[#010101] shadow-[4px_4px_0px_#010101] space-y-6">
+        /* GROUP REVEAL & PERCENTAGE STATS */
+        <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6">
           {gameState.stats && (
             <div className="text-center space-y-2">
-              <span className="text-xs uppercase font-black text-[#010101]/60 tracking-wider">
-                Group Confession Stats
+              <span className="text-xs uppercase font-semibold text-gray-500 tracking-wider">
+                Group Results
               </span>
-              <div className="text-3xl md:text-5xl font-black text-[#010101]">
+              <div className="text-2xl sm:text-4xl font-extrabold text-gray-900">
                 {gameState.stats.havePercentage}% of the room has done this!
               </div>
 
-              {/* Graphical Percentage Bar */}
-              <div className="w-full max-w-md mx-auto h-4 bg-[#F8F8F8] rounded-full overflow-hidden border-2 border-[#010101] flex mt-3">
+              {/* Progress Bar */}
+              <div className="w-full max-w-md mx-auto h-3 bg-gray-100 rounded-full overflow-hidden border border-gray-200 flex mt-3">
                 <div
-                  className="h-full bg-[#FD3F01]"
+                  className="h-full bg-rose-500 transition-all duration-700"
                   style={{ width: `${gameState.stats.havePercentage}%` }}
                 />
                 <div
-                  className="h-full bg-[#0B89FD]"
+                  className="h-full bg-blue-600 transition-all duration-700"
                   style={{ width: `${100 - gameState.stats.havePercentage}%` }}
                 />
               </div>
 
-              <div className="flex justify-between max-w-md mx-auto text-xs font-black pt-1 px-1">
-                <span className="text-[#FD3F01]">
-                  🙋‍♂️ {gameState.stats.haveCount} Have
+              <div className="flex justify-between max-w-md mx-auto text-xs font-semibold pt-1 px-1">
+                <span className="text-rose-600">
+                  🥤 {gameState.stats.haveCount} Have (Took a Sip)
                 </span>
-                <span className="text-[#0B89FD]">
-                  😇 {gameState.stats.haveNotCount} Haven&rsquo;t
+                <span className="text-blue-600">
+                  😇 {gameState.stats.haveNotCount} Never
                 </span>
               </div>
             </div>
@@ -209,30 +202,30 @@ export const NeverHaveIEverGameView: React.FC<NeverHaveIEverGameViewProps> = ({
               return (
                 <motion.div
                   key={p.id}
-                  initial={{ scale: 0.8, opacity: 0 }}
+                  initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  className={`p-3 rounded-2xl border-2 border-[#010101] flex flex-col items-center gap-1.5 transition-all shadow-[2px_2px_0px_#010101] ${
+                  className={`p-3 rounded-xl border flex flex-col items-center gap-1.5 transition-all ${
                     isHave
-                      ? 'bg-[#FD3F01]/10'
-                      : 'bg-[#0B89FD]/10'
+                      ? 'bg-rose-50 border-rose-200'
+                      : 'bg-blue-50 border-blue-200'
                   }`}
                 >
                   <NeonAvatarDisplay avatarId={p.avatar} size="sm" showGlow={false} />
-                  <span className="text-[#010101] font-black text-xs truncate max-w-[90px]">
+                  <span className="text-gray-900 font-bold text-xs truncate max-w-[90px]">
                     {p.username}
                   </span>
                   <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase border border-[#010101] ${
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
                       isHave
-                        ? 'bg-[#FD3F01] text-white'
-                        : 'bg-[#0B89FD] text-white'
+                        ? 'bg-rose-500 text-white'
+                        : 'bg-blue-600 text-white'
                     }`}
                   >
-                    {isHave ? 'I HAVE' : 'I HAVEN’T'}
+                    {isHave ? 'I Have 🥤' : 'Never'}
                   </span>
-                  <span className="text-xs text-[#010101] font-black flex items-center gap-1">
-                    <Heart strokeWidth={2.5} className="w-3 h-3 fill-[#FD3F01] text-[#FD3F01] shrink-0" />
-                    {points}
+                  <span className="text-xs text-gray-700 font-medium flex items-center gap-1">
+                    <Heart strokeWidth={2.5} className="w-3 h-3 fill-rose-500 text-rose-500 shrink-0" />
+                    {points} pts
                   </span>
                 </motion.div>
               );
@@ -241,16 +234,14 @@ export const NeverHaveIEverGameView: React.FC<NeverHaveIEverGameViewProps> = ({
         </div>
       )}
 
-      {/* ======================================================== */}
-      {/* INNOCENCE STANDINGS (UP TO 15 PLAYERS)                    */}
-      {/* ======================================================== */}
-      <div className="bg-[#FFFFFF] p-4 rounded-3xl border-2 border-[#010101] shadow-[4px_4px_0px_#010101]">
-        <div className="flex items-center justify-between mb-3 px-2 border-b-2 border-[#010101]/10 pb-2">
-          <span className="text-xs font-black text-[#010101] flex items-center gap-1.5 uppercase tracking-wider">
-            <Users strokeWidth={2.5} className="w-4 h-4 text-[#0B89FD] shrink-0" />
+      {/* INNOCENCE STANDINGS */}
+      <div className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm">
+        <div className="flex items-center justify-between mb-3 px-1 border-b border-gray-100 pb-2">
+          <span className="text-xs font-bold text-gray-900 flex items-center gap-1.5 uppercase tracking-wider">
+            <Users className="w-4 h-4 text-blue-600 shrink-0" />
             Innocence Standings
           </span>
-          <span className="text-xs text-[#010101]/60 font-bold">10 Initial Points</span>
+          <span className="text-xs text-gray-500 font-medium">10 Initial Points</span>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
@@ -266,17 +257,17 @@ export const NeverHaveIEverGameView: React.FC<NeverHaveIEverGameViewProps> = ({
               return (
                 <div
                   key={p.id}
-                  className="flex items-center justify-between p-2 rounded-xl bg-[#F8F8F8] border border-[#010101] text-xs font-black shadow-[1px_1px_0px_#010101]"
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-gray-50 border border-gray-200 text-xs font-semibold"
                 >
                   <div className="flex items-center gap-1.5 truncate">
-                    <span className="text-[#010101]/50 font-black w-3">#{idx + 1}</span>
-                    <span className="text-[#010101] font-black truncate max-w-[70px]">
+                    <span className="text-gray-400 font-bold w-4">#{idx + 1}</span>
+                    <span className="text-gray-800 font-medium truncate max-w-[70px]">
                       {p.username}
                     </span>
                   </div>
                   <span
-                    className={`font-black ${
-                      pts <= 3 ? 'text-[#FD3F01] animate-pulse' : 'text-[#010101]'
+                    className={`font-bold ${
+                      pts <= 3 ? 'text-rose-600' : 'text-gray-900'
                     }`}
                   >
                     {pts} pts

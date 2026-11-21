@@ -1,16 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   RotateCw,
-  Sparkles,
-  Flame,
   Clock,
   ThumbsUp,
   ThumbsDown,
-  Award,
-  AlertCircle
+  ArrowRight
 } from 'lucide-react';
 import {
   SillyRoulettePublicState,
@@ -36,12 +33,11 @@ export function SillyRouletteGameView({
   players,
   currentPlayerId,
   isHost,
-  vibeMode,
+  vibeMode: _vibeMode,
   onAction
 }: SillyRouletteGameViewProps) {
   const [hasVoted, setHasVoted] = useState(false);
   const isMyTurn = currentPlayerId === state.targetPlayerId;
-  const targetPlayer = players.find((p) => p.id === state.targetPlayerId);
 
   // Trigger wheel clicks during spinning phase
   useEffect(() => {
@@ -53,7 +49,7 @@ export function SillyRouletteGameView({
     }
   }, [state.phase]);
 
-  // Trigger victory fanfare or screen shake when voting ends
+  // Trigger victory fanfare or wrong sound when voting ends
   useEffect(() => {
     if (state.phase === 'round_results') {
       if (state.voteTallies.nailed_it >= state.voteTallies.shame_penalty) {
@@ -93,72 +89,71 @@ export function SillyRouletteGameView({
   };
 
   return (
-    <div className="flex flex-col h-full w-full max-w-4xl mx-auto px-2 sm:px-4 py-2 select-none">
+    <div className="flex flex-col h-full w-full max-w-md mx-auto px-2 sm:px-4 py-2 overflow-x-hidden select-none">
       {/* 1. TOP HEADER */}
-      <div className="flex items-center justify-between mb-3 px-1">
+      <div className="flex items-center justify-between mb-4 px-1">
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-[#FFFFFF] text-[#010101] border-2 border-[#010101] flex items-center gap-1.5 shadow-[2px_2px_0px_#010101]">
+          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white border border-gray-200 text-gray-800 flex items-center gap-1.5 shadow-sm">
             <GameIcon gameMode="silly_roulette" size="xs" />
-            Round {state.round} / {state.totalRounds}
+            Round {state.round} of {state.totalRounds}
           </span>
-          <span className="hidden sm:inline-block px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-[#FEC90E] text-[#010101] border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
+          <span className="hidden sm:inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
             {state.challengeCategory}
           </span>
         </div>
 
         {/* TIMER */}
         <div
-          className={`flex items-center gap-1.5 px-3 py-1 rounded-full border-2 border-[#010101] text-xs font-black tracking-wider shadow-[2px_2px_0px_#010101] transition-all ${
+          className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold transition-all ${
             state.remainingSeconds <= 5
-              ? 'bg-[#FD3F01] text-white animate-bounce'
-              : 'bg-[#FFFFFF] text-[#010101]'
+              ? 'bg-red-50 text-red-600 border-red-200 animate-pulse'
+              : 'bg-white text-gray-800 border-gray-200 shadow-sm'
           }`}
         >
-          <Clock strokeWidth={2.5} className="w-3.5 h-3.5 text-[#FD3F01] shrink-0" />
+          <Clock className={`w-3.5 h-3.5 ${state.remainingSeconds <= 5 ? 'text-red-500' : 'text-blue-600'}`} />
           <span>{state.remainingSeconds}s</span>
         </div>
       </div>
 
-      {/* 2. SPINNING PHASE: SYNCED BAUHAUS ROULETTE WHEEL */}
+      {/* 2. SPINNING PHASE: MINIMAL MODERN ROULETTE WHEEL */}
       {state.phase === 'spinning' && (
-        <div className="flex-1 flex flex-col items-center justify-center text-center">
-          <div className="relative w-64 h-64 sm:w-80 sm:h-80 flex items-center justify-center mb-6">
+        <div className="flex-1 flex flex-col items-center justify-center text-center py-6">
+          <div className="relative w-60 h-60 sm:w-72 sm:h-72 flex items-center justify-center mb-6">
             {/* Outer Rim */}
-            <div className="absolute inset-0 rounded-full border-4 border-[#010101] shadow-[6px_6px_0px_#010101]" />
+            <div className="absolute inset-0 rounded-full border-2 border-gray-200 shadow-lg" />
 
             {/* Rotating Wheel Core */}
             <motion.div
               animate={{ rotate: state.targetAngle }}
               transition={{ duration: 4.8, ease: [0.15, 0.9, 0.25, 1] }}
-              className="w-full h-full rounded-full border-4 border-[#010101] bg-[#FFFFFF] flex items-center justify-center relative overflow-hidden"
+              className="w-full h-full rounded-full border border-gray-200 bg-white flex items-center justify-center relative overflow-hidden"
             >
-              {/* Radial 4-Color Bauhaus Slices */}
+              {/* Radial Slices */}
               {players.slice(0, 8).map((p, idx) => {
                 const angle = (idx * 360) / Math.min(8, players.length);
-                const colors = ['#0B89FD', '#FEC90E', '#FD3F01', '#F8F8F8'];
                 return (
                   <div
                     key={p.id}
-                    className="absolute w-full h-0.5 bg-[#010101] origin-center"
+                    className="absolute w-full h-[1px] bg-gray-200 origin-center"
                     style={{ transform: `rotate(${angle}deg)` }}
                   />
                 );
               })}
 
-              <div className="w-24 h-24 rounded-full bg-[#FEC90E] border-2 border-[#010101] flex items-center justify-center shadow-[2px_2px_0px_#010101] z-10">
-                <RotateCw strokeWidth={2.5} className="w-10 h-10 text-[#010101] animate-spin shrink-0" />
+              <div className="w-20 h-20 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center shadow-sm z-10">
+                <RotateCw className="w-8 h-8 text-blue-600 animate-spin" />
               </div>
             </motion.div>
 
             {/* Top Indicator Arrow */}
-            <div className="absolute -top-3 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[18px] border-t-[#010101] z-20" />
+            <div className="absolute -top-2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[14px] border-t-blue-600 z-20" />
           </div>
 
-          <h3 className="text-xl sm:text-2xl font-black text-[#010101] uppercase tracking-tight animate-pulse">
-            Spinning The Chaos Wheel...
+          <h3 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
+            Spinning Roulette...
           </h3>
-          <p className="text-xs text-[#010101]/70 font-black mt-1">
-            Who will be chosen for the challenge?
+          <p className="text-xs text-gray-500 font-medium mt-1">
+            Selecting a random player for the party dare!
           </p>
         </div>
       )}
@@ -168,73 +163,69 @@ export function SillyRouletteGameView({
         <div className="flex-1 flex flex-col justify-between">
           {/* Active Player Focus Card */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.94 }}
+            initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-[#FFFFFF] p-5 sm:p-7 rounded-3xl border-2 border-[#010101] text-center relative overflow-hidden mb-4 shadow-[4px_4px_0px_#010101]"
+            className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 text-center relative overflow-hidden mb-4 shadow-sm"
           >
             <div className="flex items-center justify-center gap-3 mb-3">
               <NeonAvatarDisplay avatarId={state.targetAvatar} size="md" showGlow={false} />
               <div className="text-left">
-                <span className="text-[10px] font-black uppercase tracking-widest text-[#0B89FD] block">
-                  Chosen Challenger:
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-blue-600 block">
+                  Selected Player:
                 </span>
-                <span className="text-lg sm:text-2xl font-black text-[#010101]">
+                <span className="text-lg sm:text-2xl font-bold text-gray-900">
                   {state.targetUsername} {isMyTurn && '(You!)'}
                 </span>
               </div>
             </div>
 
-            <div className="inline-block px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-[#FEC90E] text-[#010101] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] mb-3">
+            <div className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 mb-3">
               {state.challengeTitle}
             </div>
 
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-[#010101] leading-snug">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900 leading-snug">
               &ldquo;{state.challengeText}&rdquo;
             </h2>
           </motion.div>
 
           {/* Voting Area */}
           {state.phase === 'voting' && (
-            <div className="bg-[#FFFFFF] p-5 rounded-2xl border-2 border-[#010101] shadow-[4px_4px_0px_#010101] text-center mb-3">
-              <span className="text-xs font-black uppercase tracking-widest text-[#0B89FD] block mb-2">
-                Audience Verdict • Did They Pull It Off?
+            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center mb-3">
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 block mb-3">
+                Did they complete the dare?
               </span>
 
               {isMyTurn ? (
-                <p className="text-sm font-bold text-[#010101]/70 italic">
+                <p className="text-sm font-medium text-gray-500 italic">
                   Awaiting the crew&apos;s vote on your performance...
                 </p>
               ) : (
-                <div className="flex items-center justify-center gap-4 max-w-sm mx-auto">
-                  <motion.button
+                <div className="flex items-center justify-center gap-3 max-w-sm mx-auto">
+                  <button
                     onClick={() => handleVote('nailed_it')}
                     disabled={hasVoted}
-                    whileHover={!hasVoted ? { scale: 1.02 } : undefined}
-                    whileTap={!hasVoted ? { scale: 0.98 } : undefined}
-                    className={`flex-1 py-3 px-4 rounded-xl flex items-center justify-center gap-2 font-black uppercase text-xs border-2 border-[#010101] transition-all shadow-[2px_2px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none ${
+                    className={`flex-1 h-12 rounded-xl flex items-center justify-center gap-2 font-bold text-xs uppercase transition-all shadow-sm ${
                       hasVoted
-                        ? 'bg-[#F8F8F8] text-[#010101]/40'
-                        : 'bg-[#10B981] hover:bg-[#059669] text-white'
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-emerald-600 hover:bg-emerald-700 text-white'
                     }`}
                   >
-                    <ThumbsUp strokeWidth={2.5} className="w-4 h-4 shrink-0" />
+                    <ThumbsUp className="w-4 h-4 shrink-0" />
                     <span>Nailed It! (+180)</span>
-                  </motion.button>
+                  </button>
 
-                  <motion.button
+                  <button
                     onClick={() => handleVote('shame_penalty')}
                     disabled={hasVoted}
-                    whileHover={!hasVoted ? { scale: 1.02 } : undefined}
-                    whileTap={!hasVoted ? { scale: 0.98 } : undefined}
-                    className={`flex-1 py-3 px-4 rounded-xl flex items-center justify-center gap-2 font-black uppercase text-xs border-2 border-[#010101] transition-all shadow-[2px_2px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none ${
+                    className={`flex-1 h-12 rounded-xl flex items-center justify-center gap-2 font-bold text-xs uppercase transition-all shadow-sm ${
                       hasVoted
-                        ? 'bg-[#F8F8F8] text-[#010101]/40'
-                        : 'bg-[#FD3F01] hover:bg-[#e03700] text-white'
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-rose-500 hover:bg-rose-600 text-white'
                     }`}
                   >
-                    <ThumbsDown strokeWidth={2.5} className="w-4 h-4 shrink-0" />
-                    <span>Shame Penalty!</span>
-                  </motion.button>
+                    <ThumbsDown className="w-4 h-4 shrink-0" />
+                    <span>Penalty</span>
+                  </button>
                 </div>
               )}
             </div>
@@ -242,26 +233,25 @@ export function SillyRouletteGameView({
 
           {/* Results Summary */}
           {state.phase === 'round_results' && (
-            <div className="text-center py-4 bg-[#FFFFFF] p-6 rounded-3xl border-2 border-[#010101] shadow-[4px_4px_0px_#010101]">
-              <h3 className="text-2xl font-black text-[#010101] mb-2">
+            <div className="text-center py-6 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+              <h3 className="text-2xl font-extrabold text-gray-900 mb-2">
                 {state.voteTallies.nailed_it >= state.voteTallies.shame_penalty
                   ? '🎉 Challenge Victorious!'
                   : '💀 The Crowd Demanded Penalty!'}
               </h3>
-              <p className="text-xs sm:text-sm font-black text-[#010101]/80 mb-4">
-                Nailed It: {state.voteTallies.nailed_it} • Shame Penalty:{' '}
+              <p className="text-xs sm:text-sm font-medium text-gray-600 mb-4">
+                Nailed It: {state.voteTallies.nailed_it} • Penalty:{' '}
                 {state.voteTallies.shame_penalty}
               </p>
 
               {isHost && (
-                <motion.button
+                <button
                   onClick={handleNextRound}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="px-8 py-3 rounded-2xl bg-[#0B89FD] hover:bg-[#0977db] text-white border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] text-sm font-black uppercase tracking-wider transition-all"
+                  className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-sm text-sm font-bold flex items-center gap-2 mx-auto transition-all"
                 >
-                  Next Round →
-                </motion.button>
+                  <span>Next Turn</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
               )}
             </div>
           )}

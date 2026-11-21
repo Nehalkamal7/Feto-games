@@ -115,13 +115,17 @@ export async function POST(req: NextRequest) {
 
     await Promise.all([...redisPromises, ...publishPromises]);
 
+    const requesterRole = result.privateRoles?.[playerId] || result.updatedRoom.gameData?.privateRoles?.[playerId] || null;
+
     return NextResponse.json({
       success: true,
       room: publicRoom,
       gameState: result.publicState,
+      privateRole: requesterRole,
       data: {
         room: publicRoom,
-        gameState: result.publicState
+        gameState: result.publicState,
+        privateRole: requesterRole
       }
     });
   } catch (err: any) {

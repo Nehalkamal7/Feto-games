@@ -3,14 +3,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Users,
   Vote,
-  Flame,
-  Award,
   Sparkles,
   AlertTriangle,
   Clock,
-  Wine
+  Wine,
+  ArrowRight
 } from 'lucide-react';
 import {
   MostLikelyToPublicState,
@@ -77,20 +75,20 @@ export function MostLikelyToGameView({
     : null;
 
   return (
-    <div className="flex flex-col h-full w-full max-w-4xl mx-auto px-2 sm:px-4 py-2 select-none">
+    <div className="flex flex-col h-full w-full max-w-md mx-auto px-2 sm:px-4 py-2 overflow-x-hidden select-none">
       {/* 1. TOP HEADER: ROUND & SYNCED TIMER */}
-      <div className="flex items-center justify-between mb-3 px-1">
+      <div className="flex items-center justify-between mb-4 px-1">
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-[#FFFFFF] text-[#010101] border-2 border-[#010101] flex items-center gap-1.5 shadow-[2px_2px_0px_#010101]">
+          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white border border-gray-200 text-gray-800 flex items-center gap-1.5 shadow-sm">
             <GameIcon gameMode="most_likely_to" size="xs" />
-            Round {state.round} / {state.totalRounds}
+            Round {state.round} of {state.totalRounds}
           </span>
-          <span className="hidden sm:inline-block px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-[#FEC90E] text-[#010101] border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
+          <span className="hidden sm:inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
             {state.category}
           </span>
           {vibeMode === 'sip_edition' && (
-            <span className="px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-[#FD3F01] text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101] flex items-center gap-1">
-              <Wine strokeWidth={2.5} className="w-3 h-3 text-white shrink-0" />
+            <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200 flex items-center gap-1">
+              <Wine className="w-3 h-3 text-rose-600 shrink-0" />
               Sip Edition 🥤
             </span>
           )}
@@ -98,45 +96,45 @@ export function MostLikelyToGameView({
 
         {/* TIME REMAINING PILL */}
         <div
-          className={`flex items-center gap-1.5 px-3 py-1 rounded-full border-2 border-[#010101] text-xs font-black tracking-wider shadow-[2px_2px_0px_#010101] transition-all ${
+          className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold transition-all ${
             state.remainingSeconds <= 5
-              ? 'bg-[#FD3F01] text-white animate-bounce'
-              : 'bg-[#FFFFFF] text-[#010101]'
+              ? 'bg-red-50 text-red-600 border-red-200 animate-pulse'
+              : 'bg-white text-gray-800 border-gray-200 shadow-sm'
           }`}
         >
-          <Clock strokeWidth={2.5} className="w-3.5 h-3.5 text-[#FD3F01] shrink-0" />
+          <Clock className={`w-3.5 h-3.5 ${state.remainingSeconds <= 5 ? 'text-red-500' : 'text-blue-600'}`} />
           <span>{state.remainingSeconds}s</span>
         </div>
       </div>
 
       {/* 2. THE PROMPT CARD */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.96, y: -6 }}
+        initial={{ opacity: 0, scale: 0.98, y: -4 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="bg-[#FFFFFF] p-4 sm:p-6 rounded-2xl md:rounded-3xl border-2 border-[#010101] text-center relative overflow-hidden mb-4 shadow-[4px_4px_0px_#010101]"
+        className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 text-center relative overflow-hidden mb-5 shadow-sm"
       >
-        <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.25em] text-[#0B89FD] block mb-1.5">
-          Party Question • Vote For The Culprit
+        <span className="text-xs font-semibold uppercase tracking-wider text-blue-600 block mb-2">
+          Who Is Most Likely To...
         </span>
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-[#010101] tracking-tight leading-snug">
+        <h2 className="text-xl sm:text-3xl font-extrabold text-gray-900 tracking-tight leading-snug">
           &ldquo;{state.prompt}&rdquo;
         </h2>
       </motion.div>
 
-      {/* 3. VOTING PHASE: PLAYER GRID WITH LIVE BAR GRAPHS */}
+      {/* 3. VOTING PHASE: PLAYER GRID WITH PROGRESS BARS */}
       {phase === 'voting' && (
-        <div className="flex-1 flex flex-col justify-between overflow-hidden">
-          <div className="flex items-center justify-between text-xs font-black text-[#010101] px-1 mb-2">
-            <span className="flex items-center gap-1.5 text-[#0B89FD]">
-              <Vote strokeWidth={2.5} className="w-4 h-4 shrink-0" />
+        <div className="flex-1 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-xs font-semibold text-gray-600 px-1 mb-3">
+            <span className="flex items-center gap-1.5 text-blue-600 font-bold">
+              <Vote className="w-4 h-4 shrink-0" />
               Tap a player to vote:
             </span>
-            <span className="text-[#010101]/60">
-              {totalVotesCast} / {players.length} Voted
+            <span className="text-gray-500">
+              {totalVotesCast} of {players.length} voted
             </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 sm:gap-3 overflow-y-auto max-h-[50dvh] pr-1 pb-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-[52dvh] overflow-y-auto pr-1 pb-2">
             {players.map((p) => {
               const isSelected = myVote === p.id;
               const voteCount = tallies[p.id] || 0;
@@ -148,21 +146,21 @@ export function MostLikelyToGameView({
                   key={p.id}
                   onClick={() => handleCastVote(p.id)}
                   disabled={hasVoted || isSubmitting}
-                  whileHover={!hasVoted ? { scale: 1.02 } : undefined}
+                  whileHover={!hasVoted ? { scale: 1.01 } : undefined}
                   whileTap={!hasVoted ? { scale: 0.98 } : undefined}
-                  className={`relative p-3 rounded-2xl flex flex-col items-center justify-between text-center border-2 border-[#010101] transition-all duration-200 overflow-hidden shadow-[2px_2px_0px_#010101] ${
+                  className={`relative p-3.5 rounded-2xl flex flex-col items-center justify-between text-center border transition-all duration-200 overflow-hidden min-h-[110px] ${
                     isSelected
-                      ? 'bg-[#FEC90E] ring-2 ring-[#010101]'
-                      : 'bg-[#FFFFFF] hover:bg-[#F8F8F8]'
+                      ? 'bg-blue-50 border-blue-600 ring-2 ring-blue-600/20 shadow-sm'
+                      : 'bg-white hover:bg-gray-50 border-gray-200 shadow-sm'
                   }`}
                 >
-                  {/* Background Fill Bar */}
+                  {/* Background Fill Bar for Votes */}
                   {hasVoted && voteCount > 0 && (
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${votePercent}%` }}
                       transition={{ duration: 0.4 }}
-                      className="absolute left-0 bottom-0 top-0 bg-[#0B89FD]/15 pointer-events-none -z-10"
+                      className="absolute left-0 bottom-0 top-0 bg-blue-100/60 pointer-events-none -z-10"
                     />
                   )}
 
@@ -170,13 +168,13 @@ export function MostLikelyToGameView({
                     <NeonAvatarDisplay avatarId={p.avatar} size="sm" showGlow={false} />
                   </div>
 
-                  <span className="text-xs sm:text-sm font-black text-[#010101] truncate w-full mb-1">
+                  <span className="text-xs sm:text-sm font-bold text-gray-900 truncate w-full mb-1">
                     {p.username}
                   </span>
 
                   {/* Vote Count Indicator */}
                   {hasVoted && (
-                    <span className="text-[11px] font-black text-[#0B89FD]">
+                    <span className="text-[11px] font-semibold text-blue-600">
                       {voteCount} {voteCount === 1 ? 'vote' : 'votes'}
                     </span>
                   )}
@@ -187,27 +185,27 @@ export function MostLikelyToGameView({
 
           {hasVoted && (
             <motion.div
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center py-2 px-3 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] text-[#010101] text-xs font-black shadow-[2px_2px_0px_#010101] mt-2"
+              className="text-center py-2.5 px-4 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold mt-3"
             >
-              ✓ Vote submitted! Waiting for the crew to finish voting...
+              ✓ Vote submitted! Waiting for the others to vote...
             </motion.div>
           )}
         </div>
       )}
 
-      {/* 4. REVEAL & PENALTY PHASE: SPOTLIGHT & ROAST MODAL */}
+      {/* 4. REVEAL & PENALTY PHASE: SPOTLIGHT MODAL */}
       {(phase === 'reveal' || phase === 'penalty' || phase === 'round_results') && (
         <AnimatePresence>
           <motion.div
-            initial={{ opacity: 0, scale: 0.92, y: 15 }}
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="flex-1 flex flex-col items-center justify-center text-center p-4 sm:p-6 rounded-2xl md:rounded-3xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[4px_4px_0px_#010101]"
+            className="flex-1 flex flex-col items-center justify-center text-center p-6 sm:p-8 rounded-2xl bg-white border border-gray-200 shadow-sm"
           >
             <div className="mb-3">
-              <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest bg-[#FD3F01] text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101] inline-flex items-center gap-1.5">
-                <AlertTriangle strokeWidth={2.5} className="w-3.5 h-3.5 text-white shrink-0" />
+              <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 inline-flex items-center gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
                 Voted Most Likely!
               </span>
             </div>
@@ -217,37 +215,40 @@ export function MostLikelyToGameView({
                 <div className="relative mb-2">
                   <NeonAvatarDisplay avatarId={victimPlayer.avatar} size="lg" showGlow={false} />
                 </div>
-                <h3 className="text-2xl sm:text-3xl font-black text-[#010101]">
+                <h3 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
                   {victimPlayer.username}
                 </h3>
               </div>
             )}
 
-            {/* Roast Banner */}
-            <p className="text-sm sm:text-base text-[#010101]/80 font-bold max-w-lg mb-4 italic">
+            {/* Roast / Verdict Banner */}
+            <p className="text-sm sm:text-base text-gray-600 font-medium max-w-md mb-4 italic">
               &ldquo;{state.roastMessage || 'The verdict has been reached!'}&rdquo;
             </p>
 
             {/* Penalty Dare Box */}
-            <div className="w-full max-w-md p-3.5 sm:p-4 rounded-xl bg-[#F8F8F8] border-2 border-[#010101] text-left mb-4 shadow-[2px_2px_0px_#010101]">
-              <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-[#FD3F01] mb-1">
-                <Sparkles strokeWidth={2.5} className="w-3.5 h-3.5 text-[#FEC90E] shrink-0" />
-                <span>Penalty Challenge:</span>
+            {state.penaltyDare && (
+              <div className="w-full max-w-md p-4 rounded-xl bg-gray-50 border border-gray-200 text-left mb-5">
+                <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-rose-600 mb-1">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                  <span>Penalty Challenge:</span>
+                </div>
+                <p className="text-sm font-semibold text-gray-900 leading-relaxed">
+                  {state.penaltyDare}
+                </p>
               </div>
-              <p className="text-sm font-black text-[#010101] leading-relaxed">
-                {state.penaltyDare}
-              </p>
-            </div>
+            )}
 
             {/* Host Advance Button */}
             {isHost && (
               <motion.button
                 onClick={handleNextRound}
-                whileHover={{ scale: 1.02 }}
+                whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
-                className="px-8 py-3 rounded-2xl bg-[#0B89FD] hover:bg-[#0977db] text-white border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] text-sm font-black uppercase tracking-wider flex items-center gap-2 transition-all"
+                className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold flex items-center gap-2 shadow-sm transition-all"
               >
-                <span>Next Round →</span>
+                <span>Next Round</span>
+                <ArrowRight className="w-4 h-4" />
               </motion.button>
             )}
           </motion.div>

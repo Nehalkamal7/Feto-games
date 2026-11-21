@@ -45,7 +45,6 @@ export function GamePlaylistQueue({
   isHost,
   onUpdatePlaylist
 }: GamePlaylistQueueProps) {
-  // Ensure there is at least 1 game in the queue
   const currentQueue = selectedGames && selectedGames.length > 0
     ? selectedGames
     : ['who_is_imposter' as GameMode];
@@ -83,21 +82,21 @@ export function GamePlaylistQueue({
   };
 
   return (
-    <div className="rounded-2xl sm:rounded-3xl p-4 sm:p-5 bg-[#FFFFFF] border-2 border-[#010101] shadow-[4px_4px_0px_#010101] space-y-4 text-[#010101]">
+    <div className="rounded-2xl p-4 sm:p-5 bg-white border border-gray-200 shadow-sm space-y-4 text-gray-900">
       {/* Header and Quick Controls */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b-2 border-[#010101]/10">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-gray-100">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-[#0B89FD] border-2 border-[#010101] text-white flex items-center justify-center shadow-[2px_2px_0px_#010101]">
-            <ListOrdered className="w-4 h-4 text-white" />
+          <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center">
+            <ListOrdered className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-xs sm:text-sm font-black text-[#010101] uppercase tracking-wider flex items-center gap-2">
+            <h3 className="text-xs sm:text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
               <span>Game Playlist Queue</span>
-              <span className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-[#FEC90E] border-2 border-[#010101] text-[#010101] font-black">
+              <span className="font-mono text-xs px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 font-semibold">
                 {currentQueue.length} {currentQueue.length === 1 ? 'Game' : 'Games Back-to-Back'}
               </span>
             </h3>
-            <p className="text-[10px] text-[#010101]/70 font-medium">
+            <p className="text-xs text-gray-500 font-normal">
               {isHost
                 ? 'Queue multiple games to play in series with cumulative match scores'
                 : 'Upcoming games in this party session'}
@@ -105,16 +104,16 @@ export function GamePlaylistQueue({
           </div>
         </div>
 
-        {/* Quick Host Actions: Party Mix (Random 4) */}
+        {/* Quick Host Actions: Party Mix */}
         {isHost && (
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <button
               type="button"
               onClick={handlePartyMix}
-              className="flex-1 sm:flex-none px-3 py-1.5 rounded-xl bg-[#FEC90E] hover:bg-[#fed338] border-2 border-[#010101] text-[#010101] text-xs font-black flex items-center justify-center gap-1.5 transition-all shadow-[2px_2px_0px_#010101] touch-manipulation active:translate-x-[1px] active:translate-y-[1px]"
+              className="flex-1 sm:flex-none px-3 py-1.5 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-800 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-xs"
               title="Pick 4 random party games for a chaotic mix"
             >
-              <Shuffle className="w-3.5 h-3.5 text-[#010101]" />
+              <Shuffle className="w-3.5 h-3.5 text-blue-600" />
               <span>Party Mix (Random 4)</span>
             </button>
           </div>
@@ -123,7 +122,7 @@ export function GamePlaylistQueue({
 
       {/* Live Playlist Queue Horizontal Strip */}
       <div className="space-y-2">
-        <span className="text-[10px] font-black uppercase tracking-wider text-[#010101]/60">
+        <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
           Play Order ({currentQueue.length})
         </span>
 
@@ -135,21 +134,21 @@ export function GamePlaylistQueue({
             return (
               <React.Fragment key={`${gameId}-${idx}`}>
                 <div
-                  className={`flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border-2 border-[#010101] transition-all ${
+                  className={`flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border transition-all ${
                     isCurrent
-                      ? 'bg-[#0B89FD] text-white shadow-[3px_3px_0px_#010101]'
-                      : 'bg-[#F8F8F8] text-[#010101] shadow-[2px_2px_0px_#010101]'
+                      ? 'bg-blue-50 border-blue-400 text-blue-900 ring-2 ring-blue-500/20 shadow-xs'
+                      : 'bg-gray-50 border-gray-200 text-gray-800'
                   }`}
                 >
-                  <span className={`font-mono text-[10px] font-black px-1.5 py-0.5 rounded-md border border-[#010101] shrink-0 ${
-                    isCurrent ? 'bg-[#FEC90E] text-[#010101]' : 'bg-[#FFFFFF] text-[#010101]'
+                  <span className={`font-mono text-xs font-bold px-1.5 py-0.5 rounded-md shrink-0 ${
+                    isCurrent ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
                   }`}>
                     #{idx + 1}
                   </span>
                   <GameIcon gameMode={gameId} size="sm" />
                   <div className="text-left">
-                    <div className="text-xs font-black truncate max-w-[120px]">{game?.title}</div>
-                    <div className={`text-[9px] font-bold ${isCurrent ? 'text-white/80' : 'text-[#010101]/60'}`}>
+                    <div className="text-xs font-bold truncate max-w-[120px]">{game?.title}</div>
+                    <div className="text-[10px] text-gray-500">
                       {game?.players}
                     </div>
                   </div>
@@ -158,21 +157,17 @@ export function GamePlaylistQueue({
                     <button
                       type="button"
                       onClick={() => handleRemoveAt(idx)}
-                      className={`ml-1 w-6 h-6 inline-flex items-center justify-center shrink-0 rounded-lg border border-[#010101] transition-colors touch-manipulation ${
-                        isCurrent
-                          ? 'bg-[#FD3F01] text-white'
-                          : 'bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white text-[#010101]'
-                      }`}
+                      className="ml-1 w-6 h-6 inline-flex items-center justify-center shrink-0 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                       title="Remove from queue"
                       aria-label={`Remove ${game?.title} from playlist`}
                     >
-                      <Trash2 className="w-3 h-3 shrink-0" strokeWidth={2.5} />
+                      <Trash2 className="w-3 h-3" />
                     </button>
                   )}
                 </div>
 
                 {idx < currentQueue.length - 1 && (
-                  <ChevronRight className="w-3.5 h-3.5 text-[#010101]/40 shrink-0" strokeWidth={2.5} />
+                  <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
                 )}
               </React.Fragment>
             );
@@ -182,12 +177,12 @@ export function GamePlaylistQueue({
 
       {/* Host Game Selector Grid */}
       {isHost && (
-        <div className="pt-2 border-t-2 border-[#010101]/10">
+        <div className="pt-2 border-t border-gray-100">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-black uppercase tracking-wider text-[#010101]">
+            <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
               Select or Queue Games (Click to Add / Remove)
             </span>
-            <span className="text-[10px] text-[#0B89FD] font-black">
+            <span className="text-xs text-blue-600 font-bold">
               {currentQueue.length} Selected
             </span>
           </div>
@@ -202,30 +197,30 @@ export function GamePlaylistQueue({
                   key={game.id}
                   type="button"
                   onClick={() => handleToggleGame(game.id)}
-                  className={`relative p-2.5 rounded-xl border-2 border-[#010101] text-left flex flex-col justify-between transition-all min-h-[72px] touch-manipulation ${
+                  className={`relative p-2.5 rounded-xl border text-left flex flex-col justify-between transition-all min-h-[72px] ${
                     inQueue
-                      ? 'bg-[#0B89FD] text-white shadow-[3px_3px_0px_#010101]'
-                      : 'bg-[#FFFFFF] text-[#010101] shadow-[2px_2px_0px_#010101] hover:bg-[#F8F8F8]'
+                      ? 'border-blue-500 bg-blue-50 text-blue-900 ring-2 ring-blue-500/20'
+                      : 'border-gray-200 bg-white text-gray-800 hover:bg-gray-50 shadow-xs'
                   }`}
                 >
                   {inQueue && (
-                    <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-[#FEC90E] text-[#010101] border border-[#010101] font-mono text-[10px] font-black flex items-center justify-center shrink-0">
+                    <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-blue-600 text-white font-mono text-[10px] font-bold flex items-center justify-center shrink-0">
                       #{queuePosition + 1}
                     </div>
                   )}
 
                   <div className="flex items-center gap-1.5">
                     <GameIcon gameMode={game.id} size="sm" />
-                    <span className={`text-[9px] font-mono font-bold ${inQueue ? 'text-white/80' : 'text-[#010101]/60'}`}>
+                    <span className="text-[10px] font-mono text-gray-500">
                       {game.players}
                     </span>
                   </div>
 
                   <div className="mt-1">
-                    <div className={`text-[11px] font-black truncate ${inQueue ? 'text-white' : 'text-[#010101]'}`}>
+                    <div className="text-xs font-bold truncate">
                       {game.title}
                     </div>
-                    <div className={`text-[9px] truncate ${inQueue ? 'text-white/80' : 'text-[#010101]/60'} font-medium`}>
+                    <div className="text-[10px] text-gray-500 truncate">
                       {game.tagline}
                     </div>
                   </div>

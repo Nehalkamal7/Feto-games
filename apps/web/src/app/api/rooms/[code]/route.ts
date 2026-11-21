@@ -27,12 +27,16 @@ export async function GET(
     }
 
     const publicRoom = sanitizeRoomState(room);
+    const playerId = req.nextUrl.searchParams.get('playerId');
+    const privateRole = playerId && room.gameData?.privateRoles ? room.gameData.privateRoles[playerId] || null : null;
 
     return NextResponse.json({
       success: true,
       room: publicRoom,
+      privateRole,
       data: {
-        room: publicRoom
+        room: publicRoom,
+        privateRole
       }
     });
   } catch (err: any) {

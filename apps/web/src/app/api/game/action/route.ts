@@ -288,10 +288,13 @@ export async function POST(req: NextRequest) {
       // Execute all async operations concurrently
       await Promise.all([...redisPromises, ...publishPromises]);
 
+      const requesterRole = result.privateRoles?.[playerId] || result.updatedRoom.gameData?.privateRoles?.[playerId] || null;
+
       return NextResponse.json({
         success: true,
         room: publicRoom,
-        gameState: result.publicState
+        gameState: result.publicState,
+        privateRole: requesterRole
       });
     }
 
@@ -445,10 +448,13 @@ export async function POST(req: NextRequest) {
       state: actionResult.publicState
     });
 
+    const requesterRole = actionResult.privateRoles?.[playerId] || actionResult.updatedRoom.gameData?.privateRoles?.[playerId] || null;
+
     return NextResponse.json({
       success: true,
       room: publicRoom,
-      gameState: actionResult.publicState
+      gameState: actionResult.publicState,
+      privateRole: requesterRole
     });
   } catch (err: any) {
     console.error('❌ [/api/game/action] Error:', err);

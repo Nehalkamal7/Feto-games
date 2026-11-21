@@ -98,12 +98,13 @@ export function initGameSession(room: RoomState, allowSolo = false): GameEngineR
 // --- 1. Who Is The Imposter ---
 function initImposterGame(room: RoomState, players: any[]): GameEngineResult {
   const wordItem = imposterWords[Math.floor(Math.random() * imposterWords.length)] || {
-    category: 'Objects',
-    word: 'Smartphone'
+    category: 'Professions',
+    word: 'Firefighter'
   };
-  const category = wordItem.category;
-  const secretWord = wordItem.word;
+  const category = wordItem.category || 'General';
+  const secretWord = (wordItem.word || 'FIREFIGHTER').toUpperCase();
 
+  // If solo dev mode (1 player), allow civilian role with secret word so all phases can be tested
   const imposterCount = players.length >= 12 ? 3 : players.length >= 7 ? 2 : players.length >= 2 ? 1 : 0;
   const shuffled = [...players].sort(() => 0.5 - Math.random());
   const imposterIds = new Set(shuffled.slice(0, imposterCount).map((p) => p.id));
@@ -115,13 +116,16 @@ function initImposterGame(room: RoomState, players: any[]): GameEngineResult {
     const isImp = imposterIds.has(player.id);
     privateRoles[player.id] = {
       playerId: player.id,
+      role: isImp ? 'imposter' : 'civilian',
       roleTitle: isImp ? 'IMPOSTER' : 'CIVILIAN',
       roleDescription: isImp
         ? 'Blend in with civilians, listen to clues, and do not get voted out!'
         : 'Give subtle clues about the secret word without making it obvious.',
       isImposter: isImp,
+      category,
       secretWord: isImp ? undefined : secretWord,
-      team: isImp ? 'imposters' : 'civilians'
+      team: isImp ? 'imposters' : 'civilians',
+      imposterCount
     };
   }
 
@@ -129,6 +133,8 @@ function initImposterGame(room: RoomState, players: any[]): GameEngineResult {
     category,
     secretWord,
     imposterIds: Array.from(imposterIds),
+    imposterId: Array.from(imposterIds)[0] || null,
+    privateRoles,
     turnOrder,
     currentTurnIndex: 0,
     clues: {},
@@ -168,13 +174,14 @@ function initDrawAndGuessGame(room: RoomState, players: any[]): GameEngineResult
     difficulty: 'easy'
   };
 
-  const secretWord = wordItem.word;
+  const secretWord = (wordItem.word || 'CASTLE').toUpperCase();
   const duration = room.config.roundDurationSeconds || 45;
   const phaseEndsAt = Date.now() + duration * 1000;
 
   const privateRoles: Record<string, any> = {
     [drawer.id]: {
       playerId: drawer.id,
+      role: 'drawer',
       roleTitle: 'DRAWER',
       roleDescription: 'Draw the secret word on the canvas! Do not write letters or numbers.',
       secretWord,
@@ -187,6 +194,7 @@ function initDrawAndGuessGame(room: RoomState, players: any[]): GameEngineResult
     secretWord,
     category: wordItem.category,
     correctGuessers: [],
+    privateRoles,
     phase: 'drawing',
     phaseEndsAt
   };

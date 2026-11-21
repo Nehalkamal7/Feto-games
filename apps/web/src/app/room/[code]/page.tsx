@@ -13,7 +13,6 @@ import {
   LogOut,
   Settings,
   UserX,
-  Volume2,
   Share2,
   AlertTriangle,
   Lock,
@@ -25,9 +24,6 @@ import {
   Shield,
   Sliders,
   ChevronDown,
-  Gamepad2,
-  Flame,
-  Radio,
   Wine,
   PlusCircle
 } from 'lucide-react';
@@ -45,9 +41,7 @@ import {
   TimerTickPayload
 } from '@feto-games/shared-types';
 import { BrandLogo } from '@/components/BrandLogo';
-import { NeonLogo } from '@/components/NeonLogo';
 import { NeonAvatarDisplay } from '@/components/NeonAvatarDisplay';
-import { FloatingReactions } from '@/components/FloatingReactions';
 import { GamePodiumView } from '@/components/GamePodiumView';
 import { SoundToggle } from '@/components/SoundToggle';
 import { RoomLobbyQRCode } from '@/components/RoomLobbyQRCode';
@@ -140,11 +134,15 @@ export default function RoomPage() {
     if (!roomCode) return;
     setIsManualSyncing(true);
     try {
-      const res = await fetch(`/api/rooms/${roomCode}`);
+      const playerIdParam = currentPlayer?.id ? `?playerId=${currentPlayer.id}` : '';
+      const res = await fetch(`/api/rooms/${roomCode}${playerIdParam}`);
       if (res.ok) {
         const json = await res.json();
         if (json.success && json.room) {
           setRoom(json.room);
+          if (json.privateRole) {
+            setPrivateRole(json.privateRole);
+          }
           const stateData = json.room.gameState || json.room.gameData;
           if (stateData) {
             setGameStateSync({
@@ -160,7 +158,7 @@ export default function RoomPage() {
     } finally {
       setIsManualSyncing(false);
     }
-  }, [roomCode]);
+  }, [roomCode, currentPlayer?.id]);
 
   useEffect(() => {
     const isPlaying = room?.status === 'playing' || room?.status === 'in_game';
@@ -207,6 +205,9 @@ export default function RoomPage() {
           throw new Error(data.error?.message || data.error || 'Action failed.');
         }
         if (data.room) setRoom(data.room);
+        if (data.privateRole) {
+          setPrivateRole(data.privateRole);
+        }
         if (data.gameState) {
           setGameStateSync({
             gameMode: room?.config.gameMode || 'who_is_imposter',
@@ -232,7 +233,7 @@ export default function RoomPage() {
         type: customCardType
       });
       sound.playClick();
-      showToast('Custom card injected into party rotation!');
+      showToast('Custom card added to party rotation!');
       setCustomCardPrompt('');
       setShowCustomCardModal(false);
     } catch (err: any) {
@@ -248,185 +249,132 @@ export default function RoomPage() {
     try {
       await handleGameAction('TAKE_SIP', { amount: 1 });
       showToast('You took a sip! 🥤 Stay hydrated!');
-    } catch {
-      showToast('Could not record sip.');
-    }
-  };
-
-  const handleUseSabotage = async (type: SabotageType, targetId: string) => {
-    try {
-      await handleGameAction('USE_SABOTAGE_POWERUP', { type, targetId });
-      setHasUsedSabotage(true);
-      showToast(`Tactical Sabotage unleashed! ⚡`);
     } catch (err: any) {
-      showToast(err.message || 'Failed to use sabotage.');
-      throw err;
+      showToast(err.message || 'Failed to register sip.');
     }
   };
 
-  // Update live grace period countdown timers every second
+  // Grace timer countdown engine for disconnected players
   useEffect(() => {
-    const interval = setInterval(() => {
-      const now = Date.now();
-      const newMap: Record<string, number> = {};
-
-      if (room) {
-        room.players.forEach((p) => {
-          if (p.connectionStatus === 'disconnected_grace' && p.graceExpiresAt) {
-            const diff = Math.max(0, Math.ceil((p.graceExpiresAt - now) / 1000));
-            newMap[p.id] = diff;
-          }
-        });
+    if (!room?.players) return;
+    const graceMap: Record<string, number> = {};
+    room.players.forEach((p) => {
+      const disconnectedAt = (p as any).disconnectedAt;
+      if (p.connectionStatus === 'disconnected_grace' && disconnectedAt) {
+        const elapsedSec = Math.floor((Date.now() - disconnectedAt) / 1000);
+        const remaining = Math.max(0, 45 - elapsedSec);
+        graceMap[p.id] = remaining;
       }
-      setGraceCountdowns(newMap);
+    });
+    setGraceCountdowns(graceMap);
+
+    const interval = setInterval(() => {
+      setGraceCountdowns((prev) => {
+        const next: Record<string, number> = {};
+        let changed = false;
+        Object.entries(prev).forEach(([id, val]) => {
+          const newVal = Math.max(0, val - 1);
+          if (newVal !== val) changed = true;
+          next[id] = newVal;
+        });
+        return changed ? next : prev;
+      });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [room]);
+  }, [room?.players]);
 
-  // Synchronized countdown timer with server phaseEndsAt and automatic phase resolution
-  const isResolvingPhaseRef = useRef(false);
-  const lastResolvedKeyRef = useRef<string>('');
-
+  // Join or Reconnect Handler
   useEffect(() => {
-    const phaseEndsAt = gameStateSync?.state?.phaseEndsAt;
-    if (!phaseEndsAt || (room?.status !== 'in_game' && room?.status !== 'playing')) return;
+    if (!roomCode) {
+      router.push('/');
+      return;
+    }
 
-    const interval = setInterval(() => {
-      const now = Date.now();
-      const diff = Math.max(0, Math.ceil((phaseEndsAt - now) / 1000));
-      setTimerState({
-        remainingSeconds: diff,
-        totalDurationSeconds: room.config.roundDurationSeconds || 30,
-        phase: (gameStateSync?.state?.phase as any) || 'question',
-        round: room.currentRound
-      });
-
-      // Tension heartbeat & haptic in final 5 seconds of active round
-      if (diff > 0 && diff <= 5 && (room.status === 'in_game' || room.status === 'playing')) {
-        sound.playHeartbeat(diff);
-      }
-
-      // Auto resolve phase if timer hit 0
-      const phaseKey = `${roomCode}:${room.currentRound}:${gameStateSync?.state?.phase}`;
-      if (diff === 0 && !isResolvingPhaseRef.current && lastResolvedKeyRef.current !== phaseKey) {
-        lastResolvedKeyRef.current = phaseKey;
-        isResolvingPhaseRef.current = true;
-
-        const pid = typeof window !== 'undefined' ? sessionStorage.getItem(`feto_player_id_${roomCode}`) : null;
-        fetch('/api/game/action', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            roomCode,
-            playerId: pid,
-            actionType: 'RESOLVE_PHASE'
-          })
-        }).finally(() => {
-          setTimeout(() => {
-            isResolvingPhaseRef.current = false;
-          }, 1500);
-        });
-      }
-    }, 500);
-
-    return () => clearInterval(interval);
-  }, [gameStateSync?.state?.phaseEndsAt, gameStateSync?.state?.phase, room?.status, room?.currentRound, room?.config.roundDurationSeconds, roomCode]);
-
-  // Handle Socket.IO events and initial connection
-  useEffect(() => {
-    if (!roomCode) return;
     const socket = getSocket();
 
+    const attemptReconnectionOrModal = () => {
+      const storedToken = getReconnectToken(roomCode);
+      const storedPlayerId = typeof window !== 'undefined' ? localStorage.getItem(`feto_player_${roomCode}`) : null;
+
+      if (storedToken && storedPlayerId) {
+        socketReconnectRoom({ reconnectToken: storedToken });
+      } else {
+        const defaultName = typeof window !== 'undefined' ? localStorage.getItem('feto_default_name') : null;
+        const defaultAvatar = typeof window !== 'undefined' ? (localStorage.getItem('feto_default_avatar') as NeonAvatarId) : null;
+
+        if (defaultName) {
+          socketJoinRoom({ roomCode, username: defaultName, avatar: defaultAvatar || 'cyber_cat' });
+        } else {
+          setShowJoinModal(true);
+          setIsInitializing(false);
+        }
+      }
+    };
+
+    if (socket.connected) {
+      attemptReconnectionOrModal();
+    } else {
+      socket.once('connect', attemptReconnectionOrModal);
+    }
+
     const handleRoomState = (newRoom: PublicRoomState) => {
-      setRoom((prev) => {
-        if (prev && prev.status === 'lobby') {
-          const oldIds = new Set(prev.players.map((p) => p.id));
-          const joined = newRoom.players.filter((p) => !oldIds.has(p.id));
-          const savedPlayerId = typeof window !== 'undefined'
-            ? sessionStorage.getItem(`feto_player_id_${roomCode}`)
-            : null;
-          joined.forEach((p) => {
-            if (p.id !== savedPlayerId && p.id !== currentPlayer?.id) {
-              sound.playPlayerJoined();
-              showToast(`${p.username} joined the party!`);
-            }
-          });
-        }
-        return newRoom;
-      });
+      setIsInitializing(false);
+      setShowJoinModal(false);
+      setRoom(newRoom);
 
-      if (newRoom.status === 'lobby') {
-        setPrivateRole(null);
-        setGameStateSync(null);
-        setCountdown(null);
-      } else if (newRoom.status === 'playing' || newRoom.status === 'in_game') {
-        if (newRoom.gameState) {
-          setGameStateSync({
-            gameMode: newRoom.config?.gameMode || 'who_is_imposter',
-            state: newRoom.gameState
-          });
-        } else if (newRoom.gameData) {
-          setGameStateSync({
-            gameMode: newRoom.config?.gameMode || 'who_is_imposter',
-            state: newRoom.gameData
-          });
-        }
-        setCountdown(null);
-      }
-
-      // Refresh current player reference
-      const savedPlayerId = typeof window !== 'undefined'
-        ? sessionStorage.getItem(`feto_player_id_${roomCode}`)
-        : null;
-
-      if (savedPlayerId) {
-        const found =
-          newRoom.players.find((p) => p.id === savedPlayerId) ||
-          newRoom.spectators.find((s) => s.id === savedPlayerId);
-        if (found) setCurrentPlayer(found);
+      const socketId = socket.id;
+      const foundPlayer = newRoom.players.find((p) => (p as any).socketId === socketId || p.id === currentPlayer?.id);
+      if (foundPlayer) {
+        setCurrentPlayer(foundPlayer);
+        localStorage.setItem(`feto_player_${roomCode}`, foundPlayer.id);
       }
     };
 
-    const handlePlayerJoined = (player: PlayerSummary) => {
-      sound.playPlayerJoined();
-      showToast(`${player.username} joined the party!`);
+    const handleJoined = (data: { room: PublicRoomState; player: PlayerSummary; reconnectToken: string }) => {
+      setIsInitializing(false);
+      setShowJoinModal(false);
+      setRoom(data.room);
+      setCurrentPlayer(data.player);
+      localStorage.setItem(`feto_player_${roomCode}`, data.player.id);
     };
 
-    const handlePlayerLeft = (data: { playerId: string; username: string; newHostId?: string }) => {
-      sound.playUnready();
-      showToast(`${data.username} left the room.`);
+    const handleRoomUpdated = (updatedRoom: PublicRoomState) => {
+      setRoom(updatedRoom);
+      if (currentPlayer) {
+        const me = updatedRoom.players.find((p) => p.id === currentPlayer.id);
+        if (me) setCurrentPlayer(me);
+      }
     };
 
-    const handleHostMigrated = (data: { newHostId: string; previousHostId: string; newHostUsername: string }) => {
-      sound.playClick();
-      showToast(`${data.newHostUsername} is now the Room Host!`);
+    const handleCountdownTick = (data: { count: number }) => {
+      setCountdown(data.count);
+      sound.playCountdownTick();
+      if (data.count === 0) {
+        setCountdown(null);
+        sound.playGameStart();
+      }
     };
 
-    const handleSettingsUpdated = (newConfig: PublicRoomConfig) => {
-      sound.playClick();
-      showToast('Room settings updated.');
+    const handleTimerTick = (data: TimerTickPayload) => {
+      setTimerState(data);
+      if (data.remainingSeconds <= 3 && data.remainingSeconds > 0) {
+        sound.playHeartbeat(data.remainingSeconds);
+        sound.triggerHaptic(25);
+      }
     };
 
-    const handleCountdown = (data: { countdownSeconds: number }) => {
-      setCountdown(data.countdownSeconds);
-      sound.playCountdown();
+    const handlePhaseChange = (data: GamePhaseChangePayload) => {
+      setCurrentPhase(data);
+      sound.playReady();
     };
 
-    const handleGamePhaseChange = (phasePayload: GamePhaseChangePayload) => {
-      setCurrentPhase(phasePayload);
+    const handleSecretRole = (data: SecretRolePayload) => {
+      setSecretRole(data);
     };
 
-    const handleSecretRole = (rolePayload: SecretRolePayload) => {
-      setSecretRole(rolePayload);
-    };
-
-    const handlePrivateRole = (rolePayload: PrivateRolePayload) => {
-      setPrivateRole(rolePayload);
-    };
-
-    const handleTimerTick = (tickPayload: TimerTickPayload) => {
-      setTimerState(tickPayload);
+    const handlePrivateRole = (data: PrivateRolePayload) => {
+      setPrivateRole(data);
     };
 
     const handleGameStateSync = (data: { gameMode: GameMode; state: any }) => {
@@ -434,409 +382,196 @@ export default function RoomPage() {
       setCountdown(null);
     };
 
-    const handleGameStarted = (data: { room?: PublicRoomState; gameMode?: GameMode; gameState?: any }) => {
-      if (data?.room) {
-        setRoom(data.room);
-      }
-      if (data?.gameMode && data?.gameState) {
-        setGameStateSync({
-          gameMode: data.gameMode,
-          state: data.gameState
-        });
-      }
-      setCountdown(null);
-    };
-
-    const handleChaosSabotage = (data: {
-      attackerId: string;
-      attackerUsername: string;
-      targetId: string;
+    const handleSabotageEffect = (data: {
+      type: SabotageType;
+      sourceUsername: string;
       targetUsername: string;
-      type: string;
-      durationMs: number;
+      targetPlayerId?: string;
     }) => {
+      const isTarget = currentPlayer && data.targetPlayerId === currentPlayer.id;
+      const msg = isTarget
+        ? `⚠️ You were sabotaged by ${data.sourceUsername}!`
+        : `⚡ ${data.sourceUsername} launched a power-up against ${data.targetUsername}!`;
+
+      setSabotageAlertBanner(msg);
       sound.playSabotage();
-      const typeLabel =
-        data.type === 'blindfold'
-          ? 'Blindfold 🕶️'
-          : data.type === 'double_trouble'
-          ? 'Double Trouble 🔥'
-          : 'Steal Turn ⚡';
+      sound.triggerScreenShake(700);
 
-      setSabotageAlertBanner(`⚡ ${data.attackerUsername} used ${typeLabel} on ${data.targetUsername}!`);
-      setTimeout(() => setSabotageAlertBanner(null), 4500);
-
-      const savedPid = typeof window !== 'undefined' ? sessionStorage.getItem(`feto_player_id_${roomCode}`) : null;
-      if (data.type === 'blindfold' && (data.targetId === currentPlayer?.id || data.targetId === savedPid)) {
+      if (isTarget && data.type === 'blindfold') {
         setIsBlindfolded(true);
-        sound.triggerHaptic([120, 80, 120]);
-        setTimeout(() => {
-          setIsBlindfolded(false);
-        }, 5000);
+        setTimeout(() => setIsBlindfolded(false), 5000);
       }
+
+      setTimeout(() => setSabotageAlertBanner(null), 4500);
     };
 
-    const handlePlayerKicked = (data: { targetPlayerId?: string; reason?: string }) => {
-      const targetId = data.targetPlayerId;
-      const myPid = currentPlayer?.id || (typeof window !== 'undefined'
-        ? sessionStorage.getItem(`feto_player_id_${roomCode}`) || sessionStorage.getItem('feto_persistent_player_id')
-        : null);
+    const handleError = (data: { code: string; message: string }) => {
+      setIsInitializing(false);
+      setErrorMessage(data.message);
+      showToast(data.message);
 
-      if (!targetId || targetId === myPid) {
-        // Current user was kicked
-        sound.playUnready();
+      if (data.code === 'ROOM_NOT_FOUND') {
         clearReconnectSession(roomCode);
-        if (typeof window !== 'undefined') {
-          sessionStorage.setItem('feto_kick_toast', 'You were removed from the room by the host');
-        }
-        router.push('/');
-        return;
-      }
-
-      // For all other players (including host):
-      sound.playUnready();
-      showToast('A player was removed by the room host.');
-      setRoom((prev) => {
-        if (!prev) return prev;
-        const updated = prev.players.filter((p) => p.id !== targetId);
-        return {
-          ...prev,
-          players: updated,
-          playerCount: updated.length
-        };
-      });
-    };
-
-    const handlePresenceLeave = (data: { playerId: string }) => {
-      if (!data?.playerId) return;
-      if (currentPlayer?.isHost || room?.hostId === currentPlayer?.id) {
-        fetch('/api/rooms/leave', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ roomCode, playerId: data.playerId })
-        }).catch(() => {});
-      }
-    };
-
-    socket.on('room:updated', handleRoomState);
-    socket.on('room:state', handleRoomState);
-    socket.on('room_state', handleRoomState);
-    socket.on('game:started', handleGameStarted);
-    socket.on('room:player-joined', handlePlayerJoined);
-    socket.on('room:player-left', handlePlayerLeft);
-    socket.on('room:host-migrated', handleHostMigrated);
-    socket.on('lobby:settings-updated', handleSettingsUpdated);
-    socket.on('game:starting', handleCountdown);
-    socket.on('game:phase-change', handleGamePhaseChange);
-    socket.on('game:secret-role', handleSecretRole);
-    socket.on('game:private_role', handlePrivateRole);
-    socket.on('game:timer-tick', handleTimerTick);
-    socket.on('game:state_sync', handleGameStateSync);
-    socket.on('chaos:sabotage', handleChaosSabotage);
-    socket.on('room:kicked', handlePlayerKicked);
-    socket.on('player_kicked', handlePlayerKicked);
-    socket.on('presence:leave', handlePresenceLeave);
-    socket.on('presence.leave', handlePresenceLeave);
-
-    // Initial Join / Reconnect Flow
-    const initConnection = async () => {
-      // 1. Immediately fetch fresh room snapshot so UI displays instantly
-      try {
-        const initialRes = await fetch(`/api/rooms/${roomCode}`);
-        if (initialRes.ok) {
-          const initialJson = await initialRes.json();
-          if (initialJson.success && initialJson.room) {
-            setRoom((prev) => (!prev || (initialJson.room.updatedAt || 0) >= (prev.updatedAt || 0) ? initialJson.room : prev));
-          }
-        }
-      } catch {
-        // fallback to socket
-      }
-
-      const reconnectToken = getReconnectToken(roomCode);
-      const savedPlayerId = typeof window !== 'undefined'
-        ? sessionStorage.getItem(`feto_player_id_${roomCode}`) || sessionStorage.getItem('feto_persistent_player_id')
-        : null;
-
-      if (reconnectToken && savedPlayerId) {
-        try {
-          const res = await socketReconnectRoom({
-            reconnectToken
-          });
-          setRoom(res.room);
-          const me =
-            res.room.players.find((p) => p.id === savedPlayerId) ||
-            res.room.spectators.find((s) => s.id === savedPlayerId);
-          if (me) setCurrentPlayer(me);
-          setIsInitializing(false);
-          return;
-        } catch {
-          clearReconnectSession(roomCode);
-        }
-      }
-
-      // Try quick join if user info exists in localStorage
-      const savedUser = typeof window !== 'undefined' ? localStorage.getItem('feto_username') : null;
-      const savedAvatar = typeof window !== 'undefined'
-        ? (localStorage.getItem('feto_avatar') as NeonAvatarId)
-        : null;
-
-      if (savedUser && savedAvatar) {
-        try {
-          const res = await socketJoinRoom({
-            roomCode,
-            username: savedUser,
-            avatar: savedAvatar
-          });
-          setRoom(res.room);
-          const me =
-            (savedPlayerId && res.room.players.find((p) => p.id === savedPlayerId)) ||
-            res.room.players.find((p) => p.username.toLowerCase() === savedUser.toLowerCase()) ||
-            res.room.spectators.find((s) => s.username.toLowerCase() === savedUser.toLowerCase());
-          if (me) setCurrentPlayer(me);
-          setIsInitializing(false);
-          return;
-        } catch {
-          setShowJoinModal(true);
-        }
-      } else {
+        setTimeout(() => router.push('/'), 2500);
+      } else if (data.code === 'INVALID_RECONNECT_TOKEN' || data.code === 'ROOM_FULL') {
+        clearReconnectSession(roomCode);
         setShowJoinModal(true);
       }
-
-      setIsInitializing(false);
     };
 
-    initConnection();
-
-    // 2-second background state sync fallback active in Lobby phase or loading
-    const syncInterval = setInterval(async () => {
-      try {
-        const res = await fetch(`/api/rooms/${roomCode}`);
-        if (res.ok) {
-          const json = await res.json();
-          if (json.success && json.room) {
-            setRoom((prev) => {
-              if (!prev || (json.room.updatedAt || 0) > (prev.updatedAt || 0)) {
-                if (prev && prev.status === 'lobby') {
-                  const oldIds = new Set(prev.players.map((p) => p.id));
-                  const joined = json.room.players.filter((p: any) => !oldIds.has(p.id));
-                  const savedPid = typeof window !== 'undefined'
-                    ? sessionStorage.getItem(`feto_player_id_${roomCode}`)
-                    : null;
-                  joined.forEach((p: any) => {
-                    if (p.id !== savedPid && p.id !== currentPlayer?.id) {
-                      sound.playPlayerJoined();
-                      showToast(`${p.username} joined the party!`);
-                    }
-                  });
-                }
-                return json.room;
-              }
-              return prev;
-            });
-            if (json.room.status === 'playing' || json.room.status === 'in_game') {
-              const stateData = json.room.gameState || json.room.gameData;
-              if (stateData) {
-                setGameStateSync({
-                  gameMode: json.room.config?.gameMode || 'who_is_imposter',
-                  state: stateData
-                });
-                setCountdown(null);
-              }
-            }
-          }
-        }
-      } catch {
-        // quiet fallback
-      }
-    }, 2000);
+    socket.on('room_state', handleRoomState);
+    socket.on('joined_room', handleJoined);
+    socket.on('room_updated', handleRoomUpdated);
+    socket.on('countdown_tick', handleCountdownTick);
+    socket.on('timer_tick', handleTimerTick);
+    socket.on('phase_change', handlePhaseChange);
+    socket.on('secret_role', handleSecretRole);
+    socket.on('private_role', handlePrivateRole);
+    socket.on('game_state_sync', handleGameStateSync);
+    socket.on('sabotage_triggered', handleSabotageEffect);
+    socket.on('error', handleError);
 
     return () => {
-      clearInterval(syncInterval);
-      socket.off('room:updated', handleRoomState);
-      socket.off('room:state', handleRoomState);
       socket.off('room_state', handleRoomState);
-      socket.off('game:started', handleGameStarted);
-      socket.off('room:player-joined', handlePlayerJoined);
-      socket.off('room:player-left', handlePlayerLeft);
-      socket.off('room:host-migrated', handleHostMigrated);
-      socket.off('lobby:settings-updated', handleSettingsUpdated);
-      socket.off('game:starting', handleCountdown);
-      socket.off('game:phase-change', handleGamePhaseChange);
-      socket.off('game:secret-role', handleSecretRole);
-      socket.off('game:private_role', handlePrivateRole);
-      socket.off('game:timer-tick', handleTimerTick);
-      socket.off('game:state_sync', handleGameStateSync);
-      socket.off('chaos:sabotage', handleChaosSabotage);
-      socket.off('room:kicked', handlePlayerKicked);
-      socket.off('player_kicked', handlePlayerKicked);
-      socket.off('presence:leave', handlePresenceLeave);
-      socket.off('presence.leave', handlePresenceLeave);
+      socket.off('joined_room', handleJoined);
+      socket.off('room_updated', handleRoomUpdated);
+      socket.off('countdown_tick', handleCountdownTick);
+      socket.off('timer_tick', handleTimerTick);
+      socket.off('phase_change', handlePhaseChange);
+      socket.off('secret_role', handleSecretRole);
+      socket.off('private_role', handlePrivateRole);
+      socket.off('game_state_sync', handleGameStateSync);
+      socket.off('sabotage_triggered', handleSabotageEffect);
+      socket.off('error', handleError);
     };
-  }, [roomCode, router, showToast]);
+  }, [roomCode, router, currentPlayer?.id, showToast]);
 
-  // Modal Join Room
-  const handleModalJoin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!joinUsername.trim()) return;
+  const isHost = currentPlayer?.isHost;
 
-    try {
-      const res = await socketJoinRoom({
-        roomCode,
-        username: joinUsername.trim(),
-        avatar: joinAvatar,
-        pin: joinPin.trim() || undefined
-      });
-
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('feto_username', joinUsername.trim());
-        localStorage.setItem('feto_avatar', joinAvatar);
-      }
-
-      setRoom(res.room);
-      const me =
-        res.room.players.find((p) => p.username === joinUsername.trim()) ||
-        res.room.spectators.find((s) => s.username === joinUsername.trim());
-      if (me) setCurrentPlayer(me);
-      setShowJoinModal(false);
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to join room.');
-    }
-  };
-
-  // Ready Status Toggle
-  const handleToggleReady = async () => {
+  const handleToggleReady = () => {
     if (!currentPlayer) return;
     const nextState = !currentPlayer.isReady;
-    sound.playClick();
-
-    try {
-      await socketSetReady({ isReady: nextState });
-      if (nextState) sound.playReady();
-      else sound.playUnready();
-
-      setCurrentPlayer((prev) => (prev ? { ...prev, isReady: nextState } : null));
-    } catch (err: any) {
-      showToast(err.message || 'Could not toggle ready status.');
-    }
+    if (nextState) sound.playReady();
+    else sound.playClick();
+    socketSetReady({ isReady: nextState });
   };
 
-  // Host Start Game (with support for normal or Force Start)
   const handleStartGame = async (force = false) => {
-    sound.playClick();
+    sound.playGameStart();
     try {
       const res = await socketStartGame(isSoloDevMode, force);
-      if (res?.room) {
-        setRoom(res.room);
+      if (res?.privateRole) {
+        setPrivateRole(res.privateRole);
       }
       if (res?.gameState) {
         setGameStateSync({
-          gameMode: res.room?.config?.gameMode || room?.config?.gameMode || 'who_is_imposter',
+          gameMode: room?.config.gameMode || 'who_is_imposter',
           state: res.gameState
         });
       }
-      setCountdown(null);
+      if (res?.room) {
+        setRoom(res.room);
+      }
     } catch (err: any) {
-      showToast(`⚠️ ${err.message || 'Could not start game.'}`);
+      showToast(err.message || 'Failed to start');
     }
   };
 
-  // Host Live In-Room Settings Save
-  const handleSaveSettings = async (newSettings: any) => {
-    try {
-      await handleGameAction('UPDATE_SETTINGS', newSettings);
-      showToast('Host updated room settings');
-    } catch (err: any) {
-      showToast(err.message || 'Failed to update settings.');
-      throw err;
+  const handleCopyCode = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(roomCode);
+      setCopiedCode(true);
+      sound.playClick();
+      showToast('Room Code copied to clipboard!');
+      setTimeout(() => setCopiedCode(false), 2000);
     }
   };
 
-  // Host Live Playlist Queue Update
-  const handleUpdatePlaylist = async (newGames: GameMode[]) => {
-    try {
-      await socketSelectGames(newGames);
-      showToast(`Playlist updated with ${newGames.length} game${newGames.length > 1 ? 's' : ''}!`);
-    } catch (err: any) {
-      showToast(err.message || 'Failed to update playlist.');
+  const handleCopyInviteLink = () => {
+    if (navigator.clipboard) {
+      const inviteUrl = `${window.location.origin}/room/${roomCode}`;
+      navigator.clipboard.writeText(inviteUrl);
+      setCopiedLink(true);
+      sound.playClick();
+      showToast('Invite Link copied! Share with friends.');
+      setTimeout(() => setCopiedLink(false), 2000);
     }
   };
 
-  // Host Kick Confirm
-  const handleConfirmKick = async () => {
-    if (!kickTarget) return;
+  const handleLeaveRoom = () => {
     sound.playClick();
-    try {
-      await socketKickPlayer({ targetPlayerId: kickTarget.id, reason: 'Removed by room host.' });
-      showToast(`Kicked ${kickTarget.username}.`);
-      setKickTarget(null);
-    } catch (err: any) {
-      showToast(err.message || 'Could not kick player.');
-    }
-  };
-
-  // Leave Room
-  const handleLeaveRoom = async () => {
-    sound.playClick();
-    await socketLeaveRoom();
+    socketLeaveRoom();
     clearReconnectSession(roomCode);
     router.push('/');
   };
 
-  // Copy Invite Link
-  const handleCopyInviteLink = () => {
+  const handleConfirmKick = () => {
+    if (!kickTarget) return;
     sound.playClick();
-    const url = `${window.location.origin}/room/${roomCode}`;
-    navigator.clipboard.writeText(url);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2000);
-    showToast('Direct invite link copied to clipboard!');
+    socketKickPlayer({ targetPlayerId: kickTarget.id });
+    setKickTarget(null);
+    showToast(`Player ${kickTarget.username} removed.`);
   };
 
-  // Copy Room Code
-  const handleCopyCode = () => {
+  const handleSaveSettings = async (newSettings: {
+    roomName: string;
+    maxPlayers: number;
+    roundDurationSeconds: number;
+    totalRounds: number;
+    vibeMode: any;
+    isPrivate: boolean;
+    pin?: string;
+  }): Promise<void> => {
     sound.playClick();
-    navigator.clipboard.writeText(roomCode);
-    setCopiedCode(true);
-    setTimeout(() => setCopiedCode(false), 2000);
-    showToast(`Room code ${roomCode} copied!`);
+    await socketUpdateSettings(newSettings);
+    setShowSettingsModal(false);
+    showToast('Match settings updated!');
   };
 
-  // Tab-close / navigate away beacon for instant stale ghost cleanup
-  useEffect(() => {
-    const handleUnload = () => {
-      const pid = currentPlayer?.id || (typeof window !== 'undefined'
-        ? sessionStorage.getItem(`feto_player_id_${roomCode}`) || sessionStorage.getItem('feto_persistent_player_id')
-        : null);
-      if (roomCode && pid) {
-        const payload = JSON.stringify({ roomCode, playerId: pid });
-        const blob = new Blob([payload], { type: 'application/json' });
-        navigator.sendBeacon('/api/rooms/leave', blob);
-      }
-    };
-    window.addEventListener('pagehide', handleUnload);
-    window.addEventListener('beforeunload', handleUnload);
-    return () => {
-      window.removeEventListener('pagehide', handleUnload);
-      window.removeEventListener('beforeunload', handleUnload);
-    };
-  }, [roomCode, currentPlayer?.id]);
+  const handleUpdatePlaylist = (games: GameMode[]) => {
+    sound.playClick();
+    socketSelectGames(games);
+    showToast(`Playlist updated with ${games.length} games.`);
+  };
 
-  const isHost = (currentPlayer?.isHost || room?.hostId === currentPlayer?.id) ?? false;
+  const handleUseSabotage = async (type: SabotageType, targetId: string): Promise<void> => {
+    if (hasUsedSabotage) return;
+    setHasUsedSabotage(true);
+    sound.playClick();
 
-  // Deduplicate active players by playerId and username to guarantee no ghost duplicates
+    const socket = getSocket();
+    socket.emit('use_sabotage', {
+      roomCode,
+      sabotageType: type,
+      targetPlayerId: targetId
+    });
+
+    showToast(`Deployed ${type.replace('_', ' ')}!`);
+  };
+
+  const handleModalJoin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!joinUsername.trim()) return;
+
+    sound.playClick();
+    localStorage.setItem('feto_default_name', joinUsername.trim());
+    localStorage.setItem('feto_default_avatar', joinAvatar);
+
+    socketJoinRoom({
+      roomCode,
+      username: joinUsername.trim(),
+      avatar: joinAvatar,
+      pin: joinPin.trim() || undefined
+    });
+  };
+
   const activePlayers = React.useMemo(() => {
     if (!room?.players) return [];
-    const seenIds = new Set<string>();
-    const seenNames = new Set<string>();
     const deduped: PlayerSummary[] = [];
-
+    const seen = new Set<string>();
     for (const p of room.players) {
-      if (!p || !p.id) continue;
-      const lowerName = (p.username || '').toLowerCase();
-      if (!seenIds.has(p.id) && !seenNames.has(lowerName)) {
-        seenIds.add(p.id);
-        seenNames.add(lowerName);
+      if (!seen.has(p.id)) {
+        seen.add(p.id);
         deduped.push(p);
       }
     }
@@ -849,10 +584,10 @@ export default function RoomPage() {
 
   if (isInitializing || !room) {
     return (
-      <div className="min-h-[100dvh] flex items-center justify-center bg-[#F8F8F8]">
+      <div className="min-h-[100dvh] flex items-center justify-center bg-[#F9FAFB]">
         <div className="text-center space-y-4">
-          <div className="w-16 h-16 border-4 border-[#010101] border-t-[#0B89FD] rounded-full animate-spin mx-auto shadow-[4px_4px_0px_#010101]" />
-          <p className="text-[#010101] font-black uppercase tracking-wider text-sm">
+          <div className="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mx-auto" />
+          <p className="text-gray-900 font-bold tracking-wide text-sm">
             Connecting to FETO Room {roomCode}...
           </p>
         </div>
@@ -861,13 +596,7 @@ export default function RoomPage() {
   }
 
   return (
-    <div
-      className={`min-h-[100dvh] bg-[#F8F8F8] text-[#010101] flex flex-col justify-between max-w-7xl mx-auto px-3 sm:px-6 py-3 sm:py-5 relative safe-top safe-bottom transition-all ${
-        timerState && timerState.remainingSeconds <= 5 && timerState.remainingSeconds > 0 && (room.status === 'in_game' || room.status === 'playing')
-          ? 'tension-pulse'
-          : ''
-      }`}
-    >
+    <div className="min-h-[100dvh] bg-[#F9FAFB] text-gray-900 flex flex-col justify-between max-w-7xl mx-auto px-3 sm:px-6 py-3 sm:py-5 relative safe-top safe-bottom overflow-x-hidden overflow-y-auto">
       {/* Toast Notification Banner */}
       <AnimatePresence>
         {toastMessage && (
@@ -875,114 +604,85 @@ export default function RoomPage() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 bg-[#FFFFFF] border-2 border-[#010101] rounded-full text-[#010101] text-xs md:text-sm font-black shadow-[4px_4px_0px_#010101] flex items-center gap-2"
+            className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 bg-white border border-gray-200 rounded-full text-gray-900 text-xs md:text-sm font-semibold shadow-md flex items-center gap-2"
           >
-            <Sparkles className="w-4 h-4 text-[#0B89FD]" />
+            <Sparkles className="w-4 h-4 text-blue-600" />
             <span>{toastMessage}</span>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Sabotage Chaos Strike Alert Banner */}
+      {/* Sabotage Alert Banner */}
       <AnimatePresence>
         {sabotageAlertBanner && (
           <motion.div
-            initial={{ opacity: 0, y: -40, scale: 0.9 }}
+            initial={{ opacity: 0, y: -40, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -40, scale: 0.9 }}
-            className="fixed top-16 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 bg-slate-950/95 border-2 border-pink-500 rounded-full text-white text-xs sm:text-sm font-black uppercase tracking-wider shadow-[0_0_30px_rgba(255,0,122,0.65)] flex items-center gap-2.5 backdrop-blur-md"
+            exit={{ opacity: 0, y: -40, scale: 0.95 }}
+            className="fixed top-16 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 bg-gray-900 text-white rounded-full text-xs sm:text-sm font-bold shadow-lg flex items-center gap-2.5"
           >
-            <Zap className="w-4 h-4 text-yellow-300 animate-pulse" />
+            <Zap className="w-4 h-4 text-amber-400" />
             <span>{sabotageAlertBanner}</span>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Blindfold Full-Screen Sabotage Impact Overlay */}
+      {/* Blindfold Sabotage Overlay */}
       <AnimatePresence>
         {isBlindfolded && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 backdrop-blur-2xl bg-black/75 flex flex-col items-center justify-center p-6 text-center select-none"
+            className="fixed inset-0 z-50 backdrop-blur-xl bg-gray-900/80 flex flex-col items-center justify-center p-6 text-center select-none"
           >
-            <span className="text-6xl mb-4 animate-bounce">🕶️</span>
-            <h2 className="text-2xl sm:text-3xl font-black text-cyan-300 uppercase tracking-widest mb-2 shadow-neon-cyan">
-              BLINDFOLD ACTIVE!
+            <span className="text-5xl mb-4 animate-bounce">🕶️</span>
+            <h2 className="text-2xl font-bold text-white uppercase tracking-widest mb-2">
+              Blindfold Active!
             </h2>
-            <p className="text-sm text-slate-300 max-w-sm">
-              An opponent fogged your vision with a tactical sabotage! Clearing up in 5 seconds...
+            <p className="text-sm text-gray-300 max-w-sm">
+              An opponent fogged your vision with a tactical sabotage! Clearing up shortly...
             </p>
-            <div className="w-56 h-2.5 bg-slate-800 rounded-full mt-6 overflow-hidden border border-cyan-500/40">
+            <div className="w-48 h-2 bg-gray-700 rounded-full mt-6 overflow-hidden">
               <motion.div
                 initial={{ width: '100%' }}
                 animate={{ width: '0%' }}
                 transition={{ duration: 5, ease: 'linear' }}
-                className="h-full bg-gradient-to-r from-cyan-400 to-purple-500"
+                className="h-full bg-blue-500"
               />
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ======================================================== */}
-      {/* 4. 15-PLAYER WAITING LOBBY REDESIGN                      */}
-      {/* ======================================================== */}
+      {/* IN-GAME OR LOBBY DISPLAY */}
       {room.status === 'in_game' || room.status === 'playing' || room.status === 'countdown' ? (
-        /* IN-GAME ACTIVE SCREEN */
-        <div className="flex-1 flex flex-col items-center justify-start py-2 relative z-10 w-full min-h-[600px]">
-          {/* IN-GAME HUD BAR */}
-          <div className="w-full bg-[#FFFFFF] rounded-2xl px-3 sm:px-5 py-2 mb-3 flex items-center justify-between border-2 border-[#010101] shadow-[4px_4px_0px_#010101]">
-            <div className="flex items-center gap-2 sm:gap-3">
+        /* IN-GAME ACTIVE SCREEN - COMPACT MOBILE OPTIMIZED (NEVER CLIPS) */
+        <div className="flex-1 flex flex-col items-center justify-start py-2 relative z-10 w-full max-w-md mx-auto px-2 sm:px-4 overflow-x-hidden min-h-[600px]">
+          {/* COMPACT TOP NAVBAR: BRAND LOGO LEFT, ROOM CODE + ROUND + SOUND + LEAVE RIGHT */}
+          <div className="w-full bg-white rounded-2xl px-3 py-2 sm:px-4 sm:py-2.5 mb-4 flex items-center justify-between gap-2 border border-gray-200 shadow-sm shrink-0">
+            <div className="flex items-center gap-2 min-w-0">
               <BrandLogo size="nav" showSubtitle={false} />
-              <span className="text-[#010101]/40 font-bold hidden sm:inline">|</span>
-              <div className="px-2.5 py-0.5 rounded-lg bg-[#FEC90E] border-2 border-[#010101] text-[10px] sm:text-xs font-black text-[#010101] font-mono shadow-[1px_1px_0px_#010101]">
-                ROOM: {roomCode}
-              </div>
-              <div className="px-2.5 py-0.5 rounded-lg bg-[#0B89FD] border-2 border-[#010101] text-[10px] sm:text-xs font-black text-white uppercase shadow-[1px_1px_0px_#010101]">
-                Round {room.currentRound} / {room.config.totalRounds}
-              </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              {room.config.vibeMode === 'sip_edition' && (
-                <button
-                  onClick={handleQuickTakeSip}
-                  className="px-2.5 py-1 rounded-xl bg-[#FD3F01] hover:bg-[#e03800] border-2 border-[#010101] text-white text-[11px] font-black flex items-center gap-1 shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] touch-target"
-                  title="Take a drink & log on leaderboard"
-                >
-                  <Wine className="w-3.5 h-3.5 text-white" />
-                  <span className="hidden sm:inline">Take Sip! 🥤</span>
-                  <span className="font-mono text-[10px] text-white font-black">
-                    ({room.sipsCount?.[currentPlayer?.id || ''] || 0})
-                  </span>
-                </button>
-              )}
-
-              <button
-                onClick={() => {
-                  sound.playClick();
-                  setShowCustomCardModal(true);
-                }}
-                className="p-1.5 sm:px-2.5 sm:py-1 rounded-xl bg-[#FFFFFF] hover:bg-[#F8F8F8] border-2 border-[#010101] text-[#010101] text-[11px] font-black flex items-center gap-1 shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px]"
-                title="Submit Custom Card"
-              >
-                <PlusCircle className="w-3.5 h-3.5 text-[#0B89FD]" />
-                <span className="hidden sm:inline">Custom Card</span>
-              </button>
-
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+              <div className="px-2 py-0.5 rounded-lg bg-gray-100 border border-gray-200 text-[11px] sm:text-xs font-bold text-gray-700 font-mono">
+                {roomCode}
+              </div>
+              <div className="px-2 py-0.5 rounded-lg bg-blue-50 border border-blue-200 text-[11px] sm:text-xs font-bold text-blue-700 whitespace-nowrap">
+                {room.currentRound}/{room.config.totalRounds}
+              </div>
               <SoundToggle />
-
               <button
                 onClick={handleLeaveRoom}
-                className="p-1.5 rounded-xl bg-[#FFFFFF] hover:bg-[#FD3F01]/20 border-2 border-[#010101] text-[#010101] shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px]"
+                className="p-1.5 sm:p-2 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 transition-all"
                 title="Leave Room"
               >
-                <LogOut className="w-3.5 h-3.5" />
+                <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
             </div>
           </div>
+
           {countdown !== null && countdown > 0 ? (
             <motion.div
               initial={{ scale: 0.5, opacity: 0 }}
@@ -990,36 +690,36 @@ export default function RoomPage() {
               exit={{ scale: 1.5, opacity: 0 }}
               className="my-auto text-center py-20 flex flex-col items-center justify-center"
             >
-              <div className="text-sm uppercase tracking-widest text-[#010101] font-black mb-4 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 animate-spin text-[#0B89FD]" />
+              <div className="text-xs uppercase tracking-widest text-gray-500 font-bold mb-4 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-blue-600 animate-spin" />
                 <span>Match Starting In</span>
               </div>
-              <div className="text-9xl md:text-[12rem] font-black text-[#FD3F01] filter drop-shadow-[6px_6px_0px_#010101] font-display">
+              <div className="text-9xl md:text-[11rem] font-extrabold text-blue-600 font-display">
                 {countdown}
               </div>
             </motion.div>
           ) : !currentPlayer ? (
-            <div className="flex flex-col items-center justify-center my-auto py-20 space-y-4">
-              <div className="w-12 h-12 border-4 border-[#010101] border-t-[#0B89FD] rounded-full animate-spin" />
-              <p className="text-[#525252] font-black">Connecting to game room...</p>
+            <div className="flex flex-col items-center justify-center my-auto py-20 space-y-3">
+              <div className="w-10 h-10 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin" />
+              <p className="text-gray-500 font-medium text-sm">Connecting to game room...</p>
             </div>
           ) : !gameStateSync || gameStateSync.gameMode !== room.config.gameMode ? (
             <div className="flex flex-col items-center justify-center my-auto py-20 space-y-4 max-w-md mx-auto text-center px-4">
-              <div className="w-12 h-12 border-4 border-[#010101] border-t-[#FD3F01] rounded-full animate-spin" />
-              <p className="text-[#010101] font-black tracking-wide">
+              <div className="w-10 h-10 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin" />
+              <p className="text-gray-900 font-bold">
                 Syncing match...
               </p>
-              <p className="text-[#525252] text-xs font-semibold">
+              <p className="text-gray-500 text-xs font-medium">
                 Connecting to live game round data
               </p>
-              {syncSeconds >= 4 && (
+              {syncSeconds >= 3 && (
                 <button
                   onClick={() => {
                     sound.playClick();
                     syncMatchState();
                   }}
                   disabled={isManualSyncing}
-                  className="mt-2 px-5 py-2.5 rounded-xl bg-[#0B89FD] hover:bg-[#0977db] text-white font-black text-xs uppercase tracking-wider border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all disabled:opacity-50"
+                  className="mt-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm transition-all disabled:opacity-50"
                 >
                   {isManualSyncing ? 'Syncing...' : '🔄 Retry Sync'}
                 </button>
@@ -1032,6 +732,8 @@ export default function RoomPage() {
               players={room.players}
               privateRole={privateRole}
               roomCode={roomCode}
+              onAction={handleGameAction}
+              isHost={Boolean(isHost)}
             />
           ) : room.config.gameMode === 'draw_and_guess' ? (
             <DrawAndGuessGameView
@@ -1073,7 +775,7 @@ export default function RoomPage() {
               state={gameStateSync.state}
               players={room.players}
               currentPlayerId={currentPlayer.id}
-              isHost={isHost}
+              isHost={Boolean(isHost)}
               vibeMode={room.config.vibeMode}
               onAction={handleGameAction}
             />
@@ -1082,7 +784,7 @@ export default function RoomPage() {
               state={gameStateSync.state}
               players={room.players}
               currentPlayerId={currentPlayer.id}
-              isHost={isHost}
+              isHost={Boolean(isHost)}
               vibeMode={room.config.vibeMode}
               onAction={handleGameAction}
             />
@@ -1091,7 +793,7 @@ export default function RoomPage() {
               state={gameStateSync.state}
               players={room.players}
               currentPlayerId={currentPlayer.id}
-              isHost={isHost}
+              isHost={Boolean(isHost)}
               vibeMode={room.config.vibeMode}
               onAction={handleGameAction}
             />
@@ -1100,127 +802,131 @@ export default function RoomPage() {
               state={gameStateSync.state}
               players={room.players}
               currentPlayerId={currentPlayer.id}
-              isHost={isHost}
+              isHost={Boolean(isHost)}
               vibeMode={room.config.vibeMode}
               onAction={handleGameAction}
             />
           ) : (
-            <div className="w-full max-w-xl glass-panel p-8 rounded-3xl text-center space-y-4 my-auto">
-              <h3 className="text-2xl font-bold text-white">Party Mode Active</h3>
-              <p className="text-slate-400">Enjoy the game with your group!</p>
+            <div className="w-full max-w-md bg-white p-8 rounded-2xl border border-gray-200 text-center space-y-3 my-auto shadow-sm">
+              <h3 className="text-xl font-bold text-gray-900">Party Mode Active</h3>
+              <p className="text-gray-500 text-sm">Enjoy the game with your group!</p>
             </div>
           )}
         </div>
-      ) : (room.status === 'game_over' || room.status === 'finished') ? (
+      ) : room.status === 'game_over' || room.status === 'finished' ? (
         /* ANIMATED PODIUM & REMATCH SCREEN */
         <GamePodiumView room={room} currentPlayer={currentPlayer} />
       ) : (
-        /* WAITING LOBBY (15-PLAYER ESPORTS LAYOUT) */
+        /* WAITING LOBBY (15-PLAYER MODERN LAYOUT) */
         <div className="flex-1 flex flex-col justify-between py-1 sm:py-2 relative z-10 w-full">
           <div>
-            {/* 1. TOP HEADER: FETO GAMES | LOBBY (LEFT), WAITING FOR PLAYERS... (X/15) (RIGHT) */}
-            <div className="bg-[#FFFFFF] rounded-2xl px-3.5 sm:px-6 py-2.5 sm:py-3.5 mb-4 flex items-center justify-between border-2 border-[#010101] shadow-[4px_4px_0px_#010101]">
+            {/* 1. TOP HEADER */}
+            <div className="bg-white rounded-2xl px-4 sm:px-6 py-3 sm:py-3.5 mb-4 flex items-center justify-between border border-gray-200 shadow-sm">
               <div className="flex items-center gap-2 sm:gap-3">
                 <BrandLogo size="nav" showSubtitle={false} />
-                <span className="text-[#010101]/30 font-bold hidden sm:inline">|</span>
-                <div className="px-2.5 py-1 rounded-xl bg-[#FEC90E] border-2 border-[#010101] text-[10px] sm:text-xs font-black uppercase tracking-widest text-[#010101] shadow-[2px_2px_0px_#010101]">
-                  LOBBY
+                <span className="text-gray-300 font-bold hidden sm:inline">|</span>
+                <div className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold uppercase tracking-wider">
+                  Lobby
                 </div>
               </div>
 
               <div className="flex items-center gap-2 sm:gap-3">
-                {/* Streamer Mode (Hide Code) Toggle */}
+                {/* Streamer Mode Toggle */}
                 <button
                   onClick={() => {
                     sound.playClick();
                     setIsStreamerMode(!isStreamerMode);
-                    showToast(isStreamerMode ? 'Streamer Mode Disabled (Code Visible)' : 'Streamer Mode Active (Code Hidden for Streaming)');
+                    showToast(
+                      isStreamerMode
+                        ? 'Streamer Mode Disabled (Code Visible)'
+                        : 'Streamer Mode Active (Code Hidden for Streaming)'
+                    );
                   }}
-                  className={`px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition-all border-2 border-[#010101] shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] ${
+                  className={`h-9 px-3 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-all border ${
                     isStreamerMode
-                      ? 'bg-[#FEC90E] text-[#010101]'
-                      : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
+                      ? 'bg-blue-50 border-blue-200 text-blue-700'
+                      : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
                   }`}
-                  title="Toggle Streamer Mode to hide room code & invite links for Twitch / YouTube / TikTok streaming"
+                  title="Toggle Streamer Mode"
                 >
-                  {isStreamerMode ? <EyeOff className="w-3.5 h-3.5 text-[#010101]" /> : <Eye className="w-3.5 h-3.5 text-[#010101]" />}
+                  {isStreamerMode ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                   <span className="hidden sm:inline">Streamer Mode</span>
                 </button>
 
-                <div className="flex items-center gap-1.5 sm:gap-2 px-3 py-1 rounded-full bg-[#0B89FD] border-2 border-[#010101] text-white text-[11px] sm:text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_#010101]">
-                  <div className="w-2 h-2 rounded-full bg-white animate-ping" />
-                  <span className="hidden sm:inline">WAITING FOR PLAYERS...</span>
-                  <span className="font-mono text-white font-black">({activePlayers.length}/15)</span>
+                <div className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="hidden sm:inline">Waiting for Players...</span>
+                  <span className="font-mono font-bold">({activePlayers.length}/15)</span>
                 </div>
               </div>
             </div>
 
-            {/* 2. LARGE BOLD ROOM CODE DISPLAY + COPY INVITE LINK + PLAYERS COUNTER */}
-            <div className="bg-[#FFFFFF] rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 mb-5 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 border-2 border-[#010101] shadow-[4px_4px_0px_#010101]">
-              <div className="flex flex-wrap items-center gap-3 sm:gap-5 w-full sm:w-auto">
-                {/* Large Room Code Display */}
+            {/* 2. ROOM CODE BAR & ACTION CONTROLS */}
+            <div className="bg-white rounded-2xl p-4 sm:p-5 mb-5 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 border border-gray-200 shadow-sm">
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                {/* Room Code Display */}
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] sm:text-xs uppercase font-black tracking-widest text-[#525252]">
-                    ROOM:
+                  <span className="text-xs uppercase font-semibold tracking-wider text-gray-500">
+                    Room:
                   </span>
                   <button
                     onClick={handleCopyCode}
-                    className="group flex items-center gap-2 px-3.5 py-1.5 bg-[#F8F8F8] border-2 border-[#010101] hover:bg-[#FFFFFF] rounded-xl transition-all shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px]"
+                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 hover:bg-gray-100 rounded-xl transition-all"
                     title="Click to copy Room Code"
                   >
-                    <span className="text-xl sm:text-3xl font-black text-[#010101] tracking-widest font-mono">
-                      {isStreamerMode ? 'FG-••••' : roomCode}
+                    <span className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-wider font-mono">
+                      {isStreamerMode ? '••••' : roomCode}
                     </span>
                     {copiedCode ? (
-                      <Check className="w-4 h-4 text-[#0B89FD]" />
+                      <Check className="w-4 h-4 text-emerald-600" />
                     ) : (
-                      <Copy className="w-4 h-4 text-[#010101] group-hover:scale-110 transition-transform" />
+                      <Copy className="w-4 h-4 text-gray-500" />
                     )}
                   </button>
                 </div>
 
-                {/* Players Counter Pill */}
-                <div className="px-3 py-1.5 rounded-xl bg-[#F8F8F8] border-2 border-[#010101] text-[#010101] font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-[2px_2px_0px_#010101]">
-                  <Users className="w-4 h-4 text-[#0B89FD]" />
-                  <span>Players: <strong className="text-[#010101] font-mono font-black">{activePlayers.length}</strong> / 15</span>
+                {/* Players Counter */}
+                <div className="px-3 py-1.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-700 text-xs font-semibold flex items-center gap-1.5">
+                  <Users className="w-3.5 h-3.5 text-blue-600" />
+                  <span>
+                    Players: <strong className="text-gray-900 font-bold">{activePlayers.length}</strong> / 15
+                  </span>
                 </div>
 
                 {/* PIN Protected indicator */}
                 {room.config.hasPin && (
-                  <div className="px-2.5 py-1 rounded-xl bg-[#FD3F01]/10 border-2 border-[#FD3F01] text-[#FD3F01] text-[10px] sm:text-xs font-black flex items-center gap-1">
-                    <Lock className="w-3.5 h-3.5 text-[#FD3F01]" />
+                  <div className="px-2.5 py-1 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-1">
+                    <Lock className="w-3 h-3 text-rose-600" />
                     <span>PIN Protected</span>
                   </div>
                 )}
               </div>
 
-              {/* Action Controls: Room Settings, Custom Cards, Sip Button, Sound Toggle, Leave Room */}
-              <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 w-full sm:w-auto justify-end">
-                {/* LIVE IN-ROOM SETTINGS BUTTON */}
+              {/* Action Controls */}
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
                 <button
                   type="button"
                   onClick={() => {
                     sound.playClick();
                     setShowSettingsModal(true);
                   }}
-                  className="h-9 sm:h-10 px-3 rounded-xl bg-[#FFFFFF] hover:bg-[#F8F8F8] border-2 border-[#010101] text-[#010101] text-xs font-black inline-flex items-center justify-center shrink-0 gap-1.5 transition-all shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] touch-manipulation"
-                  title="Live In-Room Settings Editor"
-                  aria-label="Room Settings"
+                  className="h-10 px-3 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 text-xs font-semibold inline-flex items-center justify-center shrink-0 gap-1.5 transition-all shadow-sm"
+                  title="Room Settings"
                 >
-                  <Settings className="w-4 h-4 text-[#010101] shrink-0" strokeWidth={2.5} />
+                  <Settings className="w-4 h-4 text-gray-500" />
                   <span>Settings</span>
                 </button>
 
                 {room.config.vibeMode === 'sip_edition' && (
                   <button
                     onClick={handleQuickTakeSip}
-                    className="h-9 sm:h-10 px-3 rounded-xl bg-[#FD3F01] hover:bg-[#e03800] border-2 border-[#010101] text-white text-xs font-black inline-flex items-center justify-center shrink-0 gap-1.5 transition-all shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] touch-target"
-                    title="Take a drink & log it on the leaderboard!"
+                    className="h-10 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 text-xs font-semibold inline-flex items-center justify-center shrink-0 gap-1.5 transition-all"
+                    title="Take a drink & log it"
                   >
-                    <Wine className="w-4 h-4 text-white shrink-0" strokeWidth={2.5} />
+                    <Wine className="w-4 h-4 text-rose-600" />
                     <span>Take Sip! 🥤</span>
-                    <span className="font-mono text-[10px] px-1.5 py-0.2 bg-white text-[#FD3F01] rounded-full border border-[#010101] font-black shrink-0">
-                      {room.sipsCount?.[currentPlayer?.id || ''] || 0}
+                    <span className="font-mono text-xs font-bold text-rose-700">
+                      ({room.sipsCount?.[currentPlayer?.id || ''] || 0})
                     </span>
                   </button>
                 )}
@@ -1230,16 +936,11 @@ export default function RoomPage() {
                     sound.playClick();
                     setShowCustomCardModal(true);
                   }}
-                  className="h-9 sm:h-10 px-3 rounded-xl bg-[#FFFFFF] hover:bg-[#F8F8F8] border-2 border-[#010101] text-[#010101] text-xs font-black inline-flex items-center justify-center shrink-0 gap-1.5 transition-all shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] touch-target"
-                  title="Submit your own question or dare"
+                  className="h-10 px-3 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 text-xs font-semibold inline-flex items-center justify-center shrink-0 gap-1.5 transition-all shadow-sm"
+                  title="Submit Custom Card"
                 >
-                  <PlusCircle className="w-4 h-4 text-[#0B89FD] shrink-0" strokeWidth={2.5} />
+                  <PlusCircle className="w-4 h-4 text-blue-600" />
                   <span className="hidden sm:inline">Custom Card</span>
-                  {room.customCardsCount ? (
-                    <span className="font-mono text-[10px] px-1 py-0.2 bg-[#FEC90E] border border-[#010101] rounded-full text-[#010101] font-black shrink-0">
-                      +{room.customCardsCount}
-                    </span>
-                  ) : null}
                 </button>
 
                 <RoomLobbyQRCode roomCode={roomCode} isStreamerMode={isStreamerMode} />
@@ -1248,30 +949,33 @@ export default function RoomPage() {
 
                 <button
                   onClick={handleCopyInviteLink}
-                  className="h-9 sm:h-10 px-3.5 rounded-xl bg-[#0B89FD] hover:bg-[#0977db] text-white border-2 border-[#010101] text-xs font-black inline-flex items-center justify-center shrink-0 gap-1.5 shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] transition-all touch-target"
+                  className="h-10 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold inline-flex items-center justify-center shrink-0 gap-1.5 shadow-sm transition-all"
                 >
                   {copiedLink ? (
-                    <Check className="w-4 h-4 text-white shrink-0" strokeWidth={2.5} />
+                    <Check className="w-4 h-4 text-white" />
                   ) : (
-                    <Share2 className="w-4 h-4 text-white shrink-0" strokeWidth={2.5} />
+                    <Share2 className="w-4 h-4 text-white" />
                   )}
                   <span>{copiedLink ? 'Copied!' : 'Invite'}</span>
                 </button>
 
                 <button
                   onClick={handleLeaveRoom}
-                  className="w-9 h-9 sm:w-10 sm:h-10 inline-flex items-center justify-center shrink-0 rounded-xl bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white border-2 border-[#010101] text-[#010101] shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] transition-all touch-target"
+                  className="w-10 h-10 inline-flex items-center justify-center shrink-0 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 shadow-sm transition-all"
                   title="Leave Room"
                 >
-                  <LogOut className="w-4 h-4 shrink-0" strokeWidth={2.5} />
+                  <LogOut className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
-            {/* MULTI-GAME PLAYLIST SELECTION (QUEUE) */}
+            {/* MULTI-GAME PLAYLIST SELECTION */}
             <div className="mb-5">
               <GamePlaylistQueue
-                selectedGames={room.selectedGames || (room.config.selectedGames || [room.config.gameMode || 'who_is_imposter'])}
+                selectedGames={
+                  room.selectedGames ||
+                  room.config.selectedGames || [room.config.gameMode || 'who_is_imposter']
+                }
                 currentGameIndex={room.currentGameIndex || 0}
                 isHost={Boolean(isHost)}
                 onUpdatePlaylist={handleUpdatePlaylist}
@@ -1280,17 +984,17 @@ export default function RoomPage() {
 
             {/* TEAM SQUAD SELECTOR (IF TEAM MODE ENABLED) */}
             {room.config.isTeamMode && (
-              <div className="mb-5 p-3.5 sm:p-5 rounded-2xl glass-panel-neon border border-cyan-500/30">
+              <div className="mb-5 p-4 rounded-2xl bg-white border border-gray-200 shadow-sm">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3">
-                  <div className="flex items-center gap-2 text-xs sm:text-sm font-black uppercase tracking-wider text-cyan-300">
-                    <Shield className="w-4 h-4 text-cyan-400" />
+                  <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-gray-900">
+                    <Shield className="w-4 h-4 text-blue-600" />
                     <span>Teams Mode Active — Blue vs Red Squad</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] text-slate-400">
+                    <span className="text-xs text-gray-500 font-medium">
                       Your Team:{' '}
-                      <strong className={currentPlayer?.team === 'red' ? 'text-pink-400 font-black' : 'text-cyan-400 font-black'}>
-                        {currentPlayer?.team === 'red' ? 'Team B (Red)' : 'Team A (Blue)'}
+                      <strong className={currentPlayer?.team === 'red' ? 'text-rose-600 font-bold' : 'text-blue-600 font-bold'}>
+                        {currentPlayer?.team === 'red' ? 'Team Red' : 'Team Blue'}
                       </strong>
                     </span>
                     <button
@@ -1300,25 +1004,25 @@ export default function RoomPage() {
                         const targetTeam = currentPlayer?.team === 'blue' ? 'red' : 'blue';
                         socketSelectTeam(targetTeam as PlayerTeam);
                       }}
-                      className="px-3 py-1 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 hover:from-cyan-500/40 hover:to-purple-500/40 border border-cyan-400/50 rounded-xl text-xs font-black text-cyan-300 transition-all shadow-neon-cyan flex items-center gap-1.5 touch-target"
+                      className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-xl text-xs font-semibold text-gray-700 transition-all"
                     >
-                      <span>Switch Team ⇄</span>
+                      Switch Team ⇄
                     </button>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {/* Team A (Cyan Blue) */}
-                  <div className="p-3.5 rounded-xl border border-cyan-500/50 bg-cyan-950/30 shadow-neon-cyan flex flex-col justify-between">
+                  {/* Team A (Blue) */}
+                  <div className="p-3.5 rounded-xl border border-blue-200 bg-blue-50/50 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse" />
-                          <span className="font-black text-xs uppercase tracking-wider text-cyan-300">
-                            Team A (Neon Cyan)
+                          <span className="w-2.5 h-2.5 rounded-full bg-blue-600" />
+                          <span className="font-bold text-xs uppercase tracking-wider text-blue-800">
+                            Team Blue
                           </span>
                         </div>
-                        <span className="text-xs font-mono font-bold text-cyan-300">
+                        <span className="text-xs font-mono font-bold text-blue-700">
                           {activePlayers.filter((p) => p.team !== 'red').length} Players
                         </span>
                       </div>
@@ -1328,42 +1032,30 @@ export default function RoomPage() {
                           .map((p) => (
                             <span
                               key={p.id}
-                              className="px-2 py-0.5 rounded-lg bg-cyan-950/80 border border-cyan-500/40 text-[10px] font-bold text-cyan-200 flex items-center gap-1"
+                              className="px-2 py-0.5 rounded-lg bg-white border border-blue-200 text-xs font-medium text-blue-900 flex items-center gap-1"
                             >
                               <span>{NEON_AVATARS[p.avatar]?.emoji || '👾'}</span>
                               <span>{p.username}</span>
                               {p.id === currentPlayer?.id && (
-                                <span className="text-[9px] text-cyan-400 font-extrabold">(You)</span>
+                                <span className="text-[10px] text-blue-600 font-bold">(You)</span>
                               )}
                             </span>
                           ))}
                       </div>
                     </div>
-                    {currentPlayer?.team !== 'blue' && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          sound.playClick();
-                          socketSelectTeam('blue');
-                        }}
-                        className="mt-3 w-full py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/50 text-cyan-300 text-[11px] font-black uppercase tracking-wider transition-all"
-                      >
-                        Join Team A (Blue)
-                      </button>
-                    )}
                   </div>
 
-                  {/* Team B (Pink / Purple Red) */}
-                  <div className="p-3.5 rounded-xl border border-pink-500/50 bg-pink-950/30 shadow-neon-magenta flex flex-col justify-between">
+                  {/* Team B (Red) */}
+                  <div className="p-3.5 rounded-xl border border-rose-200 bg-rose-50/50 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <span className="w-2.5 h-2.5 rounded-full bg-pink-400 animate-pulse" />
-                          <span className="font-black text-xs uppercase tracking-wider text-pink-300">
-                            Team B (Neon Pink)
+                          <span className="w-2.5 h-2.5 rounded-full bg-rose-600" />
+                          <span className="font-bold text-xs uppercase tracking-wider text-rose-800">
+                            Team Red
                           </span>
                         </div>
-                        <span className="text-xs font-mono font-bold text-pink-300">
+                        <span className="text-xs font-mono font-bold text-rose-700">
                           {activePlayers.filter((p) => p.team === 'red').length} Players
                         </span>
                       </div>
@@ -1373,53 +1065,40 @@ export default function RoomPage() {
                           .map((p) => (
                             <span
                               key={p.id}
-                              className="px-2 py-0.5 rounded-lg bg-pink-950/80 border border-pink-500/40 text-[10px] font-bold text-pink-200 flex items-center gap-1"
+                              className="px-2 py-0.5 rounded-lg bg-white border border-rose-200 text-xs font-medium text-rose-900 flex items-center gap-1"
                             >
                               <span>{NEON_AVATARS[p.avatar]?.emoji || '👾'}</span>
                               <span>{p.username}</span>
                               {p.id === currentPlayer?.id && (
-                                <span className="text-[9px] text-pink-400 font-extrabold">(You)</span>
+                                <span className="text-[10px] text-rose-600 font-bold">(You)</span>
                               )}
                             </span>
                           ))}
                       </div>
                     </div>
-                    {currentPlayer?.team === 'blue' && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          sound.playClick();
-                          socketSelectTeam('red');
-                        }}
-                        className="mt-3 w-full py-1.5 rounded-lg bg-pink-500/20 hover:bg-pink-500/30 border border-pink-400/50 text-pink-300 text-[11px] font-black uppercase tracking-wider transition-all"
-                      >
-                        Join Team B (Pink)
-                      </button>
-                    )}
                   </div>
                 </div>
               </div>
             )}
 
-            {/* 3. MAIN AREA: LEFT/CENTER = 5x3 STRUCTURED 15-SLOT GRID | RIGHT = GAME SETTINGS SIDEBAR */}
+            {/* 3. MAIN AREA: LEFT = 15-SLOT GRID | RIGHT = SETTINGS SIDEBAR */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-6 items-start">
-              {/* LEFT/CENTER AREA: 5x3 STRUCTURED GRID OF 15 GLOWING PLAYER SLOTS */}
+              {/* LEFT: 15-SLOT PLAYER GRID */}
               <div className="lg:col-span-8 flex flex-col">
                 <div className="flex items-center justify-between mb-3 px-1">
-                  <span className="text-xs font-black uppercase tracking-wider text-[#010101] flex items-center gap-1.5">
-                    <Users className="w-3.5 h-3.5 text-[#0B89FD]" />
-                    <span>Lobby Slots (5 × 3 Grid)</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-gray-700 flex items-center gap-1.5">
+                    <Users className="w-4 h-4 text-blue-600" />
+                    <span>Lobby Slots</span>
                   </span>
                   <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-[#0B89FD] border-2 border-[#010101] text-white shadow-[2px_2px_0px_#010101]">
-                      <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                      {activePlayers.filter((p) => p.isReady).length} / {activePlayers.length} READY
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 border border-emerald-200 text-emerald-700">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      {activePlayers.filter((p) => p.isReady).length} of {activePlayers.length} Ready
                     </span>
                   </div>
                 </div>
 
-                {/* 5x3 STRUCTURED 15-SLOT GRID */}
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2.5 sm:gap-3">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
                   {Array.from({ length: 15 }).map((_, index) => {
                     const player = activePlayers[index];
                     const slotNum = index + 1;
@@ -1432,44 +1111,43 @@ export default function RoomPage() {
                         <motion.div
                           key={player.id}
                           layout
-                          initial={{ scale: 0.85, opacity: 0 }}
+                          initial={{ scale: 0.9, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
-                          className={`relative bg-[#FFFFFF] rounded-2xl p-2.5 sm:p-3 flex flex-col items-center justify-between text-center transition-all min-h-[145px] sm:min-h-[165px] border-2 border-[#010101] ${
+                          className={`relative bg-white rounded-2xl p-3 flex flex-col items-center justify-between text-center transition-all min-h-[145px] sm:min-h-[160px] border shadow-sm ${
                             player.isReady
-                              ? 'shadow-[4px_4px_0px_#010101]'
+                              ? 'border-emerald-200 ring-2 ring-emerald-500/20'
                               : isDisconnected
-                              ? 'border-[#FD3F01] bg-[#FD3F01]/10 shadow-[2px_2px_0px_#010101]'
-                              : 'shadow-[2px_2px_0px_#010101]'
+                              ? 'border-rose-300 bg-rose-50/50'
+                              : 'border-gray-200'
                           }`}
                         >
-                          {/* TOP PILL BADGE: BLUE READY OR MUTED NOT READY */}
+                          {/* TOP PILL BADGE */}
                           <div className="w-full mb-1">
                             {isDisconnected ? (
-                              <div className="w-full py-0.5 px-1 bg-[#FD3F01] border-2 border-[#010101] rounded-lg text-white text-[9px] font-black flex items-center justify-center gap-1 animate-pulse">
-                                <Clock className="w-2.5 h-2.5 text-white" />
+                              <div className="w-full py-0.5 px-1 bg-rose-50 border border-rose-200 rounded-lg text-rose-700 text-[10px] font-bold flex items-center justify-center gap-1">
+                                <Clock className="w-2.5 h-2.5 text-rose-600" />
                                 <span>{remainingGrace}s</span>
                               </div>
                             ) : player.isReady ? (
-                              <div className="w-full py-0.5 px-1 bg-[#0B89FD] border-2 border-[#010101] rounded-lg text-white text-[9px] sm:text-[10px] font-black flex items-center justify-center gap-1 shadow-[1px_1px_0px_#010101]">
-                                <CheckCircle2 className="w-3 h-3 text-white flex-shrink-0" />
-                                <span>READY ✓</span>
+                              <div className="w-full py-0.5 px-1 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-[10px] font-bold flex items-center justify-center gap-1">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                <span>Ready</span>
                               </div>
                             ) : (
-                              <div className="w-full py-0.5 px-1 bg-[#F8F8F8] border border-[#010101] rounded-lg text-[#525252] text-[9px] sm:text-[10px] font-black truncate">
-                                NOT READY
+                              <div className="w-full py-0.5 px-1 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 text-[10px] font-medium">
+                                Not Ready
                               </div>
                             )}
                           </div>
 
                           {/* AVATAR FRAME */}
                           <div className="relative my-1">
-                            {/* Golden Host Crown Badge */}
                             {player.isHost && (
                               <div
-                                className="absolute -top-2.5 -right-2.5 z-10 p-1 bg-[#FEC90E] border-2 border-[#010101] rounded-full shadow-[2px_2px_0px_#010101] transform rotate-12"
+                                className="absolute -top-2 -right-2 z-10 p-1 bg-amber-400 rounded-full shadow-sm"
                                 title="Room Host"
                               >
-                                <Crown className="w-3 h-3 text-[#010101] fill-[#010101]" />
+                                <Crown className="w-3 h-3 text-white fill-white" />
                               </div>
                             )}
 
@@ -1481,24 +1159,21 @@ export default function RoomPage() {
                             />
                           </div>
 
-                          {/* BOLD USERNAME UNDERNEATH */}
+                          {/* USERNAME */}
                           <div className="w-full truncate mt-1">
-                            <div className="font-black text-xs text-[#010101] truncate px-0.5">
+                            <div className="font-bold text-xs text-gray-900 truncate px-0.5">
                               {player.username}
                               {player.id === currentPlayer?.id && (
-                                <span className="ml-1 text-[9px] text-[#0B89FD] font-black">(You)</span>
+                                <span className="ml-1 text-[10px] text-blue-600 font-semibold">(You)</span>
                               )}
                             </div>
 
-                            {/* Squad Badge if Team Mode */}
                             {room.config.isTeamMode && player.team && (
                               <div
-                                className={`mt-0.5 text-[8px] font-black px-1.5 py-0.2 rounded-full uppercase inline-block border border-[#010101] ${
+                                className={`mt-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase inline-block ${
                                   player.team === 'red'
-                                    ? 'bg-[#FD3F01] text-white'
-                                    : player.team === 'blue'
-                                    ? 'bg-[#0B89FD] text-white'
-                                    : 'bg-[#FEC90E] text-[#010101]'
+                                    ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                                    : 'bg-blue-50 text-blue-700 border border-blue-200'
                                 }`}
                               >
                                 {player.team}
@@ -1507,18 +1182,20 @@ export default function RoomPage() {
                           </div>
 
                           {/* Host Kick Option */}
-                          {isHost && player.id !== currentPlayer?.id && player.id !== room.hostId && !player.isHost ? (
+                          {isHost &&
+                          player.id !== currentPlayer?.id &&
+                          player.id !== room.hostId &&
+                          !player.isHost ? (
                             <button
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setKickTarget(player);
                               }}
-                              className="mt-1 text-[10px] text-[#FD3F01] hover:bg-[#FD3F01] hover:text-white bg-[#FFFFFF] font-black inline-flex items-center justify-center shrink-0 gap-1 py-1 px-2.5 rounded-lg border-2 border-[#010101] shadow-[2px_2px_0px_#010101] active:translate-x-[1px] active:translate-y-[1px] transition-all relative z-20 pointer-events-auto touch-manipulation"
+                              className="mt-1 text-[10px] text-rose-600 hover:text-rose-700 font-semibold py-0.5 px-2 rounded-lg hover:bg-rose-50 transition-all"
                               title={`Kick ${player.username}`}
                             >
-                              <UserX className="w-3 h-3 text-current shrink-0" strokeWidth={2.5} />
-                              <span>Kick</span>
+                              Kick
                             </button>
                           ) : (
                             <div className="h-3" />
@@ -1531,36 +1208,37 @@ export default function RoomPage() {
                     return (
                       <div
                         key={`slot-${index}`}
-                        className="rounded-2xl border-2 border-dashed border-[#010101]/30 bg-[#FFFFFF]/60 flex flex-col items-center justify-center p-2.5 text-center text-[#737373] select-none min-h-[145px] sm:min-h-[165px]"
+                        className="rounded-2xl border border-dashed border-gray-200 bg-white/60 flex flex-col items-center justify-center p-2.5 text-center text-gray-400 select-none min-h-[145px] sm:min-h-[160px]"
                       >
-                        <div className="w-10 h-10 rounded-full border-2 border-dashed border-[#010101]/30 flex items-center justify-center mb-1 text-[#010101]/50 text-xs font-black">
-                          ...
+                        <div className="w-8 h-8 rounded-full border border-dashed border-gray-300 flex items-center justify-center mb-1 text-gray-400 text-xs">
+                          {slotNum}
                         </div>
-                        <span className="text-[10px] font-black text-[#525252] uppercase tracking-wider">
-                          Slot #{slotNum}
+                        <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">
+                          Open Slot
                         </span>
-                        <span className="text-[9px] text-[#737373] font-semibold">Open</span>
                       </div>
                     );
                   })}
                 </div>
               </div>
 
-              {/* RIGHT SIDEBAR: BOLD BAUHAUS GAME SETTINGS PANEL */}
-              <div className="lg:col-span-4 bg-[#FFFFFF] rounded-2xl sm:rounded-3xl p-4 sm:p-5 border-2 border-[#010101] shadow-[4px_4px_0px_#010101] flex flex-col justify-between">
+              {/* RIGHT SIDEBAR: GAME SETTINGS PANEL */}
+              <div className="lg:col-span-4 bg-white rounded-2xl p-4 sm:p-5 border border-gray-200 shadow-sm flex flex-col justify-between">
                 <div>
                   {/* Panel Header */}
-                  <div className="flex items-center justify-between pb-3 mb-4 border-b-2 border-[#010101]">
+                  <div className="flex items-center justify-between pb-3 mb-4 border-b border-gray-100">
                     <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-xl bg-[#FEC90E] text-[#010101] border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
-                        <Sliders className="w-4 h-4 text-[#010101]" />
+                      <div className="p-1.5 rounded-xl bg-blue-50 text-blue-600">
+                        <Sliders className="w-4 h-4" />
                       </div>
                       <div>
-                        <h3 className="text-xs sm:text-sm font-black text-[#010101] uppercase tracking-wider">
+                        <h3 className="text-xs sm:text-sm font-bold text-gray-900 uppercase tracking-wider">
                           Game Settings
                         </h3>
-                        <p className="text-[10px] text-[#525252] font-semibold">
-                          {isHost ? 'Host controls & match configuration' : 'Match settings locked by host'}
+                        <p className="text-[10px] text-gray-500 font-medium">
+                          {isHost
+                            ? 'Host controls & match configuration'
+                            : 'Match settings locked by host'}
                         </p>
                       </div>
                     </div>
@@ -1571,10 +1249,10 @@ export default function RoomPage() {
                     {/* 1. 10-GAME SELECTOR */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <label className="text-[11px] font-black uppercase tracking-wider text-[#010101]">
-                          Selected Game (10 Modes)
+                        <label className="text-xs font-semibold uppercase tracking-wider text-gray-700">
+                          Selected Game
                         </label>
-                        <span className="text-[10px] text-[#0B89FD] font-black uppercase">
+                        <span className="text-[11px] text-blue-600 font-bold uppercase">
                           {room.config.gameMode?.replace(/_/g, ' ')}
                         </span>
                       </div>
@@ -1603,23 +1281,23 @@ export default function RoomPage() {
                                 sound.playClick();
                                 socketUpdateSettings({ gameMode: g.id as GameMode });
                               }}
-                              className={`p-2 rounded-xl border-2 text-left flex flex-col justify-between transition-all ${
+                              className={`p-2 rounded-xl border text-left flex flex-col justify-between transition-all ${
                                 isSelected
-                                  ? 'border-[#010101] bg-[#FEC90E] text-[#010101] shadow-[2px_2px_0px_#010101]'
-                                  : 'border-[#010101] bg-[#F8F8F8] text-[#010101] hover:bg-[#FFFFFF]'
-                              } ${!isHost ? 'cursor-default' : 'cursor-pointer active:translate-x-[1px] active:translate-y-[1px]'}`}
+                                  ? 'border-blue-600 bg-blue-50 text-blue-900 shadow-sm'
+                                  : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                              } ${!isHost ? 'cursor-default' : 'cursor-pointer'}`}
                             >
                               <div className="flex items-center justify-between">
                                 <span className="text-base">{g.emoji}</span>
-                                <span className="text-[9px] font-mono text-[#525252] font-black">{g.players}</span>
+                                <span className="text-[10px] font-mono text-gray-400 font-medium">{g.players}</span>
                               </div>
-                              <span className="text-[11px] font-black truncate mt-1">{g.title}</span>
+                              <span className="text-xs font-semibold truncate mt-1">{g.title}</span>
                             </button>
                           );
                         })}
                       </div>
 
-                      {/* Select dropdown fallback / quick-select */}
+                      {/* Dropdown for Host */}
                       {isHost && (
                         <div className="relative">
                           <select
@@ -1628,7 +1306,7 @@ export default function RoomPage() {
                               sound.playClick();
                               socketUpdateSettings({ gameMode: e.target.value as GameMode });
                             }}
-                            className="w-full bg-[#F8F8F8] border-2 border-[#010101] rounded-xl px-3 py-1.5 text-xs font-black text-[#010101] outline-none cursor-pointer appearance-none hover:bg-[#FFFFFF] transition-all"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold text-gray-900 outline-none cursor-pointer appearance-none hover:bg-white transition-all"
                           >
                             <option value="who_is_imposter">🎭 Who Is The Imposter? (3-15p)</option>
                             <option value="draw_and_guess">🎨 Draw & Guess (2-15p)</option>
@@ -1641,30 +1319,30 @@ export default function RoomPage() {
                             <option value="silly_roulette">🎯 Silly Roulette (2-15p)</option>
                             <option value="hot_potato">🥔 Hot Potato (2-15p)</option>
                           </select>
-                          <ChevronDown className="w-4 h-4 text-[#010101] absolute right-3 top-2 pointer-events-none" />
+                          <ChevronDown className="w-4 h-4 text-gray-500 absolute right-3 top-2.5 pointer-events-none" />
                         </div>
                       )}
                     </div>
 
                     {/* 2. MATCH MODE: SOLO VS TEAMS */}
-                    <div className="p-3 rounded-2xl bg-[#F8F8F8] border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
+                    <div className="p-3 rounded-xl bg-gray-50 border border-gray-200">
                       <div className="flex items-center justify-between mb-1.5">
                         <div className="flex items-center gap-1.5">
-                          <Shield className="w-4 h-4 text-[#010101]" />
-                          <span className="text-xs font-black text-[#010101]">Match Mode</span>
+                          <Shield className="w-4 h-4 text-gray-700" />
+                          <span className="text-xs font-bold text-gray-900">Match Mode</span>
                         </div>
                         {isHost ? (
-                          <div className="flex items-center bg-[#FFFFFF] p-0.5 rounded-xl border-2 border-[#010101]">
+                          <div className="flex items-center bg-white p-0.5 rounded-lg border border-gray-200">
                             <button
                               type="button"
                               onClick={() => {
                                 sound.playClick();
                                 socketUpdateSettings({ isTeamMode: false, mode: 'solo' });
                               }}
-                              className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase transition-all ${
+                              className={`px-3 py-1 rounded-md text-[11px] font-semibold transition-all ${
                                 !room.config.isTeamMode
-                                  ? 'bg-[#0B89FD] text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101]'
-                                  : 'text-[#010101] hover:bg-[#F8F8F8]'
+                                  ? 'bg-blue-600 text-white shadow-sm'
+                                  : 'text-gray-600 hover:bg-gray-50'
                               }`}
                             >
                               Solo
@@ -1675,22 +1353,22 @@ export default function RoomPage() {
                                 sound.playClick();
                                 socketUpdateSettings({ isTeamMode: true, mode: 'teams' });
                               }}
-                              className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase transition-all ${
+                              className={`px-3 py-1 rounded-md text-[11px] font-semibold transition-all ${
                                 room.config.isTeamMode
-                                  ? 'bg-[#FEC90E] text-[#010101] border-2 border-[#010101] shadow-[2px_2px_0px_#010101]'
-                                  : 'text-[#010101] hover:bg-[#F8F8F8]'
+                                  ? 'bg-blue-600 text-white shadow-sm'
+                                  : 'text-gray-600 hover:bg-gray-50'
                               }`}
                             >
                               Teams
                             </button>
                           </div>
                         ) : (
-                          <span className="text-xs font-black uppercase text-[#0B89FD]">
+                          <span className="text-xs font-bold text-blue-600 uppercase">
                             {room.config.isTeamMode ? 'Teams Mode' : 'Solo FFA'}
                           </span>
                         )}
                       </div>
-                      <p className="text-[10px] text-[#010101]/70 font-medium">
+                      <p className="text-[10px] text-gray-500 font-medium">
                         {room.config.isTeamMode
                           ? 'Blue Squad vs Red Squad (Team victory)'
                           : 'Free-For-All (Individual points & leaderboard)'}
@@ -1699,12 +1377,12 @@ export default function RoomPage() {
 
                     {/* 3. SOLO TEST / DEV MODE TOGGLE (HOST ONLY) */}
                     {isHost && (
-                      <div className="p-3 rounded-2xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] flex items-center justify-between">
+                      <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <Sparkles className="w-4 h-4 text-[#FEC90E]" />
+                          <Sparkles className="w-4 h-4 text-amber-500" />
                           <div>
-                            <div className="text-xs font-black text-[#010101]">Solo Test / Dev Mode</div>
-                            <div className="text-[9px] text-[#010101]/70 font-medium">Allow 1 player to launch & test any mode</div>
+                            <div className="text-xs font-bold text-gray-900">Solo Test Mode</div>
+                            <div className="text-[10px] text-gray-500 font-medium">Allow 1 player to launch & test any game</div>
                           </div>
                         </div>
                         <input
@@ -1716,7 +1394,7 @@ export default function RoomPage() {
                             setIsSoloDevMode(next);
                             socketUpdateSettings({ isSoloDevMode: next });
                           }}
-                          className="w-4 h-4 accent-[#0B89FD] rounded cursor-pointer border-2 border-[#010101]"
+                          className="w-4 h-4 accent-blue-600 rounded cursor-pointer"
                         />
                       </div>
                     )}
@@ -1724,10 +1402,10 @@ export default function RoomPage() {
                     {/* 4. PARTY VIBE MODE */}
                     <div>
                       <div className="flex justify-between items-center mb-1">
-                        <label className="text-[11px] font-black uppercase tracking-wider text-[#010101]">
+                        <label className="text-xs font-semibold uppercase tracking-wider text-gray-700">
                           Party Vibe Mode
                         </label>
-                        <span className="text-[#0B89FD] font-black text-[10px] uppercase">
+                        <span className="text-blue-600 font-bold text-[11px] uppercase">
                           {room.config.vibeMode?.replace('_', ' ') || 'chill'}
                         </span>
                       </div>
@@ -1745,10 +1423,10 @@ export default function RoomPage() {
                                 sound.playClick();
                                 socketUpdateSettings({ vibeMode: vibe.id as any });
                               }}
-                              className={`py-1.5 rounded-xl border-2 border-[#010101] text-[11px] font-black transition-all ${
+                              className={`py-1.5 rounded-xl border text-xs font-semibold transition-all ${
                                 (room.config.vibeMode || 'chill') === vibe.id
-                                  ? 'bg-[#0B89FD] text-white shadow-[2px_2px_0px_#010101]'
-                                  : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
+                                  ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                                  : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
                               }`}
                             >
                               {vibe.label}
@@ -1756,7 +1434,7 @@ export default function RoomPage() {
                           ))}
                         </div>
                       ) : (
-                        <div className="px-3 py-1.5 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] text-xs font-black text-[#010101] capitalize">
+                        <div className="px-3 py-1.5 rounded-xl bg-gray-50 border border-gray-200 text-xs font-semibold text-gray-800 capitalize">
                           {room.config.vibeMode?.replace('_', ' ') || 'Chill & Funny'}
                         </div>
                       )}
@@ -1765,39 +1443,12 @@ export default function RoomPage() {
                     {/* 5. ROUNDS SELECTOR */}
                     <div>
                       <div className="flex justify-between items-center mb-1">
-                        <label className="text-[11px] font-black uppercase tracking-wider text-[#010101]">
+                        <label className="text-xs font-semibold uppercase tracking-wider text-gray-700">
                           Rounds
                         </label>
-                        <span className="text-[#010101] font-black text-xs">{room.config.totalRounds || 5} Rounds</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 mb-1.5">
-                        <button
-                          type="button"
-                          disabled={!isHost || (room.config.totalRounds || 5) <= 1}
-                          onClick={() => {
-                            sound.playClick();
-                            const next = Math.max(1, (room.config.totalRounds || 5) - 1);
-                            socketUpdateSettings({ totalRounds: next });
-                          }}
-                          className="w-8 h-8 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] hover:bg-[#FEC90E] text-[#010101] font-black flex items-center justify-center disabled:opacity-40"
-                        >
-                          -
-                        </button>
-                        <div className="flex-1 py-1 rounded-xl bg-[#F8F8F8] border-2 border-[#010101] text-center font-black text-[#010101] text-xs">
+                        <span className="text-gray-900 font-bold text-xs">
                           {room.config.totalRounds || 5} Rounds
-                        </div>
-                        <button
-                          type="button"
-                          disabled={!isHost || (room.config.totalRounds || 5) >= 15}
-                          onClick={() => {
-                            sound.playClick();
-                            const next = Math.min(15, (room.config.totalRounds || 5) + 1);
-                            socketUpdateSettings({ totalRounds: next });
-                          }}
-                          className="w-8 h-8 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] hover:bg-[#FEC90E] text-[#010101] font-black flex items-center justify-center disabled:opacity-40"
-                        >
-                          +
-                        </button>
+                        </span>
                       </div>
                       <div className="grid grid-cols-4 gap-1.5">
                         {[3, 5, 7, 10].map((rounds) => (
@@ -1809,10 +1460,10 @@ export default function RoomPage() {
                               sound.playClick();
                               socketUpdateSettings({ totalRounds: rounds });
                             }}
-                            className={`py-1 rounded-xl border-2 border-[#010101] text-[11px] font-black transition-all ${
+                            className={`py-1.5 rounded-xl border text-xs font-semibold transition-all ${
                               (room.config.totalRounds || 5) === rounds
-                                ? 'bg-[#FEC90E] text-[#010101] shadow-[2px_2px_0px_#010101]'
-                                : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
+                                ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                                : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
                             }`}
                           >
                             {rounds}
@@ -1824,39 +1475,12 @@ export default function RoomPage() {
                     {/* 6. TIMER SELECTOR */}
                     <div>
                       <div className="flex justify-between items-center mb-1">
-                        <label className="text-[11px] font-black uppercase tracking-wider text-[#010101]">
+                        <label className="text-xs font-semibold uppercase tracking-wider text-gray-700">
                           Timer (Sec / Turn)
                         </label>
-                        <span className="text-[#0B89FD] font-black text-xs">{room.config.roundDurationSeconds || 30}s</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 mb-1.5">
-                        <button
-                          type="button"
-                          disabled={!isHost || (room.config.roundDurationSeconds || 30) <= 10}
-                          onClick={() => {
-                            sound.playClick();
-                            const next = Math.max(10, (room.config.roundDurationSeconds || 30) - 5);
-                            socketUpdateSettings({ roundDurationSeconds: next });
-                          }}
-                          className="w-8 h-8 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] hover:bg-[#0B89FD] hover:text-white text-[#010101] font-black flex items-center justify-center disabled:opacity-40"
-                        >
-                          -
-                        </button>
-                        <div className="flex-1 py-1 rounded-xl bg-[#F8F8F8] border-2 border-[#010101] text-center font-black text-[#010101] text-xs">
-                          {room.config.roundDurationSeconds || 30} Seconds
-                        </div>
-                        <button
-                          type="button"
-                          disabled={!isHost || (room.config.roundDurationSeconds || 30) >= 180}
-                          onClick={() => {
-                            sound.playClick();
-                            const next = Math.min(180, (room.config.roundDurationSeconds || 30) + 5);
-                            socketUpdateSettings({ roundDurationSeconds: next });
-                          }}
-                          className="w-8 h-8 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] hover:bg-[#0B89FD] hover:text-white text-[#010101] font-black flex items-center justify-center disabled:opacity-40"
-                        >
-                          +
-                        </button>
+                        <span className="text-blue-600 font-bold text-xs">
+                          {room.config.roundDurationSeconds || 30}s
+                        </span>
                       </div>
                       <div className="grid grid-cols-4 gap-1.5">
                         {[20, 30, 45, 60].map((sec) => (
@@ -1868,10 +1492,10 @@ export default function RoomPage() {
                               sound.playClick();
                               socketUpdateSettings({ roundDurationSeconds: sec });
                             }}
-                            className={`py-1 rounded-xl border-2 border-[#010101] text-[11px] font-black transition-all ${
+                            className={`py-1.5 rounded-xl border text-xs font-semibold transition-all ${
                               (room.config.roundDurationSeconds || 30) === sec
-                                ? 'bg-[#0B89FD] text-white shadow-[2px_2px_0px_#010101]'
-                                : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
+                                ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                                : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
                             }`}
                           >
                             {sec}s
@@ -1879,169 +1503,38 @@ export default function RoomPage() {
                         ))}
                       </div>
                     </div>
-
-                    {/* 7. MAX PLAYERS SELECTOR */}
-                    <div>
-                      <div className="flex justify-between items-center mb-1">
-                        <label className="text-[11px] font-black uppercase tracking-wider text-[#010101]">
-                          Max Players
-                        </label>
-                        <span className="text-[#010101] font-black text-xs">{room.config.maxPlayers || 15} Players</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 mb-1.5">
-                        <button
-                          type="button"
-                          disabled={!isHost || (room.config.maxPlayers || 15) <= 2}
-                          onClick={() => {
-                            sound.playClick();
-                            const next = Math.max(2, (room.config.maxPlayers || 15) - 1);
-                            socketUpdateSettings({ maxPlayers: next });
-                          }}
-                          className="w-8 h-8 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] hover:bg-[#FEC90E] text-[#010101] font-black flex items-center justify-center disabled:opacity-40"
-                        >
-                          -
-                        </button>
-                        <div className="flex-1 py-1 rounded-xl bg-[#F8F8F8] border-2 border-[#010101] text-center font-black text-[#010101] text-xs">
-                          {room.config.maxPlayers || 15} Capacity
-                        </div>
-                        <button
-                          type="button"
-                          disabled={!isHost || (room.config.maxPlayers || 15) >= 15}
-                          onClick={() => {
-                            sound.playClick();
-                            const next = Math.min(15, (room.config.maxPlayers || 15) + 1);
-                            socketUpdateSettings({ maxPlayers: next });
-                          }}
-                          className="w-8 h-8 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] hover:bg-[#FEC90E] text-[#010101] font-black flex items-center justify-center disabled:opacity-40"
-                        >
-                          +
-                        </button>
-                      </div>
-                      <div className="grid grid-cols-4 gap-1.5">
-                        {[4, 8, 12, 15].map((count) => (
-                          <button
-                            key={count}
-                            type="button"
-                            disabled={!isHost}
-                            onClick={() => {
-                              sound.playClick();
-                              socketUpdateSettings({ maxPlayers: count });
-                            }}
-                            className={`py-1 rounded-xl border-2 border-[#010101] text-[11px] font-black transition-all ${
-                              (room.config.maxPlayers || 15) === count
-                                ? 'bg-[#FEC90E] text-[#010101] shadow-[2px_2px_0px_#010101]'
-                                : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
-                            }`}
-                          >
-                            {count}p
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* 8. DIFFICULTY SELECTOR */}
-                    <div>
-                      <label className="block text-[11px] font-black uppercase tracking-wider text-[#010101] mb-1">
-                        Match Intensity
-                      </label>
-                      <div className="grid grid-cols-3 gap-1.5">
-                        {[
-                          { id: 'casual', label: 'Casual' },
-                          { id: 'standard', label: 'Standard' },
-                          { id: 'wild', label: 'Wild' }
-                        ].map((diff) => (
-                          <button
-                            key={diff.id}
-                            type="button"
-                            onClick={() => {
-                              sound.playClick();
-                              setDifficultySetting(diff.id as any);
-                            }}
-                            className={`py-1.5 rounded-xl border-2 border-[#010101] text-[11px] font-black transition-all ${
-                              difficultySetting === diff.id
-                                ? 'bg-[#FD3F01] text-white shadow-[2px_2px_0px_#010101]'
-                                : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
-                            }`}
-                          >
-                            {diff.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
                   </div>
                 </div>
 
-                {/* Compact Live Player Management List */}
-                <div className="mt-5 pt-3 border-t-2 border-[#010101]/10">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] uppercase font-black tracking-wider text-[#010101]">
-                      Connected ({activePlayers.length}/15)
-                    </span>
-                    <span className="text-[10px] text-[#0B89FD] font-black">
-                      {activePlayers.filter((p) => p.isReady).length} Ready
-                    </span>
-                  </div>
-
-                  <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1">
-                    {activePlayers.map((player) => (
-                      <div
-                        key={player.id}
-                        className="flex items-center justify-between px-2.5 py-1.5 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] text-xs"
-                      >
-                        <div className="flex items-center gap-2 truncate">
-                          <span className="text-sm">{NEON_AVATARS[player.avatar]?.emoji || '👾'}</span>
-                          <span className="font-bold text-[#010101] truncate">{player.username}</span>
-                          {player.isHost && (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-[#FEC90E] text-[#010101] border border-[#010101] font-black">
-                              HOST
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`text-[9px] font-black uppercase ${
-                              player.isReady ? 'text-[#0B89FD]' : 'text-[#FD3F01]'
-                            }`}
-                          >
-                            {player.isReady ? '✓ READY' : 'WAITING'}
-                          </span>
-                          {isHost && player.id !== currentPlayer?.id && player.id !== room.hostId && !player.isHost && (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setKickTarget(player);
-                              }}
-                              className="text-[#FD3F01] hover:bg-[#FD3F01] hover:text-white w-7 h-7 inline-flex items-center justify-center shrink-0 rounded-lg border-2 border-[#010101] shadow-[2px_2px_0px_#010101] transition-all relative z-20 pointer-events-auto active:translate-x-[1px] active:translate-y-[1px]"
-                              title={`Kick ${player.username}`}
-                            >
-                              <UserX className="w-3.5 h-3.5 shrink-0" strokeWidth={2.5} />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                {/* Connected players counter */}
+                <div className="mt-5 pt-3 border-t border-gray-100 flex items-center justify-between text-xs">
+                  <span className="text-gray-500 font-medium">
+                    Connected ({activePlayers.length}/15)
+                  </span>
+                  <span className="text-emerald-600 font-semibold">
+                    {activePlayers.filter((p) => p.isReady).length} Ready
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* 5. BOTTOM CENTER: WIDE BRIGHT GRADIENT CYAN-TO-PURPLE GLOWING START GAME ▶ PLAY BUTTON */}
-          <div className="bg-[#FFFFFF] rounded-2xl sm:rounded-3xl p-3 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 border-2 border-[#010101] sticky bottom-2 z-20 shadow-[6px_6px_0px_#010101] safe-bottom">
+          {/* 4. BOTTOM ACTION BAR: READY TOGGLE + HOST START BUTTON */}
+          <div className="bg-white rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 border border-gray-200 sticky bottom-2 z-20 shadow-md safe-bottom">
             {/* Player Info Preview */}
             <div className="flex items-center gap-3 w-full sm:w-auto">
               {currentPlayer && (
                 <NeonAvatarDisplay avatarId={currentPlayer.avatar} size="sm" showGlow={false} />
               )}
               <div>
-                <div className="text-[11px] text-[#010101]/70 font-bold uppercase tracking-wider">Playing as</div>
-                <div className="text-sm sm:text-base font-black text-[#010101] flex items-center gap-2">
+                <div className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">
+                  Playing as
+                </div>
+                <div className="text-sm sm:text-base font-bold text-gray-900 flex items-center gap-2">
                   <span>{currentPlayer?.username}</span>
                   {isHost && (
-                    <span className="px-2 py-0.5 bg-[#FEC90E] text-[#010101] border-2 border-[#010101] text-[9px] sm:text-[10px] font-black rounded-full shadow-[1px_1px_0px_#010101]">
-                      HOST
+                    <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-bold rounded-full">
+                      Host
                     </span>
                   )}
                 </div>
@@ -2049,25 +1542,25 @@ export default function RoomPage() {
             </div>
 
             {/* Action Buttons: Ready Toggle + Host Start / Force Start Buttons */}
-            <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto justify-end">
+            <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full sm:w-auto justify-end">
               {/* Ready Status Toggle */}
               <button
                 onClick={handleToggleReady}
-                className={`w-full sm:w-auto px-6 py-3.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 touch-target border-2 border-[#010101] active:translate-x-[2px] active:translate-y-[2px] ${
+                className={`w-full sm:w-auto h-12 px-6 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-sm ${
                   currentPlayer?.isReady
-                    ? 'bg-[#0B89FD] hover:bg-[#0977db] text-white shadow-[4px_4px_0px_#010101] active:shadow-[2px_2px_0px_#010101]'
-                    : 'bg-[#FFFFFF] hover:bg-[#F8F8F8] text-[#010101] shadow-[4px_4px_0px_#010101] active:shadow-[2px_2px_0px_#010101]'
+                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                    : 'bg-white border border-gray-200 hover:bg-gray-50 text-gray-800'
                 }`}
               >
                 {currentPlayer?.isReady ? (
                   <>
                     <CheckCircle2 className="w-4 h-4 text-white" />
-                    <span>READY ✓ (CLICK TO UNREADY)</span>
+                    <span>Ready ✓ (Tap to unready)</span>
                   </>
                 ) : (
                   <>
-                    <Zap className="w-4 h-4 text-[#FEC90E]" />
-                    <span>I'M READY!</span>
+                    <Zap className="w-4 h-4 text-amber-500" />
+                    <span>Ready</span>
                   </>
                 )}
               </button>
@@ -2075,16 +1568,16 @@ export default function RoomPage() {
               {/* Host Controls */}
               {isHost && (
                 <>
-                  {/* Force Start Button: Active whenever 2+ players are present, even if some aren't ready */}
+                  {/* Force Start Button */}
                   {activePlayers.length >= 2 && !allReady && (
                     <button
                       type="button"
                       onClick={() => handleStartGame(true)}
-                      className="w-full sm:w-auto px-5 sm:px-6 py-3.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 touch-target bg-[#FEC90E] hover:bg-[#fed338] text-[#010101] border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101]"
+                      className="w-full sm:w-auto h-12 px-5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white shadow-sm"
                       title="Force start match with currently connected players"
                     >
                       <Zap className="w-4 h-4 fill-current" />
-                      <span>⚡ FORCE START</span>
+                      <span>Force Start</span>
                     </button>
                   )}
 
@@ -2098,18 +1591,18 @@ export default function RoomPage() {
                           ? isSoloDevMode
                             ? 'At least 1 player required'
                             : 'At least 2 players required'
-                          : 'All players must click READY (or use Force Start)'
+                          : 'All players must click Ready (or use Force Start)'
                         : 'Launch Match'
                     }
-                    className={`w-full sm:w-auto min-w-[220px] px-8 py-3.5 rounded-2xl font-black text-xs sm:text-sm md:text-base uppercase tracking-wider transition-all flex items-center justify-center gap-2 touch-target border-2 border-[#010101] active:translate-x-[2px] active:translate-y-[2px] ${
+                    className={`w-full sm:w-auto min-w-[200px] h-12 px-8 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-sm ${
                       allReady
-                        ? 'bg-[#0B89FD] hover:bg-[#0977db] text-white shadow-[4px_4px_0px_#010101] active:shadow-[2px_2px_0px_#010101] cursor-pointer'
-                        : 'bg-[#E5E5E5] text-[#010101]/40 border-[#010101]/40 cursor-not-allowed opacity-60'
+                        ? 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'
+                        : 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
                     }`}
                     id="btn-start-game"
                   >
-                    <Play className="w-5 h-5 fill-current" />
-                    <span>START GAME ▶ PLAY</span>
+                    <Play className="w-4 h-4 fill-current" />
+                    <span>Start Game</span>
                   </button>
                 </>
               )}
@@ -2118,24 +1611,22 @@ export default function RoomPage() {
         </div>
       )}
 
-      {/* ======================================================== */}
-      {/* 3-SECOND COUNTDOWN OVERLAY                               */}
-      {/* ======================================================== */}
+      {/* 3-SECOND COUNTDOWN OVERLAY */}
       <AnimatePresence>
         {countdown !== null && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#010101]/90 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm">
             <motion.div
               key={countdown}
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1.2, opacity: 1 }}
-              exit={{ scale: 1.8, opacity: 0 }}
+              initial={{ scale: 0.6, opacity: 0 }}
+              animate={{ scale: 1.1, opacity: 1 }}
+              exit={{ scale: 1.6, opacity: 0 }}
               transition={{ duration: 0.5 }}
               className="text-center"
             >
-              <div className="text-8xl md:text-9xl font-black text-[#FD3F01] drop-shadow-[4px_4px_0px_#010101]">
+              <div className="text-8xl md:text-9xl font-extrabold text-white">
                 {countdown}
               </div>
-              <p className="text-[#FFFFFF] font-black uppercase tracking-widest text-lg mt-4">
+              <p className="text-white font-bold uppercase tracking-wider text-base mt-3">
                 Starting Game...
               </p>
             </motion.div>
@@ -2143,31 +1634,29 @@ export default function RoomPage() {
         )}
       </AnimatePresence>
 
-      {/* ======================================================== */}
-      {/* JOIN ROOM MODAL (For invite links or new sessions)        */}
-      {/* ======================================================== */}
+      {/* JOIN ROOM MODAL */}
       <AnimatePresence>
         {showJoinModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#010101]/80 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="w-full max-w-md bg-[#FFFFFF] rounded-3xl p-6 md:p-8 border-3 border-[#010101] shadow-[8px_8px_0px_#010101]"
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-md bg-white rounded-2xl p-6 sm:p-7 border border-gray-200 shadow-xl"
             >
-              <h3 className="text-2xl font-black text-[#010101] mb-1">Join Room {roomCode}</h3>
-              <p className="text-xs text-[#010101]/70 mb-6 font-medium">Choose your avatar and nickname to enter.</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-1">Join Room {roomCode}</h3>
+              <p className="text-xs text-gray-500 mb-5 font-medium">Choose your avatar and nickname to enter.</p>
 
               {errorMessage && (
-                <div className="mb-4 p-3 bg-[#FD3F01]/10 border-2 border-[#FD3F01] rounded-xl text-[#FD3F01] text-xs flex items-center gap-2 font-bold">
-                  <AlertTriangle className="w-4 h-4 flex-shrink-0 text-[#FD3F01]" />
+                <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2 font-medium">
+                  <AlertTriangle className="w-4 h-4 flex-shrink-0 text-rose-600" />
                   <span>{errorMessage}</span>
                 </div>
               )}
 
               <form onSubmit={handleModalJoin} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-black uppercase tracking-wider text-[#010101] mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
                     Your Nickname
                   </label>
                   <input
@@ -2176,12 +1665,12 @@ export default function RoomPage() {
                     onChange={(e) => setJoinUsername(e.target.value.slice(0, 18))}
                     placeholder="Enter nickname..."
                     required
-                    className="w-full bg-[#F8F8F8] border-2 border-[#010101] focus:border-[#0B89FD] rounded-xl px-4 py-3 text-[#010101] font-bold outline-none"
+                    className="w-full h-11 bg-gray-50 border border-gray-200 focus:border-blue-600 rounded-xl px-4 text-gray-900 font-medium text-sm outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-black uppercase tracking-wider text-[#010101] mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
                     Pick Avatar
                   </label>
                   <div className="grid grid-cols-4 gap-2">
@@ -2193,23 +1682,20 @@ export default function RoomPage() {
                           sound.playClick();
                           setJoinAvatar(key);
                         }}
-                        aria-label={`Select avatar ${NEON_AVATARS[key].label || key}`}
-                        className={`min-w-[44px] min-h-[44px] p-2 rounded-xl border-2 border-[#010101] flex items-center justify-center text-2xl transition-all select-none touch-manipulation font-emoji ${
+                        className={`h-11 rounded-xl border flex items-center justify-center text-xl transition-all ${
                           joinAvatar === key
-                            ? 'bg-[#0B89FD] text-white scale-105 shadow-[2px_2px_0px_#010101]'
-                            : 'bg-[#FFFFFF] hover:bg-[#F8F8F8]'
+                            ? 'bg-blue-50 border-blue-600 shadow-sm'
+                            : 'bg-white border-gray-200 hover:bg-gray-50'
                         }`}
                       >
-                        <span role="img" aria-label={NEON_AVATARS[key].label || key} className="font-emoji">
-                          {NEON_AVATARS[key].emoji}
-                        </span>
+                        <span>{NEON_AVATARS[key].emoji}</span>
                       </button>
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-black uppercase tracking-wider text-[#010101] mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
                     Room PIN (If private)
                   </label>
                   <input
@@ -2218,13 +1704,13 @@ export default function RoomPage() {
                     value={joinPin}
                     onChange={(e) => setJoinPin(e.target.value.replace(/\D/g, ''))}
                     placeholder="••••"
-                    className="w-full bg-[#F8F8F8] border-2 border-[#010101] focus:border-[#FEC90E] rounded-xl px-4 py-2.5 text-center text-lg tracking-widest text-[#010101] font-black outline-none"
+                    className="w-full h-11 bg-gray-50 border border-gray-200 focus:border-blue-600 rounded-xl px-4 text-center text-lg tracking-widest text-gray-900 font-bold outline-none"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full bg-[#0B89FD] hover:bg-[#0977db] text-white border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] py-3.5 rounded-2xl font-black text-base mt-2"
+                  className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm shadow-sm mt-2 transition-all"
                 >
                   Enter Waiting Lobby
                 </button>
@@ -2234,35 +1720,33 @@ export default function RoomPage() {
         )}
       </AnimatePresence>
 
-      {/* ======================================================== */}
-      {/* CONFIRM KICK MODAL                                       */}
-      {/* ======================================================== */}
+      {/* CONFIRM KICK MODAL */}
       <AnimatePresence>
         {kickTarget && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#010101]/80 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="w-full max-w-sm bg-[#FFFFFF] p-6 rounded-3xl text-center space-y-4 border-3 border-[#010101] shadow-[8px_8px_0px_#010101]"
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-sm bg-white p-6 rounded-2xl text-center space-y-4 border border-gray-200 shadow-xl"
             >
-              <div className="w-12 h-12 rounded-2xl bg-[#FD3F01]/10 border-2 border-[#FD3F01] flex items-center justify-center mx-auto text-[#FD3F01]">
+              <div className="w-12 h-12 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center mx-auto text-rose-600">
                 <UserX className="w-6 h-6" />
               </div>
-              <h4 className="text-xl font-black text-[#010101]">Kick {kickTarget.username}?</h4>
-              <p className="text-xs text-[#010101]/70 font-medium">
+              <h4 className="text-lg font-bold text-gray-900">Kick {kickTarget.username}?</h4>
+              <p className="text-xs text-gray-500 font-medium">
                 Are you sure you want to remove this player from the room?
               </p>
-              <div className="flex gap-2 pt-2">
+              <div className="flex gap-2 pt-1">
                 <button
                   onClick={() => setKickTarget(null)}
-                  className="flex-1 py-2.5 bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] rounded-xl text-[#010101] font-bold text-xs hover:bg-[#F8F8F8]"
+                  className="flex-1 h-10 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 font-bold text-xs"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleConfirmKick}
-                  className="flex-1 py-2.5 bg-[#FD3F01] hover:bg-[#e03700] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] rounded-xl text-white font-black text-xs"
+                  className="flex-1 h-10 bg-rose-600 hover:bg-rose-700 rounded-xl text-white font-bold text-xs shadow-sm"
                 >
                   Yes, Kick
                 </button>
@@ -2272,35 +1756,33 @@ export default function RoomPage() {
         )}
       </AnimatePresence>
 
-      {/* ======================================================== */}
-      {/* CUSTOM CARDS SUBMISSION MODAL                            */}
-      {/* ======================================================== */}
+      {/* CUSTOM CARDS SUBMISSION MODAL */}
       <AnimatePresence>
         {showCustomCardModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#010101]/80 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
             <motion.div
-              initial={{ opacity: 0, scale: 0.92 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.92 }}
-              className="w-full max-w-md bg-[#FFFFFF] rounded-3xl p-6 border-3 border-[#010101] shadow-[8px_8px_0px_#010101]"
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-md bg-white rounded-2xl p-6 border border-gray-200 shadow-xl"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-xl bg-[#0B89FD] text-white border-2 border-[#010101]">
-                    <PlusCircle className="w-5 h-5 text-white" />
+                  <div className="p-2 rounded-xl bg-blue-50 text-blue-600">
+                    <PlusCircle className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-[#010101] uppercase tracking-wider">
+                    <h3 className="text-base font-bold text-gray-900 uppercase tracking-wider">
                       Submit Custom Card
                     </h3>
-                    <p className="text-[11px] text-[#010101]/70 font-medium">
+                    <p className="text-xs text-gray-500 font-medium">
                       Inject your question or dare live into this room
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setShowCustomCardModal(false)}
-                  className="text-[#010101] hover:text-[#FD3F01] text-2xl font-black leading-none p-1"
+                  className="text-gray-400 hover:text-gray-600 text-xl font-bold leading-none p-1"
                 >
                   &times;
                 </button>
@@ -2308,7 +1790,7 @@ export default function RoomPage() {
 
               <form onSubmit={handleSubmitCustomCard} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-black uppercase tracking-wider text-[#010101] mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
                     Card Category
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -2324,10 +1806,10 @@ export default function RoomPage() {
                           sound.playClick();
                           setCustomCardType(cat.id);
                         }}
-                        className={`py-2 rounded-xl border-2 border-[#010101] text-xs font-black transition-all ${
+                        className={`py-2 rounded-xl border text-xs font-semibold transition-all ${
                           customCardType === cat.id
-                            ? 'bg-[#FEC90E] text-[#010101] shadow-[2px_2px_0px_#010101]'
-                            : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
+                            ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                            : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
                         }`}
                       >
                         {cat.label}
@@ -2337,7 +1819,7 @@ export default function RoomPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-black uppercase tracking-wider text-[#010101] mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
                     Your Party Prompt / Challenge (English)
                   </label>
                   <textarea
@@ -2347,9 +1829,9 @@ export default function RoomPage() {
                     onChange={(e) => setCustomCardPrompt(e.target.value)}
                     placeholder="e.g., Who is most likely to win a reality TV show? or Do an impression of your favorite movie villain..."
                     required
-                    className="w-full bg-[#F8F8F8] border-2 border-[#010101] focus:border-[#0B89FD] rounded-xl p-3 text-[#010101] text-xs font-bold outline-none resize-none leading-relaxed"
+                    className="w-full bg-gray-50 border border-gray-200 focus:border-blue-600 rounded-xl p-3 text-gray-900 text-xs font-medium outline-none resize-none leading-relaxed"
                   />
-                  <div className="text-right text-[10px] text-[#010101]/50 mt-1 font-bold">
+                  <div className="text-right text-[10px] text-gray-400 mt-1 font-medium">
                     {customCardPrompt.length}/160
                   </div>
                 </div>
@@ -2357,10 +1839,10 @@ export default function RoomPage() {
                 <button
                   type="submit"
                   disabled={isSubmittingCard || !customCardPrompt.trim()}
-                  className="w-full py-3.5 rounded-2xl bg-[#0B89FD] hover:bg-[#0977db] text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all disabled:opacity-50"
+                  className="w-full h-11 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition-all disabled:opacity-50"
                 >
                   <Sparkles className="w-4 h-4" />
-                  <span>{isSubmittingCard ? 'Injecting Card...' : 'Add to Match Rotation'}</span>
+                  <span>{isSubmittingCard ? 'Adding Card...' : 'Add to Match Rotation'}</span>
                 </button>
               </form>
             </motion.div>
@@ -2376,19 +1858,6 @@ export default function RoomPage() {
         isHost={Boolean(isHost)}
         onSave={handleSaveSettings}
       />
-
-      {/* TACTICAL SABOTAGE POWER-UP DRAWER (DURING ACTIVE MATCHES) */}
-      {(room.status === 'in_game' || room.status === 'playing') && currentPlayer && (
-        <SabotageDrawer
-          room={room}
-          currentPlayer={currentPlayer}
-          hasUsedPowerUp={hasUsedSabotage}
-          onUsePowerUp={handleUseSabotage}
-        />
-      )}
-
-      {/* FLOATING EMOJI REACTIONS OVERLAY */}
-      <FloatingReactions />
     </div>
   );
 }

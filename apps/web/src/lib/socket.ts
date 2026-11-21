@@ -643,6 +643,20 @@ class AblySocketBridge {
       })
         .then((res) => res.json())
         .then((res) => {
+          if (res && res.success) {
+            if (res.privateRole) {
+              this.dispatch('private_role', res.privateRole);
+            }
+            if (res.gameState) {
+              this.dispatch('game_state_sync', {
+                gameMode: res.room?.config?.gameMode || 'who_is_imposter',
+                state: res.gameState
+              });
+            }
+            if (res.room) {
+              this.dispatch('room_updated', res.room);
+            }
+          }
           if (callback) callback(res);
         })
         .catch((err) => {

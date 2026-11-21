@@ -6,7 +6,7 @@ import {
   Bomb,
   Clock,
   Send,
-  Sparkles
+  ArrowRight
 } from 'lucide-react';
 import {
   HotPotatoPublicState,
@@ -31,7 +31,7 @@ export function HotPotatoGameView({
   players,
   currentPlayerId,
   isHost,
-  vibeMode,
+  vibeMode: _vibeMode,
   onAction
 }: HotPotatoGameViewProps) {
   const [wordInput, setWordInput] = useState('');
@@ -39,7 +39,7 @@ export function HotPotatoGameView({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const isHoldingBomb = currentPlayerId === state.activeHolderId;
-  const currentHolder = players.find((p) => p.id === state.activeHolderId);
+  const _currentHolder = players.find((p) => p.id === state.activeHolderId);
 
   // Auto-focus input when bomb passes to current player
   useEffect(() => {
@@ -105,78 +105,78 @@ export function HotPotatoGameView({
     : null;
 
   return (
-    <div className="flex flex-col h-full w-full max-w-4xl mx-auto px-2 sm:px-4 py-2 select-none">
+    <div className="flex flex-col h-full w-full max-w-md mx-auto px-2 sm:px-4 py-2 overflow-x-hidden select-none">
       {/* 1. TOP HEADER */}
-      <div className="flex items-center justify-between mb-3 px-1">
+      <div className="flex items-center justify-between mb-4 px-1">
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-[#FFFFFF] text-[#010101] border-2 border-[#010101] flex items-center gap-1.5 shadow-[2px_2px_0px_#010101]">
+          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white border border-gray-200 text-gray-800 flex items-center gap-1.5 shadow-sm">
             <GameIcon gameMode="hot_potato" size="xs" />
-            Round {state.round} / {state.totalRounds}
+            Round {state.round} of {state.totalRounds}
           </span>
-          <span className="px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-[#FEC90E] text-[#010101] border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
+          <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
             Passes: {state.passCount} ⚡
           </span>
         </div>
 
         {/* URGENT FUSE TIMER */}
         <div
-          className={`flex items-center gap-1.5 px-3.5 py-1 rounded-full border-2 border-[#010101] text-xs font-black tracking-wider shadow-[2px_2px_0px_#010101] transition-all ${
+          className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold transition-all ${
             state.remainingSeconds <= 3
-              ? 'bg-[#FD3F01] text-white animate-bounce'
-              : 'bg-[#FFFFFF] text-[#FD3F01]'
+              ? 'bg-red-50 text-red-600 border-red-200 animate-pulse'
+              : 'bg-white text-gray-800 border-gray-200 shadow-sm'
           }`}
         >
-          <Clock strokeWidth={2.5} className="w-3.5 h-3.5 shrink-0" />
-          <span>{state.remainingSeconds}s FUSE</span>
+          <Clock className={`w-3.5 h-3.5 ${state.remainingSeconds <= 3 ? 'text-red-500' : 'text-blue-600'}`} />
+          <span>{state.remainingSeconds}s Fuse</span>
         </div>
       </div>
 
       {/* 2. CATEGORY CARD */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.96 }}
+        initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-[#FFFFFF] p-4 sm:p-6 rounded-2xl md:rounded-3xl border-2 border-[#010101] text-center relative overflow-hidden mb-3 shadow-[4px_4px_0px_#010101]"
+        className="bg-white p-6 sm:p-7 rounded-2xl border border-gray-200 text-center relative overflow-hidden mb-4 shadow-sm"
       >
-        <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.25em] text-[#FD3F01] block mb-1">
+        <span className="text-xs font-semibold uppercase tracking-wider text-rose-600 block mb-1">
           Rapid Category • Type &amp; Pass Quick!
         </span>
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-[#010101] tracking-tight leading-snug">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight leading-snug">
           &ldquo;{state.category}&rdquo;
         </h2>
       </motion.div>
 
       {/* 3. ACTIVE BOMB HOLDER SPOTLIGHT */}
       {state.phase === 'bomb_ticking' && (
-        <div className="flex-1 flex flex-col items-center justify-between">
+        <div className="flex-1 flex flex-col items-center justify-between gap-4 py-2">
           <div className="flex flex-col items-center my-auto">
             {/* The Animated Bomb */}
             <motion.div
               animate={{
-                scale: isHoldingBomb ? [1, 1.14, 1] : [1, 1.05, 1],
-                rotate: isHoldingBomb ? [-3, 3, -3] : [0, 0, 0]
+                scale: isHoldingBomb ? [1, 1.1, 1] : [1, 1.04, 1],
+                rotate: isHoldingBomb ? [-2, 2, -2] : [0, 0, 0]
               }}
               transition={{ duration: 0.35, repeat: Infinity }}
-              className={`relative w-28 h-28 sm:w-36 sm:h-36 rounded-full flex items-center justify-center border-4 border-[#010101] transition-all ${
+              className={`relative w-28 h-28 sm:w-32 sm:h-32 rounded-full flex items-center justify-center border transition-all ${
                 isHoldingBomb
-                  ? 'bg-[#FD3F01] shadow-[6px_6px_0px_#010101]'
-                  : 'bg-[#FFFFFF] shadow-[4px_4px_0px_#010101]'
+                  ? 'bg-rose-50 border-rose-400 shadow-lg ring-4 ring-rose-200'
+                  : 'bg-white border-gray-200 shadow-sm'
               }`}
             >
               <Bomb
-                className={`w-14 h-14 sm:w-18 sm:h-18 ${
-                  isHoldingBomb ? 'text-white' : 'text-[#FD3F01]'
+                className={`w-14 h-14 ${
+                  isHoldingBomb ? 'text-rose-600 animate-pulse' : 'text-gray-700'
                 }`}
               />
-              {/* Sizzling Fuse Spark */}
-              <div className="absolute -top-3 -right-2 text-xl animate-spin">
+              {/* Sizzling Spark */}
+              <div className="absolute -top-2 -right-1 text-lg animate-spin">
                 💥
               </div>
             </motion.div>
 
             {/* Holder Identity */}
-            <div className="mt-4 flex items-center gap-2.5 bg-[#FFFFFF] px-4 py-2 rounded-2xl border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
+            <div className="mt-4 flex items-center gap-2.5 bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-sm">
               <NeonAvatarDisplay avatarId={state.activeHolderAvatar} size="sm" showGlow={false} />
-              <span className="text-base sm:text-lg font-black text-[#010101]">
+              <span className="text-sm sm:text-base font-bold text-gray-900">
                 {state.activeHolderUsername} {isHoldingBomb && '(YOU HAVE THE BOMB!)'}
               </span>
             </div>
@@ -186,40 +186,40 @@ export function HotPotatoGameView({
           {isHoldingBomb ? (
             <motion.form
               onSubmit={handlePassBomb}
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="w-full max-w-lg flex gap-2 pb-2"
+              className="w-full max-w-md flex flex-col sm:flex-row gap-2 pb-2"
             >
               <input
                 ref={inputRef}
                 type="text"
                 value={wordInput}
                 onChange={(e) => setWordInput(e.target.value)}
-                placeholder="Type category item & hit PASS!..."
-                className="flex-1 px-4 py-3 rounded-2xl bg-[#FFFFFF] border-2 border-[#010101] text-[#010101] font-bold text-sm sm:text-base focus:outline-none shadow-[4px_4px_0px_#010101] placeholder-[#010101]/40"
+                placeholder="Type answer & tap Pass Bomb..."
+                className="w-full flex-1 h-12 px-4 rounded-xl bg-white border border-gray-300 text-gray-900 font-medium text-sm focus:outline-none focus:border-blue-600 shadow-sm placeholder-gray-400"
               />
               <button
                 type="submit"
                 disabled={!wordInput.trim() || isSubmitting}
-                className="bg-[#0B89FD] hover:bg-[#0977db] text-white px-6 py-3 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-wider flex items-center gap-1.5 border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all disabled:opacity-50"
+                className="w-full sm:w-auto h-12 bg-blue-600 hover:bg-blue-700 text-white px-5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all disabled:opacity-50 shrink-0"
               >
-                <span>PASS</span>
-                <Send strokeWidth={2.5} className="w-3.5 h-3.5 shrink-0" />
+                <span>Pass Bomb</span>
+                <Send className="w-3.5 h-3.5 shrink-0" />
               </button>
             </motion.form>
           ) : (
-            <div className="text-center py-3 text-xs font-black text-[#010101]/70">
-              ⚡ Waiting for {state.activeHolderUsername} to pass the ticking bomb...
+            <div className="text-center py-2 text-xs font-medium text-gray-500">
+              ⚡ Waiting for {state.activeHolderUsername} to type an answer and pass the bomb...
             </div>
           )}
 
           {/* Recent Words Ticker */}
           {state.recentWords && state.recentWords.length > 0 && (
-            <div className="w-full max-w-lg flex flex-wrap gap-1.5 justify-center mt-2">
+            <div className="w-full max-w-md flex flex-wrap gap-1.5 justify-center mt-1">
               {state.recentWords.slice(-5).map((w, idx) => (
                 <span
                   key={idx}
-                  className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-[#FFFFFF] border border-[#010101] text-[#010101] shadow-[1px_1px_0px_#010101]"
+                  className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200"
                 >
                   ✓ {w}
                 </span>
@@ -229,26 +229,26 @@ export function HotPotatoGameView({
         </div>
       )}
 
-      {/* 4. EXPLODED PHASE: SCREEN SHAKE & ROAST CONSEQUENCE */}
+      {/* 4. EXPLODED PHASE: SCREEN SHAKE & CONSEQUENCE */}
       {(state.phase === 'exploded' || state.phase === 'round_results') && (
         <AnimatePresence>
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="flex-1 flex flex-col items-center justify-center text-center p-6 bg-[#FFFFFF] rounded-3xl border-3 border-[#010101] shadow-[8px_8px_0px_#010101]"
+            className="flex-1 flex flex-col items-center justify-center text-center p-6 sm:p-8 bg-white rounded-2xl border border-gray-200 shadow-sm"
           >
-            <div className="text-6xl mb-2 animate-bounce">💥</div>
-            <h3 className="text-2xl sm:text-3xl font-black text-[#FD3F01] mb-2 uppercase tracking-tight">
+            <div className="text-5xl mb-2">💥</div>
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-rose-600 mb-2 uppercase tracking-tight">
               KABOOM! Bomb Exploded!
             </h3>
 
             {victimPlayer && (
               <div className="flex flex-col items-center my-3">
                 <NeonAvatarDisplay avatarId={victimPlayer.avatar} size="md" showGlow={false} />
-                <span className="text-lg font-black text-[#010101] mt-2">
-                  {victimPlayer.username} got caught holding the potato!
+                <span className="text-base sm:text-lg font-bold text-gray-900 mt-2">
+                  {victimPlayer.username} got caught holding the bomb!
                 </span>
-                <div className="mt-2 px-3 py-1 rounded-full bg-[#FD3F01] text-white border-2 border-[#010101] text-xs font-black shadow-[2px_2px_0px_#010101]">
+                <div className="mt-2 px-3 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-xs font-semibold">
                   Consequence: 2 Sips Penalty 🥤
                 </div>
               </div>
@@ -257,10 +257,10 @@ export function HotPotatoGameView({
             {isHost && (
               <button
                 onClick={handleNextRound}
-                className="mt-4 px-8 py-3.5 rounded-2xl bg-[#0B89FD] hover:bg-[#0977db] text-white font-black text-sm uppercase tracking-wider flex items-center gap-2 border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all"
+                className="mt-4 h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm flex items-center gap-2 shadow-sm transition-all"
               >
-                <Sparkles strokeWidth={2.5} className="w-4 h-4 text-[#FEC90E] shrink-0" />
-                <span>Next Round →</span>
+                <span>Next Round</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
             )}
           </motion.div>

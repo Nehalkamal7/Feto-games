@@ -16,44 +16,32 @@ interface SabotagePowerUpInfo {
   icon: string;
   tagline: string;
   description: string;
-  colorBorder: string;
-  colorGlow: string;
-  colorBg: string;
 }
 
 const SABOTAGE_POWERUPS: SabotagePowerUpInfo[] = [
   {
     type: 'blindfold',
     name: 'Blindfold',
-    badge: '5S BLUR',
+    badge: '5S Blur',
     icon: '🕶️',
     tagline: 'Screen Fog of War',
-    description: 'Blurs your target’s entire screen for 5 seconds while they draw, guess, or type!',
-    colorBorder: 'border-2 border-[#010101]',
-    colorGlow: 'shadow-[4px_4px_0px_#010101]',
-    colorBg: 'bg-[#F8F8F8]'
+    description: 'Blurs your target’s entire screen for 5 seconds while they draw, guess, or type!'
   },
   {
     type: 'double_trouble',
     name: 'Double Trouble',
-    badge: '2X PENALTY',
+    badge: '2X Penalty',
     icon: '🔥',
     tagline: 'Double Points & Sips',
-    description: 'Doubles points lost or Sip penalties on the target for the current round!',
-    colorBorder: 'border-2 border-[#010101]',
-    colorGlow: 'shadow-[4px_4px_0px_#010101]',
-    colorBg: 'bg-[#F8F8F8]'
+    description: 'Doubles points lost or Sip penalties on the target for the current round!'
   },
   {
     type: 'steal_turn',
     name: 'Steal Turn',
-    badge: 'HOT SEAT PASS',
+    badge: 'Turn Swap',
     icon: '⚡',
     tagline: 'Pass the Pressure',
-    description: 'Forces target player into the hot seat or ticking bomb immediately!',
-    colorBorder: 'border-2 border-[#010101]',
-    colorGlow: 'shadow-[4px_4px_0px_#010101]',
-    colorBg: 'bg-[#F8F8F8]'
+    description: 'Forces target player into the hot seat or ticking bomb immediately!'
   }
 ];
 
@@ -103,7 +91,7 @@ export function SabotageDrawer({
 
   return (
     <>
-      {/* FLOATING TRIGGER BUTTON (MOBILE-FIRST BOTTOM LEFT) */}
+      {/* FLOATING TRIGGER BUTTON (BOTTOM LEFT) */}
       <div className="fixed bottom-3 sm:bottom-4 left-3 sm:left-4 z-40 safe-bottom safe-left">
         <button
           onClick={() => {
@@ -111,14 +99,14 @@ export function SabotageDrawer({
             setIsOpen(true);
           }}
           disabled={hasUsedPowerUp}
-          className={`flex items-center gap-2 px-3.5 py-2.5 rounded-2xl font-black text-xs uppercase tracking-wider border-2 border-[#010101] transition-all touch-target ${
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl font-semibold text-xs tracking-wide border transition-all ${
             hasUsedPowerUp
-              ? 'bg-[#E5E5E5] text-[#010101]/40 border-[#010101]/30 cursor-not-allowed opacity-60'
-              : 'bg-[#FD3F01] hover:bg-[#e03700] text-white shadow-[3px_3px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#010101]'
+              ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60'
+              : 'bg-white hover:bg-gray-50 text-gray-800 border-gray-200 shadow-sm active:scale-95'
           }`}
           aria-label="Open Sabotage Power-Ups Drawer"
         >
-          <Zap className="w-4 h-4 text-[#FEC90E] fill-current" />
+          <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
           <span>{hasUsedPowerUp ? 'Sabotage Used' : 'Sabotage ⚡'}</span>
         </button>
       </div>
@@ -126,26 +114,26 @@ export function SabotageDrawer({
       {/* SABOTAGE MODAL DRAWER OVERLAY */}
       <AnimatePresence>
         {isOpen && (
-          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-[#010101]/80 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-gray-900/50 backdrop-blur-sm">
             <motion.div
               initial={{ y: '100%', opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: '100%', opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 280 }}
-              className="w-full max-w-lg bg-[#FFFFFF] border-t-3 sm:border-3 border-[#010101] rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 shadow-[8px_8px_0px_#010101] relative text-[#010101] max-h-[85vh] overflow-y-auto"
+              className="w-full max-w-lg bg-white border border-gray-200 rounded-t-2xl sm:rounded-2xl p-5 sm:p-6 shadow-xl relative text-gray-900 max-h-[85vh] overflow-y-auto"
             >
               {/* Header */}
-              <div className="flex items-center justify-between pb-3 border-b-2 border-[#010101]/10 mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-xl bg-[#FD3F01] text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101]">
-                    <Zap className="w-5 h-5 fill-current" />
+              <div className="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center">
+                    <Zap className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="text-base sm:text-lg font-black uppercase tracking-wider text-[#010101]">
+                    <h3 className="text-base font-bold text-gray-900">
                       Tactical Sabotage
                     </h3>
-                    <p className="text-[11px] text-[#010101]/70 font-medium">
-                      1 Single-Use Chaos Card Per Match • Unleash on any opponent
+                    <p className="text-xs text-gray-500">
+                      1 single-use card per match • Target an opponent
                     </p>
                   </div>
                 </div>
@@ -156,54 +144,51 @@ export function SabotageDrawer({
                     setIsOpen(false);
                     setSelectedType(null);
                   }}
-                  className="p-2 rounded-xl bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white text-[#010101] border-2 border-[#010101] shadow-[2px_2px_0px_#010101]"
+                  className="w-8 h-8 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 flex items-center justify-center transition-colors"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
 
               {errorMsg && (
-                <div className="mb-4 p-3 rounded-xl bg-[#FD3F01]/10 border-2 border-[#FD3F01] text-[#FD3F01] text-xs font-black">
+                <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
                   {errorMsg}
                 </div>
               )}
 
               {/* STEP 1: SELECT POWER-UP CARD */}
               {!selectedType ? (
-                <div className="space-y-3">
-                  <div className="text-xs font-black uppercase tracking-wider text-[#010101] mb-2">
-                    Select Your Chaos Power-Up:
+                <div className="space-y-2.5">
+                  <div className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">
+                    Select Your Power-Up:
                   </div>
 
                   {SABOTAGE_POWERUPS.map((pu) => (
                     <button
                       key={pu.type}
                       onClick={() => handleSelectPowerUp(pu.type)}
-                      className={`w-full text-left p-4 rounded-2xl ${pu.colorBorder} ${pu.colorBg} ${pu.colorGlow} hover:bg-[#FFFFFF] transition-all flex items-center justify-between group active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101]`}
+                      className="w-full text-left p-3.5 rounded-xl border border-gray-200 bg-gray-50 hover:bg-white hover:border-blue-300 hover:shadow-xs transition-all flex items-center justify-between group"
                     >
                       <div className="flex items-start gap-3">
-                        <div
-                          className="min-w-[44px] min-h-[44px] w-11 h-11 rounded-xl bg-[#FFFFFF] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] inline-flex items-center justify-center shrink-0 text-2xl select-none"
-                          style={{ fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif' }}
-                        >
+                        <div className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center shrink-0 text-xl shadow-xs">
                           {pu.icon}
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-black text-sm text-[#010101] transition-colors">
+                            <span className="font-bold text-sm text-gray-900">
                               {pu.name}
                             </span>
-                            <span className="px-2 py-0.5 rounded-full bg-[#FD3F01] text-white border border-[#010101] text-[9px] font-black uppercase tracking-widest font-mono">
+                            <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-semibold">
                               {pu.badge}
                             </span>
                           </div>
-                          <p className="text-xs text-[#010101]/70 mt-1 leading-relaxed font-medium">
+                          <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">
                             {pu.description}
                           </p>
                         </div>
                       </div>
 
-                      <ChevronRight className="w-5 h-5 text-[#010101] group-hover:text-[#FD3F01] shrink-0 ml-2" strokeWidth={2.5} />
+                      <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 shrink-0 ml-2 transition-colors" />
                     </button>
                   ))}
                 </div>
@@ -212,57 +197,52 @@ export function SabotageDrawer({
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-xs text-[#010101]/70 uppercase font-black block">Targeting:</span>
-                      <span className="text-sm font-black text-[#FD3F01] flex items-center gap-1.5 mt-0.5">
+                      <span className="text-xs text-gray-500 uppercase font-semibold block">Targeting:</span>
+                      <span className="text-sm font-bold text-gray-900 flex items-center gap-1.5 mt-0.5">
                         <span>{SABOTAGE_POWERUPS.find((p) => p.type === selectedType)?.name}</span>
-                        <span
-                          className="min-w-[28px] min-h-[28px] w-7 h-7 rounded-lg bg-[#FFFFFF] border-2 border-[#010101] shadow-[1px_1px_0px_#010101] inline-flex items-center justify-center shrink-0 text-base"
-                          style={{ fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif' }}
-                        >
-                          {SABOTAGE_POWERUPS.find((p) => p.type === selectedType)?.icon}
-                        </span>
+                        <span>{SABOTAGE_POWERUPS.find((p) => p.type === selectedType)?.icon}</span>
                       </span>
                     </div>
 
                     <button
                       onClick={() => setSelectedType(null)}
-                      className="text-xs text-[#0B89FD] hover:underline font-black"
+                      className="text-xs text-blue-600 hover:underline font-semibold"
                     >
                       Change Power-Up
                     </button>
                   </div>
 
-                  <div className="text-xs font-black uppercase tracking-wider text-[#010101]">
-                    Choose Opponent To Sabotage ({opponents.length} Available):
+                  <div className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    Choose Opponent ({opponents.length} Available):
                   </div>
 
                   {opponents.length === 0 ? (
-                    <div className="p-4 rounded-2xl bg-[#F8F8F8] border-2 border-[#010101] text-center text-xs text-[#010101]/70 font-medium">
+                    <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 text-center text-xs text-gray-500">
                       Need at least 1 other player in the room to unleash sabotage!
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-56 overflow-y-auto pr-1">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1">
                       {opponents.map((opp) => (
                         <button
                           key={opp.id}
                           onClick={() => handleExecuteSabotage(opp.id)}
                           disabled={isSubmitting}
-                          className="p-3 rounded-xl bg-[#FFFFFF] hover:bg-[#F8F8F8] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] text-left flex items-center justify-between transition-all group active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0px_#010101]"
+                          className="p-3 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-left flex items-center justify-between transition-all group shadow-xs"
                         >
                           <div className="flex items-center gap-2.5 truncate">
                             <NeonAvatarDisplay avatarId={opp.avatar} size="sm" showGlow={false} />
                             <div className="truncate">
-                              <span className="text-xs font-black text-[#010101] truncate block">
+                              <span className="text-xs font-semibold text-gray-900 truncate block">
                                 {opp.username}
                               </span>
-                              <span className="text-[10px] text-[#010101]/70 font-mono font-bold">
+                              <span className="text-[10px] text-gray-500 font-mono">
                                 {opp.score || 0} pts
                               </span>
                             </div>
                           </div>
 
-                          <span className="text-[10px] font-black uppercase text-white bg-[#FD3F01] px-2 py-0.5 rounded border border-[#010101]">
-                            STRIKE ⚡
+                          <span className="text-[10px] font-semibold uppercase text-white bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded-lg">
+                            Strike ⚡
                           </span>
                         </button>
                       ))}

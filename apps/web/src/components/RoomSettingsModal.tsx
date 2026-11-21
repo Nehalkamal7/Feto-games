@@ -48,7 +48,6 @@ export function RoomSettingsModal({
   const [pin, setPin] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
-  // Sync state when room config changes
   useEffect(() => {
     setRoomName(room.roomName || `Room ${room.code}`);
     setMaxPlayers(room.config.maxPlayers || 15);
@@ -86,28 +85,28 @@ export function RoomSettingsModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#010101]/80 backdrop-blur-sm">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-gray-900/50 backdrop-blur-sm">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
           transition={{ duration: 0.18, ease: 'easeOut' }}
-          className="relative w-full max-w-lg bg-[#FFFFFF] border-3 border-[#010101] rounded-3xl shadow-[8px_8px_0px_#010101] overflow-hidden flex flex-col max-h-[90vh]"
+          className="relative w-full max-w-lg bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh] text-gray-900"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b-2 border-[#010101] bg-[#F8F8F8]">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-white">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-[#0B89FD] text-white border-2 border-[#010101] inline-flex items-center justify-center shrink-0 shadow-[2px_2px_0px_#010101]">
-                <Settings className="w-5 h-5 text-white shrink-0" strokeWidth={2.5} />
+              <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                <Settings className="w-4 h-4" />
               </div>
               <div>
-                <h2 className="text-base font-black text-[#010101] tracking-wide flex items-center gap-2">
+                <h2 className="text-base font-bold text-gray-900 tracking-tight flex items-center gap-2">
                   <span>Room Settings</span>
-                  <span className="font-mono text-xs px-2 py-0.5 rounded-full bg-[#FEC90E] border-2 border-[#010101] text-[#010101] font-black">
+                  <span className="font-mono text-xs px-2 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 font-bold">
                     {room.code}
                   </span>
                 </h2>
-                <p className="text-[11px] text-[#010101]/70 font-medium">
+                <p className="text-xs text-gray-500">
                   {isHost ? 'Live adjustments instantly synced to all screens' : 'View match rules set by the host'}
                 </p>
               </div>
@@ -117,10 +116,10 @@ export function RoomSettingsModal({
                 sound.playClick();
                 onClose();
               }}
-              className="w-9 h-9 inline-flex items-center justify-center shrink-0 rounded-xl bg-[#FFFFFF] hover:bg-[#FD3F01] hover:text-white border-2 border-[#010101] shadow-[2px_2px_0px_#010101] text-[#010101] transition-colors touch-manipulation font-black"
+              className="w-8 h-8 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 flex items-center justify-center transition-colors"
               aria-label="Close modal"
             >
-              <X className="w-4 h-4 shrink-0" strokeWidth={2.5} />
+              <X className="w-4 h-4" />
             </button>
           </div>
 
@@ -128,7 +127,7 @@ export function RoomSettingsModal({
           <form onSubmit={handleSubmit} className="p-5 space-y-4 overflow-y-auto flex-1">
             {/* 1. Room Name */}
             <div>
-              <label className="block text-[11px] font-black uppercase tracking-wider text-[#010101] mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
                 Room Name
               </label>
               <input
@@ -138,14 +137,14 @@ export function RoomSettingsModal({
                 onChange={(e) => setRoomName(e.target.value)}
                 maxLength={30}
                 placeholder="Friday Night Party Hub"
-                className="w-full bg-[#F8F8F8] border-2 border-[#010101] focus:border-[#0B89FD] rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-bold text-[#010101] outline-none transition-colors disabled:opacity-60"
+                className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-blue-500 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-gray-900 outline-none transition-colors disabled:opacity-60"
               />
             </div>
 
-            {/* 2. Vibe Mode (3 authentic choices) */}
+            {/* 2. Vibe Mode */}
             <div>
-              <label className="block text-[11px] font-black uppercase tracking-wider text-[#010101] mb-1.5 flex items-center gap-1.5">
-                <Flame className="w-3.5 h-3.5 text-[#FD3F01]" />
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5 flex items-center gap-1.5">
+                <Flame className="w-3.5 h-3.5 text-amber-500" />
                 <span>Vibe Mode</span>
               </label>
               <div className="grid grid-cols-3 gap-2">
@@ -164,14 +163,14 @@ export function RoomSettingsModal({
                         sound.playClick();
                         setVibeMode(v.id as VibeMode);
                       }}
-                      className={`p-2.5 rounded-xl border-2 border-[#010101] text-left flex flex-col justify-between transition-all touch-manipulation min-h-[56px] ${
+                      className={`p-2.5 rounded-xl border text-left flex flex-col justify-between transition-all min-h-[56px] ${
                         isSelected
-                          ? 'bg-[#0B89FD] text-white shadow-[2px_2px_0px_#010101]'
-                          : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
+                          ? 'border-blue-500 bg-blue-50 text-blue-900 ring-2 ring-blue-500/20'
+                          : 'border-gray-200 bg-white text-gray-800 hover:bg-gray-50'
                       } ${!isHost ? 'cursor-default' : 'cursor-pointer'}`}
                     >
-                      <span className="text-sm font-emoji">{v.icon}</span>
-                      <span className="text-[11px] font-black mt-1 truncate">{v.label}</span>
+                      <span className="text-sm">{v.icon}</span>
+                      <span className="text-xs font-semibold mt-1 truncate">{v.label}</span>
                     </button>
                   );
                 })}
@@ -182,8 +181,8 @@ export function RoomSettingsModal({
             <div className="grid grid-cols-2 gap-3">
               {/* Round Timer */}
               <div>
-                <label className="block text-[11px] font-black uppercase tracking-wider text-[#010101] mb-1.5 flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-[#0B89FD]" />
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5 flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-blue-600" />
                   <span>Timer (Seconds)</span>
                 </label>
                 <div className="grid grid-cols-4 gap-1">
@@ -196,10 +195,10 @@ export function RoomSettingsModal({
                         sound.playClick();
                         setRoundTimer(sec);
                       }}
-                      className={`py-2 rounded-xl border-2 border-[#010101] text-xs font-mono font-black transition-all touch-manipulation ${
+                      className={`py-1.5 rounded-xl border text-xs font-mono font-semibold transition-all ${
                         roundTimer === sec
-                          ? 'bg-[#0B89FD] text-white shadow-[2px_2px_0px_#010101]'
-                          : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
+                          ? 'border-blue-500 bg-blue-600 text-white'
+                          : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
                       } ${!isHost ? 'cursor-default' : 'cursor-pointer'}`}
                     >
                       {sec}s
@@ -210,8 +209,8 @@ export function RoomSettingsModal({
 
               {/* Rounds per Game */}
               <div>
-                <label className="block text-[11px] font-black uppercase tracking-wider text-[#010101] mb-1.5 flex items-center gap-1.5">
-                  <RotateCcw className="w-3.5 h-3.5 text-[#FEC90E]" />
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5 flex items-center gap-1.5">
+                  <RotateCcw className="w-3.5 h-3.5 text-amber-500" />
                   <span>Rounds per Game</span>
                 </label>
                 <div className="grid grid-cols-4 gap-1">
@@ -224,10 +223,10 @@ export function RoomSettingsModal({
                         sound.playClick();
                         setTotalRounds(r);
                       }}
-                      className={`py-2 rounded-xl border-2 border-[#010101] text-xs font-mono font-black transition-all touch-manipulation ${
+                      className={`py-1.5 rounded-xl border text-xs font-mono font-semibold transition-all ${
                         totalRounds === r
-                          ? 'bg-[#FEC90E] text-[#010101] shadow-[2px_2px_0px_#010101]'
-                          : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
+                          ? 'border-blue-500 bg-blue-600 text-white'
+                          : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
                       } ${!isHost ? 'cursor-default' : 'cursor-pointer'}`}
                     >
                       {r}
@@ -240,11 +239,11 @@ export function RoomSettingsModal({
             {/* 4. Max Players Capacity */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-[11px] font-black uppercase tracking-wider text-[#010101] flex items-center gap-1.5">
-                  <Users className="w-3.5 h-3.5 text-[#010101]" />
+                <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 flex items-center gap-1.5">
+                  <Users className="w-3.5 h-3.5 text-gray-600" />
                   <span>Player Limit (2–15)</span>
                 </label>
-                <span className="font-mono text-xs text-[#0B89FD] font-black">
+                <span className="font-mono text-xs text-blue-600 font-bold">
                   {maxPlayers} Players Max
                 </span>
               </div>
@@ -258,10 +257,10 @@ export function RoomSettingsModal({
                       sound.playClick();
                       setMaxPlayers(cnt);
                     }}
-                    className={`py-1.5 rounded-xl border-2 border-[#010101] text-xs font-mono font-black transition-all touch-manipulation ${
+                    className={`py-1.5 rounded-xl border text-xs font-mono font-semibold transition-all ${
                       maxPlayers === cnt
-                        ? 'bg-[#FEC90E] text-[#010101] shadow-[2px_2px_0px_#010101]'
-                        : 'bg-[#FFFFFF] text-[#010101] hover:bg-[#F8F8F8]'
+                        ? 'border-blue-500 bg-blue-50 text-blue-800 ring-2 ring-blue-500/20'
+                        : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
                     } ${!isHost ? 'cursor-default' : 'cursor-pointer'}`}
                   >
                     {cnt}p
@@ -271,22 +270,22 @@ export function RoomSettingsModal({
             </div>
 
             {/* 5. Public / Private Room & PIN Protection */}
-            <div className="p-3.5 rounded-2xl bg-[#F8F8F8] border-2 border-[#010101] shadow-[2px_2px_0px_#010101] space-y-3">
+            <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {isPrivate ? (
-                    <Lock className="w-4 h-4 text-[#FD3F01]" />
+                    <Lock className="w-4 h-4 text-amber-500" />
                   ) : (
-                    <Globe className="w-4 h-4 text-[#0B89FD]" />
+                    <Globe className="w-4 h-4 text-blue-600" />
                   )}
                   <div>
-                    <div className="text-xs font-black text-[#010101]">
-                      {isPrivate ? 'Private Room (PIN / Direct Link Only)' : 'Public Room (Visible in Quick Match)'}
+                    <div className="text-xs font-semibold text-gray-900">
+                      {isPrivate ? 'Private Room (PIN / Direct Link Only)' : 'Public Room (Visible in Directory)'}
                     </div>
-                    <div className="text-[10px] text-[#010101]/70 font-medium">
+                    <div className="text-[11px] text-gray-500 font-normal">
                       {isPrivate
-                        ? 'Strangers cannot auto-join via Quick Play'
-                        : 'Open to quick matching party gamers'}
+                        ? 'Players require 4-digit PIN to enter'
+                        : 'Open to quick matching players'}
                     </div>
                   </div>
                 </div>
@@ -298,10 +297,10 @@ export function RoomSettingsModal({
                       sound.playClick();
                       setIsPrivate(!isPrivate);
                     }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all touch-manipulation border-2 border-[#010101] ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border ${
                       isPrivate
-                        ? 'bg-[#FD3F01] text-white shadow-[2px_2px_0px_#010101]'
-                        : 'bg-[#0B89FD] text-white shadow-[2px_2px_0px_#010101]'
+                        ? 'bg-amber-50 text-amber-800 border-amber-200'
+                        : 'bg-blue-50 text-blue-800 border-blue-200'
                     }`}
                   >
                     {isPrivate ? 'Make Public' : 'Make Private'}
@@ -310,8 +309,8 @@ export function RoomSettingsModal({
               </div>
 
               {isPrivate && isHost && (
-                <div className="pt-2 border-t-2 border-[#010101]/10">
-                  <label className="block text-[10px] font-black text-[#010101] uppercase mb-1">
+                <div className="pt-2 border-t border-gray-200">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
                     Optional 4-Digit Entry PIN
                   </label>
                   <input
@@ -320,7 +319,7 @@ export function RoomSettingsModal({
                     value={pin}
                     onChange={(e) => setPin(e.target.value.replace(/[^0-9]/g, ''))}
                     placeholder="Leave empty for no PIN"
-                    className="w-full bg-[#FFFFFF] border-2 border-[#010101] focus:border-[#FEC90E] rounded-xl px-3 py-2 text-xs font-mono font-black text-[#010101] outline-none"
+                    className="w-full bg-white border border-gray-200 focus:border-blue-500 rounded-xl px-3 py-1.5 text-xs font-mono font-bold text-gray-900 outline-none"
                   />
                 </div>
               )}
@@ -335,28 +334,28 @@ export function RoomSettingsModal({
                     sound.playClick();
                     onClose();
                   }}
-                  className="px-4 py-2.5 rounded-xl border-2 border-[#010101] shadow-[2px_2px_0px_#010101] bg-[#FFFFFF] hover:bg-[#F8F8F8] text-[#010101] text-xs font-black transition-all touch-manipulation"
+                  className="px-4 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs font-semibold transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="px-5 py-2.5 rounded-xl bg-[#0B89FD] hover:bg-[#0977db] text-white text-xs font-black flex items-center gap-1.5 border-2 border-[#010101] shadow-[4px_4px_0px_#010101] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#010101] transition-all touch-manipulation disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-all disabled:opacity-50"
                 >
                   {isSaving ? (
                     <span>Saving...</span>
                   ) : (
                     <>
-                      <Check className="w-4 h-4 stroke-[3]" />
-                      <span>Save & Broadcast</span>
+                      <Check className="w-4 h-4" />
+                      <span>Save & Sync</span>
                     </>
                   )}
                 </button>
               </div>
             ) : (
               <div className="text-center py-1">
-                <p className="text-[11px] text-[#010101]/60 italic font-medium">
+                <p className="text-xs text-gray-400 italic font-medium">
                   Only the room host can modify these settings.
                 </p>
               </div>

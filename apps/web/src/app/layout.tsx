@@ -4,32 +4,30 @@ import './globals.css';
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://fetogames.com'),
   title: {
-    default: 'FETO GAMES — 15-Player Chaotic Party Games Online',
+    default: 'FETO GAMES — 15-Player Party Games Online',
     template: '%s | FETO GAMES'
   },
   description:
-    'The ultimate free online party game arcade! Play with up to 15 friends or strangers on mobile or desktop with Zero Downloads: Imposter, Draw & Guess, Quiz Battle, Word Battle, Truth or Dare, Hot Potato & more.',
+    'Play instant online party games with friends on mobile or desktop: Imposter, Draw & Guess, Quiz Battle, Word Battle, Truth or Dare, Hot Potato & more. Zero downloads, 100% free.',
   keywords: [
     'party games',
     'multiplayer party games',
     'free browser games',
-    'jackbox online free',
     'imposter party game',
     'draw and guess online',
     'feto games',
     'mobile party games',
-    'sip edition',
     'hot potato game',
     '15 player game'
   ],
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
+    statusBarStyle: 'default',
     title: 'FETO GAMES'
   },
   openGraph: {
-    title: 'FETO GAMES — 15-Player Chaotic Party Games Online',
+    title: 'FETO GAMES — 15-Player Party Games Online',
     description:
       'Jump into instant party rooms with up to 15 players on mobile or desktop! Zero Downloads • 10 Full Party Games • 100% Free.',
     url: 'https://fetogames.com',
@@ -39,7 +37,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FETO GAMES — 15-Player Chaotic Party Games Online',
+    title: 'FETO GAMES — 15-Player Party Games Online',
     description:
       'Jump into instant party rooms with up to 15 players on mobile or desktop! Zero Downloads • 10 Full Party Games • 100% Free.',
     creator: '@fetogames'
@@ -57,7 +55,7 @@ export const viewport: Viewport = {
   userScalable: false,
   viewportFit: 'cover',
   interactiveWidget: 'resizes-content',
-  themeColor: '#07080f'
+  themeColor: '#F9FAFB'
 };
 
 export default function RootLayout({
@@ -66,8 +64,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className="min-h-[100dvh] bg-[#07080f] text-slate-100 antialiased selection:bg-cyan-500 selection:text-black">
+    <html lang="en" className="bg-[#F9FAFB]">
+      <body className="min-h-[100dvh] w-full bg-[#F9FAFB] text-gray-900 antialiased selection:bg-blue-600 selection:text-white overflow-x-hidden">
         {children}
       </body>
     </html>
