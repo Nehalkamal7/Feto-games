@@ -167,9 +167,40 @@ const PUBLIC_ROOMS_SET = 'feto:rooms:public';
 const STATS_KEY = 'feto:stats:live';
 const DEFAULT_ROOM_TTL_SECONDS = 7200; // 2 hours
 
+const ROOM_CODE_ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+
+/**
+ * Generates a clean 6-character uppercase alphanumeric room code
+ * using unambiguous characters (no 'I', 'O', '1', '0').
+ * Example: K8M4P2, 94X7B1
+ */
+export function generateRoomCode(length = 6): string {
+  let code = '';
+  for (let i = 0; i < length; i++) {
+    code += ROOM_CODE_ALPHABET.charAt(Math.floor(Math.random() * ROOM_CODE_ALPHABET.length));
+  }
+  return code;
+}
+
+/**
+ * Normalizes any incoming room code by removing whitespace, hyphens,
+ * and legacy "FG-" prefixes to guarantee 100% reliable lookups.
+ */
+export function normalizeRoomCode(code: string): string {
+  return (code || '')
+    .toUpperCase()
+    .trim()
+    .replace(/^FG-?/i, '')
+    .replace(/[^A-Z0-9]/g, '');
+}
+
 export async function getRoomState(code: string): Promise<RoomState | null> {
-  const normalized = code.toUpperCase().trim();
-  const raw = await redis.get<RoomState>(`${ROOM_KEY_PREFIX}${normalized}`);
+  const normalized = normalizeRoomCode(code);
+  if (!normalized) return null;
+  let raw = await redis.get<RoomState>(`${ROOM_KEY_PREFIX}${normalized}`);
+  if (!raw && !code.startsWith('FG-')) {
+    raw = await redis.get<RoomState>(`${ROOM_KEY_PREFIX}FG-${normalized}`);
+  }
   return raw || null;
 }
 
@@ -177,7 +208,8 @@ export async function saveRoomState(
   room: RoomState,
   ttlSeconds = DEFAULT_ROOM_TTL_SECONDS
 ): Promise<void> {
-  const normalized = room.code.toUpperCase().trim();
+  const normalized = normalizeRoomCode(room.code);
+  room.code = normalized;
   const key = `${ROOM_KEY_PREFIX}${normalized}`;
   const playersHashKey = `room:${normalized}:players`;
 
@@ -234,7 +266,7 @@ export async function removePlayerFromRoomHash(code: string, playerId: string): 
 }
 
 export async function deleteRoomState(code: string): Promise<void> {
-  const normalized = code.toUpperCase().trim();
+  const normalized = normalizeRoomCode(code);
   await redis.del(`${ROOM_KEY_PREFIX}${normalized}`);
   await redis.del(`room:${normalized}:players`);
   await redis.del(`feto:room:${normalized}:players`);
@@ -242,18 +274,21 @@ export async function deleteRoomState(code: string): Promise<void> {
 }
 
 export async function addPublicRoomDirectory(item: PublicRoomDirectoryItem | string): Promise<void> {
-  const code = (typeof item === 'string' ? item : item.code).toUpperCase().trim();
+  const rawCode = typeof item === 'string' ? item : item.code;
+  const code = normalizeRoomCode(rawCode);
   // Clean any old entries for this room code first to prevent duplicates
   await removePublicRoomDirectory(code);
-  const jsonStr = typeof item === 'string' ? JSON.stringify({ code }) : JSON.stringify(item);
+  const normalizedItem = typeof item === 'string' ? { code } : { ...item, code };
+  const jsonStr = JSON.stringify(normalizedItem);
   await (redis as any).sadd(PUBLIC_ROOMS_SET, code);
   await (redis as any).sadd(PUBLIC_ROOMS_SET, jsonStr);
 }
 
 export async function removePublicRoomDirectory(code: string): Promise<void> {
-  const normalized = code.toUpperCase().trim();
+  const normalized = normalizeRoomCode(code);
   try {
     await (redis as any).srem(PUBLIC_ROOMS_SET, normalized);
+    await (redis as any).srem(PUBLIC_ROOMS_SET, `FG-${normalized}`);
     const members = await (redis as any).smembers(PUBLIC_ROOMS_SET);
     if (!members || members.length === 0) return;
 

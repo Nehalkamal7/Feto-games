@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { CreateRoomDTO, Player, RoomConfig, RoomState } from '@feto-games/shared-types';
-import { addPublicRoomDirectory, getRoomState, sanitizeRoomState, saveRoomState } from '@/lib/redis';
+import {
+  addPublicRoomDirectory,
+  generateRoomCode,
+  getRoomState,
+  normalizeRoomCode,
+  sanitizeRoomState,
+  saveRoomState
+} from '@/lib/redis';
 import { nanoid } from 'nanoid';
 
 export const dynamic = 'force-dynamic';
-
-function generateRoomCode(): string {
-  const characters = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-  let suffix = '';
-  for (let i = 0; i < 4; i++) {
-    suffix += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return `FG-${suffix}`;
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,15 +24,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Generate unique room code with collision prevention
-    let roomCode = generateRoomCode();
+    // Generate unique 6-character alphanumeric room code with collision prevention
+    let roomCode = generateRoomCode(6);
     let attempts = 0;
-    while (attempts < 5) {
+    while (attempts < 8) {
       const existing = await getRoomState(roomCode);
       if (!existing) break;
-      roomCode = generateRoomCode();
+      roomCode = generateRoomCode(6);
       attempts++;
     }
+    roomCode = normalizeRoomCode(roomCode);
 
     const playerId = (body as any).playerId
       ? String((body as any).playerId).trim()
@@ -114,6 +113,11 @@ export async function POST(req: NextRequest) {
     // Return immediately (< 500ms) so frontend redirects swiftly to /room/[code]
     return NextResponse.json({
       success: true,
+      roomCode,
+      playerId,
+      sessionToken,
+      reconnectToken: sessionToken,
+      room: publicRoom,
       data: {
         roomCode,
         playerId,

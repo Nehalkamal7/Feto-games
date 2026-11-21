@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getRoomState, removePlayerFromRoomHash, sanitizeRoomState, saveRoomState } from '@/lib/redis';
+import { getRoomState, normalizeRoomCode, removePlayerFromRoomHash, sanitizeRoomState, saveRoomState } from '@/lib/redis';
 import { publishToPlayer, publishToRoom } from '@/lib/ably-server';
 
 export const dynamic = 'force-dynamic';
@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
-    const roomCode = (body.roomCode || '').toUpperCase().trim();
+    const roomCode = normalizeRoomCode(body.roomCode || '');
     const playerId = body.playerId ? String(body.playerId).trim() : '';
     const targetPlayerId = body.targetPlayerId ? String(body.targetPlayerId).trim() : '';
     const reason = body.reason || 'You were removed from the room by the host.';

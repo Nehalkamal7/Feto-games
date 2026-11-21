@@ -31,6 +31,18 @@ let activeRoomCode: string = '';
 let activePlayerId: string = '';
 
 /**
+ * Normalizes any room code to a clean uppercase alphanumeric format
+ * (stripping any "FG-" prefix and hyphens/whitespace).
+ */
+export const cleanRoomCode = (code: string): string => {
+  return (code || '')
+    .toUpperCase()
+    .trim()
+    .replace(/^FG-?/i, '')
+    .replace(/[^A-Z0-9]/g, '');
+};
+
+/**
  * Returns a single persistent playerId (UUID) stored in sessionStorage per browser tab.
  * Guarantees that React StrictMode double-mounts, re-renders, or page refreshes
  * NEVER create a duplicate second player with the same nickname.
@@ -38,12 +50,13 @@ let activePlayerId: string = '';
 export const getPersistentPlayerId = (): string => {
   if (typeof window === 'undefined') return 'usr_server';
   try {
-    let pid = sessionStorage.getItem(PERSISTENT_PLAYER_ID_KEY);
+    let pid = sessionStorage.getItem(PERSISTENT_PLAYER_ID_KEY) || localStorage.getItem(PERSISTENT_PLAYER_ID_KEY);
     if (!pid) {
       pid = typeof crypto !== 'undefined' && crypto.randomUUID
         ? `usr_${crypto.randomUUID().replace(/-/g, '').slice(0, 12)}`
         : `usr_${Math.random().toString(36).substring(2, 10)}${Date.now().toString(36).slice(-4)}`;
       sessionStorage.setItem(PERSISTENT_PLAYER_ID_KEY, pid);
+      localStorage.setItem(PERSISTENT_PLAYER_ID_KEY, pid);
     }
     return pid;
   } catch {
@@ -51,23 +64,49 @@ export const getPersistentPlayerId = (): string => {
   }
 };
 
-export const saveReconnectSession = (roomCode: string, token: string, playerId: string): void => {
+export const saveReconnectSession = (
+  roomCode: string,
+  token: string,
+  playerId: string,
+  nickname?: string
+): void => {
   if (typeof window === 'undefined') return;
-  activeRoomCode = roomCode.toUpperCase();
+  const cleanCode = cleanRoomCode(roomCode);
+  activeRoomCode = cleanCode;
   activePlayerId = playerId;
   try {
     sessionStorage.setItem(PERSISTENT_PLAYER_ID_KEY, playerId);
-    sessionStorage.setItem(`${SESSION_TOKEN_KEY}${roomCode.toUpperCase()}`, token);
-    sessionStorage.setItem(`${SESSION_PLAYER_ID_KEY}${roomCode.toUpperCase()}`, playerId);
+    sessionStorage.setItem(`${SESSION_TOKEN_KEY}${cleanCode}`, token);
+    sessionStorage.setItem(`${SESSION_PLAYER_ID_KEY}${cleanCode}`, playerId);
+    sessionStorage.setItem('feto_active_room_code', cleanCode);
+
+    // localStorage backup for reliable cross-page and reload persistence
+    localStorage.setItem(PERSISTENT_PLAYER_ID_KEY, playerId);
+    localStorage.setItem(`${SESSION_TOKEN_KEY}${cleanCode}`, token);
+    localStorage.setItem(`${SESSION_PLAYER_ID_KEY}${cleanCode}`, playerId);
+    localStorage.setItem(`feto_player_${cleanCode}`, playerId);
+    localStorage.setItem(`feto_token_${cleanCode}`, token);
+    localStorage.setItem('feto_active_room_code', cleanCode);
+
+    if (nickname) {
+      sessionStorage.setItem('feto_username', nickname);
+      localStorage.setItem('feto_username', nickname);
+    }
   } catch (err) {
-    console.error('Failed to save session token in sessionStorage:', err);
+    console.error('Failed to save session token in storage:', err);
   }
 };
 
 export const getReconnectToken = (roomCode: string): string | null => {
   if (typeof window === 'undefined') return null;
+  const cleanCode = cleanRoomCode(roomCode);
   try {
-    return sessionStorage.getItem(`${SESSION_TOKEN_KEY}${roomCode.toUpperCase()}`);
+    return (
+      sessionStorage.getItem(`${SESSION_TOKEN_KEY}${cleanCode}`) ||
+      localStorage.getItem(`${SESSION_TOKEN_KEY}${cleanCode}`) ||
+      localStorage.getItem(`feto_token_${cleanCode}`) ||
+      null
+    );
   } catch {
     return null;
   }
@@ -75,12 +114,21 @@ export const getReconnectToken = (roomCode: string): string | null => {
 
 export const getSavedPlayerId = (roomCode?: string): string | null => {
   if (typeof window === 'undefined') return activePlayerId || null;
+  const cleanCode = roomCode ? cleanRoomCode(roomCode) : '';
   try {
-    if (roomCode) {
-      const roomPid = sessionStorage.getItem(`${SESSION_PLAYER_ID_KEY}${roomCode.toUpperCase()}`);
+    if (cleanCode) {
+      const roomPid =
+        sessionStorage.getItem(`${SESSION_PLAYER_ID_KEY}${cleanCode}`) ||
+        localStorage.getItem(`${SESSION_PLAYER_ID_KEY}${cleanCode}`) ||
+        localStorage.getItem(`feto_player_${cleanCode}`);
       if (roomPid) return roomPid;
     }
-    return sessionStorage.getItem(PERSISTENT_PLAYER_ID_KEY) || activePlayerId || null;
+    return (
+      sessionStorage.getItem(PERSISTENT_PLAYER_ID_KEY) ||
+      localStorage.getItem(PERSISTENT_PLAYER_ID_KEY) ||
+      activePlayerId ||
+      null
+    );
   } catch {
     return activePlayerId || null;
   }
@@ -88,9 +136,14 @@ export const getSavedPlayerId = (roomCode?: string): string | null => {
 
 export const clearReconnectSession = (roomCode: string): void => {
   if (typeof window === 'undefined') return;
+  const cleanCode = cleanRoomCode(roomCode);
   try {
-    sessionStorage.removeItem(`${SESSION_TOKEN_KEY}${roomCode.toUpperCase()}`);
-    sessionStorage.removeItem(`${SESSION_PLAYER_ID_KEY}${roomCode.toUpperCase()}`);
+    sessionStorage.removeItem(`${SESSION_TOKEN_KEY}${cleanCode}`);
+    sessionStorage.removeItem(`${SESSION_PLAYER_ID_KEY}${cleanCode}`);
+    localStorage.removeItem(`${SESSION_TOKEN_KEY}${cleanCode}`);
+    localStorage.removeItem(`${SESSION_PLAYER_ID_KEY}${cleanCode}`);
+    localStorage.removeItem(`feto_player_${cleanCode}`);
+    localStorage.removeItem(`feto_token_${cleanCode}`);
   } catch (err) {
     console.error('Failed to clear session token:', err);
   }
@@ -110,13 +163,38 @@ export async function socketCreateRoom(dto: CreateRoomDTO): Promise<CreateRoomRe
 
   const json = await res.json();
   if (!json.success) {
-    throw new Error(json.error?.message || 'Failed to create room.');
+    throw new Error(json.error?.message || json.message || 'Failed to create room.');
   }
 
-  saveReconnectSession(json.data.roomCode, json.data.reconnectToken, json.data.player.id);
-  getSocket().bindRoom(json.data.roomCode, json.data.player.id);
+  const cleanCode = cleanRoomCode(json.roomCode || json.data?.roomCode || json.room?.code || json.data?.room?.code);
+  const reconnectToken = json.reconnectToken || json.sessionToken || json.data?.reconnectToken || json.data?.sessionToken;
+  const playerId = json.playerId || json.data?.playerId || json.data?.player?.id || persistentPid;
+  const nickname = dto.username || json.data?.player?.username;
 
-  return json.data;
+  saveReconnectSession(cleanCode, reconnectToken, playerId, nickname);
+  getSocket().bindRoom(cleanCode, playerId);
+
+  const responseData: CreateRoomResponse = json.data || {
+    roomCode: cleanCode,
+    playerId,
+    sessionToken: reconnectToken,
+    reconnectToken,
+    player: {
+      id: playerId,
+      username: nickname,
+      avatar: dto.avatar || 'cyber_cat',
+      isHost: true,
+      isReady: true,
+      isSpectator: false,
+      score: 0,
+      connectionStatus: 'connected',
+      graceExpiresAt: null,
+      joinedAt: Date.now()
+    },
+    room: json.room
+  };
+
+  return responseData;
 }
 
 export async function socketJoinRoom(dto: JoinRoomDTO): Promise<JoinRoomResponse> {
@@ -129,13 +207,27 @@ export async function socketJoinRoom(dto: JoinRoomDTO): Promise<JoinRoomResponse
 
   const json = await res.json();
   if (!json.success) {
-    throw new Error(json.error?.message || 'Failed to join room.');
+    throw new Error(json.error?.message || json.message || 'Failed to join room.');
   }
 
-  saveReconnectSession(json.data.roomCode, json.data.reconnectToken, json.data.player.id);
-  getSocket().bindRoom(json.data.roomCode, json.data.player.id);
+  const cleanCode = cleanRoomCode(json.roomCode || json.data?.roomCode || json.room?.code || json.data?.room?.code);
+  const reconnectToken = json.reconnectToken || json.sessionToken || json.data?.reconnectToken || json.data?.sessionToken;
+  const playerId = json.playerId || json.data?.playerId || json.data?.player?.id || persistentPid;
+  const nickname = dto.username || json.data?.player?.username;
 
-  return json.data;
+  saveReconnectSession(cleanCode, reconnectToken, playerId, nickname);
+  getSocket().bindRoom(cleanCode, playerId);
+
+  return (
+    json.data || {
+      roomCode: cleanCode,
+      playerId,
+      sessionToken: reconnectToken,
+      reconnectToken,
+      player: json.player,
+      room: json.room
+    }
+  );
 }
 
 export async function socketReconnectRoom(dto: ReconnectDTO): Promise<ReconnectResponse> {
@@ -393,9 +485,9 @@ export async function socketQuickPlay(dto: { username: string; avatar: any }): P
 function getActiveRoomCode(): string {
   if (typeof window !== 'undefined') {
     const match = window.location.pathname.match(/\/room\/([a-zA-Z0-9_-]+)/);
-    if (match) return match[1].toUpperCase();
+    if (match) return cleanRoomCode(match[1]);
   }
-  return activeRoomCode;
+  return cleanRoomCode(activeRoomCode);
 }
 
 // ==========================================
@@ -421,7 +513,7 @@ class AblySocketBridge {
   }
 
   public bindRoom(roomCode: string, playerId?: string) {
-    const normalized = roomCode.toUpperCase().trim();
+    const normalized = cleanRoomCode(roomCode);
     const effectivePlayerId = playerId || this.boundPlayerId || getPersistentPlayerId();
 
     if (this.boundRoomCode === normalized && this.isSubscribed && effectivePlayerId === this.boundPlayerId) {

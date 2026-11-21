@@ -61,7 +61,7 @@ export type PublicRoomConfig = Omit<RoomConfig, 'pinHash'>;
  * Full server-authoritative Room State stored in Redis.
  */
 export interface RoomState {
-  code: string; // e.g. "FG-8492"
+  code: string; // e.g. "K8M4P2" (clean 6-character alphanumeric code)
   roomName?: string; // Optional custom room title
   hostId: string; // ID of current host player
   status: RoomStatus;

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { JoinRoomDTO, Player, PlayerSummary } from '@feto-games/shared-types';
-import { getRoomState, saveRoomState, sanitizeRoomState } from '@/lib/redis';
+import { getRoomState, saveRoomState, sanitizeRoomState, normalizeRoomCode } from '@/lib/redis';
 import { publishToRoom } from '@/lib/ably-server';
 import { nanoid } from 'nanoid';
 
@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   try {
     const body: JoinRoomDTO = await req.json();
 
-    const roomCode = (body.roomCode || '').toUpperCase().trim();
+    const roomCode = normalizeRoomCode(body.roomCode || '');
     if (!roomCode) {
       return NextResponse.json(
         { success: false, error: { message: 'Room code is required.' } },
@@ -169,6 +169,12 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      roomCode,
+      playerId,
+      sessionToken,
+      reconnectToken: sessionToken,
+      player: playerSummary,
+      room: publicRoom,
       data: {
         roomCode,
         playerId,

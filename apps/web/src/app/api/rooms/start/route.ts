@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getRoomState, removePublicRoomDirectory, sanitizeRoomState, saveRoomState } from '@/lib/redis';
+import { getRoomState, normalizeRoomCode, removePublicRoomDirectory, sanitizeRoomState, saveRoomState } from '@/lib/redis';
 import { publishToPlayer, publishToRoom } from '@/lib/ably-server';
 import { initGameSession } from '@/lib/game-engine';
 
@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
-    const roomCode = (body.roomCode || '').toUpperCase().trim();
+    const roomCode = normalizeRoomCode(body.roomCode || '');
     const playerId = body.playerId ? String(body.playerId).trim() : '';
     const isSoloDevMode = Boolean(body.isSoloDevMode);
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getRoomState, sanitizeRoomState } from '@/lib/redis';
+import { getRoomState, normalizeRoomCode, sanitizeRoomState } from '@/lib/redis';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,7 +9,7 @@ export async function GET(
 ) {
   try {
     const rawCode = params?.code || '';
-    const roomCode = rawCode.toUpperCase().trim();
+    const roomCode = normalizeRoomCode(rawCode);
 
     if (!roomCode) {
       return NextResponse.json(

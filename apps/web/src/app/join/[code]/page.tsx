@@ -18,14 +18,14 @@ import {
 import { BrandLogo } from '@/components/BrandLogo';
 import { NeonAvatarDisplay } from '@/components/NeonAvatarDisplay';
 import { NeonAvatarId, NEON_AVATARS } from '@feto-games/shared-types';
-import { getReconnectToken, socketJoinRoom } from '@/lib/socket';
+import { cleanRoomCode, getReconnectToken, socketJoinRoom } from '@/lib/socket';
 import { PINNED_NICKNAMES, rollDynamicNicknames } from '@/lib/nicknames';
 import { sound } from '@/lib/sound';
 
 export default function FastJoinPage() {
   const params = useParams();
   const router = useRouter();
-  const roomCode = ((params?.code as string) || '').toUpperCase().trim();
+  const roomCode = cleanRoomCode((params?.code as string) || '');
 
   const [username, setUsername] = useState('');
   const [avatar, setAvatar] = useState<NeonAvatarId>('cyber_cat');

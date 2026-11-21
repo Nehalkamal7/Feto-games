@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { deleteRoomState, getRoomState, sanitizeRoomState, saveRoomState } from '@/lib/redis';
+import { deleteRoomState, getRoomState, normalizeRoomCode, sanitizeRoomState, saveRoomState } from '@/lib/redis';
 import { publishToRoom } from '@/lib/ably-server';
 
 export const dynamic = 'force-dynamic';
@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const roomCode = (body.roomCode || '').toUpperCase().trim();
+    const roomCode = normalizeRoomCode(body.roomCode || '');
     const playerId = body.playerId;
 
     if (!roomCode || !playerId) {

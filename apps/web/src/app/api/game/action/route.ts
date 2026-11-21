@@ -3,6 +3,7 @@ import {
   acquireLock,
   addPublicRoomDirectory,
   getRoomState,
+  normalizeRoomCode,
   removePublicRoomDirectory,
   sanitizeRoomState,
   saveRoomState
@@ -21,7 +22,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const roomCode = (body.roomCode || '').toUpperCase().trim();
+    const roomCode = normalizeRoomCode(body.roomCode || '');
     const playerId = body.playerId;
     const actionType = body.actionType;
     const payload = body.payload || {};

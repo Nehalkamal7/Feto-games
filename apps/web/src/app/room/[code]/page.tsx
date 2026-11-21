@@ -59,6 +59,7 @@ import { SipOrSpillGameView } from '@/components/games/SipOrSpillGameView';
 import { SillyRouletteGameView } from '@/components/games/SillyRouletteGameView';
 import { HotPotatoGameView } from '@/components/games/HotPotatoGameView';
 import {
+  cleanRoomCode,
   clearReconnectSession,
   getReconnectToken,
   getSocket,
@@ -77,7 +78,7 @@ import { sound } from '@/lib/sound';
 export default function RoomPage() {
   const params = useParams();
   const router = useRouter();
-  const roomCode = ((params?.code as string) || '').toUpperCase().trim();
+  const roomCode = cleanRoomCode((params?.code as string) || '');
 
   // Room & Player State
   const [room, setRoom] = useState<PublicRoomState | null>(null);
@@ -293,18 +294,86 @@ export default function RoomPage() {
 
     const socket = getSocket();
 
+    // 1. Immediate REST fetch to hydrate room state and current player
+    const fetchInitialRoomState = async () => {
+      try {
+        const storedPid =
+          (typeof window !== 'undefined' &&
+            (sessionStorage.getItem(`feto_player_id_${roomCode}`) ||
+              localStorage.getItem(`feto_player_${roomCode}`) ||
+              sessionStorage.getItem('feto_persistent_player_id') ||
+              localStorage.getItem('feto_persistent_player_id'))) ||
+          '';
+
+        const res = await fetch(`/api/rooms/${roomCode}${storedPid ? `?playerId=${storedPid}` : ''}`);
+        if (!res.ok) {
+          if (res.status === 404) {
+            setIsInitializing(false);
+            setErrorMessage('Room not found or expired.');
+            setTimeout(() => router.push('/'), 2500);
+          }
+          return;
+        }
+
+        const json = await res.json();
+        if (json.success && json.room) {
+          setRoom(json.room);
+          setIsInitializing(false);
+
+          if (json.privateRole) {
+            setPrivateRole(json.privateRole);
+          }
+
+          // Check if stored player is in this room
+          const matchedPlayer = json.room.players?.find(
+            (p: PlayerSummary) => p.id === storedPid
+          ) || (json.room.spectators && (json.room.spectators as any)[storedPid]);
+
+          if (matchedPlayer) {
+            setCurrentPlayer(matchedPlayer);
+            setShowJoinModal(false);
+          } else {
+            // Player is not currently in room, attempt auto-join if nickname exists
+            const defaultName = typeof window !== 'undefined' ? (localStorage.getItem('feto_username') || localStorage.getItem('feto_default_name')) : null;
+            const defaultAvatar = typeof window !== 'undefined' ? (localStorage.getItem('feto_avatar') || localStorage.getItem('feto_default_avatar') || 'cyber_cat') as NeonAvatarId : 'cyber_cat';
+
+            if (defaultName) {
+              socketJoinRoom({ roomCode, username: defaultName, avatar: defaultAvatar }).catch(() => {
+                setShowJoinModal(true);
+              });
+            } else {
+              setShowJoinModal(true);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to fetch initial room state:', err);
+      }
+    };
+
+    fetchInitialRoomState();
+
     const attemptReconnectionOrModal = () => {
       const storedToken = getReconnectToken(roomCode);
-      const storedPlayerId = typeof window !== 'undefined' ? localStorage.getItem(`feto_player_${roomCode}`) : null;
+      const storedPlayerId =
+        (typeof window !== 'undefined' &&
+          (localStorage.getItem(`feto_player_${roomCode}`) ||
+            sessionStorage.getItem(`feto_player_id_${roomCode}`) ||
+            localStorage.getItem('feto_persistent_player_id') ||
+            sessionStorage.getItem('feto_persistent_player_id'))) ||
+        null;
 
       if (storedToken && storedPlayerId) {
-        socketReconnectRoom({ reconnectToken: storedToken });
+        socketReconnectRoom({ reconnectToken: storedToken }).catch(() => {});
       } else {
-        const defaultName = typeof window !== 'undefined' ? localStorage.getItem('feto_default_name') : null;
-        const defaultAvatar = typeof window !== 'undefined' ? (localStorage.getItem('feto_default_avatar') as NeonAvatarId) : null;
+        const defaultName = typeof window !== 'undefined' ? (localStorage.getItem('feto_username') || localStorage.getItem('feto_default_name')) : null;
+        const defaultAvatar = typeof window !== 'undefined' ? (localStorage.getItem('feto_avatar') || localStorage.getItem('feto_default_avatar') || 'cyber_cat') as NeonAvatarId : 'cyber_cat';
 
         if (defaultName) {
-          socketJoinRoom({ roomCode, username: defaultName, avatar: defaultAvatar || 'cyber_cat' });
+          socketJoinRoom({ roomCode, username: defaultName, avatar: defaultAvatar }).catch(() => {
+            setShowJoinModal(true);
+            setIsInitializing(false);
+          });
         } else {
           setShowJoinModal(true);
           setIsInitializing(false);
@@ -323,8 +392,17 @@ export default function RoomPage() {
       setShowJoinModal(false);
       setRoom(newRoom);
 
-      const socketId = socket.id;
-      const foundPlayer = newRoom.players.find((p) => (p as any).socketId === socketId || p.id === currentPlayer?.id);
+      const storedPid =
+        (typeof window !== 'undefined' &&
+          (localStorage.getItem(`feto_player_${roomCode}`) ||
+            sessionStorage.getItem(`feto_player_id_${roomCode}`) ||
+            sessionStorage.getItem('feto_persistent_player_id') ||
+            localStorage.getItem('feto_persistent_player_id'))) ||
+        '';
+
+      const foundPlayer = newRoom.players.find(
+        (p) => p.id === currentPlayer?.id || p.id === storedPid || (p as any).socketId === socket.id
+      );
       if (foundPlayer) {
         setCurrentPlayer(foundPlayer);
         localStorage.setItem(`feto_player_${roomCode}`, foundPlayer.id);

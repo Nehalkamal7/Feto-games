@@ -34,7 +34,7 @@ import {
   PublicRoomDirectoryItem,
   VibeMode
 } from '@feto-games/shared-types';
-import { socketCreateRoom, socketJoinRoom, socketQuickPlay } from '@/lib/socket';
+import { cleanRoomCode, socketCreateRoom, socketJoinRoom, socketQuickPlay } from '@/lib/socket';
 import { PINNED_NICKNAMES } from '@/lib/nicknames';
 import { sound } from '@/lib/sound';
 
@@ -169,9 +169,13 @@ export default function HomePage() {
 
   // Quick Play Matchmaking
   const handleQuickPlay = async () => {
-    if (!username.trim()) {
-      setErrorMessage('Please enter your player nickname.');
-      return;
+    let playerName = username.trim();
+    if (!playerName) {
+      playerName = PINNED_NICKNAMES[0];
+      setUsername(playerName);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('feto_username', playerName);
+      }
     }
     setIsQuickPlaying(true);
     setErrorMessage(null);
@@ -179,12 +183,13 @@ export default function HomePage() {
 
     try {
       const res = await socketQuickPlay({
-        username: username.trim(),
+        username: playerName,
         avatar: selectedAvatar
       });
-      router.push(`/room/${res.roomCode}`);
+      const targetCode = cleanRoomCode(res.roomCode);
+      router.push(`/room/${targetCode}`);
     } catch (err: any) {
-      setErrorMessage(err.message || 'Quick play matchmaking failed. Creating new room...');
+      setErrorMessage(err.message || 'Quick play matchmaking failed.');
       setIsQuickPlaying(false);
     }
   };
@@ -192,9 +197,13 @@ export default function HomePage() {
   // Create Room Submission
   const handleCreateRoom = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username.trim()) {
-      setErrorMessage('Please enter your player nickname.');
-      return;
+    let hostName = username.trim();
+    if (!hostName) {
+      hostName = PINNED_NICKNAMES[0];
+      setUsername(hostName);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('feto_username', hostName);
+      }
     }
     if (isPrivate && pin.trim().length !== 4) {
       setErrorMessage('Private rooms require a 4-digit numeric PIN.');
@@ -207,7 +216,7 @@ export default function HomePage() {
 
     try {
       const res = await socketCreateRoom({
-        username: username.trim(),
+        username: hostName,
         avatar: selectedAvatar,
         maxPlayers,
         isPrivate,
@@ -220,8 +229,14 @@ export default function HomePage() {
         isTeamMode
       });
 
-      router.push(`/room/${res.roomCode}`);
+      const targetCode = cleanRoomCode(res.roomCode || (res as any).room?.code);
+      if (!targetCode) {
+        throw new Error('Room created, but room code was missing.');
+      }
+
+      router.push(`/room/${targetCode}`);
     } catch (err: any) {
+      console.error('Failed to create room:', err);
       setErrorMessage(err.message || 'Failed to create room.');
       setIsLoading(false);
     }
@@ -230,18 +245,19 @@ export default function HomePage() {
   // Join Room Submission
   const handleJoinRoom = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username.trim()) {
-      setErrorMessage('Please enter your player nickname.');
-      return;
+    let playerName = username.trim();
+    if (!playerName) {
+      playerName = PINNED_NICKNAMES[0];
+      setUsername(playerName);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('feto_username', playerName);
+      }
     }
 
-    let code = joinCode.toUpperCase().trim();
-    if (!code) {
-      setErrorMessage('Please enter a 6-character room code.');
+    const code = cleanRoomCode(joinCode);
+    if (!code || code.length < 4) {
+      setErrorMessage('Please enter a valid 6-character room code.');
       return;
-    }
-    if (!code.startsWith('FG-') && code.length === 4) {
-      code = `FG-${code}`;
     }
 
     setIsLoading(true);
@@ -251,12 +267,13 @@ export default function HomePage() {
     try {
       const res = await socketJoinRoom({
         roomCode: code,
-        username: username.trim(),
+        username: playerName,
         avatar: selectedAvatar,
         pin: joinPin.trim() || undefined
       });
 
-      router.push(`/room/${res.roomCode}`);
+      const targetCode = cleanRoomCode(res.roomCode || (res as any).room?.code || code);
+      router.push(`/room/${targetCode}`);
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to join room.');
       setIsLoading(false);
@@ -517,6 +534,35 @@ export default function HomePage() {
               </div>
 
               <form onSubmit={handleCreateRoom} className="space-y-4 sm:space-y-5">
+                <AnimatePresence>
+                  {errorMessage && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs flex items-center gap-2"
+                    >
+                      <ShieldAlert className="w-4 h-4 text-red-500 shrink-0" />
+                      <span>{errorMessage}</span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Host Nickname */}
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
+                    Host Nickname
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={20}
+                    value={username}
+                    onChange={(e) => handleUsernameChange(e.target.value)}
+                    placeholder="Enter your nickname..."
+                    className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 rounded-xl px-4 py-2.5 text-gray-900 text-sm font-semibold outline-none"
+                  />
+                </div>
+
                 {/* Select Game Mode */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
@@ -684,10 +730,13 @@ export default function HomePage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full h-12 rounded-xl font-semibold text-sm text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all flex items-center justify-center gap-2"
+                  className="w-full h-12 rounded-xl font-semibold text-sm text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Creating Room...</span>
+                    </>
                   ) : (
                     <>
                       <Plus className="w-4 h-4" />
@@ -731,14 +780,28 @@ export default function HomePage() {
               </div>
 
               <form onSubmit={handleJoinRoom} className="space-y-4">
+                <AnimatePresence>
+                  {errorMessage && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs flex items-center gap-2"
+                    >
+                      <ShieldAlert className="w-4 h-4 text-red-500 shrink-0" />
+                      <span>{errorMessage}</span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
-                    Room Code
+                    Enter 6-character room code
                   </label>
                   <input
                     type="text"
-                    maxLength={7}
-                    placeholder="FG-XXXX"
+                    maxLength={8}
+                    placeholder="e.g. K8M4P2"
                     value={joinCode}
                     onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                     className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 rounded-xl px-4 py-3 text-gray-900 text-center font-mono font-bold tracking-widest text-2xl outline-none"
@@ -762,10 +825,13 @@ export default function HomePage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full h-12 rounded-xl font-semibold text-sm text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all flex items-center justify-center gap-2"
+                  className="w-full h-12 rounded-xl font-semibold text-sm text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Joining Room...</span>
+                    </>
                   ) : (
                     <>
                       <ArrowRight className="w-4 h-4 text-white" />

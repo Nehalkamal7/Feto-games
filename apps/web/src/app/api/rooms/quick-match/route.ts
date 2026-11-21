@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
   addPublicRoomDirectory,
+  generateRoomCode,
   getPublicRoomDirectory,
   getRoomState,
+  normalizeRoomCode,
   sanitizeRoomState,
   saveRoomState
 } from '@/lib/redis';
@@ -10,15 +12,6 @@ import { GameMode, Player, RoomConfig, RoomState } from '@feto-games/shared-type
 import { nanoid } from 'nanoid';
 
 export const dynamic = 'force-dynamic';
-
-function generateRoomCode(): string {
-  const characters = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-  let suffix = '';
-  for (let i = 0; i < 4; i++) {
-    suffix += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return `FG-${suffix}`;
-}
 
 const PARTY_GAME_MODES: GameMode[] = [
   'most_likely_to',
@@ -67,14 +60,15 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. If no open public room is available, create a fresh public 15-player room
-    let roomCode = generateRoomCode();
+    let roomCode = generateRoomCode(6);
     let attempts = 0;
-    while (attempts < 5) {
+    while (attempts < 8) {
       const existing = await getRoomState(roomCode);
       if (!existing) break;
-      roomCode = generateRoomCode();
+      roomCode = generateRoomCode(6);
       attempts++;
     }
+    roomCode = normalizeRoomCode(roomCode);
 
     const playerId = body.playerId ? String(body.playerId).trim() : `usr_${nanoid(10)}`;
     const sessionToken = `ssn_${nanoid(24)}`;
@@ -146,6 +140,12 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      roomCode,
+      isNewRoom: true,
+      playerId,
+      sessionToken,
+      reconnectToken: sessionToken,
+      room: publicRoom,
       data: {
         roomCode,
         isNewRoom: true,
