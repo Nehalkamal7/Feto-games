@@ -64,7 +64,10 @@ export async function POST(req: NextRequest) {
     await publishToRoom(roomCode, 'room:state', publicRoom);
     await publishToRoom(roomCode, 'room:updated', publicRoom);
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json(
+      { success: true, room: publicRoom },
+      { headers: { 'Cache-Control': 'no-store, max-age=0' } }
+    );
   } catch (err: any) {
     console.error('❌ [/api/rooms/leave] Error:', err);
     return NextResponse.json(

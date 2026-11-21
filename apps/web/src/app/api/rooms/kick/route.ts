@@ -83,13 +83,21 @@ export async function POST(req: NextRequest) {
       roomCode
     });
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        kickedPlayerId: targetPlayerId,
-        room: publicRoom
+    return NextResponse.json(
+      {
+        success: true,
+        room: publicRoom,
+        data: {
+          kickedPlayerId: targetPlayerId,
+          room: publicRoom
+        }
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, max-age=0'
+        }
       }
-    });
+    );
   } catch (err: any) {
     console.error('❌ [/api/rooms/kick] Error:', err);
     return NextResponse.json(

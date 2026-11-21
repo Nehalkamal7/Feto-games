@@ -167,23 +167,30 @@ export async function POST(req: NextRequest) {
     await publishToRoom(roomCode, 'room_state', publicRoom);
     await publishToRoom(roomCode, 'room:updated', publicRoom);
 
-    return NextResponse.json({
-      success: true,
-      roomCode,
-      playerId,
-      sessionToken,
-      reconnectToken: sessionToken,
-      player: playerSummary,
-      room: publicRoom,
-      data: {
+    return NextResponse.json(
+      {
+        success: true,
         roomCode,
         playerId,
         sessionToken,
         reconnectToken: sessionToken,
         player: playerSummary,
-        room: publicRoom
+        room: publicRoom,
+        data: {
+          roomCode,
+          playerId,
+          sessionToken,
+          reconnectToken: sessionToken,
+          player: playerSummary,
+          room: publicRoom
+        }
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, max-age=0'
+        }
       }
-    });
+    );
   } catch (err: any) {
     console.error('❌ [/api/rooms/join] Error:', err);
     return NextResponse.json(

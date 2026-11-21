@@ -159,14 +159,21 @@ export async function POST(req: NextRequest) {
     await publishToRoom(roomCode, 'room:updated', publicRoom);
     await publishToRoom(roomCode, 'lobby:settings-updated', publicRoom.config);
 
-    return NextResponse.json({
-      success: true,
-      room: publicRoom,
-      data: {
+    return NextResponse.json(
+      {
+        success: true,
         room: publicRoom,
-        config: publicRoom.config
+        data: {
+          room: publicRoom,
+          config: publicRoom.config
+        }
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, max-age=0'
+        }
       }
-    });
+    );
   } catch (err: any) {
     console.error('❌ [/api/rooms/update] Error:', err);
     return NextResponse.json(

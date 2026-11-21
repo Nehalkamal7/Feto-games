@@ -184,7 +184,27 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
     prevPosRef.current = currCoords;
   };
 
+  const saveSnapshot = useCallback(() => {
+    if (!isDrawerRef.current) return;
+    try {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const dataUrl = canvas.toDataURL('image/webp', 0.5);
+      if (dataUrl) {
+        if (onAction) {
+          onAction('SAVE_DRAWING_SNAPSHOT', { imageSnapshot: dataUrl });
+        }
+        socket.emit('draw:snapshot', { imageSnapshot: dataUrl });
+      }
+    } catch {
+      // ignore
+    }
+  }, [onAction, socket]);
+
   const handlePointerUp = () => {
+    if (isDrawingRef.current) {
+      saveSnapshot();
+    }
     isDrawingRef.current = false;
     prevPosRef.current = null;
   };
@@ -195,7 +215,7 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
     if (!canvas) return;
 
     canvas.width = 800;
-    canvas.height = 600;
+    canvas.height = 800;
     clearCanvas();
 
     const onTouchStart = (e: TouchEvent) => {
@@ -227,6 +247,9 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
     const onTouchEnd = (e: TouchEvent) => {
       if (isDrawerRef.current && phaseRef.current === 'drawing' && e.cancelable) {
         e.preventDefault();
+      }
+      if (isDrawingRef.current) {
+        saveSnapshot();
       }
       isDrawingRef.current = false;
       prevPosRef.current = null;
@@ -405,7 +428,7 @@ export const DrawAndGuessGameView: React.FC<DrawAndGuessGameViewProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-start">
         {/* CANVAS CONTAINER */}
         <div className="lg:col-span-8 flex flex-col space-y-2 sm:space-y-3">
-          <div className="relative rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-sm aspect-[4/3] touch-none">
+          <div className="relative rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-sm aspect-square touch-none">
             <canvas
               ref={canvasRef}
               onMouseDown={handlePointerDown}

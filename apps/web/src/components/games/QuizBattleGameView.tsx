@@ -25,6 +25,7 @@ interface QuizBattleGameViewProps {
   currentPlayer: PlayerSummary;
   players: PlayerSummary[];
   roomCode: string;
+  onAction?: (actionType: string, payload?: any) => Promise<any>;
 }
 
 const OPTION_LETTERS = ['A', 'B', 'C', 'D'];
@@ -33,7 +34,8 @@ export const QuizBattleGameView: React.FC<QuizBattleGameViewProps> = ({
   gameState,
   currentPlayer,
   players,
-  roomCode
+  roomCode,
+  onAction
 }) => {
   const socket = getSocket();
   const { language } = useLanguage();
@@ -59,7 +61,7 @@ export const QuizBattleGameView: React.FC<QuizBattleGameViewProps> = ({
   }, [currentQ?.id]);
 
   // Handle Option Click
-  const handleSelectOption = (idx: number) => {
+  const handleSelectOption = async (idx: number) => {
     if (gameState.phase !== 'question' || hasAnswered || selectedOption !== null) {
       return;
     }
@@ -67,11 +69,20 @@ export const QuizBattleGameView: React.FC<QuizBattleGameViewProps> = ({
     sound.playClick();
     setSelectedOption(idx);
 
-    socket.emit('quiz:submit_answer', { optionIndex: idx }, (res: any) => {
-      if (res && res.success) {
+    try {
+      if (onAction) {
+        await onAction('SUBMIT_ANSWER', { optionIndex: idx });
         sound.playReady();
+      } else {
+        socket.emit('quiz:submit_answer', { optionIndex: idx }, (res: any) => {
+          if (res && res.success) {
+            sound.playReady();
+          }
+        });
       }
-    });
+    } catch (err) {
+      console.error('Failed to submit quiz answer:', err);
+    }
   };
 
   const timerPercentage = currentQ

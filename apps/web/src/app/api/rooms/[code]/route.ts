@@ -30,15 +30,22 @@ export async function GET(
     const playerId = req.nextUrl.searchParams.get('playerId');
     const privateRole = playerId && room.gameData?.privateRoles ? room.gameData.privateRoles[playerId] || null : null;
 
-    return NextResponse.json({
-      success: true,
-      room: publicRoom,
-      privateRole,
-      data: {
+    return NextResponse.json(
+      {
+        success: true,
         room: publicRoom,
-        privateRole
+        privateRole,
+        data: {
+          room: publicRoom,
+          privateRole
+        }
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, max-age=0'
+        }
       }
-    });
+    );
   } catch (err: any) {
     console.error(`❌ [GET /api/rooms/${params?.code}] Error:`, err);
     return NextResponse.json(

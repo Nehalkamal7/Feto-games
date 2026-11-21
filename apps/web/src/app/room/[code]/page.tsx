@@ -979,6 +979,7 @@ export default function RoomPage() {
               currentPlayer={currentPlayer}
               players={room.players}
               roomCode={roomCode}
+              onAction={handleGameAction}
             />
           ) : room.config.gameMode === 'word_battle' ? (
             <WordBattleGameView

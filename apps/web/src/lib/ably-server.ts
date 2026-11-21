@@ -57,7 +57,11 @@ export async function publishToRoom(roomCode: string, eventName: string, data: a
 
   try {
     const channel = ably.channels.get(`feto:room:${normalized}`);
-    await channel.publish(eventName, data);
+    const payload =
+      eventName === 'room:updated' && data && !data.room
+        ? { room: data, updatedAt: data.updatedAt || Date.now(), ...data }
+        : data;
+    await channel.publish(eventName, payload);
   } catch (err: any) {
     console.error(`❌ [Ably] Failed to publish to feto:room:${normalized}:`, err.message);
   }

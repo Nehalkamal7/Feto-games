@@ -117,17 +117,24 @@ export async function POST(req: NextRequest) {
 
     const requesterRole = result.privateRoles?.[playerId] || result.updatedRoom.gameData?.privateRoles?.[playerId] || null;
 
-    return NextResponse.json({
-      success: true,
-      room: publicRoom,
-      gameState: result.publicState,
-      privateRole: requesterRole,
-      data: {
+    return NextResponse.json(
+      {
+        success: true,
         room: publicRoom,
         gameState: result.publicState,
-        privateRole: requesterRole
+        privateRole: requesterRole,
+        data: {
+          room: publicRoom,
+          gameState: result.publicState,
+          privateRole: requesterRole
+        }
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, max-age=0'
+        }
       }
-    });
+    );
   } catch (err: any) {
     console.error('❌ [/api/rooms/start] Error:', err);
     return NextResponse.json(

@@ -111,34 +111,41 @@ export async function POST(req: NextRequest) {
     const publicRoom = sanitizeRoomState(roomState);
 
     // Return immediately (< 500ms) so frontend redirects swiftly to /room/[code]
-    return NextResponse.json({
-      success: true,
-      roomCode,
-      playerId,
-      sessionToken,
-      reconnectToken: sessionToken,
-      room: publicRoom,
-      data: {
+    return NextResponse.json(
+      {
+        success: true,
         roomCode,
         playerId,
         sessionToken,
         reconnectToken: sessionToken,
-        player: {
-          id: hostPlayer.id,
-          username: hostPlayer.username,
-          avatar: hostPlayer.avatar,
-          isHost: true,
-          isReady: true,
-          isSpectator: false,
-          score: 0,
-          connectionStatus: 'connected',
-          graceExpiresAt: null,
-          joinedAt: hostPlayer.joinedAt,
-          team: hostPlayer.team
-        },
-        room: publicRoom
+        room: publicRoom,
+        data: {
+          roomCode,
+          playerId,
+          sessionToken,
+          reconnectToken: sessionToken,
+          player: {
+            id: hostPlayer.id,
+            username: hostPlayer.username,
+            avatar: hostPlayer.avatar,
+            isHost: true,
+            isReady: true,
+            isSpectator: false,
+            score: 0,
+            connectionStatus: 'connected',
+            graceExpiresAt: null,
+            joinedAt: hostPlayer.joinedAt,
+            team: hostPlayer.team
+          },
+          room: publicRoom
+        }
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, max-age=0'
+        }
       }
-    });
+    );
   } catch (err: any) {
     console.error('❌ [/api/rooms/create] Error:', err);
     return NextResponse.json(

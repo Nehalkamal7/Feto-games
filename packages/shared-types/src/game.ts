@@ -104,6 +104,9 @@ export interface ImposterPublicState {
   phaseEndsAt?: number;
   category: string;
   categoryAr?: string;
+  secretWord?: string;
+  secretWordAr?: string;
+  imposterId?: string;
   currentTurnPlayerId?: string;
   currentTurnUsername?: string;
   turnOrder: string[]; // array of playerIds
@@ -202,6 +205,7 @@ export interface QuizPublicState {
   totalActivePlayers: number;
   correctAnswerIndex?: number; // Only revealed during 'reveal' phase
   roundScoreUpdates?: PlayerScoreUpdate[];
+  answers?: Record<string, number>;
 }
 
 // ========================================================
@@ -226,9 +230,11 @@ export interface WordBattlePublicState {
   startingLetter: string;
   startingLetterAr?: string;
   claimedWords: string[];
+  usedWords?: string[];
   recentSubmissions: WordBattleSubmission[];
   scores: Record<string, number>;
   playerWordCounts: Record<string, number>;
+  activePlayerId?: string;
   phaseEndsAt: number;
   remainingSeconds: number;
 }
@@ -267,6 +273,7 @@ export interface TruthOrDarePublicState {
   round: number;
   totalRounds: number;
   targetPlayerId: string;
+  activePlayerId?: string;
   targetUsername: string;
   targetAvatar: NeonAvatarId;
   intensity: TodIntensityMode;
@@ -304,6 +311,7 @@ export interface NeverHaveIEverPublicState {
   categoryAr?: string;
   innocencePoints: Record<string, number>;
   roundChoices: Record<string, 'have' | 'havenot'>;
+  votes?: Record<string, 'have' | 'havenot'>;
   stats?: {
     haveCount: number;
     haveNotCount: number;
@@ -440,6 +448,7 @@ export interface HotPotatoPublicState {
   round: number;
   totalRounds: number;
   activeHolderId: string;
+  bombHolderId?: string;
   activeHolderUsername: string;
   activeHolderAvatar: NeonAvatarId;
   category: string;
@@ -451,6 +460,7 @@ export interface HotPotatoPublicState {
   bombTimerRemainingMs: number; // Dynamic fuse timer
   explodedPlayerId?: string;
   explodedUsername?: string;
+  isExploded?: boolean;
   phaseEndsAt: number;
   remainingSeconds: number;
 }

@@ -818,31 +818,31 @@ export function handleGameAction(
       return { updatedRoom: room, publicState: getPublicGameState(room) };
     }
 
-    case 'GUESS_WORD': {
-      if (mode !== 'who_is_imposter' || !g.suddenDeathActive) break;
-      const guess = (payload?.guessedWord || '').toLowerCase().trim();
-      const secret = (g.secretWord || '').toLowerCase().trim();
-      const secretAr = (g.secretWordAr || '').toLowerCase().trim();
-      const isCorrect = guess === secret || (Boolean(secretAr) && guess === secretAr);
-
-      if (isCorrect) {
-        player.score = (player.score || 0) + 150;
-      }
-      g.suddenDeathActive = false;
-      g.phase = 'round_result';
-      g.revealedWord = g.secretWord;
-      g.revealedWordAr = g.secretWordAr;
-      g.impostersWon = isCorrect;
-
-      return { updatedRoom: room, publicState: getPublicGameState(room) };
-    }
-
-    // --- GAME 2: DRAW & GUESS ACTIONS ---
+    case 'GUESS_WORD':
     case 'DRAW_GUESS': {
+      if (mode === 'who_is_imposter') {
+        if (!g.suddenDeathActive) break;
+        const guess = (payload?.guessedWord || payload?.guess || payload?.message || '').toLowerCase().trim();
+        const secret = (g.secretWord || '').toLowerCase().trim();
+        const secretAr = (g.secretWordAr || '').toLowerCase().trim();
+        const isCorrect = guess === secret || (Boolean(secretAr) && guess === secretAr);
+
+        if (isCorrect) {
+          player.score = (player.score || 0) + 150;
+        }
+        g.suddenDeathActive = false;
+        g.phase = 'round_result';
+        g.revealedWord = g.secretWord;
+        g.revealedWordAr = g.secretWordAr;
+        g.impostersWon = isCorrect;
+
+        return { updatedRoom: room, publicState: getPublicGameState(room) };
+      }
+
       if (mode !== 'draw_and_guess' || g.phase !== 'drawing') break;
       if (playerId === g.drawerId) return { updatedRoom: room, publicState: getPublicGameState(room) };
 
-      const guess = (payload?.message || '').toLowerCase().trim();
+      const guess = (payload?.guess || payload?.message || '').toLowerCase().trim();
       const secret = (g.secretWord || '').toLowerCase().trim();
       const secretAr = (g.secretWordAr || '').toLowerCase().trim();
       const isCorrect = guess === secret || (Boolean(secretAr) && guess === secretAr);
@@ -892,7 +892,7 @@ export function handleGameAction(
             id: `msg_${Date.now()}`,
             playerId,
             username: player.username,
-            text: payload?.message || '',
+            text: payload?.message || payload?.guess || '',
             isCorrectGuess: false,
             timestamp: Date.now()
           }
@@ -968,14 +968,16 @@ export function handleGameAction(
     }
 
     // --- GAME 5: TRUTH OR DARE ACTIONS ---
-    case 'TOD_CHOOSE': {
+    case 'TOD_CHOOSE':
+    case 'CHOOSE_TYPE': {
       if (mode !== 'truth_or_dare') break;
       const choice = payload?.choice === 'dare' ? 'dare' : 'truth';
       g.chosenType = choice;
 
       const matching = truthOrDarePrompts.filter((p: any) => p.type === choice);
       const chosen = matching[Math.floor(Math.random() * matching.length)] || {
-        prompt: choice === 'truth' ? 'What is your biggest fear?' : 'Do 10 jumping jacks!'
+        prompt: choice === 'truth' ? 'What is your biggest fear?' : 'Do 10 jumping jacks!',
+        promptAr: choice === 'truth' ? 'ما هو أكبر خوف لديك؟' : 'قم بـ 10 قفزات!'
       };
 
       g.currentPrompt = chosen.prompt;
@@ -985,8 +987,26 @@ export function handleGameAction(
       return { updatedRoom: room, publicState: getPublicGameState(room) };
     }
 
+    case 'COMPLETE_ACTION':
+    case 'SKIP_ACTION':
     case 'TOD_VOTE': {
       if (mode !== 'truth_or_dare') break;
+      if (actionType === 'COMPLETE_ACTION' || payload?.action === 'completed' || payload?.choice === 'completed') {
+        const target = room.players[g.targetPlayerId];
+        if (target) target.score = (target.score || 0) + (g.chosenType === 'dare' ? 160 : 110);
+        g.phase = 'round_results';
+        g.phaseEndsAt = Date.now() + 5000;
+        return { updatedRoom: room, publicState: getPublicGameState(room) };
+      }
+      if (actionType === 'SKIP_ACTION' || payload?.action === 'skip' || payload?.action === 'refused') {
+        if (room.config.vibeMode === 'sip_edition' && g.targetPlayerId) {
+          room.sipsCount[g.targetPlayerId] = (room.sipsCount[g.targetPlayerId] || 0) + 2;
+        }
+        g.phase = 'round_results';
+        g.phaseEndsAt = Date.now() + 5000;
+        return { updatedRoom: room, publicState: getPublicGameState(room) };
+      }
+
       const vote = payload?.vote === 'completed' ? 'completed' : 'refused';
       if (!g.votes) g.votes = {};
       g.votes[playerId] = vote;
@@ -1010,7 +1030,8 @@ export function handleGameAction(
     }
 
     // --- GAME 6: NEVER HAVE I EVER ACTIONS ---
-    case 'NHIE_CHOICE': {
+    case 'NHIE_CHOICE':
+    case 'SUBMIT_CHOICE': {
       if (mode !== 'never_have_i_ever') break;
       const choice = payload?.choice === 'have' ? 'have' : 'havenot';
       if (!g.roundChoices) g.roundChoices = {};
@@ -1060,13 +1081,15 @@ export function handleGameAction(
     }
 
     // --- GAME 8: SIP OR SPILL ACTIONS ---
-    case 'SOS_ACTION': {
+    case 'SOS_ACTION':
+    case 'ANSWER':
+    case 'SKIP': {
       if (mode !== 'sip_or_spill') break;
       if (playerId !== g.targetPlayerId) {
         return { updatedRoom: room, publicState: getPublicGameState(room), error: 'Not your turn to answer or sip.' };
       }
 
-      const action = payload?.action === 'sip' ? 'sip' : 'spill';
+      const action = actionType === 'SKIP' || payload?.action === 'sip' ? 'sip' : 'spill';
       const confession = (payload?.confession || '').trim().slice(0, 200);
 
       g.chosenAction = action;
@@ -1109,7 +1132,8 @@ export function handleGameAction(
     }
 
     // --- GAME 9: SILLY ROULETTE ACTIONS ---
-    case 'ROULETTE_SPIN': {
+    case 'ROULETTE_SPIN':
+    case 'SPIN_WHEEL': {
       if (mode !== 'silly_roulette' || g.phase !== 'spinning') break;
       // Host or target can trigger the spin
       g.targetAngle = 1800 + Math.floor(Math.random() * 360);
@@ -1147,7 +1171,8 @@ export function handleGameAction(
     }
 
     // --- GAME 10: HOT POTATO ACTIONS ---
-    case 'POTATO_PASS': {
+    case 'POTATO_PASS':
+    case 'PASS_BOMB': {
       if (mode !== 'hot_potato' || g.phase !== 'bomb_ticking') break;
       if (playerId !== g.activeHolderId) {
         return { updatedRoom: room, publicState: getPublicGameState(room), error: 'You are not holding the ticking bomb!' };
@@ -1673,6 +1698,7 @@ export function getPublicGameState(room: RoomState): any {
         totalRounds: room.config.totalRounds,
         category: g.category || 'General',
         categoryAr: g.categoryAr,
+        imposterId: g.imposterId || g.imposterIds?.[0] || undefined,
         currentTurnPlayerId: currentTurnId,
         currentTurnUsername: room.players[currentTurnId]?.username,
         turnOrder,
@@ -1734,7 +1760,8 @@ export function getPublicGameState(room: RoomState): any {
           : undefined,
         answeredPlayerIds: g.answeredPlayerIds || [],
         totalActivePlayers: Object.keys(room.players).length,
-        correctAnswerIndex: g.phase === 'reveal' ? q?.correctIndex : undefined
+        correctAnswerIndex: g.phase === 'reveal' ? q?.correctIndex : undefined,
+        answers: g.answers || {}
       };
       return state;
     }
@@ -1752,9 +1779,11 @@ export function getPublicGameState(room: RoomState): any {
         startingLetter: g.startingLetter || 'A',
         startingLetterAr: g.startingLetterAr,
         claimedWords: g.claimedWords || [],
+        usedWords: g.claimedWords || [],
         recentSubmissions: g.submissions || [],
         scores,
         playerWordCounts: g.playerWordCounts || {},
+        activePlayerId: g.activePlayerId || Object.keys(room.players)[0],
         phaseEndsAt: g.phaseEndsAt,
         remainingSeconds: remaining
       };
@@ -1776,6 +1805,7 @@ export function getPublicGameState(room: RoomState): any {
         round: room.currentRound,
         totalRounds: room.config.totalRounds,
         targetPlayerId: target?.id || '',
+        activePlayerId: target?.id || '',
         targetUsername: target?.username || '',
         targetAvatar: target?.avatar || 'cyber_cat',
         intensity: g.intensity || 'party',
@@ -1808,6 +1838,7 @@ export function getPublicGameState(room: RoomState): any {
         categoryAr: g.categoryAr,
         innocencePoints: g.innocencePoints || {},
         roundChoices: choices,
+        votes: choices,
         stats:
           totalVoted > 0
             ? {
@@ -1910,6 +1941,7 @@ export function getPublicGameState(room: RoomState): any {
         round: room.currentRound,
         totalRounds: room.config.totalRounds,
         activeHolderId: holder?.id || '',
+        bombHolderId: holder?.id || '',
         activeHolderUsername: holder?.username || 'Player',
         activeHolderAvatar: holder?.avatar || 'cyber_cat',
         category: g.category || 'Rapid Fire',
@@ -1921,6 +1953,7 @@ export function getPublicGameState(room: RoomState): any {
         bombTimerRemainingMs: Math.max(0, (g.phaseEndsAt || 0) - Date.now()),
         explodedPlayerId: g.explodedPlayerId || undefined,
         explodedUsername: victim?.username,
+        isExploded: g.phase === 'exploded' || Boolean(g.explodedPlayerId),
         phaseEndsAt: g.phaseEndsAt,
         remainingSeconds: remaining
       };
